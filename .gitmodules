@@ -1,0 +1,6 @@
+[submodule "Tools/Mechanics"]
+	path = Tools/Mechanics
+	url = git@github.com:taylanot/Mechanics.git
+[submodule "Tools/MachineLearning"]
+	path = Tools/MachineLearning
+	url = git@github.com:taylanot/MachineLearning.git
