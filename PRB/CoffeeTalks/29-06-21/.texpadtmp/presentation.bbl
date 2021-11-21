@@ -1,0 +1,82 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Nakkiran2020}{article}{}
+    \name{author}{3}{}{%
+      {{hash=NP}{%
+         family={Nakkiran},
+         familyi={N\bibinitperiod},
+         given={Preetum},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=NB}{%
+         family={Neyshabur},
+         familyi={N\bibinitperiod},
+         given={Behnam},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=SH}{%
+         family={Sedghi},
+         familyi={S\bibinitperiod},
+         given={Hanie},
+         giveni={H\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{NPNBSH1}
+    \strng{fullhash}{NPNBSH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2020}
+    \field{labeldatesource}{year}
+    \field{sortinit}{N}
+    \field{sortinithash}{N}
+    \field{abstract}{%
+    We propose a new framework for reasoning about generalization in deep
+  learning. The core idea is to couple the Real World, where optimizers take
+  stochastic gradient steps on the empirical loss, to an Ideal World, where
+  optimizers take steps on the population loss. This leads to an alternate
+  decomposition of test error into: (1) the Ideal World test error plus (2) the
+  gap between the two worlds. If the gap (2) is universally small, this reduces
+  the problem of generalization in offline learning to the problem of
+  optimization in online learning. We then give empirical evidence that this
+  gap between worlds can be small in realistic deep learning settings, in
+  particular supervised image classification. For example, CNNs generalize
+  better than MLPs on image distributions in the Real World, but this is
+  "because" they optimize faster on the population loss in the Ideal World.
+  This suggests our framework is a useful tool for understanding generalization
+  in deep learning, and lays a foundation for future research in the area.%
+    }
+    \verb{eprint}
+    \verb 2010.08127
+    \endverb
+    \field{number}{1}
+    \field{title}{{The Deep Bootstrap Framework: Good Online Learners are Good
+  Offline Generalizers}}
+    \verb{url}
+    \verb http://arxiv.org/abs/2010.08127
+    \endverb
+    \verb{file}
+    \verb :Users/ozgurtaylanturan/Dropbox/PhD/CoffeeTalks/29-06-21/2010.08127.p
+    \verb df:pdf
+    \endverb
+    \field{eprinttype}{arXiv}
+    \field{year}{2020}
+  \endentry
+\enddatalist
+\endinput

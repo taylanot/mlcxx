@@ -1,0 +1,74 @@
+% Beamer template
+% Author: Ozgur Taylan TURAN
+% Delft University of Technology
+
+\documentclass[aspectratio=169]{beamer}
+\usepackage{/home/taylanot/texmf/tex/beamerthemetot}
+% PACKAGES
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{animate}
+%\usepackage{calc}
+\usepackage{calligra}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[T1]{fontenc}
+%\usefonttheme{serif}
+\usefonttheme{professionalfonts}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{graphicx}
+%\usepackage{subfig}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+%\usefonttheme{serif}
+%\usepackage{titling}
+\usepackage{graphicx}
+%\usepackage{subfig}
+%\usepackage{tikz}
+%\usetikzlibrary{shapes,arrows}
+\usepackage{mathtools}
+\usepackage{cancel}
+    
+% BIB SETTINGS
+\usepackage[backend=bibtex,firstinits=true,maxnames=30,maxcitenames=20,url=false,style=authoryear]{biblatex}
+%\bibliography{../../../Mendeley/bibtex_linux/CoffeeTalks}
+
+\setlength\bibitemsep{0.3cm} % space between entries in the reference list
+\renewcommand{\bibfont}{\normalfont\scriptsize}
+\renewcommand{\cite}[1]{\footnote<.->[frame]{\fullcite{#1}}}
+\setbeamertemplate{bibliography item}{}
+
+\setbeamertemplate{navigation symbols}{} % remove navigation symbols
+
+
+ % COVER PAGE INFO   
+\newcommand{\mytitle}{\color{White}\huge{\textbf{Coffee Talk \#3}}}
+\newcommand{\mysubtitle}{\color{Pink}\Large{\textbf{Optimal Regularization Can Mitigate Double Descent}}}
+\newcommand{\myauthor}{\color{White}\textcalligra{\LARGE Ozgur Taylan Turan}}
+\newcommand{\authorlabel}{\small O.T. Turan}
+\author{\authorlabel}
+
+
+\begin{document}
+% COVER PAGE
+{
+\include{cover/cover}
+\setbeamercovered{transparent}
+\setbeamertemplate{footline}{\usebeamertemplate*{minimal footline}}
+\setbeamertemplate{headline}{\usebeamertemplate*{minimal headline}}
+\def\beamer@entrycode{\vspace*{-\headheight}}
+}
+% MAIN
+\setbeamercovered{transparent}
+
+
+\begin{frame}
+	\centering
+	\mysubtitle
+\end{frame}
+
+\end{document}
+

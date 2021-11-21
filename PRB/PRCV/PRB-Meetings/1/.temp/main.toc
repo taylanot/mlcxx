@@ -1,0 +1,11 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {1}{Introduction}{4}{0}{1}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {2}{Modeling Composites}{7}{0}{2}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {3}{Machine Learning in Mechanics}{17}{0}{3}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {4}{My view}{22}{0}{4}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {5}{Summary}{32}{0}{5}

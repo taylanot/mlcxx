@@ -1,0 +1,78 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{richard}{online}{}
+    \name{author}{1}{}{%
+      {{hash=SS}{%
+         family={Stahie},
+         familyi={S\bibinitperiod},
+         given={Silviu},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{SS1}
+    \strng{fullhash}{SS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2015}
+    \field{labeldatesource}{year}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{Richard Stallman Says He Created GNU, Which is Called often
+  Linux}
+    \verb{url}
+    \verb https://news.softpedia.com/news/Richard-Stallman-Says-He-Created-GNU-
+    \verb Which-Is-Called-Often-Linux-482416.shtml
+    \endverb
+    \field{year}{2015}
+  \endentry
+
+  \entry{Sam}{online}{}
+    \name{author}{1}{}{%
+      {{hash=TS}{%
+         family={Taylor},
+         familyi={T\bibinitperiod},
+         given={Sam},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TS1}
+    \strng{fullhash}{TS1}
+    \field{labelnamesource}{author}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+  \endentry
+
+  \entry{UNESCO}{online}{}
+    \name{author}{1}{}{%
+      {{hash=U}{%
+         family={UNESCO},
+         familyi={U\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{U1}
+    \strng{fullhash}{U1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{U}
+    \field{sortinithash}{U}
+    \field{title}{First Draft of the UNESCO Recommendation on Open Science}
+  \endentry
+\enddatalist
+\endinput

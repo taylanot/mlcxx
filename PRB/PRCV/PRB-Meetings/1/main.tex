@@ -1,0 +1,54 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{beamerthemetot}
+\usepackage{graphicx}
+\usepackage{animate}
+\usepackage{calligra}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[T1]{fontenc}
+\usefonttheme{professionalfonts}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage{cancel}
+ 
+
+\newcommand{\mytitle}{\color{White}\huge{\textbf{Lab Talk \#1}}}
+\newcommand{\mysubtitle}{\color{Pink}\Large{\textbf{New Machine Learning Strategies for Data Scarce Material Science Problems}}}
+\newcommand{\myauthor}{\color{White}\textcalligra{\LARGE Ozgur Taylan Turan}}
+\newcommand{\authorlabel}{\small O.T. Turan}
+\author{\authorlabel}
+\setbeamercovered{transparent}
+\usepackage[backend=bibtex,firstinits=true,maxnames=30,maxcitenames=20,url=false,style=authoryear]{biblatex}
+
+\setlength\bibitemsep{0.3cm} % space between entries in the reference list
+\renewcommand{\bibfont}{\normalfont\scriptsize}
+\renewcommand{\cite}[1]{\footnote<.->[frame]{\fullcite{#1}}}
+\setbeamertemplate{bibliography item}{}
+\bibliography{../../../Mendeley/bibtex_linux/GNG.bib}
+
+\begin{document}
+
+\include{cover/cover}
+
+\begin{frame}
+  \centering
+  \mysubtitle
+\end{frame}
+
+\begin{frame}{Outline}
+  \centering
+  \begin{itemize}
+    \item Introduction
+    \item Modeling Composites
+    \item Machine Learning in Mechanics
+    \item My view 
+    \item Summary
+  \end{itemize}
+\end{frame}
+
+\include{introduction}
+\include{surrogate}
+\include{myview}
+
+\end{document}

@@ -1,0 +1,49 @@
+% Beamer Template
+% Author: Ozgur Taylan TURAN
+% Delft Universiy of Technology
+
+\mode<presentation>
+
+% outer theme colors
+\setbeamercolor{normal text}{fg=Black}
+\setbeamercolor{alerted text}{fg=customAlertColor}
+\setbeamercolor{example text}{fg=Pink}
+
+\setbeamercolor*{structure}{fg=Pink}
+
+\setbeamercolor*{decoration}{fg=White,bg=Pink}
+
+\setbeamercolor*{palette primary}{use=decoration,fg=decoration.fg,bg=decoration.bg}
+\setbeamercolor*{palette secondary}{parent=palette primary}
+\setbeamercolor*{palette tertiary}{parent=palette secondary}
+\setbeamercolor*{palette quaternary}{use=palette primary,bg=palette primary.fg}
+
+\setbeamercolor{separation line}{bg=Black}
+\setbeamercolor{fine separation line}{parent=separation line}
+
+\setbeamercolor{upper separation line foot}{parent=fine separation line}
+\setbeamercolor{middle separation line foot}{parent=separation line,bg=White}
+\setbeamercolor{lower separation line foot}{parent=separation line}
+
+\setbeamercolor{titlelike}{parent=structure}
+
+%inner theme colors
+\setbeamercolor{title block body}{fg=White,bg=Black}
+\setbeamercolor{title}{parent=title block body}
+\setbeamercolor{subtitle}{parent=title}
+\setbeamercolor{institute}{parent=structure}
+\setbeamercolor{author}{parent=title block body}
+\setbeamercolor{date}{parent=author}
+
+\setbeamercolor{block title}{parent=normal text,bg=Pink}
+\setbeamercolor{block title alerted}{parent=block title,bg=Yellow}
+\setbeamercolor{block title example}{parent=block title,bg=Pink}
+
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!50!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!50!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!50!bg}
+
+\setbeamercolor{item projected}{use=item,fg=White,bg=item.fg}
+
+\mode
+<all>

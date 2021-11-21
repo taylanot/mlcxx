@@ -1,0 +1,81 @@
+This is BibTeX, Version 0.99d (TeX Live 2018)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: /Users/ozgurtaylanturan/Dropbox/PhD/PRLab/.texpadtmp/presentation.aux
+The style file: biblatex.bst
+A level-1 auxiliary file: cover/cover.aux
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: presentation-blx.bib
+Database file #2: ../bibli.bib
+I was expecting a `,' or a `}'---line 6 of file ../bibli.bib
+ :   
+ :   urldate = {2021-03-10}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 11 of file ../bibli.bib
+ :   
+ :   year = -,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 18 of file ../bibli.bib
+ :   
+ :   year = 2020,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Biblatex version: 3.8
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 4 entries,
+            6268 wiz_defined-function locations,
+            1190 strings with 8987 characters,
+and the built_in function-call counts, 10852 in all, are:
+= -- 519
+> -- 290
+< -- 76
++ -- 186
+- -- 101
+* -- 641
+:= -- 1026
+add.period$ -- 0
+call.type$ -- 4
+change.case$ -- 27
+chr.to.int$ -- 32
+cite$ -- 6
+duplicate$ -- 1180
+empty$ -- 1137
+format.name$ -- 140
+if$ -- 2373
+int.to.chr$ -- 0
+int.to.str$ -- 6
+missing$ -- 0
+newline$ -- 77
+num.names$ -- 123
+pop$ -- 1038
+preamble$ -- 1
+purify$ -- 33
+quote$ -- 0
+skip$ -- 513
+stack$ -- 0
+substring$ -- 577
+swap$ -- 310
+text.length$ -- 89
+text.prefix$ -- 3
+top$ -- 1
+type$ -- 124
+warning$ -- 0
+while$ -- 145
+width$ -- 0
+write$ -- 74
+(There were 3 error messages)

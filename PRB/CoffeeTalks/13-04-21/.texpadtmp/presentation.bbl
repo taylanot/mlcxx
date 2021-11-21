@@ -1,0 +1,87 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Flennerhag2018}{article}{}
+    \name{author}{4}{}{%
+      {{hash=FS}{%
+         family={Flennerhag},
+         familyi={F\bibinitperiod},
+         given={Sebastian},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=MPG}{%
+         family={Moreno},
+         familyi={M\bibinitperiod},
+         given={Pablo\bibnamedelima G.},
+         giveni={P\bibinitperiod\bibinitdelim G\bibinitperiod},
+      }}%
+      {{hash=LND}{%
+         family={Lawrence},
+         familyi={L\bibinitperiod},
+         given={Neil\bibnamedelima D.},
+         giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+      {{hash=DA}{%
+         family={Damianou},
+         familyi={D\bibinitperiod},
+         given={Andreas},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{FSMPGLNDDA1}
+    \strng{fullhash}{FSMPGLNDDA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{year}
+    \field{sortinit}{F}
+    \field{sortinithash}{F}
+    \field{abstract}{%
+    In complex transfer learning scenarios new tasks might not be tightly
+  linked to previous tasks. Approaches that transfer information contained only
+  in the final parameters of a source model will therefore struggle. Instead,
+  transfer learning at a higher level of abstraction is needed. We propose
+  Leap, a framework that achieves this by transferring knowledge across
+  learning processes. We associate each task with a manifold on which the
+  training process travels from initialization to final parameters and
+  construct a meta-learning objective that minimizes the expected length of
+  this path. Our framework leverages only information obtained during training
+  and can be computed on the fly at negligible cost. We demonstrate that our
+  framework outperforms competing methods, both in meta-learning and transfer
+  learning, on a set of computer vision tasks. Finally, we demonstrate that
+  Leap can transfer knowledge across learning processes in demanding
+  reinforcement learning environments (Atari) that involve millions of gradient
+  steps.%
+    }
+    \verb{eprint}
+    \verb 1812.01054
+    \endverb
+    \field{issn}{23318422}
+    \field{pages}{1\bibrangedash 23}
+    \field{title}{{Transferring knowledge across learning processes}}
+    \verb{file}
+    \verb :Users/ozgurtaylanturan/Dropbox/PhD/CoffeeTalks/13-04-21/1812.01054.p
+    \verb df:pdf
+    \endverb
+    \field{journaltitle}{arXiv}
+    \field{eprinttype}{arXiv}
+    \field{year}{2018}
+  \endentry
+\enddatalist
+\endinput

@@ -1,0 +1,67 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{beamerthemetot}
+\usepackage{graphicx}
+\usepackage{animate}
+\usepackage{calligra}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[T1]{fontenc}
+\usefonttheme{professionalfonts}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage{cancel}
+ 
+
+\newcommand{\mytitle}{\color{White}\huge{\textbf{New Machine Learning Strategies for Data Scarce Material Science Problems}}}
+\newcommand{\mysubtitle}{\color{Pink}\Large{\textbf{Go/No-go Meeting}}}
+\newcommand{\myauthor}{\color{White}\textcalligra{\LARGE Ozgur Taylan Turan}}
+\newcommand{\authorlabel}{\small O.T. Turan}
+\author{\authorlabel}
+\usepackage[backend=bibtex,firstinits=true,maxnames=30,maxcitenames=20,url=false,style=authoryear]{biblatex}
+
+\setlength\bibitemsep{0.3cm} % space between entries in the reference list
+\renewcommand{\bibfont}{\normalfont\scriptsize}
+\renewcommand{\cite}[1]{\footnote<.->[frame]{\fullcite{#1}}}
+\setbeamertemplate{bibliography item}{}
+\bibliography{../../../archive_bib/library.bib}
+
+
+\begin{document}
+
+\setbeamercovered{transparent}
+
+\include{cover/cover}
+
+\begin{frame}
+  \centering
+  \mysubtitle
+\end{frame}
+
+\begin{frame}{Outline}
+  \centering
+  \begin{itemize}
+    \item Introduction 
+    \item Literature
+    \item Aim
+    \item Research Questions
+    \item Planning 
+    \item Reflection 
+  \end{itemize}
+\end{frame}
+
+%\include{introduction}
+\include{intro}
+\include{literature}
+\include{problem}
+\include{research}
+\include{planning}
+\include{past_year}
+\begin{frame}
+  \centering
+  \color{Pink} Thanks for your attention!
+\end{frame}
+\section{Extras}
+\include{extras}
+
+\end{document}
