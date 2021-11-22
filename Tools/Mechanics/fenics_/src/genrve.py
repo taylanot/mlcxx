@@ -33,11 +33,13 @@ class GENERATE_RVE():
         self.directory_base += '/'+str(dim)+'D/L:'+str(Lc)+'/r:'+str(r)
 
 
-    def __call__(self,Vf,tag=None):              
+    def __call__(self,Vf,hmax=0.1,tag=None):              
 
         """ Call for the volume fraction of desire """
 
-        self.directory = self.directory_base + '/Vf:'+str(int(Vf*100))
+        self.directory = self.directory_base + '/Vf:'+str(int(Vf*100)) + '/meshratio:'+str(int(self.Lc/hmax))
+
+        self.hmax = hmax
 
         self.init_Vf = Vf 
 
@@ -102,8 +104,8 @@ class GENERATE_RVE():
  
         meshingParameters={                                                             
             "threads": None,                                                            
-            "refinementOptions": {"maxMeshSize": 0.1,                                
-                                  "inclusionRefinement": True,                          
+            "refinementOptions": {"maxMeshSize": self.hmax,                                
+                                  "inclusionRefinement": False,                          
                                   "interInclusionRefinement": False,                    
                                   "elementsPerCircumference": 10,                       
                                   "elementsBetweenInclusions": 10,                       

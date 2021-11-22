@@ -1,3 +1,7 @@
-from MechanicsTools.fenics_.src.genrve import Generate_RVE
+from fenics_.src.genrve import *
+
+generator = GENERATE_RVE()
+
+generator(0.4)
 
 
