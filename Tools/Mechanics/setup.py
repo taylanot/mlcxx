@@ -6,6 +6,5 @@ setup(
    description='Mechanics Toolbox',
    author='O.T. Turan',
    author_email='taylanozgurturan@gmail.com',
-   packages=['fenics_'],
-   install_requires=['fenics', 'numpy', 'meshio', ],
+   packages=setuptools.find_packages()
 )
