@@ -249,7 +249,8 @@ class CreateRVEGeometry():
         if tag != None:
             self.directory += '/'+str(tag)
 
-        os.makedirs(self.directory)
+        if not (os.path.isdir(self.directory)):
+            os.makedirs(self.directory)
         self.directory += '/'+filename
 
         self.RVE.saveGeometry(self.directory+self.write_ext)

@@ -1,12 +1,11 @@
 from fenics_.src.genrve import *
 
-
-hs = np.array([1,5,10,50,100])/100
 Vfs  = np.array([1,2,3,4])/10
-generator = GENERATE_RVE()
+num = 100
+generator = CreateRVEGeometry(name="Gallery")
 
-for h in hs:
-    for Vf in Vfs:
-    generator(Vf, h)
+for Vf in Vfs:
+    for i in range(num):
+        generator(Vf,tag=i+1)
 
 
