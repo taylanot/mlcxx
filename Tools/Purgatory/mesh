@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-for i in {0.1,0.5,1}; do
-   python3 converter.py /home/shared/Tools/Gallery/2D/L:4/r:0.3/Vf:10/1/rve.step $i
-done
