@@ -13,16 +13,18 @@ class GENERATE_RVE():
 
     """
 
-    def __init__(self, dim=2, Lc=4, r=0.3, directory=None, name='gmshModelRVE-collect', ext='.msh'):
+    def __init__(self, dim=2, Lc=4, r=0.3, mesh_size=0.1, directory=None, name='gmshModelRVE-collect', ext='.msh'):
         
         """ Initialize """
 
         self.dim = dim                      # Dimension of RVE 2 or 3 
         self.Lc = Lc                        # Size of the RVE
-        self.r = r                          # size of the inclusions
+        self.r = r                          # Size of the inclusions
 
-        self.write_ext = ext                # Extension for saving 
-        self.read_ext = '.xdmf'             # Extension for reading 
+        self.mesh_size = mesh_size          # Mesh Size
+
+        self.write_ext = ext                # Extension for Saving 
+        self.read_ext = '.xdmf'             # Extension for Reading 
 
         
         if directory is None:
@@ -102,7 +104,7 @@ class GENERATE_RVE():
  
         self.meshingParameters={                                                             
             "threads": None,                                                            
-            "refinementOptions": {"maxMeshSize": 0.1,                                
+            "refinementOptions": {"maxMeshSize": self.mesh_size,                                
                                   "inclusionRefinement": True,                          
                                   "interInclusionRefinement": False,                    
                                   "elementsPerCircumference": 10,                       
@@ -128,7 +130,7 @@ class GENERATE_RVE():
 
 
         if tag != None:
-            self.directory += '/'+str(tag)
+            self.directory += '/'+str(tag)+'/h:'+str(self.mesh_size)
 
         self.directory += '/'+filename
 
