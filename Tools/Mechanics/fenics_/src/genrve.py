@@ -142,7 +142,7 @@ class GENERATE_RVE():
 
         """ Method: Extract all the information needed from xdmf file """
 
-        xdmf_extract(self.directory+self.write_ext)
+        xdmf_extract(self.directory+self.msh)
 
 class CreateRVEGeometry():
 
