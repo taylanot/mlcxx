@@ -8,14 +8,14 @@ from fenics_.src.genrve import *
 #    for i in range(num):
 #        generator(Vf,tag=i+1)
 
-generate = GENERATE_RVE(ext='.msh2')
+generator = GENERATE_RVE(ext='.msh2')
 Vfs  = np.array([1,2,3,4])/10
 hs  = np.array([0.1,0.2,0.5,1])
 
 num = 100
 for Vf in Vfs:
     for i in range(num):
-        for h in range(hs):
+        for h in hs:
             generator.mesh_size=h
             generator(Vf, tag=i+1)
 

@@ -113,7 +113,7 @@ class GENERATE_RVE():
                                   "transitionElements": "auto",                         
                                   "aspectRatio": 1.5}}
 
-        self.RVE.createMesh(**meshingParameters)
+        self.RVE.createMesh(**self.meshingParameters)
 
 
         self.placed = np.sum(self.RVE.placementInfo)
