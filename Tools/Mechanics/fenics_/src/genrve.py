@@ -100,7 +100,7 @@ class GENERATE_RVE():
 
         self.RVE.createGmshModel(**self.modelingParameters)
  
-        meshingParameters={                                                             
+        self.meshingParameters={                                                             
             "threads": None,                                                            
             "refinementOptions": {"maxMeshSize": 0.1,                                
                                   "inclusionRefinement": True,                          
