@@ -29,15 +29,15 @@ def my_config():
 
     run_tag = 'std_y' 
 
-    model_tag = 'SGD'
+    model_tag = 'Linear'
     
     res = 100               # Resolution of the experiments!
 
-    res_hyper = 10          # Resolution of the hypers!
+    res_hyper = 5          # Resolution of the hypers!
 
+    seed = 24               # KOBEEEEEE!
 
     config = {}
-    config['seed'] = 24 # KOBEEEEEE!
     
     config['dim'] = 1.
     if run_tag == 'dim':
@@ -55,8 +55,8 @@ def my_config():
     if run_tag == 'b':
         config['b'] = np.linspace(1,5, res).tolist()
 
-    config['Na'] = 1000.
-    config['Nz'] = 1000.
+    config['Na'] = 100.
+    config['Nz'] = 100.
 
     config['std_y'] = 1
     if run_tag == 'std_y':
@@ -76,19 +76,20 @@ def my_config():
     if run_tag == 'n_iter':
         config['n_iter'] = np.arange(0,100, res_hyper).tolist()
 
+# Stupid Numba, but fasssssstttt ...
 
-
-    numba_config = Dict.empty(
-        key_type=types.unicode_type,
-        value_type=types.float64[:],
-    )
+    numba_config = Dict.empty(key_type=types.unicode_type, \
+            value_type=types.float64[:])
+    numba_config_runner = Dict.empty(key_type=types.unicode_type, \
+            value_type=types.float64[:])
     
-    # The typed-dict can be used from the interpreter.
     for k, v in config.items():
         if type(v) is list:
             numba_config[k] = np.array(v, dtype='f8')
+            numba_config_runner[k] = np.array(v, dtype='f8')
         else:
             numba_config[k] = np.array([v], dtype='f8')
+            numba_config_runner[k] = np.array([v], dtype='f8')
  
 @nb.njit
 def set_seed(value):
@@ -99,117 +100,133 @@ def error(y,yp):
     return (yp-y).T.dot((yp-y)) / (y.size)
 
 @nb.njit
-def EE_Bayes(dim, m, c, std_y, b, Ntrn, Ntst, Nz, Na):
-    model = Bayes(c,std_y)
-    dist = Multivariate_Normal(np.ones(dim)*m,np.eye(dim)*c,Na*10)
-    eea = 0
-    for j in range(Na):
-        eez = 0
-        a = dist.sample()
-        for i in range(Nz):
-            xtrn = np.random.uniform(0, b, (Ntrn,dim))
-            ytrn = (np.random.normal(0, std_y) + xtrn.dot(a)).reshape(-1,1)
-            xtst = np.random.uniform(0, b, (Ntrn,dim))
-            ytst = (np.random.normal(0, std_y) + xtst.dot(a)).reshape(-1,1)
-            model.fit(xtrn,ytrn)
-            eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
-        eea += eez / Nz
-    return eea / Na
+def EE_Linear(seed, model_tag, run_tag, numba_config, numba_config_runner):
+    var = numba_config 
+    run = numba_config_runner
+    err = [ ]
+    for value in var[run_tag]:
+        run[run_tag] = np.array([value], dtype='f8')
+        set_seed(seed)
+        model = Linear()
+        dist = Multivariate_Normal(np.ones(int(run['dim'][0]))*run['m'][0], \
+                np.eye(int(run['dim'][0]))*run['c'], run['Na'][0]*10)
+        eea = 0
+        for j in range(int(run['Na'][0])):
+            eez = 0
+            a = dist.sample()
+            for i in range(int(run['Nz'][0])):
+                xtrn = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                ytrn = (np.random.normal(0, float(run['std_y'][0])) + xtrn.dot(a)).reshape(-1,1)
+                xtst = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                ytst = (np.random.normal(0, float(run['std_y'][0])) + xtst.dot(a)).reshape(-1,1)
+                model.fit(xtrn,ytrn)
+                eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
+            eea += eez / run['Nz'][0]
+        err.append(eea / run['Na'][0])
+    return err
 
 @nb.njit
-def EE_Linear(dim, m, c, std_y, b, Ntrn, Ntst, Nz, Na):
-    model = Linear()
-    dist = Multivariate_Normal(np.ones(dim)*m,np.eye(dim)*c,Na*10)
-    eea = 0
-    for j in range(Na):
-        eez = 0
-        a = dist.sample()
-        for i in range(Nz):
-            xtrn = np.random.uniform(0, b, (Ntrn,dim))
-            ytrn = (np.random.normal(0, std_y) + xtrn.dot(a)).reshape(-1,1)
-            xtst = np.random.uniform(0, b, (Ntrn,dim))
-            ytst = (np.random.normal(0, std_y) + xtst.dot(a)).reshape(-1,1)
-            model.fit(xtrn,ytrn)
-            eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
-        eea += eez / Nz
-    return eea / Na
+def EE_Bayes(seed, model_tag, run_tag, numba_config, numba_config_runner):
+    var = numba_config 
+    run = numba_config_runner
+    err = [ ]
+    for value in var[run_tag]:
+        run[run_tag] = np.array([value], dtype='f8')
+        set_seed(seed)
+        model = Bayes(float(run['c'][0]), float(run['std_y'][0]))
+        dist = Multivariate_Normal(np.ones(int(run['dim'][0]))*run['m'][0], \
+                np.eye(int(run['dim'][0]))*run['c'], run['Na'][0]*10)
+        eea = 0
+        for j in range(int(run['Na'][0])):
+            eez = 0
+            a = dist.sample()
+            for i in range(int(run['Nz'][0])):
+                xtrn = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                ytrn = (np.random.normal(0, float(run['std_y'][0])) + xtrn.dot(a)).reshape(-1,1)
+                xtst = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                ytst = (np.random.normal(0, float(run['std_y'][0])) + xtst.dot(a)).reshape(-1,1)
+                model.fit(xtrn,ytrn)
+                eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
+            eea += eez / run['Nz'][0]
+        err.append(eea / run['Na'][0])
+    return err
 
-@nb.njit
-def EE_Ridge(dim, m, c, std_y, b, Ntrn, Ntst, Nz, Na, alpha):
-    model = Ridge(alpha)
-    dist = Multivariate_Normal(np.ones(dim)*m,np.eye(dim)*c,Na*10)
-    eea = 0
-    for j in range(Na):
-        eez = 0
-        a = dist.sample()
-        for i in range(Nz):
-            xtrn = np.random.uniform(0, b, (Ntrn,dim))
-            ytrn = (np.random.normal(0, std_y) + xtrn.dot(a)).reshape(-1,1)
-            xtst = np.random.uniform(0, b, (Ntrn,dim))
-            ytst = (np.random.normal(0, std_y) + xtst.dot(a)).reshape(-1,1)
-            model.fit(xtrn,ytrn)
-            eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
-        eea += eez / Nz
-    return eea / Na
+def EE_Ridge(seed, model_tag, run_tag, numba_config, numba_config_runner):
+    var = numba_config 
+    run = numba_config_runner
+    overall_ee = []
+    for alpha in var['alpha']:
+        err = [ ]
+        for value in var[run_tag]:
+            run[run_tag] = np.array([value], dtype='f8')
+            set_seed(seed)
+            model = Ridge(alpha)
+            dist = Multivariate_Normal(np.ones(int(run['dim'][0]))*run['m'][0], \
+                    np.eye(int(run['dim'][0]))*run['c'], run['Na'][0]*10)
+            eea = 0
+            for j in range(int(run['Na'][0])):
+                eez = 0
+                a = dist.sample()
+                for i in range(int(run['Nz'][0])):
+                    xtrn = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                    ytrn = (np.random.normal(0, float(run['std_y'][0])) + xtrn.dot(a)).reshape(-1,1)
+                    xtst = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                    ytst = (np.random.normal(0, float(run['std_y'][0])) + xtst.dot(a)).reshape(-1,1)
+                    model.fit(xtrn,ytrn)
+                    eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
+                eea += eez / run['Nz'][0]
+            err.append(eea / run['Na'][0])
+        overall_ee.append(err)
+    return err
 
-@nb.njit
-def EE_SGD(dim, m, c, std_y, b, Ntrn, Ntst, Nz, Na, lr, n_iter):
-    model = SGD(lr,n_iter)
-    dist = Multivariate_Normal(np.ones(dim)*m,np.eye(dim)*c,Na*10)
-    eea = 0
-    for j in range(Na):
-        eez = 0
-        a = dist.sample()
-        for i in range(Nz):
-            xtrn = np.random.uniform(0, b, (Ntrn,dim))
-            ytrn = (np.random.normal(0, std_y) + xtrn.dot(a)).reshape(-1,1)
-            xtst = np.random.uniform(0, b, (Ntrn,dim))
-            ytst = (np.random.normal(0, std_y) + xtst.dot(a)).reshape(-1,1)
-            model.fit(xtrn,ytrn)
-            eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
-        eea += eez / Nz
-    return eea / Na
+def EE_SGD(seed, model_tag, run_tag, numba_config, numba_config_runner):
+    var = numba_config 
+    run = numba_config_runner
+    overall_ee = []
+    for lr in var['lr']:
+        err = [ ]
+        for value in var[run_tag]:
+            run[run_tag] = np.array([value], dtype='f8')
+            set_seed(seed)
+            model = SGD(lr, int(run['n_iter'][0]))
+            dist = Multivariate_Normal(np.ones(int(run['dim'][0]))*run['m'][0], \
+                    np.eye(int(run['dim'][0]))*run['c'], run['Na'][0]*10)
+            eea = 0
+            for j in range(int(run['Na'][0])):
+                eez = 0
+                a = dist.sample()
+                for i in range(int(run['Nz'][0])):
+                    xtrn = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                    ytrn = (np.random.normal(0, float(run['std_y'][0])) + xtrn.dot(a)).reshape(-1,1)
+                    xtst = np.random.uniform(0, float(run['b'][0]), (int(run['Ntrn'][0]),int(run['dim'][0])))
+                    ytst = (np.random.normal(0, float(run['std_y'][0])) + xtst.dot(a)).reshape(-1,1)
+                    model.fit(xtrn,ytrn)
+                    eez += np.mean(error(ytst, model.predict(xtst).reshape(-1,1)))
+                eea += eez / run['Nz'][0]
+            err.append(eea / run['Na'][0])
+        overall_ee.append(err)
+    return err
+
+
+
 
 @ex.automain
-def main(run_tag, numba_config):
+def main(seed, config, model_tag, run_tag, numba_config, numba_config_runner, SUPPORTED_MODELS):
 
-    #var = Namespace(**config)
-    #assert var.model in var.SUPPORTED_MODELS, "Model is not supported!"
-    #EE = []
-    #if var.model == "Bayes":
-    #    err = []
-    #    set_seed(var.seed)
-    #    for var.__dict__[run_tag] in config[run_tag]:
-    #        err.append(EE_Bayes(var.dim, var.m, var.c, var.std_y, var.b, \
-    #                var.Ntrn, var.Ntst, var.Nz, var.Na))
-    #    EE.append({run_tag:err})
+    assert model_tag in SUPPORTED_MODELS, "Model is not supported!"
+    EE = []
+    if model_tag == "Bayes":
+        EE.append(EE_Bayes(seed, model_tag, run_tag, numba_config, numba_config_runner))
 
-    #elif var.model == "Linear":
-    #    err = []
-    #    set_seed(var.seed)
-    #    for var.__dict__[run_tag] in config[run_tag]:
-    #        err.append(EE_Linear(var.dim, var.m, var.c, var.std_y, var.b, var.Ntrn,\
-    #                var.Ntst, var.Nz, var.Na))
-    #    EE.append({run_tag:err})
+    elif model_tag == "Linear":
+        EE.append(EE_Linear(seed, model_tag, run_tag, numba_config, numba_config_runner))
 
-    #elif var.model == "Ridge":
-    #    for var.__dict__['alpha'] in config['alpha']:
-    #        err = []
-    #        set_seed(var.seed)
-    #        for var.__dict__[run_tag] in config[run_tag]:
-    #            err.append(EE_Ridge(var.dim, var.m, var.c, var.std_y, var.b, \
-    #                    var.Ntrn, var.Ntst, var.Nz, var.Na, var.alpha))
-    #        EE.append({'alpha':var.alpha, run_tag:err})
+    elif model_tag == "Ridge":
+        EE.append(EE_Ridge(seed, model_tag, run_tag, numba_config, numba_config_runner))
 
-    #elif var.model == "SGD":
-    #    for var.__dict__['lr'] in config['lr']:
-    #        err = []
-    #        set_seed(var.seed)
-    #        for var.__dict__[run_tag] in config[run_tag]:
-    #            err.append(EE_SGD(var.dim, var.m, var.c, var.std_y, var.b, \
-    #                    var.Ntrn, var.Ntst, var.Nz, var.Na, var.lr, var.n_iter))
-    #        EE.append({'lr':var.lr, run_tag:err})
+    elif model_tag == "SGD":
+        EE.append(EE_SGD(seed, model_tag, run_tag, numba_config, numba_config_runner))
     
-    return numba_config
+    return EE
 
 
