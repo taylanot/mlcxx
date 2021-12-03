@@ -1,0 +1,83 @@
+{
+  "artifacts": [],
+  "command": "main",
+  "experiment": {
+    "base_dir": "/home/shared/Projects/MAML_Investigation/code/unimodal",
+    "dependencies": [
+      "matplotlib==3.5.0",
+      "numba==0.54.1",
+      "numpy==1.20.3",
+      "sacred==0.8.2",
+      "tqdm==4.62.3"
+    ],
+    "mainfile": "numba_EE_ff.py",
+    "name": "unimodal",
+    "repositories": [
+      {
+        "commit": "d52d518dc961e06fa4476b82a6ecf38c7a0b98b9",
+        "dirty": false,
+        "url": "git@github.com:taylanot/PhD.git"
+      }
+    ],
+    "sources": [
+      [
+        "numba_EE_ff.py",
+        "_sources/numba_EE_ff_e9a152226426020a13f84eb528c94de4.py"
+      ]
+    ]
+  },
+  "fail_trace": [
+    "Traceback (most recent call last):\n",
+    "  File \"/usr/local/lib/python3.8/dist-packages/sacred/config/captured_function.py\", line 42, in captured_function\n    result = wrapped(*args, **kwargs)\n",
+    "  File \"numba_EE_ff.py\", line 181, in main\n    res = EE_Bayes(run_tag, var.dim, var.m, var.c, var.std_y, var.b, \\\n",
+    "  File \"/usr/local/lib/python3.8/dist-packages/numba/core/dispatcher.py\", line 482, in _compile_for_args\n    error_rewrite(e, 'typing')\n",
+    "  File \"/usr/local/lib/python3.8/dist-packages/numba/core/dispatcher.py\", line 423, in error_rewrite\n    raise e.with_traceback(None)\n",
+    "numba.core.errors.TypingError: Failed in nopython mode pipeline (step: nopython frontend)\n\u001b[1m\u001b[1mNo implementation of function Function(<built-in function setitem>) found for signature:\n \n >>> setitem(DictType[unicode_type,int64]<iv=None>, Literal[str](std_y), reflected list(float64)<iv=None>)\n \nThere are 16 candidate implementations:\n\u001b[1m      - Of which 14 did not match due to:\n      Overload of function 'setitem': File: <numerous>: Line N/A.\n        With argument(s): '(DictType[unicode_type,int64]<iv=None>, unicode_type, reflected list(float64)<iv=None>)':\u001b[0m\n\u001b[1m       No match.\u001b[0m\n\u001b[1m      - Of which 2 did not match due to:\n      Overload in function 'impl_setitem': File: numba/typed/dictobject.py: Line 674.\n        With argument(s): '(DictType[unicode_type,int64]<iv=None>, unicode_type, reflected list(float64)<iv=None>)':\u001b[0m\n\u001b[1m       Rejected as the implementation raised a specific error:\n         TypingError: Failed in nopython mode pipeline (step: nopython frontend)\n       \u001b[1m\u001b[1m\u001b[1mNo implementation of function Function(<intrinsic _cast>) found for signature:\n        \n        >>> _cast(reflected list(float64)<iv=None>, class(int64))\n        \n       There are 2 candidate implementations:\n       \u001b[1m      - Of which 2 did not match due to:\n             Intrinsic in function '_cast': File: numba/typed/typedobjectutils.py: Line 23.\n               With argument(s): '(reflected list(float64)<iv=None>, class(int64))':\u001b[0m\n       \u001b[1m       Rejected as the implementation raised a specific error:\n                TypingError: \u001b[1mcannot safely cast reflected list(float64)<iv=None> to int64. Please cast explicitly.\u001b[0m\u001b[0m\n         raised from /usr/local/lib/python3.8/dist-packages/numba/typed/typedobjectutils.py:76\n       \u001b[0m\n       \u001b[0m\u001b[1mDuring: resolving callee type: Function(<intrinsic _cast>)\u001b[0m\n       \u001b[0m\u001b[1mDuring: typing of call at /usr/local/lib/python3.8/dist-packages/numba/typed/dictobject.py (684)\n       \u001b[0m\n       \u001b[1m\n       File \"../../../../../../usr/local/lib/python3.8/dist-packages/numba/typed/dictobject.py\", line 684:\u001b[0m\n       \u001b[1m    def impl(d, key, value):\n               <source elided>\n               castedkey = _cast(key, keyty)\n       \u001b[1m        castedval = _cast(value, valty)\n       \u001b[0m        \u001b[1m^\u001b[0m\u001b[0m\n\u001b[0m\n  raised from /usr/local/lib/python3.8/dist-packages/numba/core/typeinfer.py:1074\n\u001b[0m\n\u001b[0m\u001b[1mDuring: typing of staticsetitem at numba_EE_ff.py (91)\u001b[0m\n\u001b[1m\nFile \"numba_EE_ff.py\", line 91:\u001b[0m\n\u001b[1mdef EE_Bayes(run_tag, dim, m, c, std_y, b, Ntrn, Ntst, Nz, Na, seed):\n    <source elided>\n    var['c'] = c\n\u001b[1m    var['std_y'] = std_y\n\u001b[0m    \u001b[1m^\u001b[0m\u001b[0m\n\n"
+  ],
+  "heartbeat": "2021-12-03T12:09:08.662082",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz",
+    "hostname": "94fc0411525c",
+    "os": [
+      "Linux",
+      "Linux-5.11.0-40-generic-x86_64-with-glibc2.29"
+    ],
+    "python_version": "3.8.10"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "config.model=\"Bayes\""
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2021-12-03T12:08:59.457453",
+  "status": "FAILED",
+  "stop_time": "2021-12-03T12:09:08.662777"
+}

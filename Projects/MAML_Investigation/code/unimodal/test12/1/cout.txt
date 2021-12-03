@@ -1,0 +1,4 @@
+INFO - run - Running command 'main'
+INFO - run - Started run with ID "1"
+{x: [2.  1.5 3. ], y: [2.]}
+INFO - run - Completed after 0:00:01

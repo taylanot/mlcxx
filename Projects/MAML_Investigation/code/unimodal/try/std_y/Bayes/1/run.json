@@ -1,0 +1,75 @@
+{
+  "artifacts": [],
+  "command": "main",
+  "experiment": {
+    "base_dir": "/home/shared/Projects/MAML_Investigation/code/unimodal",
+    "dependencies": [
+      "matplotlib==3.5.0",
+      "numba==0.54.1",
+      "numpy==1.20.3",
+      "sacred==0.8.2",
+      "tqdm==4.62.3"
+    ],
+    "mainfile": "numba_EE_final.py",
+    "name": "unimodal",
+    "repositories": [
+      {
+        "commit": "d52d518dc961e06fa4476b82a6ecf38c7a0b98b9",
+        "dirty": false,
+        "url": "git@github.com:taylanot/PhD.git"
+      }
+    ],
+    "sources": [
+      [
+        "numba_EE_final.py",
+        "_sources/numba_EE_final_7983788d76e2eb1c3d2fc20d65b2bacf.py"
+      ]
+    ]
+  },
+  "heartbeat": "2021-12-03T10:11:43.872527",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz",
+    "hostname": "94fc0411525c",
+    "os": [
+      "Linux",
+      "Linux-5.11.0-40-generic-x86_64-with-glibc2.29"
+    ],
+    "python_version": "3.8.10"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "config.model=\"Bayes\""
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": {},
+  "start_time": "2021-12-03T10:11:33.695487",
+  "status": "COMPLETED",
+  "stop_time": "2021-12-03T10:11:43.871064"
+}
