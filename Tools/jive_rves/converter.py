@@ -27,10 +27,11 @@ def nodes(filename,mesh):
 
 def elements(filename,mesh):
     cells = mesh.cells_dict['triangle']+1
-    cells_data = mesh.cell_data_dict['gmsh:geometrical']['triangle'].reshape(-1,1)-1
-    geo_tags = np.ones((cells.shape[0],2))*2
-    phys_tags = np.zeros((cells.shape[0],1))
-    data = np.hstack(((np.arange(cells.shape[0])+1).reshape(-1,1),geo_tags,phys_tags,cells_data,cells))
+    geo_tags = mesh.cell_data_dict['gmsh:geometrical']['triangle'].reshape(-1,1)-1
+    phys_tags = mesh.cell_data_dict['gmsh:physical']['triangle'].reshape(-1,1)-1
+    tags = np.ones((cells.shape[0],2))*2
+    data = np.hstack(((np.arange(cells.shape[0])+1).reshape(-1,1),tags,phys_tags,geo_tags,cells))
     np.savetxt(filename, data ,fmt='%i')
     
 write_2D(filename=sys.argv[1])
+#write_2D('rve.msh')
