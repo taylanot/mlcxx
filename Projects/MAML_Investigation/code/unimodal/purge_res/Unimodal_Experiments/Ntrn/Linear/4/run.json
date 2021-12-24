@@ -1,0 +1,128 @@
+{
+  "artifacts": [],
+  "command": "main",
+  "experiment": {
+    "base_dir": "/home/shared/Projects/MAML_Investigation/code/unimodal",
+    "dependencies": [
+      "matplotlib==3.5.0",
+      "numba==0.54.1",
+      "numpy==1.20.3",
+      "sacred==0.8.2",
+      "tqdm==4.62.3"
+    ],
+    "mainfile": "numba_EE.py",
+    "name": "unimodal",
+    "repositories": [
+      {
+        "commit": "7a59bd4bb8e0a1a80c173fabb53bbeb9ccba1777",
+        "dirty": true,
+        "url": "git@github.com:taylanot/PhD.git"
+      }
+    ],
+    "sources": [
+      [
+        "numba_EE.py",
+        "_sources/numba_EE_4937e9da6a58d3fe3609e6cb23e6e479.py"
+      ]
+    ]
+  },
+  "heartbeat": "2021-12-22T19:39:55.485083",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz",
+    "hostname": "94fc0411525c",
+    "os": [
+      "Linux",
+      "Linux-5.11.0-41-generic-x86_64-with-glibc2.29"
+    ],
+    "python_version": "3.8.10"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "model_tag='Linear'",
+        "run_tag=Ntrn"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": [
+    [
+      4.472313342888091,
+      3.9957684903762156,
+      3.742418015313756,
+      3.5743182953481276,
+      3.3885106273477934,
+      3.324205535140599,
+      3.1618411649612237,
+      3.125148225647381,
+      3.017764150675589,
+      2.8869688015319435,
+      2.8422164003641432,
+      2.6967715799420255,
+      2.6065312343441236,
+      2.5926703240162747,
+      2.4448596845558273,
+      2.325578634216677,
+      2.2910742554838706,
+      2.236401515428053,
+      2.1443151140535797,
+      2.0411052191298604,
+      1.9980966687063348,
+      2.009306743715401,
+      1.994013595176743,
+      1.9598319228311143,
+      2.000819766825975,
+      2.0251289672940884,
+      2.0214830808940634,
+      2.01435033557365,
+      1.981233503176659,
+      1.9875669627626318,
+      2.017486553436701,
+      2.0036761583767513,
+      2.044313195221939,
+      1.9858907764073046,
+      2.047719365148602,
+      2.003782810221543,
+      2.002002204050581,
+      2.0058100356590636,
+      1.9793812937862876,
+      2.023542700410942,
+      2.0004208319576886,
+      2.052976767493816,
+      2.007635038977879,
+      2.0005785872019115,
+      1.9669508222155565,
+      2.0373598878281,
+      2.0178328745740934,
+      1.9308126479971495,
+      2.0564374651249047
+    ]
+  ],
+  "start_time": "2021-12-22T19:38:47.818229",
+  "status": "COMPLETED",
+  "stop_time": "2021-12-22T19:39:55.483455"
+}

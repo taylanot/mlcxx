@@ -33,18 +33,18 @@ def get_results(exp_dir=Experiment_Directory, model='Linear', run_tag='std_y', I
     ys = run_info['result']
 
     if len(ys) == 1:
-        y = ys[0][run_tag]
+        y = ys[0]
         label_ext = ''
     else:
-        ymeans = [mean(res[run_tag]) for res in run_info['result']]
+        ymeans = [mean(res) for res in run_info['result']]
         select = ymeans.index(min(ymeans))
-        y = ys[select][run_tag]
+        y = ys[select]
         if model == 'Ridge':
-            label_ext = '-alpha:'+str(round(ys[select]['alpha']))
+            label_ext = '-alpha:'+str((config_info['config']['alpha'][select]))
         elif model == 'SGD':
-            label_ext = '-lr:'+str(round(ys[select]['lr']))
+            label_ext = '-lr:'+str((config_info['config']['lr'][select]))
     tag = model+label_ext+'-ID:'+str(ID)
-    return x, y, tag
+    return x, ys[0], tag
 
 def plot(ax, x, y, tag):
     ax.plot(x,y, label=tag)
@@ -53,10 +53,11 @@ def add_legend(ax):
 
 
 fig, ax = plt.subplots(figsize=(6,6))
-x,y,tag = get_results()
-plot(ax, x, y, tag)
+#x,y,tag = get_results(model='SGD')
+#plot(ax, x, y, tag)
 
-x,y,tag = get_results(ID=2)
+x,y,tag = get_results(model='Bayes',ID=7)
+print(x,y)
 plot(ax, x, y, tag)
 add_legend(ax)
 
