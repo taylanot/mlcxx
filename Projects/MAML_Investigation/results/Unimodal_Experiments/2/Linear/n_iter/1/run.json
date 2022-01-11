@@ -7,8 +7,7 @@
       "matplotlib==3.4.3",
       "numba==0.54.1",
       "numpy==1.20.2",
-      "sacred==0.8.2",
-      "tqdm==4.60.0"
+      "sacred==0.8.2"
     ],
     "mainfile": "numba_EE.py",
     "name": "unimodal",
@@ -16,18 +15,18 @@
     "sources": [
       [
         "numba_EE.py",
-        "_sources/numba_EE_9984378e5f8738d3b37d0ce4bd3881d5.py"
+        "_sources/numba_EE_3abd1069d48a41691348042b7d6e8628.py"
       ]
     ]
   },
-  "heartbeat": "2021-12-25T07:59:52.973094",
+  "heartbeat": "2022-01-07T00:32:10.331821",
   "host": {
     "ENV": {},
-    "cpu": "Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz",
-    "hostname": "n06-153",
+    "cpu": "AMD EPYC 7302 16-Core Processor",
+    "hostname": "n06-76",
     "os": [
       "Linux",
-      "Linux-3.10.0-957.21.3.el7.x86_64-x86_64-with-glibc2.17"
+      "Linux-3.10.0-1160.45.1.el7.x86_64-x86_64-with-glibc2.17"
     ],
     "python_version": "3.8.6"
   },
@@ -67,14 +66,14 @@
   "resources": [],
   "result": [
     [
-      2.1143876180104666,
-      2.1143876180104666,
-      2.1143876180104666,
-      2.1143876180104666,
-      2.1143876180104666
+      2.950587051087092,
+      3.0604720982998037,
+      2.801999478596846,
+      2.958198244010181,
+      2.7302620169378633
     ]
   ],
-  "start_time": "2021-12-25T07:59:30.101157",
+  "start_time": "2022-01-07T00:32:06.327411",
   "status": "COMPLETED",
-  "stop_time": "2021-12-25T07:59:52.970937"
+  "stop_time": "2022-01-07T00:32:10.329743"
 }

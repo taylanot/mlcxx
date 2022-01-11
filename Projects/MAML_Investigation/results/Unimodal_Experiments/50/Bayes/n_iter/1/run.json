@@ -7,8 +7,7 @@
       "matplotlib==3.4.3",
       "numba==0.54.1",
       "numpy==1.20.2",
-      "sacred==0.8.2",
-      "tqdm==4.60.0"
+      "sacred==0.8.2"
     ],
     "mainfile": "numba_EE.py",
     "name": "unimodal",
@@ -16,15 +15,15 @@
     "sources": [
       [
         "numba_EE.py",
-        "_sources/numba_EE_9984378e5f8738d3b37d0ce4bd3881d5.py"
+        "_sources/numba_EE_3abd1069d48a41691348042b7d6e8628.py"
       ]
     ]
   },
-  "heartbeat": "2021-12-31T06:05:45.804678",
+  "heartbeat": "2022-01-07T23:30:29.325571",
   "host": {
     "ENV": {},
-    "cpu": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
-    "hostname": "n06-118",
+    "cpu": "AMD EPYC 7302 16-Core Processor",
+    "hostname": "n06-76",
     "os": [
       "Linux",
       "Linux-3.10.0-1160.45.1.el7.x86_64-x86_64-with-glibc2.17"
@@ -57,7 +56,7 @@
       "UPDATE": [
         "model_tag='Bayes'",
         "run_tag='n_iter'",
-        "config.Ntrn=100",
+        "config.Ntrn=1",
         "config.dim=50"
       ],
       "help": false,
@@ -67,14 +66,14 @@
   "resources": [],
   "result": [
     [
-      2.1911611963857154,
-      2.1911611963857154,
-      2.1911611963857154,
-      2.1911611963857154,
-      2.1911611963857154
+      48.244622698384475,
+      49.45307332566015,
+      48.709129658765576,
+      51.493231285679194,
+      48.798674613719875
     ]
   ],
-  "start_time": "2021-12-31T06:05:02.046372",
+  "start_time": "2022-01-07T23:30:20.436709",
   "status": "COMPLETED",
-  "stop_time": "2021-12-31T06:05:45.790939"
+  "stop_time": "2022-01-07T23:30:29.323246"
 }

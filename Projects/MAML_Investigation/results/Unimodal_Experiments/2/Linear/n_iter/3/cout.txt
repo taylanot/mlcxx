@@ -1,2 +1,4 @@
 INFO - unimodal - Running command 'main'
 INFO - unimodal - Started run with ID "3"
+INFO - unimodal - Result: [[1.4612032290374237, 1.4924894734479848, 1.5127465415030539, 1.4513507624056543, 1.4657846077896282]]
+INFO - unimodal - Completed after 0:00:04
