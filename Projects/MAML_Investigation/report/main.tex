@@ -15,8 +15,13 @@
 \usepackage{lipsum}
 \usepackage{graphicx}
 \graphicspath{{media/}}     % organize your images and other figures under media/ folder
+%\usepackage{float}
+%\usepackage[cochineal,bigdelims,cmintegrals,vvarbb]{newtxmath}
+\usepackage{amsmath}       % blackboard math symbols
+\usepackage{bm}       % blackboard math symbols
+\usepackage[cal=cm]{mathalfa}
 
-  
+
 %% Title
 \title{A Future Empirical Risk Minimizers Transfer Risk Performance
 %%%% Cite as
@@ -71,15 +76,15 @@
 
 
 \section{Introduction}
-  \input{\version/abstract}
+  \input{\version/introduction}
 \section{Related Work}
   \input{\version/relatedwork}
 \section{Experimental Setting}
-  \input{\version/experimentalsetting}
+  \input{\version/methods}
 \section{Results and Discussion}
   \input{\version/resultsanddiscussion}
 \section{Conclusion}
-  \input{\version/conclusion}
+  \input{\version/conclusions}
 \section*{Acknowledgments}
 
 %Bibliography

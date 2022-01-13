@@ -74,18 +74,20 @@ fig, ax = plt.subplots(figsize=(6,6))
 #x,y,tag = get_results(model='SGD')
 #plot(ax, x, y, tag)
 
-def plot_result(run_tag, dim, Ntrn, log=False):
+def plot_result(run_tag, dim, Ntrn, log=False, ex='Linear'):
+
     for model in models:
-        x,y,tag = get_results(model=model, run_tag=run_tag,dim=dim, Ntrn=Ntrn)
-        if log:
-            logplot(ax, x, y, tag)
-        else:
-            plot(ax, x, y, tag)
-        add_legend(ax)
-        add_label(ax,run_tag)
+        if model != ex:
+            x,y,tag = get_results(model=model, run_tag=run_tag,dim=dim, Ntrn=Ntrn)
+            if log:
+                logplot(ax, x, y, tag)
+            else:
+                plot(ax, x, y, tag)
+            add_legend(ax)
+            add_label(ax,run_tag)
     plt.show()
 
-plot_result('std_y', dim=10, Ntrn=1, log=False)
+plot_result('std_y', dim=10, Ntrn=10, log=False)
 
 ### NEED to write some other function for n_iter
 
