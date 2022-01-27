@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 # Hardcore Numba
 import numba as nb
-from numba_models import Bayes, Linear, Ridge, SGD
+from numba_models import Bayes, Linear, Ridge, SGD, MAML, GeneralRidge
 from numba.core.errors import NumbaPerformanceWarning
 #from numba_multivariate import *
 from numba.core import types
@@ -23,17 +23,17 @@ ex =  Experiment('unimodal')
 
 @ex.config
 def my_config():
-    NAME = "Unimodal_Experiments_dim"
+    NAME = "Unimodal_Experiments-correction"
 
-    SUPPORTED_MODELS = ['Bayes', 'SGD', 'Linear', 'Ridge']
+    SUPPORTED_MODELS = ['Bayes', 'SGD', 'Linear', 'Ridge', 'MAML', 'GeneralRidge']
 
     run_tag = 'std_y' 
 
-    model_tag = 'Linear'
+    model_tag = 'GeneralRidge'
     
     res = 50               # Resolution of the experiments!
 
-    res_hyper = 20         # Resolution of the hypers!
+    res_hyper = 10         # Resolution of the hypers!
 
     seed = 24               # KOBEEEEEE!
 
@@ -90,10 +90,10 @@ def my_config():
         else:
             numba_config[k] = np.array([v], dtype='f8')
             numba_config_runner[k] = np.array([v], dtype='f8')
-    if run_tag == 'dim': 
-        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
-    else:
-        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(config['dim'])+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
+#    if run_tag == 'dim': 
+#        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
+#    else:
+#        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(config['dim'])+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
 
 @nb.njit(cache=True)
 def set_seed(value):
@@ -120,7 +120,7 @@ def EE_Linear(run, a_dist, xtrn_dist, xtst_dist):
 
 @nb.njit(cache=True)
 def EE_Bayes(run, a_dist, xtrn_dist, xtst_dist):
-    model = Bayes(float(run['m'][0]),float(run['c'][0]), float(run['std_y'][0]))
+    model = Bayes()
     eea = 0
     for a in a_dist:
         eez = 0
@@ -128,7 +128,7 @@ def EE_Bayes(run, a_dist, xtrn_dist, xtst_dist):
             ytrn = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntrn'][0]),1)) + xtrn.dot(a.T)).reshape(-1,1)
             xtst = xtst_dist[i]
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
-            model.fit(xtrn,ytrn)
+            model.fit(np.ascontiguousarray(a).reshape(-1,1))
             eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
         eea += eez / float(run['Nz'][0])
     return eea
@@ -143,7 +143,24 @@ def EE_SGD(run, a_dist, xtrn_dist, xtst_dist, lr, n_iter):
             ytrn = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntrn'][0]),1)) + xtrn.dot(a.T)).reshape(-1,1)
             xtst = xtst_dist[i]
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
-            model.fit(xtrn,ytrn,np.ascontiguousarray(a).reshape(-1,1))
+            _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
+            model.fit(xtrn,ytrn,_a)
+            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+        eea += eez / float(run['Nz'][0])
+    return eea
+
+@nb.njit(cache=True)
+def EE_MAML(run, a_dist, a_noise, xtrn_dist, xtst_dist, lr, n_iter):
+    model = MAML(lr, n_iter)
+    eea = 0
+    for num, a in enumerate(a_dist):
+        eez = 0
+        for i,xtrn in enumerate(xtrn_dist):
+            ytrn = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntrn'][0]),1)) + xtrn.dot(a.T)).reshape(-1,1)
+            xtst = xtst_dist[i]
+            ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
+            _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
+            model.fit(xtrn,ytrn,_a)
             eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
         eea += eez / float(run['Nz'][0])
     return eea
@@ -163,6 +180,23 @@ def EE_Ridge(run, a_dist, xtrn_dist, xtst_dist, alpha):
         eea += eez / float(run['Nz'][0])
     return eea
 
+@nb.njit(cache=True)
+def EE_GeneralRidge(run, a_dist, xtrn_dist, xtst_dist, alpha):
+    model = GeneralRidge(alpha)
+    eea = 0
+    for a in a_dist:
+        eez = 0
+        for i,xtrn in enumerate(xtrn_dist):
+            ytrn = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntrn'][0]),1)) + xtrn.dot(a.T)).reshape(-1,1)
+            xtst = xtst_dist[i]
+            ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
+            _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
+            model.fit(xtrn,ytrn, _a)
+            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+        eea += eez / float(run['Nz'][0])
+    return eea
+
+
 #@nb.njit(cache=True)
 def EE_wrap(seed, model_tag, run_tag, numba_config, numba_config_runner):
     var = numba_config 
@@ -174,7 +208,7 @@ def EE_wrap(seed, model_tag, run_tag, numba_config, numba_config_runner):
         set_seed(seed)
         xtrn_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0])),np.eye(int(run['dim'][0]))*run['b'][0], int(run['Ntrn'][0]*run['Nz'][0]))).reshape(-1,int(run['Ntrn'][0]),int(run['dim'][0]))
         xtst_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0])),np.eye(int(run['dim'][0]))*run['b'][0], int(run['Ntst'][0]*run['Nz'][0]))).reshape(-1,int(run['Ntst'][0]),int(run['dim'][0]))
-        a_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0]))*run['m'][0],np.eye(int(run['dim'][0]))*run['c'][0], int(run['Na'][0]))).reshape(-1,1,int(run['dim'][0]))
+        a_dist = np.ascontiguousarray(np.random.multivariate_normal(np.ones(int(run['dim'][0]))*run['m'][0],np.eye(int(run['dim'][0]))*run['c'][0], int(run['Na'][0]))).reshape(-1,1,int(run['dim'][0]))
         if model_tag == 'Linear':
             err.append(EE_Linear(run, a_dist, xtrn_dist, xtst_dist) / float(run['Na'][0]))
         elif model_tag == 'Bayes':
@@ -198,11 +232,16 @@ def EE_wrap_b(seed, model_tag, run_tag, numba_config, numba_config_runner):
             set_seed(seed)
             xtrn_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0])),np.eye(int(run['dim'][0]))*run['b'][0], int(run['Ntrn'][0]*run['Nz'][0]))).reshape(-1,int(run['Ntrn'][0]),int(run['dim'][0]))
             xtst_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0])),np.eye(int(run['dim'][0]))*run['b'][0], int(run['Ntst'][0]*run['Nz'][0]))).reshape(-1,int(run['Ntst'][0]),int(run['dim'][0]))
-            a_dist = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0]))*run['m'][0],np.eye(int(run['dim'][0]))*run['c'][0], int(run['Na'][0]))).reshape(-1,1,int(run['dim'][0]))
+            a_dist = np.ascontiguousarray(np.random.multivariate_normal(np.ones(int(run['dim'][0]))*run['m'][0],np.eye(int(run['dim'][0]))*run['c'][0], int(run['Na'][0]))).reshape(-1,1,int(run['dim'][0]))
             if model_tag == 'Ridge':
                 err.append(EE_Ridge(run, a_dist, xtrn_dist, xtst_dist, hyper) / float(run['Na'][0]))
+            if model_tag == 'GeneralRidge':
+                err.append(EE_GeneralRidge(run, a_dist, xtrn_dist, xtst_dist, hyper) / float(run['Na'][0]))
             elif model_tag == 'SGD':
                 err.append(EE_SGD(run, a_dist, xtrn_dist, xtst_dist, hyper, int(run['n_iter'][0])) / float(run['Na'][0]))
+            elif model_tag == 'MAML':
+                a_noise = np.ascontiguousarray(np.random.multivariate_normal(np.zeros(int(run['dim'][0])),np.eye(int(run['dim'][0]))*0.1, int(run['Na'][0]))).reshape(-1,1,int(run['dim'][0]))
+                err.append(EE_MAML(run, a_dist, a_noise, xtrn_dist, xtst_dist, hyper, int(run['n_iter'][0])) / float(run['Na'][0]))
         overall_ee.append(err)
     return overall_ee
 
@@ -212,12 +251,16 @@ def main(seed, config, model_tag, run_tag, numba_config, numba_config_runner, SU
     assert model_tag in SUPPORTED_MODELS, "Model is not supported!"
     if model_tag == "Bayes":
         return EE_wrap(seed, model_tag, run_tag, numba_config, numba_config_runner) 
-    if model_tag == "Linear":
+    elif model_tag == "Linear":
         return EE_wrap(seed, model_tag, run_tag, numba_config, numba_config_runner) 
-    if model_tag == "Ridge":
+    elif model_tag == "Ridge":
         return EE_wrap_b(seed, model_tag, run_tag, numba_config, numba_config_runner) 
-    if model_tag == "SGD":
+    elif model_tag == "SGD":
         return EE_wrap_b(seed, model_tag, run_tag, numba_config, numba_config_runner) 
+    elif model_tag == "MAML":
+        return EE_wrap_b(seed, model_tag, run_tag, numba_config, numba_config_runner)
+    elif model_tag == "GeneralRidge":
+        return EE_wrap_b(seed, model_tag, run_tag, numba_config, numba_config_runner)
     return res
 
 

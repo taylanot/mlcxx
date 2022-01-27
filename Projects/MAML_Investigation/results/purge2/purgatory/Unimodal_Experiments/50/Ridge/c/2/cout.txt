@@ -1,0 +1,2 @@
+INFO - unimodal - Running command 'main'
+INFO - unimodal - Started run with ID "2"

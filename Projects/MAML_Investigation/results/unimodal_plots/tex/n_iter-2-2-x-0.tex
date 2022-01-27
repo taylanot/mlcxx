@@ -1,0 +1,61 @@
+% This file was created with tikzplotlib v0.9.17.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.105882352941176,0.619607843137255,0.466666666666667}
+\definecolor{color1}{rgb}{0.850980392156863,0.372549019607843,0.00784313725490196}
+\definecolor{color2}{rgb}{0.458823529411765,0.43921568627451,0.701960784313725}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=none},
+tick align=outside,
+tick pos=left,
+x grid style={white!69.0196078431373!black},
+xlabel={\(\displaystyle n\)},
+xmin=-4.5, xmax=94.5,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ylabel={Expected Error},
+ymin=2.49218588284494, ymax=6.12197156924192,
+ytick style={color=black}
+]
+\addplot [semithick, color0]
+table {%
+0 2.87652782336296
+10 3.01197850950835
+20 3.10157517506131
+30 2.65717614131753
+40 3.00185022922502
+50 3.00226567149774
+60 2.83040819228986
+70 2.93397004755674
+80 2.92918263993231
+90 3.09066371991792
+};
+\addlegendentry{SGD-lr:0.0001}
+\addplot [semithick, color1]
+table {%
+0 2.8853783677924
+10 2.80508526266293
+20 2.89143040078767
+30 2.75790690430983
+40 3.06536793520025
+50 2.92214919611003
+60 2.90795208723574
+70 2.79456661094236
+80 3.20115811909234
+90 2.90142588300096
+};
+\addlegendentry{MAML-lr:0.0001}
+\addplot [semithick, color2]
+table {%
+0 5.95698131076933
+20 3.82286776291929
+40 3.79218876212573
+60 4.05553291035505
+80 4.15654730346858
+};
+\addlegendentry{randomSGD-lr:0.0527}
+\end{axis}
+
+\end{tikzpicture}

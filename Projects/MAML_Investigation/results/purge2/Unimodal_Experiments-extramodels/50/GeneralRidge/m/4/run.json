@@ -1,0 +1,70 @@
+{
+  "artifacts": [],
+  "command": "main",
+  "experiment": {
+    "base_dir": "/home/oturan/projects/MAML_Investigation/unimodal-extra",
+    "dependencies": [
+      "matplotlib==3.4.3",
+      "numba==0.54.1",
+      "numpy==1.20.2",
+      "sacred==0.8.2"
+    ],
+    "mainfile": "numba_EE.py",
+    "name": "unimodal",
+    "repositories": [],
+    "sources": [
+      [
+        "numba_EE.py",
+        "_sources/numba_EE_d29c9aba0d5a3fd8b5d19466af3caf12.py"
+      ]
+    ]
+  },
+  "heartbeat": "2022-01-24T11:38:02.386664",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Xeon(R) CPU E5-2620 0 @ 2.00GHz",
+    "hostname": "n06-120",
+    "os": [
+      "Linux",
+      "Linux-3.10.0-1160.45.1.el7.x86_64-x86_64-with-glibc2.17"
+    ],
+    "python_version": "3.8.6"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "model_tag='GeneralRidge'",
+        "run_tag='m'",
+        "config.Ntrn=50",
+        "config.dim=50"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2022-01-24T07:24:02.151396",
+  "status": "RUNNING"
+}
