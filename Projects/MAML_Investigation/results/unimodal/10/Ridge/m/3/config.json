@@ -1,5 +1,5 @@
 {
-  "NAME": "Unimodal_Experiments",
+  "NAME": "Unimodal_Experiments_m",
   "SUPPORTED_MODELS": [
     "Bayes",
     "SGD",

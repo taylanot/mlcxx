@@ -3,6 +3,7 @@
 
 \definecolor{color0}{rgb}{0.105882352941176,0.619607843137255,0.466666666666667}
 \definecolor{color1}{rgb}{0.850980392156863,0.372549019607843,0.00784313725490196}
+\definecolor{color2}{rgb}{0.458823529411765,0.43921568627451,0.701960784313725}
 
 \begin{axis}[
 legend cell align={left},
@@ -15,7 +16,7 @@ xmin=-4.5, xmax=94.5,
 xtick style={color=black},
 y grid style={white!69.0196078431373!black},
 ylabel={Expected Error},
-ymin=0.99043909774471, ymax=2.07139594584336,
+ymin=0.897089417450369, ymax=4.03173923202451,
 ytick style={color=black}
 ]
 \addplot [semithick, color0]
@@ -46,6 +47,15 @@ table {%
 90 1.04102000405134
 };
 \addlegendentry{MAML-lr:0.1112}
+\addplot [semithick, color2]
+table {%
+0 3.88925514954387
+20 1.0427258228501
+40 1.04220690161408
+60 1.04189442835725
+80 1.04234635885852
+};
+\addlegendentry{randomSGD-lr:0.2632}
 \end{axis}
 
 \end{tikzpicture}

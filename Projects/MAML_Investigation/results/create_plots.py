@@ -82,7 +82,7 @@ def add_label(ax, run_tag):
 
 def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='test',):
     tex_name = 'tex' 
-    pdf_name = 'pdf' 
+    pdf_name = 'png' 
     tex_dir = os.path.join(name,tex_name)
     pdf_dir = os.path.join(name,pdf_name)
     if not os.path.exists(tex_dir):
@@ -107,7 +107,7 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
             if run_tag == 'dim':
                 filename = run_tag+'-'+str(Ntrn)+'-x-'+str(id_)
             tikzplotlib.save(os.path.join(tex_dir, filename)+'.tex')
-            plt.savefig(os.path.join(pdf_dir, filename)+".pdf")
+            plt.savefig(os.path.join(pdf_dir, filename)+".png")
         else:
             plt.show()
     else:
@@ -126,7 +126,7 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
             if run_tag == 'dim':
                 filename = run_tag+'-'+str(Ntrn)+'-x-'+str(id_)
             tikzplotlib.save(os.path.join(tex_dir, filename)+'.tex')
-            plt.savefig(os.path.join(pdf_dir, filename)+".pdf")
+            plt.savefig(os.path.join(pdf_dir, filename)+".png")
         else:
             plt.show()
 
@@ -135,7 +135,7 @@ run_tags = ['std_y', 'c', 'b', 'm', 'n_iter', 'dim', 'Ntrn']
 dims = [1,2,10,50]
 ntrns = [1,2,10,50]
 #run_tag = 'n_iter'
-exs = [[],['Linear', 'randomSGD']]#,['Linear', 'Ridge', 'randomSGD'],['Linear','SGD'],['Linear','randomSGD']]
+exs = [[],['Linear'],['Linear', 'randomSGD']]#,['Linear', 'Ridge', 'randomSGD'],['Linear','SGD'],['Linear','randomSGD']]
 #exs = [[]]#,['Linear'],['Linear', 'Ridge', 'randomSGD'],['Linear','randomSGD']]
 #ex = []
 #ex = ['Linear']
@@ -149,6 +149,7 @@ for dim in dims:
                 plot_result(id_=id_,run_tag=run_tag, dim=dim, Ntrn=Ntrn, ex=ex, save=True, name='unimodal_plots')
                 plt.close()
 
+#plot_result(id_=0,run_tag='m', dim=1, Ntrn=10, ex=['randomSGD'], save=False, name='test')
 #plot_result(run_tag, dim=1, Ntrn=2)
 
 ### NEED to write some other function for n_iter
