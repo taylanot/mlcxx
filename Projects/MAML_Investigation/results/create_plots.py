@@ -82,14 +82,17 @@ def add_label(ax, run_tag):
 
 def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='test',):
     tex_name = 'tex' 
-    pdf_name = 'png' 
+    pdf_name = 'pdf' 
+    png_name = 'png' 
     tex_dir = os.path.join(name,tex_name)
     pdf_dir = os.path.join(name,pdf_name)
+    png_dir = os.path.join(name,png_name)
     if not os.path.exists(tex_dir):
         os.makedirs(tex_dir)
     if not os.path.exists(pdf_dir):
         os.makedirs(pdf_dir)
-
+    if not os.path.exists(png_dir):
+        os.makedirs(png_dir)
     fig, ax = plt.subplots(figsize=(6,6))
     if run_tag != 'n_iter':
         models = ['SGD', 'Linear', 'Ridge', 'Bayes', 'randomSGD', 'MAML','GeneralRidge']
@@ -107,7 +110,8 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
             if run_tag == 'dim':
                 filename = run_tag+'-'+str(Ntrn)+'-x-'+str(id_)
             tikzplotlib.save(os.path.join(tex_dir, filename)+'.tex')
-            plt.savefig(os.path.join(pdf_dir, filename)+".png")
+            plt.savefig(os.path.join(png_dir, filename)+".png")
+            plt.savefig(os.path.join(pdf_dir, filename)+".pdf")
         else:
             plt.show()
     else:
@@ -126,7 +130,8 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
             if run_tag == 'dim':
                 filename = run_tag+'-'+str(Ntrn)+'-x-'+str(id_)
             tikzplotlib.save(os.path.join(tex_dir, filename)+'.tex')
-            plt.savefig(os.path.join(pdf_dir, filename)+".png")
+            plt.savefig(os.path.join(pdf_dir, filename)+".pdf")
+            plt.savefig(os.path.join(png_dir, filename)+".png")
         else:
             plt.show()
 
