@@ -1,0 +1,140 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Cohen2021}{article}{}
+    \name{author}{5}{}{%
+      {{hash=CJM}{%
+         family={Cohen},
+         familyi={C\bibinitperiod},
+         given={Jeremy\bibnamedelima M.},
+         giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod},
+      }}%
+      {{hash=KS}{%
+         family={Kaur},
+         familyi={K\bibinitperiod},
+         given={Simran},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=LY}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Yuanzhi},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=KJZ}{%
+         family={Kolter},
+         familyi={K\bibinitperiod},
+         given={J.\bibnamedelima Zico},
+         giveni={J\bibinitperiod\bibinitdelim Z\bibinitperiod},
+      }}%
+      {{hash=TA}{%
+         family={Talwalkar},
+         familyi={T\bibinitperiod},
+         given={Ameet},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{CJMKSLYKJZTA1}
+    \strng{fullhash}{CJMKSLYKJZTA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    We empirically demonstrate that full-batch gradient descent on neural
+  network training objectives typically operates in a regime we call the Edge
+  of Stability. In this regime, the maximum eigenvalue of the training loss
+  Hessian hovers just above the numerical value $2 / \text{(step size)}$, and
+  the training loss behaves non-monotonically over short timescales, yet
+  consistently decreases over long timescales. Since this behavior is
+  inconsistent with several widespread presumptions in the field of
+  optimization, our findings raise questions as to whether these presumptions
+  are relevant to neural network training. We hope that our findings will
+  inspire future efforts aimed at rigorously understanding optimization at the
+  Edge of Stability. Code is available at
+  https://github.com/locuslab/edge-of-stability.%
+    }
+    \verb{eprint}
+    \verb 2103.00065
+    \endverb
+    \field{pages}{1\bibrangedash 80}
+    \field{title}{{Gradient Descent on Neural Networks Typically Occurs at the
+  Edge of Stability}}
+    \verb{url}
+    \verb http://arxiv.org/abs/2103.00065
+    \endverb
+    \verb{file}
+    \verb :home/taylanot/pCloudDrive/Papers/2103.00065.pdf:pdf
+    \endverb
+    \field{eprinttype}{arXiv}
+    \field{year}{2021}
+  \endentry
+
+  \entry{Orr1998}{book}{}
+    \name{author}{2}{}{%
+      {{hash=OGB}{%
+         family={Orr},
+         familyi={O\bibinitperiod},
+         given={Genevieve\bibnamedelima B},
+         giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=MKR}{%
+         family={M{\"{u}}ller},
+         familyi={M\bibinitperiod},
+         given={Klaus-Robert},
+         giveni={K\bibinithyphendelim R\bibinitperiod},
+      }}%
+    }
+    \keyw{deep neural networks}
+    \strng{namehash}{OGBMKR1}
+    \strng{fullhash}{OGBMKR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1998}
+    \field{labeldatesource}{}
+    \field{sortinit}{O}
+    \field{sortinithash}{O}
+    \field{abstract}{%
+    ... Neural Networks : Tricks of the Trade , this book is an outgrowth of a
+  1996 NIPS workshop. ... Proceeding, Neural Networks : Tricks of the Trade ,
+  this book is an outgrowth of a 1996 NIPS workshop. Springer-Verlag London, UK
+  {\textcopyright}1998 table of contents ISBN:3-540-65311-2. ... \n%
+    }
+    \field{booktitle}{Neural Networks Tricks of the Trade 1998}
+    \verb{eprint}
+    \verb 9780201398298
+    \endverb
+    \field{isbn}{3-540-65311-2}
+    \field{issn}{3540653112}
+    \field{title}{{Neural Networks: Tricks of the Trade, this book is an
+  outgrowth of a 1996 NIPS workshop}}
+    \verb{url}
+    \verb http://www.dblp.org/rec/bibtex/conf/nips/1996%0Apapers3://publication
+    \verb /uuid/24F6BD66-584A-4ADA-AF7C-68D832D7FDB7
+    \endverb
+    \verb{file}
+    \verb :home/taylanot/Dropbox/Books/ML/3-540-49430-8.pdf:pdf
+    \endverb
+    \field{eprinttype}{arXiv}
+    \field{year}{1998}
+  \endentry
+\enddatalist
+\endinput
