@@ -1,0 +1,77 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+  \entry{Parker-Jenkins2018}{article}{}
+    \name{author}{1}{}{%
+      {{hash=PJM}{%
+         family={Parker-Jenkins},
+         familyi={P\bibinithyphendelim J\bibinitperiod},
+         given={Marie},
+         giveni={M\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Taylor & Francis}%
+    }
+    \keyw{doctoral arrangements,doctoral supervision,mature students,reflective
+  practice,role of supervisor}
+    \strng{namehash}{PJM1}
+    \strng{fullhash}{PJM1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{P}
+    \field{sortinithash}{P}
+    \field{abstract}{%
+    Does one need really need boundaries between doctoral supervisor and
+  supervisee when talking about mature learners? Drawing on reflection from her
+  extensive experience, the author believes it is critical to maintain this
+  divide. There is an increase in doctoral students, proliferation of doctoral
+  programmes globally and practices which vary from context to context. A
+  shared concern, however, is the engagement between the supervisor and the
+  supervisee which can often be mutually unsatisfactory. Why is this
+  relationship often so problematic for both parties? What kind of relationship
+  is most appropriate and beneficial? To what extent does this academic
+  engagement need rethinking? These questions are explored with reference to
+  roles, expectations and boundaries and the underlying principles of good
+  practice.%
+    }
+    \verb{doi}
+    \verb 10.1080/03075079.2016.1153622
+    \endverb
+    \field{issn}{1470174X}
+    \field{number}{1}
+    \field{pages}{57\bibrangedash 71}
+    \field{title}{{Mind the gap: developing the roles, expectations and
+  boundaries in the doctoral supervisor–supervisee relationship}}
+    \verb{url}
+    \verb https://doi.org/10.1080/03075079.2016.1153622
+    \endverb
+    \field{volume}{43}
+    \verb{file}
+    \verb :home/taylanot/pCloudDrive/Papers/Mind the gap developing the roles e
+    \verb xpectations and boundaries in the doctoral supervisor supervisee rela
+    \verb tionship.pdf:pdf
+    \endverb
+    \field{journaltitle}{Studies in Higher Education}
+    \field{year}{2018}
+  \endentry
+\enddatalist
+\endinput

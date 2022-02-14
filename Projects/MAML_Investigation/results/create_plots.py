@@ -2,8 +2,7 @@
 import json
 import os
 from glob import glob
-# Stats
-from statistics import mean, pstdev
+# Stats from statistics import mean, pstdev
 # Plotting Stuff
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,13 +45,17 @@ def get_results(exp_dir=Experiment_Directory, model='Linear', run_tag='std_y', d
         y = ys[0]
         label_ext = ''
     else:
-        ymeans = [mean(res) for res in run_info['result']]
+        ymeans = [np.mean(res) for res in run_info['result']]
         select = ymeans.index(min(ymeans))
         y = ys[select]
         if model == 'Ridge' or model == 'GeneralRidge':
-            label_ext = '-alpha:'+str(round(config_info['config']['alpha'][select],4))
+            label_ext = '-$\lambda$:'+str(round(config_info['config']['alpha'][select],4))
         elif model == 'SGD' or model == 'randomSGD' or model == 'MAML':
             label_ext = '-lr:'+str(round(config_info['config']['lr'][select],4))
+    if model == 'SGD':
+        model = 'GD'
+    if model == 'randomSGD':
+        model = 'randomGD'
     tag = model+label_ext
     return x, y, tag
 

@@ -1,0 +1,78 @@
+\documentclass[a4paper,9pt]{article}
+\usepackage{amssymb, amsmath} 
+\usepackage[utf8]{inputenc}  
+\usepackage[USenglish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{framed}
+\usepackage{enumerate} 
+\usepackage{csquotes}  
+
+\newcommand\titletext{Peer-Review of\\"Studying Complex Evolution of Hyperelastic Materials Under External Field Stimuli Use Artificial Neural Networks with Spatiotemporal Features in Small-Scale Dataset"}
+
+\usepackage{palatino}
+\title{\titletext}
+\author{O.T. Turan}
+
+\hypersetup{
+  pdfauthor   = {O.T. Turan},
+  pdfkeywords = {peer,review},
+}
+
+\usepackage{microtype}
+
+\begin{document}
+\maketitle
+
+\section{Summary of the Content}
+Authors, try to tackle the data-scarcity problem in machine learning applications in material science, which is tried to be achieved by introducing a  model that exploits temporal and spatial relations called CBLSTM ("Convolutional Bi-directional Long-Short Term Memory"). The proposed model consists of 2 parts one Convolutional Neural Network(CNN) and a Bi-directional Long-Short Term Memory (BLSTM). The effectiveness of the model is shown on an experimental dataset obtained from 438 3D printed porous silicone rubber samples, for which all the spatial structure features and the stress-strain curves are collected. Then, various descriptor definitions are investigated for the problem (density, spatial coordinates+diameter, and structural parameters). Moreover, the training dataset size dependency is presented for the given descriptors. The majority of the paper tries to convey the idea that the combination of CNN and BLSTM achieves better generalization performance for the selected dataset, compared to individual components, and concludes that it is the case.
+
+\section{Review}
+
+\subsection{Strong Points}
+\begin{itemize}
+    \item Tries to investigate a valid and important problem regarding machine learning applications.
+    \item Importance of the problem descriptors for machine learning is established.
+    \item Learning curves are investigated to a certain extent.
+    \item Good machine learning practices are utilized.(\textit{e.g.} Normalization of data, cross-validation.)
+    \item Models are provided online in GitHub.
+    \item Short video clips from the generated materials are supplied.
+\end{itemize}
+
+\subsection{Weak Points}
+\begin{itemize}
+    \item The fairness of the model comparisons, which constitute the majority of the paper is questionable.
+    \item Conclusions regarding machine learning applications are vague, as most of the observations are reasoned with either inner workings of the model or the inability to learn either spatial or temporal information. (\textit{e.g.} pg:12/ln:21 "CNN-predicted curves are tortuous zigzag lines, which can be attributed to the working mechanisms of the CNN.", pg:12/ln:46 "However, the ability of a BLSTM network to extract spatial features is insufficient compared with that of a CNN ..." ). These conclusions are drawn just by looking at the model error on a specific run with one set of hyper-parameters. Thus, the validity of the conclusions is questionable.
+    \item Claims of uniqueness (pg:2/ln:14) and the universality pg.16/ln:13) of the method is not backed-up.
+\end{itemize}
+
+\subsection{Minor Remarks}
+
+\begin{itemize}
+  \item pg:9/ln:45 typo while Figure referral (4-J$\to$4-L).
+  \item Figure 4, x-axes labels typo (Ture$\to$True).
+  \item Section 2.4 named "Model and hyperparameter analysis", does not include anything regarding hyperparameters. Moreover, this is the only mention of the "hyperparameter" in the article.
+  \item pg:9/ln:51-61 The outlier effect on Mean Absolute Error (MAE) and Mean Squared Error (MSE) is mentioned and concluded that the MAE usage is good when you have outliers. However, pg:10/ln:4 the small number of outliers are given as a reason for selecting MAE for the current dataset which contradicts the former explanation. For a small number of outliers, MSE and MAE difference is not that much, right? 
+  \item Some partially obvious observations are posed as interesting observations \textit{e.g.} pg:16/ln:27 "Interestingly, however, increasing the descriptor dimensions to improve the accuracy of the descriptors for spatial structure extraction does not always yield a positive return on small datasets." $\to$ How is it an interesting observation? One might expect this before the experimentation too right? (\textit{e.g.} curse of dimensionality)
+  \item Movies shared are not compatible with base Linux OS and Mac OS. An online video sharing platform might overcome the hassle of downloading an external video player for readers using one of the operating systems.
+  \item Hyperlinks for citations and the Figures might be useful for navigation.
+  \item Very long sentences that last almost a paragraph might be a bit hard to follow \textit{e.g.} pg:3/ln:47-60.
+\end{itemize}
+
+
+
+\subsection{Major Remarks}
+\begin{itemize}
+    \item The comparisons of models can be solidified. One might argue that if the training curves are not available the comparison on the same data with the same learning rate and same epochs the results of the model with the fewer parameters might be performing worse compared to a model with a higher number of parameters. Thus, providing training information for all the models with increased attention towards tuning all the available models can make the model presented in the paper much more concrete.
+    \item Mentioned "uniqueness" of the presented model can be elaborated further. As far as the reviewers' knowledge combination of CNNs with BLSTMs is not something new. Maybe, providing these literature examples might help with the uniqueness of CBLSTM.
+    \item Hyperparameter dependencies and the effort of tuning might help increase the proposed models performance.or might invalidate the proposed models benefits, as the other methods might have improved performance.
+\end{itemize}
+
+\subsection{Overall Feedback/Recommendation}
+The paper under review tries to overcome an important problem of data scarcity and tries to come up with a model in order to do so. However, the lack of referral to the current literature regarding machine learning hinders the reader to put the proposed model into context with the existing methods that use CNNs and BLSTMs in combination. Moreover, the comparison experiments are not designed carefully, as most of the models are trained with the same hyperparameters, which might result in degraded/lessened performance for the models with fewer parameters, but this is not clear at this point. Thus, providing training information and adjusting the experimentation to be fairer can make the point of the paper more concrete as the generalization performance of the proposed model might increase further too.
+\\
+
+\textbf{Recommendation of acceptance:} \textit{Rejection }
+
+\end{document}
