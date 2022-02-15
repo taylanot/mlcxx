@@ -5,32 +5,7 @@ from collections import OrderedDict
 from .util import network_tools, RBF
 from .base import network_modules
 
-class SingleNet(torch.nn.Module):
-    def __init__(self, in_feature, n_hidden, out_feature):
-        super(SingleNet,self).__init__()
-
-        self.layer1 = torch.nn.Linear(in_feature, n_hidden)
-        self.layer2 = torch.nn.Linear(n_hidden, out_feature)
-        self.sigmoid = torch.nn.Sigmoid()
-
-    def forward(self, x):
-        x = self.layer2(self.sigmoid(self.layer1(x)))
-        return x
-
-class SimpleNet(network_tools,torch.nn.Module):
-    def __init__(self, in_feature, n_hidden, out_feature, activation_tag='softsign'):
-        super(SimpleNet, self).__init__()
-
-        self.layer1 = torch.nn.Linear(in_feature, n_hidden)
-        self.layer2 = torch.nn.Linear(n_hidden, out_feature)
-        self.activations = {'sigmoid':torch.nn.Sigmoid, 'tanh':torch.nn.Tanh, 'softsign':torch.nn.Softsign,'relu':torch.nn.ReLU}
-        self.activation = self.activations[activation_tag]()
-
-    def forward(self,x):
-        x = self.layer2(self.activation(self.layer1(x)))
-        return x
-
-class DeepNet(network_tools,torch.nn.Module):
+class GeneralNetwork(network_tools,torch.nn.Module):
     def __init__(self, in_feature, n_neuron, out_feature, n_hidden=0, activation_tag='softsign'):
         super(DeepNet, self).__init__()
 
@@ -41,11 +16,9 @@ class DeepNet(network_tools,torch.nn.Module):
         self.activation = self.activations[activation_tag]()
 
     def forward(self,x):
-
         x = self.activation(self.layer_in(x))
         for layer in self.layers:
             x = self.activation(layer(x))
-        
         x = self.layer_out(x)
 
         return x
@@ -221,6 +194,81 @@ class FeedForward(network_modules, network_tools,torch.nn.Module):
         x = self.layer_out(x)
 
         return x
+
+class RBF(torch.nn.Module):
+    def __init__(self, in_features, out_features, domain=[-5,5], sigma=0.1, functional_key='gaussian'):
+        super(RBF, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        #self.centers = torch.nn.Parameter(torch.Tensor(out_features, in_features))
+        self.centers = torch.linspace(domain[0],domain[1],out_features*in_features).view(out_features, in_features)
+        #self.log_sigmas = torch.nn.Parameter(torch.Tensor(out_features))
+        self.log_sigmas = torch.ones((out_features))*sigma
+        self.basis_func = getattr(self,functional_key)
+        #self.reset_parameters()
+
+    def gaussian(self, alpha):
+        phi = torch.exp(-1*alpha.pow(2))
+        return phi       
+
+    def matern32(self, alpha):
+        phi = (torch.ones_like(alpha) + 3**0.5*alpha)*torch.exp(-3**0.5*alpha)
+        return phi
+
+    def quadratic(self, alpha):
+        phi = alpha.pow(2)
+        return phi
+
+    def linear(self, alpha):
+        phi = alpha
+        return phi
+
+    def inverse_quadratic(self, alpha):
+        phi = torch.ones_like(alpha) / (torch.ones_like(alpha) + alpha.pow(2))
+        return phi
+
+    def multiquadric(self, alpha):
+        phi = (torch.ones_like(alpha) + alpha.pow(2)).pow(0.5)
+        return phi
+
+    def inverse_multiquadric(self, alpha):
+        phi = torch.ones_like(alpha) / (torch.ones_like(alpha) + alpha.pow(2)).pow(0.5)
+        return phi
+
+    def spline(self, alpha):
+        phi = (alpha.pow(2) * torch.log(alpha + torch.ones_like(alpha)))
+        return phi
+
+    def poisson_one(self, alpha):
+        phi = (alpha - torch.ones_like(alpha)) * torch.exp(-alpha)
+        return phi
+
+    def poisson_two(self, alpha):
+        phi = ((alpha - 2*torch.ones_like(alpha)) / 2*torch.ones_like(alpha)) \
+        * alpha * torch.exp(-alpha)
+        return phi
+
+    def matern32(self, alpha):
+        phi = (torch.ones_like(alpha) + 3**0.5*alpha)*torch.exp(-3**0.5*alpha)
+        return phi
+
+    def matern52(self, alpha):
+        phi = (torch.ones_like(alpha) + 5**0.5*alpha + (5/3) \
+        * alpha.pow(2))*torch.exp(-5**0.5*alpha)
+        return phi
+
+    def reset_parameters(self):
+        #torch.nn.init.normal_(self.centres, 0, 1)
+        #torch.nn.init.constant_(self.log_sigmas, 0)
+        pass
+
+    def forward(self, x):
+        size = (x.size(0), self.out_features, self.in_features)
+        x = x.unsqueeze(1).expand(size)
+        c = self.centers.unsqueeze(0).expand(size)
+        distances = (x - c).pow(2).sum(-1).pow(0.5) / torch.exp(self.log_sigmas).unsqueeze(0)
+
+        return self.basis_func(distances)
 
 
 
