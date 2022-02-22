@@ -2,8 +2,87 @@ import numpy as np
 import random
 from math import ceil, log, floor 
 from .dataset import * 
+import torch.distributions as dist
 
-class LinearTasks():
+class TaskDistribution():
+    def __init__(self):
+        pass 
+    
+    def sample_data(self):
+        pass 
+
+    def sample_task(self):
+        pass 
+
+class LinearTasks(TaskDistribution):
+    def __init__(self,dim, x_info=[0,1], m_info=[1,2]):
+        super(LinearTasks, self).__init__()
+
+        self.m_bound = (m_info[0] - 2*m_info[1], m_info[0] + 2* m_info[1])
+
+        self.m_dist = dist.MultivariateNormal(torch.ones(dim)*m_info[0], \
+                torch.eye(dim)*m_info[1])
+
+        self.x_dist = dist.MultivariateNormal(torch.ones(dim)*x_info[0], \
+                torch.eye(dim)*x_info[1])
+
+        self.dim = dim
+
+    def sample_task(self):
+        self.m = self.m_dist.sample()
+        self.task = self.m
+        return self.task
+
+    def sample_data(self, task, size, std_y=0):
+        x = self.x_dist.sample(torch.Size([size]))
+        y = self.f(task,x) + torch.FloatTensor(x.shape[0],1).normal_(0,std_y)
+        print(y)
+        return x, y
+
+    def f(self,task, x):
+        return x @ task.reshape(-1,1)
+
+    def boundaries(self,x):
+        return [self.f(self.m_bounds[i],x) for i in range(2)]
+
+class SineTasks(TaskDistribution):
+    def __init__(self, dim, x_info=[0,2], a_info=[1,1], p_info=[0,1]):
+        super(SineTasks, self).__init__()
+
+        self.a_bound = (a_info[0] - a_info[1], a_info[0] + a_info[1])
+        self.p_bound = (p_info[0] - p_info[1], p_info[0] + p_info[1])
+        self.a_dist = dist.MultivariateNormal(torch.ones(dim)*a_info[0], \
+                torch.eye(dim)*a_info[1])
+        self.p_dist = dist.MultivariateNormal(torch.ones(dim)*p_info[0], \
+                torch.eye(dim)*p_info[1])
+        self.x_dist = dist.MultivariateNormal(torch.ones(dim)*x_info[0], \
+                torch.eye(dim)*x_info[1])
+        self.dim = dim
+
+    def sample_task(self):
+        self.a = self.a_dist.sample()
+        self.p = self.p_dist.sample()
+        self.task = (self.a, self.p)
+        return self.task
+
+    def sample_data(self, task, size, std_y=0):
+        x = self.x_dist.sample(torch.Size([size]))
+        y = self.f(task,x) + torch.FloatTensor(x.shape[0],self.dim).normal_(0,std_y)
+        return x, y
+
+    def f(self, task, x):
+        return  torch.sin(x+task[1]) @ task[0].reshape(-1,1)
+
+    def boundaries(self,x):
+        assert self.dim == 1
+        return [self.f((self.a_bound[i],self.p_bound[i]),x) for i in range(2)]
+
+
+################################################################################
+# PURGATORY
+################################################################################
+
+class LinearTasks_old():
     def __init__(self, m_bounds=[1,2],b_bounds=None, diff='easy'):
         self.m_bounds = m_bounds
         self.b_bounds = b_bounds
@@ -36,7 +115,22 @@ class LinearTasks():
     def boundaries(self,x):
         return [self.f((self.m_bounds[i],self.b_bounds[i]),x) for i in range(2)]
 
-class SineTasks():
+
+class TaskDistribution_old():
+    def __init__(self, task_def, domain_bounds):
+        self.task_def = task_def
+        self.domain_bounds = domain_bounds
+    
+    def sample_data(self, task, size, noise=False):
+        #self.sample_task()
+        return self.task_def.sample_data(task, self.domain_bounds, size, noise=noise)
+
+    def sample_task(self):
+        self.task = self.task_def.sample_task()
+        return self.task
+
+
+class SineTasks_old():
     def __init__(self, a_bounds=[1,2], p_bounds=None, diff='easy'):
         self.a_bounds = a_bounds
         self.p_bounds = p_bounds
@@ -72,21 +166,6 @@ class SineTasks():
 
     def boundaries(self,x):
         return [self.f((self.a_bounds[i],self.p_bounds[i]),x) for i in range(2)]
-
-
-class TaskDistribution():
-    def __init__(self, task_def, domain_bounds):
-        self.task_def = task_def
-        self.domain_bounds = domain_bounds
-    
-    def sample_data(self, task, size, noise=False):
-        #self.sample_task()
-        return self.task_def.sample_data(task, self.domain_bounds, size, noise=noise)
-
-    def sample_task(self):
-        self.task = self.task_def.sample_task()
-        return self.task
-
 
 class FunctionalDatasetGenerator():
 

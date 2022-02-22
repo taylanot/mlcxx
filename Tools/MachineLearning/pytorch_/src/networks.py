@@ -7,7 +7,7 @@ from .base import network_modules
 
 class GeneralNetwork(network_tools,torch.nn.Module):
     def __init__(self, in_feature, n_neuron, out_feature, n_hidden=0, activation_tag='softsign'):
-        super(DeepNet, self).__init__()
+        super(GeneralNetwork, self).__init__()
 
         self.layer_in = torch.nn.Linear(in_feature, n_neuron,bias=True)
         self.layer_out = torch.nn.Linear(n_neuron, out_feature,bias=True)

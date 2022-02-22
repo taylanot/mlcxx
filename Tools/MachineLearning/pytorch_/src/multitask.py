@@ -9,7 +9,7 @@ import os
 import matplotlib.pyplot as plt 
 
 class MAML():
-    def __init__(self, network, alpha, beta, task_dist, num_points_task, num_task_sample, first_order = False, show_weights=False):
+    def __init__(self, network, alpha, beta, task_dist, num_points_task, num_task_sample, first_order = False, show_weights=False, plot=False):
         self.network = network
         self.weights = self.network.list_parameters()
         self.alpha = alpha
@@ -22,7 +22,7 @@ class MAML():
         self.loss_func = torch.nn.MSELoss()
         self.fo = first_order 
         self.print_step = 10
-        self.plot_step = 50 
+        self.plot_step = 100
         self.show_weights = show_weights
 
     def inner(self, task):
@@ -69,8 +69,9 @@ class MAML():
                 if self.show_weights:
                     print("weights:{}".format(list(self.network.parameters())))
 
-            if epoch % self.plot_step == 0:
-                self.plot(epoch,path=path)
+            if self.plot:
+                if epoch % self.plot_step == 0:
+                    self.plot(epoch,path=path)
             
     def train(self, epochs, path='results'):
         if not os.path.exists(path):

@@ -114,7 +114,7 @@ def EE_Linear(run, a_dist, xtrn_dist, xtst_dist):
             xtst = xtst_dist[i]
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             model.fit(xtrn,ytrn)
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 
@@ -129,7 +129,7 @@ def EE_Bayes(run, a_dist, xtrn_dist, xtst_dist):
             xtst = xtst_dist[i]
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             model.fit(np.ascontiguousarray(a).reshape(-1,1))
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 
@@ -145,7 +145,7 @@ def EE_SGD(run, a_dist, xtrn_dist, xtst_dist, lr, n_iter):
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
             model.fit(xtrn,ytrn,_a)
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 
@@ -161,7 +161,7 @@ def EE_MAML(run, a_dist, a_noise, xtrn_dist, xtst_dist, lr, n_iter):
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
             model.fit(xtrn,ytrn,_a)
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 
@@ -176,7 +176,7 @@ def EE_Ridge(run, a_dist, xtrn_dist, xtst_dist, alpha):
             xtst = xtst_dist[i]
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             model.fit(xtrn,ytrn)
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 
@@ -192,7 +192,7 @@ def EE_GeneralRidge(run, a_dist, xtrn_dist, xtst_dist, alpha):
             ytst = (np.random.normal(0, float(run['std_y'][0]), (int(run['Ntst'][0]),1)) + xtst.dot(a.T)).reshape(-1,1)
             _a = np.ones((int(run['dim'][0]),1))*run['m'][0]
             model.fit(xtrn,ytrn, _a)
-            eez += np.mean((error(ytst, model.predict(xtst).reshape(-1,1))))
+            eez += error(ytst, model.predict(xtst).reshape(-1,1))
         eea += eez / float(run['Nz'][0])
     return eea
 

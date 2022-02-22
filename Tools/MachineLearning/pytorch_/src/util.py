@@ -3,22 +3,6 @@ import os
 import torch
 import pandas
 
-def read_pickle(filename):
-
-    """ Read Pickle files """
-
-    name, ext = os.path.splitext(filename)
-    assert ext == '.pkl' or ext == '.pickle', 'File extension should be .pkl or .pickle'
-    loading = open(filename,"rb")
-    return  pickle.load(loading)
-
-def tensorize_DataFrame(frame):
-
-    """ Convert pandas DataFrame to pytorch Tensor object """
-
-    assert isinstance(frame,pandas.DataFrame), 'You have to provide pandas.DataFrame.'
-    return torch.Tensor([frame[frame.keys()[i]] for i in range(len(frame.keys()))])
-
 class ewma():
 
     """ Exponential Weighted Moving Average """
