@@ -1,0 +1,36 @@
+{
+  "config": {
+    "a_info": [
+      1,
+      2
+    ],
+    "activation_tag": "relu",
+    "alpha": 0.01,
+    "beta": 0.001,
+    "dim": 10,
+    "epochs": 70000,
+    "fo": false,
+    "k": 5,
+    "n_hidden": 2,
+    "n_neuron": 40,
+    "network": {
+      "py/type": "networks.NonlinearNetwork"
+    },
+    "pT": {
+      "py/type": "task_generator.SineTasks"
+    },
+    "p_info": [
+      0,
+      2
+    ],
+    "show_weights": false,
+    "std_y": 0.0,
+    "task_batch_size": 10,
+    "x_info": [
+      0,
+      2
+    ]
+  },
+  "problem": "nonlinear",
+  "seed": 24
+}

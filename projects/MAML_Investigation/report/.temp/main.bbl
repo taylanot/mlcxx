@@ -1,0 +1,9 @@
+\begin{thebibliography}{1}
+
+\bibitem{Finn2017}
+Chelsea Finn, Pieter Abbeel, and Sergey Levine.
+\newblock {Model-agnostic meta-learning for fast adaptation of deep networks}.
+\newblock {\em 34th International Conference on Machine Learning, ICML 2017},
+  3:1856--1868, 2017.
+
+\end{thebibliography}
