@@ -14,11 +14,12 @@ import copy
 import os 
 import warnings
 
+
 ex =  Experiment('unimodal-nonlinear')
 
 @ex.config
 def my_config():
-    NAME = "Unimodal_Experiments"
+    NAME = "unimodal-nonlinear"
 
     SUPPORTED_MODELS = ['Bayes', 'KernelRidge', 'MAML']
 
@@ -28,7 +29,7 @@ def my_config():
 
     res = 50               # Resolution of the experiments! make 0 for just one 
 
-    res_hyper = 10         # Resolution of the hypers!
+    res_hyper = 1         # Resolution of the hypers!
 
     seed = 24               # KOBEEEEEE!
 
@@ -39,20 +40,16 @@ def my_config():
         config['dim'] = torch.arange(1, 50).tolist()
 
     config['m_amplitude'] = 1.
-    if run_tag == 'm_amplitude':
-        config['m_amplitude'] = torch.linspace(0,10, res).tolist()
 
     config['c_amplitude'] = 2.
     if run_tag == 'c_amplitude':
-        config['c_amplitude'] = torch.linspace(0,10, res).tolist()
+        config['c_amplitude'] = torch.linspace(0.001,10, res).tolist()
 
     config['m_phase'] = 0.
-    if run_tag == 'm_phase':
-        config['m_phase'] = torch.linspace(0,10, res).tolist()
 
     config['c_phase'] = 2.
     if run_tag == 'c_phase':
-        config['c_phase'] = torch.linspace(0,10, res).tolist()
+        config['c_phase'] = torch.linspace(0.001,10, res).tolist()
 
     config['b'] = 2.
     if run_tag == 'b':
@@ -71,25 +68,21 @@ def my_config():
     config['alpha'] = torch.linspace(1e-4, 20, res_hyper).tolist()
     config['empty'] = []
 
-    config['Ntrn'] = 1000 
+    config['Ntrn'] = 5
     if run_tag == 'Ntrn':
         config['Ntrn'] = torch.arange(1, 50).tolist()
 
     config['Ntst'] = 1000
 
-    config['n_iter'] = 1
+    config['n_iter'] = 10
     if run_tag == 'n_iter':
         config['n_iter'] = torch.arange(0,100, res_hyper).tolist()
 
     if model_tag == 'MAML':
-        config['model_ids'] = {1:1, 2:2, 3:10, 4:50}
+        config['model_ids'] = {1:1, 2:2, 10:3, 50:4}
         config['model_path'] = os.path.join('MAML_Training_noiseless', 'artifacts',\
                 str(config['model_ids'][config['dim']]), 'model.pt')
 
-#    if run_tag == 'dim': 
-#        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
-#    else:
-#        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(config['dim'])+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
 
 def set_seed(value):
     torch.manual_seed(value)
@@ -214,15 +207,10 @@ def EE(model_tag, run_tag, config, seed):
         overall_ee.append(err)
         return overall_ee
 
-@ex.automain
+@ex.main
 def main(seed, config, model_tag, run_tag, SUPPORTED_MODELS):
     assert model_tag in SUPPORTED_MODELS
     return EE(model_tag, run_tag, config, seed)
-    #_, train, test = create_Z(config, seed)
-    #print(train[0])
-    #plt.scatter(train[0][0], train[1][0])
-    #plt.scatter(train[0][1], train[1][1])
-    #plt.savefig('plot.pdf')
 
 
 

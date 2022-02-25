@@ -14,21 +14,54 @@
 \usepackage{microtype}      % microtypography
 \usepackage{lipsum}
 \usepackage{graphicx}
-\graphicspath{{media/}}     % organize your images and other figures under media/ folder
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{subcaption}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=Figures/tikz]
+\usepackage{pgfplots}
+\graphicspath{{Figures/}}     % organize your images and other figures under media/ folder
 %\usepackage{float}
 %\usepackage[cochineal,bigdelims,cmintegrals,vvarbb]{newtxmath}
 \usepackage{amsmath}       % blackboard math symbols
 \usepackage{bm}       % blackboard math symbols
 \usepackage[cal=cm]{mathalfa}
 
+% Math related commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\I}[1]{\mathbf{I}}
+\newcommand{\slope}{\mathbf{w}}
+\newcommand{\bias}{b}
+\newcommand{\feat}{\mathbf{x}}
+\newcommand{\task}{\mathbf{a}}
+\newcommand{\featbias}{\bar{\mathbf{x}}}
+\newcommand{\feats}{\mathbf{X}}
+\newcommand{\phase}{\boldsymbol{\phi}}
+\newcommand{\sine}{\text{sin}}
+\newcommand{\lab}{y}
+\newcommand{\labs}{\mathbf{y}}
+\newcommand{\EE}{\mathcal{E}}
+\newcommand{\prob}{p}
+\newcommand{\trans}[1]{#1^\text{T}}
+\newcommand{\trainset}{Z}
+\newcommand{\model}{\mathcal{M}}
+\newcommand{\estim}{\mathcal{\hat{M}}}
+\newcommand{\noise}{\varepsilon}
+\newcommand{\var}{\sigma^2}
+\newcommand{\mean}{\mu}
+\newcommand{\normal}[2]{\mathcal{N}(#1, #2)}
+
+\newcommand{\param}{\bar{\mathbf{w}}}
+\newcommand{\opt}{\mathbf{\hat{\bar{w}}}}% Text Related Commands
+\newcommand{\eg}{\textit{e.g.}}
 
 %% Title
-\title{A Future Empirical Risk Minimizers Transfer Risk Performance
+\title{Expected Loss of a Future Empirical Risk Minimizer}
 %%%% Cite as
 %%%% Update your official citation here when published 
 %\thanks{\textit{\underline{Citation}}: 
 %\textbf{Authors. Title. Pages.... DOI:000000/11111.}} 
-}
+
 
 \author{
   Author1, Author2 \\
@@ -74,7 +107,6 @@
 % keywords can be removed
 \keywords{First keyword \and Second keyword \and More}
 
-
 \section{Introduction}
   \input{\version/introduction}
 \section{Related Work}
@@ -93,85 +125,4 @@
 
 
 \end{document}
-
-%\label{sec:headings}
-%
-%\lipsum[4] See Section \ref{sec:headings}.
-%
-%\subsection{Headings: second level}
-%\lipsum[5]
-%\begin{equation}
-%\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
-%\end{equation}
-%
-%\subsubsection{Headings: third level}
-%\lipsum[6]
-%
-%\paragraph{Paragraph}
-%\lipsum[7]
-%
-%\section{Examples of citations, figures, tables, references}
-%\label{sec:others}
-%\lipsum[8] \cite{kour2014real,kour2014fast} and see \cite{hadash2018estimate}.
-%
-%The documentation for \verb+natbib+ may be found at
-%\begin{center}
-%  \url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-%\end{center}
-%Of note is the command \verb+\citet+, which produces citations
-%appropriate for use in inline text.  For example,
-%\begin{verbatim}
-%   \citet{hasselmo} investigated\dots
-%\end{verbatim}
-%produces
-%\begin{quote}
-%  Hasselmo, et al.\ (1995) investigated\dots
-%\end{quote}
-%
-%\begin{center}
-%  \url{https://www.ctan.org/pkg/booktabs}
-%\end{center}
-%
-%
-%\subsection{Figures}
-%\lipsum[10] 
-%See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
-%\lipsum[11] 
-%
-%\begin{figure}
-%  \centering
-%  \fbox{\rule[-.5cm]{4cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
-%  \caption{Sample figure caption.}
-%  \label{fig:fig1}
-%\end{figure}
-%
-%\subsection{Tables}
-%\lipsum[12]
-%See awesome Table~\ref{tab:table}.
-%
-%\begin{table}
-% \caption{Sample table title}
-%  \centering
-%  \begin{tabular}{lll}
-%    \toprule
-%    \multicolumn{2}{c}{Part}                   \\
-%    \cmidrule(r){1-2}
-%    Name     & Description     & Size ($\mu$m) \\
-%    \midrule
-%    Dendrite & Input terminal  & $\sim$100     \\
-%    Axon     & Output terminal & $\sim$10      \\
-%    Soma     & Cell body       & up to $10^6$  \\
-%    \bottomrule
-%  \end{tabular}
-%  \label{tab:table}
-%\end{table}
-%
-%\subsection{Lists}
-%\begin{itemize}
-%\item Lorem ipsum dolor sit amet
-%\item consectetur adipiscing elit. 
-%\item Aliquam dignissim blandit est, in dictum tortor gravida eget. In ac rutrum magna.
-%\end{itemize}
-
-
 

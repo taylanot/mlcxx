@@ -1,0 +1,42 @@
+\subsubsection{Problem Setting}
+\footnote{It should be noted that the roman letters represent scalars, lower case bold letters represent vectors and the upper case bold letters represent the matrices. Moreover, calligraphic letters are designated for distributions.(\textit{e.g.} $\{u,N\}\to\text{scalar}$, $\{\bm{v}\}\to\text{vector}$ and $\{\bm{M}\}\to\text{matrix}$}
+\begin{equation}\label{eq:reg}
+  y = a^\text{T}x + \underbrace{\varepsilon}_{\mathcal{N}(0,\sigma=1)}
+\end{equation}
+\begin{itemize}
+  \item We are looking at linear regression problem in meta learning setting where each task is represented by the slope ($a$).
+  \item For the sake of simplicity  task distribution is assumed to be originating from the multivariate normal distribution $p_A\sim\mathcal{N}(m\boldsymbol{I},c\boldsymbol{I})$, where $m$ and $c$ are constants used for parametrizing the experiments.
+  \item Samples drawn are represented by $Z:=(x_i,y_i)_{i=1}^{N}$. $x_i$, $y_i$ and $N$ represent the $i^{\text{th}}$ feature, $i^{\text{th}}$ label and the number of samples respectively. Moreover, the distribution of these samples are represented by $p_Z$.
+  \item For an estimator $\hat{a}_N$ trained with $N$ samples from $Z$ we are after the expected error over the whole task distribution.
+  \item Input distribution is given by a multivariate normal distribution $p_x \sim \mathcal{N}(\boldsymbol{0},b\boldsymbol{I})$
+  \item The expected overall the loss over the task distribution can be formulated as,
+  \begin{equation}\label{eq:loss}
+    \int\int\int(\hat{a}_N(Z)^\text{T}x-y)^2p(x,y)dxdyp_ZdZp_Ada.
+  \end{equation}
+\end{itemize}
+
+\subsection{Models}
+
+\subsubsection{Linear Regression Model}\label{section:Linear}
+Assume we have a model in the form $m(x):= \mathbf{w}^\text{T}x+\mathbf{b}$. The free-parameters $\mathbf{w}$ and $\mathbf{b}$ can be estimated upon observing $N$ training samples via squared loss which gives the least squares solution as
+\begin{equation}
+  \mathbf{W}=(\mathbf{X}^{\text{T}}\mathbf{X})^{-1}\mathbf{X}^{\text{T}}\mathbf{y}
+\end{equation}
+,where $\mathbf{W}$ represents the stacked free parameters $\mathbf{X}$ represents design matrix and the $\mathbf{y}$ represents the stacked $N$ labels.
+
+\subsubsection{Ridge Regression Model}
+Assuming the same model given in Section \ref{section:Linear} the $L_2$-regularized version of it can be found as. 
+\begin{equation}
+  \mathbf{W}=(\lambda\mathbf{I}+\mathbf{X}^{\text{T}}\mathbf{X})^{-1}\mathbf{X}^{\text{T}}\mathbf{y},
+\end{equation}
+where $\lambda$ is the regularization parameter that is regularizing both $\mathbf{w}$ and the $\mathbf{b}$.
+
+\subsection{Bayes}
+Knowing the distribution of the tasks give us the exact posterior that one would expect for $N\to\infty$ after starting even from an uninformative prior such as $\mathcal{N}\sim(\mathbf{0}, \mathbf{I})$.
+
+\subsection{MAML}
+This model considers the approach taken in MAML paper. For this simple setting what MAML implicitly does is that it takes the intermadiate model near the vicinity of the mean of the task distribution and leave the model there for a quick adaptation.
+\subsection*{Experiments}
+\begin{itemize}
+  \item All the models are trained with same training points and tested with the same training points.
+n\end{itemize}
