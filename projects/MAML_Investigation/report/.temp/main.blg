@@ -3,44 +3,58 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: unsrt.bst
 Database file #1: ../../../../../Dropbox/archive_bib/library.bib
-You've used 1 entry,
+Repeated entry---line 4157 of file ../../../../../Dropbox/archive_bib/library.bib
+ : @article{Guiroy2019a
+ :                     ,
+I'm skipping whatever remains of this entry
+Warning--empty journal in Flennerhag2019
+Warning--empty journal in Guiroy2019a
+Warning--empty journal in Bernacchia2021
+Warning--there's a number but no volume in Bernacchia2021
+Warning--empty journal in Collins2020b
+Warning--empty journal in Fallah2021
+Warning--empty journal in Bai2020
+Warning--empty journal in Lam2015
+Warning--empty journal in Nakkiran2020b
+You've used 20 entries,
             1791 wiz_defined-function locations,
-            452 strings with 3760 characters,
-and the built_in function-call counts, 286 in all, are:
-= -- 26
-> -- 11
-< -- 0
-+ -- 4
-- -- 3
-* -- 23
-:= -- 51
-add.period$ -- 3
-call.type$ -- 1
-change.case$ -- 1
+            560 strings with 7201 characters,
+and the built_in function-call counts, 5382 in all, are:
+= -- 470
+> -- 296
+< -- 8
++ -- 106
+- -- 86
+* -- 388
+:= -- 865
+add.period$ -- 60
+call.type$ -- 20
+change.case$ -- 20
 chr.to.int$ -- 0
-cite$ -- 1
-duplicate$ -- 9
-empty$ -- 26
-format.name$ -- 3
-if$ -- 58
+cite$ -- 29
+duplicate$ -- 224
+empty$ -- 451
+format.name$ -- 86
+if$ -- 1171
 int.to.chr$ -- 0
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 8
-num.names$ -- 1
-pop$ -- 1
+int.to.str$ -- 20
+missing$ -- 20
+newline$ -- 103
+num.names$ -- 20
+pop$ -- 57
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 3
+skip$ -- 120
 stack$ -- 0
-substring$ -- 31
-swap$ -- 1
-text.length$ -- 0
+substring$ -- 390
+swap$ -- 60
+text.length$ -- 8
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 0
-while$ -- 3
-width$ -- 2
-write$ -- 13
+warning$ -- 9
+while$ -- 60
+width$ -- 22
+write$ -- 212
+(There was 1 error message)

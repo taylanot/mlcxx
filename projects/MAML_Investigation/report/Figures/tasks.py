@@ -23,7 +23,9 @@ xnonlin = np.linspace(-5,5,100).reshape(-1,1)
 for i in range(100):
     y = lin(np.random.normal(0,1), xlin)
     ax.plot(xlin, y)
-tikzplotlib.save("lin_eg.tex")
+plt.xlabel('x')
+plt.ylabel('y')
+tikzplotlib.save("methods/lin_eg.tex")
 
 plt.close()
 fig2, ax2 = plt.subplots(figsize=(6,6))
@@ -32,6 +34,8 @@ fig2, ax2 = plt.subplots(figsize=(6,6))
 for i in range(100):
     y = nonlin(np.random.normal(1,1),np.random.normal(0,1), xnonlin)
     ax2.plot(xnonlin, y)
-tikzplotlib.save("nonlin_eg.tex")
+plt.xlabel('x')
+plt.ylabel('y')
+tikzplotlib.save("methods/nonlin_eg.tex")
 
 

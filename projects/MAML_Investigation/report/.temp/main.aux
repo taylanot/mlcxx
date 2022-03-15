@@ -20,20 +20,260 @@
 \citation{Finn2017}
 \citation{Finn2017}
 \citation{Finn2017}
+\citation{Flennerhag2019}
+\citation{Nichol2018}
+\citation{Rajasegaran2020}
+\citation{Collins2020}
+\citation{Guiroy2019a}
+\citation{Antoniou2019}
+\citation{Nichol2018}
 \citation{Finn2017}
+\providecommand \oddpage@label [2]{}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{Introduction}{section.1}{}}
+\citation{Finn2017}
+\citation{Antoniou2019}
+\citation{Guiroy2019a}
+\citation{Khodak2019}
+\citation{Bernacchia2021}
+\citation{Collins2020b}
+\citation{Fallah2021}
+\citation{Denevi2018a}
+\citation{Denevi2019}
+\citation{Kuzborskij2017}
+\citation{Kuzborskij2017a}
+\citation{Bai2020}
+\citation{Denevi2018a}
+\citation{Finn2017}
+\citation{Denevi2018a}
+\citation{Lam2015}
+\citation{Paszke2019}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
+\newlabel{sec:rw}{{2}{2}{Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Our Contribution:}{2}{section*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Problem Setting}{2}{section.3}\protected@file@percent }
+\newlabel{sec:methods}{{3}{2}{Problem Setting}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Learning Problems}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.1}Linear Regression}{3}{subsubsection.3.1.1}\protected@file@percent }
+\newlabel{sec:Linear}{{3.1.1}{3}{Linear Regression}{subsubsection.3.1.1}{}}
+\newlabel{eq:linearreg}{{1}{3}{Linear Regression}{equation.3.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.2}Nonlinear Regression}{3}{subsubsection.3.1.2}\protected@file@percent }
+\newlabel{sec:Nonlinear}{{3.1.2}{3}{Nonlinear Regression}{subsubsection.3.1.2}{}}
+\newlabel{eq:nonlinearreg}{{2}{3}{Nonlinear Regression}{equation.3.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.3}General Problem Setting}{3}{subsubsection.3.1.3}\protected@file@percent }
+\newlabel{eq:ee}{{3}{3}{General Problem Setting}{equation.3.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.1.4}Experimental Assumptions}{3}{subsubsection.3.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Models}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Single Task Learning Models}{3}{subsubsection.3.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Linear Estimator}{3}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Ridge Estimator}{3}{section*.4}\protected@file@percent }
+\citation{Finn2017}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:lintasks}{{1a}{4}{$\lab = \trans {\inp }\scaletask $\relax }{figure.caption.2}{}}
+\newlabel{sub@fig:lintasks}{{a}{4}{$\lab = \trans {\inp }\scaletask $\relax }{figure.caption.2}{}}
+\newlabel{fig:nonlintasks}{{1b}{4}{$\lab = \trans {\sine (\inp +\phasetask )}\scaletask $\relax }{figure.caption.2}{}}
+\newlabel{sub@fig:nonlintasks}{{b}{4}{$\lab = \trans {\sine (\inp +\phasetask )}\scaletask $\relax }{figure.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 100 sample tasks drawn from $p_\mathcal  {T}$ for both linear ($m=0$ and $c=1$) and nonlinear ($c_1=1$ and $c_2=1$) problems.\relax }}{4}{figure.caption.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{General Ridge Estimator}{4}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Kernel Ridge Estimator}{4}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Gradient Descent Estimator}{4}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Meta Learning Models}{4}{subsubsection.3.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Model-Agnostic Meta Learning (MAML)}{4}{section*.8}\protected@file@percent }
+\@writefile{loa}{\contentsline {algocf}{\numberline {1}{\ignorespaces MAML\cite  {Finn2017} Algorithm\relax }}{4}{algocf.1}\protected@file@percent }
+\newlabel{alg:MAML}{{1}{4}{Model-Agnostic Meta Learning (MAML)}{algocf.1}{}}
+\citation{Nakkiran2020b}
+\citation{Finn2017}
+\citation{Denevi2018a}
+\newlabel{fig:lin_maml}{{2a}{5}{Linear Problem\relax }{figure.caption.10}{}}
+\newlabel{sub@fig:lin_maml}{{a}{5}{Linear Problem\relax }{figure.caption.10}{}}
+\newlabel{fig:nonlin_maml}{{2b}{5}{Nonlinear Problem\relax }{figure.caption.10}{}}
+\newlabel{sub@fig:nonlin_maml}{{b}{5}{Nonlinear Problem\relax }{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Visualizing the MAML intermediate model. 100 sample tasks drawn from $p_\mathcal  {T}$ for both linear ($m=0$ and $c=1$) and nonlinear ($c_1=2$ and $c_2=2$) problems shown transparent and intermediate model trained (obtained from MAML algorithm) for 1D cases of the experimentation given with solid dark orange line.\relax }}{5}{figure.caption.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results and Discussion}{5}{section.4}\protected@file@percent }
+\newlabel{sec:resdis}{{4}{5}{Results and Discussion}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Linear Problem}{6}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Effect of Training Samples $N$:}{6}{section*.11}\protected@file@percent }
+\newlabel{fig:linear-N-D-1}{{3a}{6}{$D=1$\relax }{figure.caption.12}{}}
+\newlabel{sub@fig:linear-N-D-1}{{a}{6}{$D=1$\relax }{figure.caption.12}{}}
+\newlabel{fig:linear-N-D-10}{{3b}{6}{$D=10$\relax }{figure.caption.12}{}}
+\newlabel{sub@fig:linear-N-D-10}{{b}{6}{$D=10$\relax }{figure.caption.12}{}}
+\newlabel{fig:linear-N-D-50}{{3c}{6}{$D=50$\relax }{figure.caption.12}{}}
+\newlabel{sub@fig:linear-N-D-50}{{c}{6}{$D=50$\relax }{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The Expected Error for changing number of training samples for various dimensional problems.\relax }}{6}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:linear-N}{{3}{6}{The Expected Error for changing number of training samples for various dimensional problems.\relax }{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Dimensionality $D$:}{6}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Effect of Task Variance $c$:}{6}{section*.15}\protected@file@percent }
+\newlabel{fig:linear-D-N-1}{{4a}{7}{$N=1$\relax }{figure.caption.14}{}}
+\newlabel{sub@fig:linear-D-N-1}{{a}{7}{$N=1$\relax }{figure.caption.14}{}}
+\newlabel{fig:linear-D-N-10}{{4b}{7}{$N=10$\relax }{figure.caption.14}{}}
+\newlabel{sub@fig:linear-D-N-10}{{b}{7}{$N=10$\relax }{figure.caption.14}{}}
+\newlabel{fig:linear-D-N-50}{{4c}{7}{$N=50$\relax }{figure.caption.14}{}}
+\newlabel{sub@fig:linear-D-N-50}{{c}{7}{$N=50$\relax }{figure.caption.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The Expected Error for changing number of dimensions for various number of training points.\relax }}{7}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:linear-D}{{4}{7}{The Expected Error for changing number of dimensions for various number of training points.\relax }{figure.caption.14}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Mean Expected Error for the range $c:[0,1]$ range with various gradient steps for the MAML and GD models with $\eta =0.334$. Note that only $D=1$, $N=10$ case (see Figure \ref  {fig:linear-c-N-10-D-1}) is presented.\relax }}{7}{table.caption.16}\protected@file@percent }
+\newlabel{tab:zoom}{{1}{7}{Mean Expected Error for the range $c:[0,1]$ range with various gradient steps for the MAML and GD models with $\lr =0.334$. Note that only $D=1$, $N=10$ case (see Figure \ref {fig:linear-c-N-10-D-1}) is presented.\relax }{table.caption.16}{}}
+\newlabel{fig:linear-c-N-1-D-1}{{5a}{7}{$D=1$, $N=1$\relax }{figure.caption.17}{}}
+\newlabel{sub@fig:linear-c-N-1-D-1}{{a}{7}{$D=1$, $N=1$\relax }{figure.caption.17}{}}
+\newlabel{fig:linear-c-N-10-D-1}{{5b}{7}{$D=1$, $N=10$\relax }{figure.caption.17}{}}
+\newlabel{sub@fig:linear-c-N-10-D-1}{{b}{7}{$D=1$, $N=10$\relax }{figure.caption.17}{}}
+\newlabel{fig:linear-c-N-50-D-1}{{5c}{7}{$D=1$, $N=50$\relax }{figure.caption.17}{}}
+\newlabel{sub@fig:linear-c-N-50-D-1}{{c}{7}{$D=1$, $N=50$\relax }{figure.caption.17}{}}
+\newlabel{fig:linear-c-N-10-D-10}{{5d}{7}{$D=10$, $N=10$\relax }{figure.caption.17}{}}
+\newlabel{sub@fig:linear-c-N-10-D-10}{{d}{7}{$D=10$, $N=10$\relax }{figure.caption.17}{}}
+\newlabel{fig:linear-c-N-10-D-50}{{5e}{7}{$D=50$, $N=10$\relax }{figure.caption.17}{}}
+\newlabel{sub@fig:linear-c-N-10-D-50}{{e}{7}{$D=50$, $N=10$\relax }{figure.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:linear-c-N-1-D-1}, \ref  {fig:linear-c-N-10-D-1}, \ref  {fig:linear-c-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:linear-c-N-10-D-1}, \ref  {fig:linear-c-N-10-D-10}, \ref  {fig:linear-c-N-10-D-50}.\relax }}{7}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:linear-c}{{5}{7}{The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:linear-c-N-1-D-1}, \ref {fig:linear-c-N-10-D-1}, \ref {fig:linear-c-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:linear-c-N-10-D-1}, \ref {fig:linear-c-N-10-D-10}, \ref {fig:linear-c-N-10-D-50}.\relax }{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Number of Gradient Steps $n_{{iter}}$:}{8}{section*.18}\protected@file@percent }
+\newlabel{fig:linear-n_iter-N-1-D-1}{{6a}{8}{$D=1$, $N=1$\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:linear-n_iter-N-1-D-1}{{a}{8}{$D=1$, $N=1$\relax }{figure.caption.19}{}}
+\newlabel{fig:linear-n_iter-N-10-D-1}{{6b}{8}{$D=1$, $N=10$\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:linear-n_iter-N-10-D-1}{{b}{8}{$D=1$, $N=10$\relax }{figure.caption.19}{}}
+\newlabel{fig:linear-n_iter-N-50-D-1}{{6c}{8}{$D=1$, $N=50$\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:linear-n_iter-N-50-D-1}{{c}{8}{$D=1$, $N=50$\relax }{figure.caption.19}{}}
+\newlabel{fig:linear-n_iter-N-10-D-10}{{6d}{8}{$D=10$, $N=10$\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:linear-n_iter-N-10-D-10}{{d}{8}{$D=10$, $N=10$\relax }{figure.caption.19}{}}
+\newlabel{fig:linear-n_iter-N-10-D-50}{{6e}{8}{$D=50$, $N=10$\relax }{figure.caption.19}{}}
+\newlabel{sub@fig:linear-n_iter-N-10-D-50}{{e}{8}{$D=50$, $N=10$\relax }{figure.caption.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The Expected Error for changing number of gradient steps $n_{{iter}}$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:linear-n_iter-N-1-D-1}, \ref  {fig:linear-n_iter-N-10-D-1}, \ref  {fig:linear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:linear-n_iter-N-10-D-1}, \ref  {fig:linear-n_iter-N-10-D-10}, \ref  {fig:linear-n_iter-N-10-D-50}.\relax }}{8}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:linear-n_iter}{{6}{8}{The Expected Error for changing number of gradient steps $\iter $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:linear-n_iter-N-1-D-1}, \ref {fig:linear-n_iter-N-10-D-1}, \ref {fig:linear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:linear-n_iter-N-10-D-1}, \ref {fig:linear-n_iter-N-10-D-10}, \ref {fig:linear-n_iter-N-10-D-50}.\relax }{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Task Mean $m$:}{8}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Nonlinear Problem}{8}{subsection.4.2}\protected@file@percent }
+\newlabel{fig:linear-m-N-1-D-1}{{7a}{9}{$D=1$, $N=1$\relax }{figure.caption.21}{}}
+\newlabel{sub@fig:linear-m-N-1-D-1}{{a}{9}{$D=1$, $N=1$\relax }{figure.caption.21}{}}
+\newlabel{fig:linear-m-N-10-D-1}{{7b}{9}{$D=1$, $N=10$\relax }{figure.caption.21}{}}
+\newlabel{sub@fig:linear-m-N-10-D-1}{{b}{9}{$D=1$, $N=10$\relax }{figure.caption.21}{}}
+\newlabel{fig:linear-m-N-50-D-1}{{7c}{9}{$D=1$, $N=50$\relax }{figure.caption.21}{}}
+\newlabel{sub@fig:linear-m-N-50-D-1}{{c}{9}{$D=1$, $N=50$\relax }{figure.caption.21}{}}
+\newlabel{fig:linear-m-N-10-D-10}{{7d}{9}{$D=10$, $N=10$\relax }{figure.caption.21}{}}
+\newlabel{sub@fig:linear-m-N-10-D-10}{{d}{9}{$D=10$, $N=10$\relax }{figure.caption.21}{}}
+\newlabel{fig:linear-m-N-10-D-50}{{7e}{9}{$D=50$, $N=10$\relax }{figure.caption.21}{}}
+\newlabel{sub@fig:linear-m-N-10-D-50}{{e}{9}{$D=50$, $N=10$\relax }{figure.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces The Expected Error for changing task mean $m$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:linear-m-N-1-D-1}, \ref  {fig:linear-m-N-10-D-1}, \ref  {fig:linear-m-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:linear-m-N-10-D-1}, \ref  {fig:linear-m-N-10-D-10}, \ref  {fig:linear-m-N-10-D-50}.\relax }}{9}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:linear-m}{{7}{9}{The Expected Error for changing task mean $m$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:linear-m-N-1-D-1}, \ref {fig:linear-m-N-10-D-1}, \ref {fig:linear-m-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:linear-m-N-10-D-1}, \ref {fig:linear-m-N-10-D-10}, \ref {fig:linear-m-N-10-D-50}.\relax }{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Training Samples $N$:}{9}{section*.22}\protected@file@percent }
+\newlabel{fig:nonlinear-N-D-1}{{8a}{9}{$D=1$\relax }{figure.caption.23}{}}
+\newlabel{sub@fig:nonlinear-N-D-1}{{a}{9}{$D=1$\relax }{figure.caption.23}{}}
+\newlabel{fig:nonlinear-N-D-10}{{8b}{9}{$D=10$\relax }{figure.caption.23}{}}
+\newlabel{sub@fig:nonlinear-N-D-10}{{b}{9}{$D=10$\relax }{figure.caption.23}{}}
+\newlabel{fig:nonlinear-N-D-50}{{8c}{9}{$D=50$\relax }{figure.caption.23}{}}
+\newlabel{sub@fig:nonlinear-N-D-50}{{c}{9}{$D=50$\relax }{figure.caption.23}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The Expected Error for changing number of training samples for various dimensional problems.\relax }}{9}{figure.caption.23}\protected@file@percent }
+\newlabel{ref:nonlinear-N}{{8}{9}{The Expected Error for changing number of training samples for various dimensional problems.\relax }{figure.caption.23}{}}
+\citation{Denevi2018a}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Number of Gradient Steps $n_{{iter}}$:}{10}{section*.24}\protected@file@percent }
+\newlabel{fig:nonlinear-n_iter-N-1-D-1}{{9a}{10}{$D=1$, $N=1$\relax }{figure.caption.25}{}}
+\newlabel{sub@fig:nonlinear-n_iter-N-1-D-1}{{a}{10}{$D=1$, $N=1$\relax }{figure.caption.25}{}}
+\newlabel{fig:nonlinear-n_iter-N-10-D-1}{{9b}{10}{$D=1$, $N=10$\relax }{figure.caption.25}{}}
+\newlabel{sub@fig:nonlinear-n_iter-N-10-D-1}{{b}{10}{$D=1$, $N=10$\relax }{figure.caption.25}{}}
+\newlabel{fig:nonlinear-n_iter-N-50-D-1}{{9c}{10}{$D=1$, $N=50$\relax }{figure.caption.25}{}}
+\newlabel{sub@fig:nonlinear-n_iter-N-50-D-1}{{c}{10}{$D=1$, $N=50$\relax }{figure.caption.25}{}}
+\newlabel{fig:nonlinear-n_iter-N-10-D-10}{{9d}{10}{$D=10$, $N=10$\relax }{figure.caption.25}{}}
+\newlabel{sub@fig:nonlinear-n_iter-N-10-D-10}{{d}{10}{$D=10$, $N=10$\relax }{figure.caption.25}{}}
+\newlabel{fig:nonlinear-n_iter-N-100-D-50}{{9e}{10}{$D=50$, $N=10$\relax }{figure.caption.25}{}}
+\newlabel{sub@fig:nonlinear-n_iter-N-100-D-50}{{e}{10}{$D=50$, $N=10$\relax }{figure.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The Expected Error for changing number of gradient steps $n_{{iter}}$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:nonlinear-n_iter-N-1-D-1}, \ref  {fig:nonlinear-n_iter-N-10-D-1}, \ref  {fig:nonlinear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:nonlinear-n_iter-N-10-D-1}, \ref  {fig:nonlinear-n_iter-N-10-D-10}, \ref  {fig:nonlinear-n_iter-N-10-D-50}.\relax }}{10}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:nonlinear-n_iter}{{9}{10}{The Expected Error for changing number of gradient steps $\iter $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:nonlinear-n_iter-N-1-D-1}, \ref {fig:nonlinear-n_iter-N-10-D-1}, \ref {fig:nonlinear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:nonlinear-n_iter-N-10-D-1}, \ref {fig:nonlinear-n_iter-N-10-D-10}, \ref {fig:nonlinear-n_iter-N-10-D-50}.\relax }{figure.caption.25}{}}
+\@writefile{toc}{\contentsline {paragraph}{Effect of Phase Task Variance $c_2$:}{10}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Overall Discussion of the Results}{10}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The extend of generalization of MAML:}{10}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Model-agnosticism of MAML:}{10}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Generalization as a result of non-convexity:}{10}{section*.30}\protected@file@percent }
+\citation{Fallah2021}
+\citation{Finn2017}
+\citation{Denevi2018}
+\citation{Denevi2018a}
+\citation{Finn2017}
+\newlabel{fig:nonlinear-c2-N-1-D-1}{{10a}{11}{$D=1$, $N=1$\relax }{figure.caption.27}{}}
+\newlabel{sub@fig:nonlinear-c2-N-1-D-1}{{a}{11}{$D=1$, $N=1$\relax }{figure.caption.27}{}}
+\newlabel{fig:nonlinear-c2-N-10-D-1}{{10b}{11}{$D=1$, $N=10$\relax }{figure.caption.27}{}}
+\newlabel{sub@fig:nonlinear-c2-N-10-D-1}{{b}{11}{$D=1$, $N=10$\relax }{figure.caption.27}{}}
+\newlabel{fig:nonlinear-c2-N-50-D-1}{{10c}{11}{$D=1$, $N=50$\relax }{figure.caption.27}{}}
+\newlabel{sub@fig:nonlinear-c2-N-50-D-1}{{c}{11}{$D=1$, $N=50$\relax }{figure.caption.27}{}}
+\newlabel{fig:nonlinear-c2-N-10-D-10}{{10d}{11}{$D=10$, $N=10$\relax }{figure.caption.27}{}}
+\newlabel{sub@fig:nonlinear-c2-N-10-D-10}{{d}{11}{$D=10$, $N=10$\relax }{figure.caption.27}{}}
+\newlabel{fig:nonlinear-c2-N-10-D-50}{{10e}{11}{$D=50$, $N=10$\relax }{figure.caption.27}{}}
+\newlabel{sub@fig:nonlinear-c2-N-10-D-50}{{e}{11}{$D=50$, $N=10$\relax }{figure.caption.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:nonlinear-c2-N-1-D-1}, \ref  {fig:nonlinear-c2-N-10-D-1}, \ref  {fig:nonlinear-c2-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:nonlinear-c2-N-10-D-1}, \ref  {fig:nonlinear-c2-N-10-D-10}, \ref  {fig:nonlinear-c2-N-10-D-50}.\relax }}{11}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:nonlinear-c2}{{10}{11}{The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:nonlinear-c2-N-1-D-1}, \ref {fig:nonlinear-c2-N-10-D-1}, \ref {fig:nonlinear-c2-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:nonlinear-c2-N-10-D-1}, \ref {fig:nonlinear-c2-N-10-D-10}, \ref {fig:nonlinear-c2-N-10-D-50}.\relax }{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {paragraph}{Additional Remarks:}{11}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{11}{section.5}\protected@file@percent }
+\newlabel{sec:conc}{{5}{11}{Conclusion}{section.5}{}}
 \bibstyle{unsrt}
 \bibdata{../../../../../Dropbox/archive_bib/library.bib}
 \bibcite{Finn2017}{1}
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:y equals x}{{1a}{2}{$\lab = \trans {\feat }\task $\relax }{figure.caption.1}{}}
-\newlabel{sub@fig:y equals x}{{a}{2}{$\lab = \trans {\feat }\task $\relax }{figure.caption.1}{}}
-\newlabel{fig:three sin x}{{1b}{2}{$\lab = \trans {\sine (\feat +\phase )}\task $\relax }{figure.caption.1}{}}
-\newlabel{sub@fig:three sin x}{{b}{2}{$\lab = \trans {\sine (\feat +\phase )}\task $\relax }{figure.caption.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 100 sample tasks drawn from $p_\mathbf  {a}$ for linear and $p_{\mathbf  {a},\bm  {\phi }}$ nonlinear tasks\relax }}{2}{figure.caption.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Experimental Setting}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Linear Regression Problem}{2}{subsection.3.1}\protected@file@percent }
-\newlabel{eq:linearreg}{{1}{2}{Linear Regression Problem}{equation.3.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Results and Discussion}{2}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{2}{section.5}\protected@file@percent }
+\bibcite{Flennerhag2019}{2}
+\bibcite{Nichol2018}{3}
+\bibcite{Rajasegaran2020}{4}
+\bibcite{Collins2020}{5}
+\bibcite{Guiroy2019a}{6}
+\bibcite{Antoniou2019}{7}
+\bibcite{Khodak2019}{8}
+\bibcite{Bernacchia2021}{9}
+\bibcite{Collins2020b}{10}
+\bibcite{Fallah2021}{11}
+\bibcite{Denevi2018a}{12}
+\bibcite{Denevi2019}{13}
+\bibcite{Kuzborskij2017}{14}
+\bibcite{Kuzborskij2017a}{15}
+\bibcite{Bai2020}{16}
+\bibcite{Lam2015}{17}
+\bibcite{Paszke2019}{18}
+\bibcite{Nakkiran2020b}{19}
+\bibcite{Denevi2018}{20}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Appendix}{13}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Linear Problem}{13}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}Effect of Sample Noise Standard Deviation $\sigma $}{13}{subsubsection.6.1.1}\protected@file@percent }
+\newlabel{fig:linear-std_y-N-1-D-1}{{11a}{13}{$D=1$, $N=1$\relax }{figure.caption.34}{}}
+\newlabel{sub@fig:linear-std_y-N-1-D-1}{{a}{13}{$D=1$, $N=1$\relax }{figure.caption.34}{}}
+\newlabel{fig:linear-std_y-N-10-D-1}{{11b}{13}{$D=1$, $N=10$\relax }{figure.caption.34}{}}
+\newlabel{sub@fig:linear-std_y-N-10-D-1}{{b}{13}{$D=1$, $N=10$\relax }{figure.caption.34}{}}
+\newlabel{fig:linear-std_y-N-50-D-1}{{11c}{13}{$D=1$, $N=50$\relax }{figure.caption.34}{}}
+\newlabel{sub@fig:linear-std_y-N-50-D-1}{{c}{13}{$D=1$, $N=50$\relax }{figure.caption.34}{}}
+\newlabel{fig:linear-std_y-N-10-D-10}{{11d}{13}{$D=10$, $N=10$\relax }{figure.caption.34}{}}
+\newlabel{sub@fig:linear-std_y-N-10-D-10}{{d}{13}{$D=10$, $N=10$\relax }{figure.caption.34}{}}
+\newlabel{fig:linear-std_y-N-10-D-50}{{11e}{13}{$D=50$, $N=10$\relax }{figure.caption.34}{}}
+\newlabel{sub@fig:linear-std_y-N-10-D-50}{{e}{13}{$D=50$, $N=10$\relax }{figure.caption.34}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces The Expected Error for changing noise standard deviation $\sigma $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:linear-std_y-N-1-D-1}, \ref  {fig:linear-std_y-N-10-D-1}, \ref  {fig:linear-std_y-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:linear-std_y-N-10-D-1}, \ref  {fig:linear-std_y-N-10-D-10}, \ref  {fig:linear-std_y-N-10-D-50}.\relax }}{13}{figure.caption.34}\protected@file@percent }
+\newlabel{fig:linear-std_y}{{11}{13}{The Expected Error for changing noise standard deviation $\sigma $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:linear-std_y-N-1-D-1}, \ref {fig:linear-std_y-N-10-D-1}, \ref {fig:linear-std_y-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:linear-std_y-N-10-D-1}, \ref {fig:linear-std_y-N-10-D-10}, \ref {fig:linear-std_y-N-10-D-50}.\relax }{figure.caption.34}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.2}Effect of Input Variance $k$}{13}{subsubsection.6.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Nonlinear Problem}{13}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}Effect of Sample Noise Standard Deviation $\sigma $}{13}{subsubsection.6.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.2}Effect of Amplitude Variance $c_1$}{13}{subsubsection.6.2.2}\protected@file@percent }
+\newlabel{fig:linear-b-N-1-D-1}{{12a}{14}{$D=1$, $N=1$\relax }{figure.caption.35}{}}
+\newlabel{sub@fig:linear-b-N-1-D-1}{{a}{14}{$D=1$, $N=1$\relax }{figure.caption.35}{}}
+\newlabel{fig:linear-b-N-10-D-1}{{12b}{14}{$D=1$, $N=10$\relax }{figure.caption.35}{}}
+\newlabel{sub@fig:linear-b-N-10-D-1}{{b}{14}{$D=1$, $N=10$\relax }{figure.caption.35}{}}
+\newlabel{fig:linear-b-N-50-D-1}{{12c}{14}{$D=1$, $N=50$\relax }{figure.caption.35}{}}
+\newlabel{sub@fig:linear-b-N-50-D-1}{{c}{14}{$D=1$, $N=50$\relax }{figure.caption.35}{}}
+\newlabel{fig:linear-b-N-10-D-10}{{12d}{14}{$D=10$, $N=10$\relax }{figure.caption.35}{}}
+\newlabel{sub@fig:linear-b-N-10-D-10}{{d}{14}{$D=10$, $N=10$\relax }{figure.caption.35}{}}
+\newlabel{fig:linear-b-N-10-D-50}{{12e}{14}{$D=50$, $N=10$\relax }{figure.caption.35}{}}
+\newlabel{sub@fig:linear-b-N-10-D-50}{{e}{14}{$D=50$, $N=10$\relax }{figure.caption.35}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces The Expected Error for changing noise standard deviation $k$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:linear-b-N-1-D-1}, \ref  {fig:linear-b-N-10-D-1}, \ref  {fig:linear-b-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:linear-b-N-10-D-1}, \ref  {fig:linear-b-N-10-D-10}, \ref  {fig:linear-b-N-10-D-50}.\relax }}{14}{figure.caption.35}\protected@file@percent }
+\newlabel{fig:linear-b}{{12}{14}{The Expected Error for changing noise standard deviation $k$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:linear-b-N-1-D-1}, \ref {fig:linear-b-N-10-D-1}, \ref {fig:linear-b-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:linear-b-N-10-D-1}, \ref {fig:linear-b-N-10-D-10}, \ref {fig:linear-b-N-10-D-50}.\relax }{figure.caption.35}{}}
+\newlabel{fig:nonlinear-std_y-N-1-D-1}{{13a}{14}{$D=1$, $N=1$\relax }{figure.caption.36}{}}
+\newlabel{sub@fig:nonlinear-std_y-N-1-D-1}{{a}{14}{$D=1$, $N=1$\relax }{figure.caption.36}{}}
+\newlabel{fig:nonlinear-std_y-N-10-D-1}{{13b}{14}{$D=1$, $N=10$\relax }{figure.caption.36}{}}
+\newlabel{sub@fig:nonlinear-std_y-N-10-D-1}{{b}{14}{$D=1$, $N=10$\relax }{figure.caption.36}{}}
+\newlabel{fig:nonlinear-std_y-N-50-D-1}{{13c}{14}{$D=1$, $N=50$\relax }{figure.caption.36}{}}
+\newlabel{sub@fig:nonlinear-std_y-N-50-D-1}{{c}{14}{$D=1$, $N=50$\relax }{figure.caption.36}{}}
+\newlabel{fig:nonlinear-std_y-N-10-D-10}{{13d}{14}{$D=10$, $N=10$\relax }{figure.caption.36}{}}
+\newlabel{sub@fig:nonlinear-std_y-N-10-D-10}{{d}{14}{$D=10$, $N=10$\relax }{figure.caption.36}{}}
+\newlabel{fig:nonlinear-std_y-N-10-D-50}{{13e}{14}{$D=50$, $N=10$\relax }{figure.caption.36}{}}
+\newlabel{sub@fig:nonlinear-std_y-N-10-D-50}{{e}{14}{$D=50$, $N=10$\relax }{figure.caption.36}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces The Expected Error for changing noise standard deviation $\sigma $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:nonlinear-std_y-N-1-D-1}, \ref  {fig:nonlinear-std_y-N-10-D-1}, \ref  {fig:nonlinear-std_y-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:nonlinear-std_y-N-10-D-1}, \ref  {fig:nonlinear-std_y-N-10-D-10}, \ref  {fig:nonlinear-std_y-N-10-D-50}.\relax }}{14}{figure.caption.36}\protected@file@percent }
+\newlabel{fig:nonlinear-std_y}{{13}{14}{The Expected Error for changing noise standard deviation $\sigma $ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:nonlinear-std_y-N-1-D-1}, \ref {fig:nonlinear-std_y-N-10-D-1}, \ref {fig:nonlinear-std_y-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:nonlinear-std_y-N-10-D-1}, \ref {fig:nonlinear-std_y-N-10-D-10}, \ref {fig:nonlinear-std_y-N-10-D-50}.\relax }{figure.caption.36}{}}
+\newlabel{fig:nonlinear-c1-N-1-D-1}{{14a}{15}{$D=1$, $N=1$\relax }{figure.caption.37}{}}
+\newlabel{sub@fig:nonlinear-c1-N-1-D-1}{{a}{15}{$D=1$, $N=1$\relax }{figure.caption.37}{}}
+\newlabel{fig:nonlinear-c1-N-10-D-1}{{14b}{15}{$D=1$, $N=10$\relax }{figure.caption.37}{}}
+\newlabel{sub@fig:nonlinear-c1-N-10-D-1}{{b}{15}{$D=1$, $N=10$\relax }{figure.caption.37}{}}
+\newlabel{fig:nonlinear-c1-N-50-D-1}{{14c}{15}{$D=1$, $N=50$\relax }{figure.caption.37}{}}
+\newlabel{sub@fig:nonlinear-c1-N-50-D-1}{{c}{15}{$D=1$, $N=50$\relax }{figure.caption.37}{}}
+\newlabel{fig:nonlinear-c1-N-10-D-10}{{14d}{15}{$D=10$, $N=10$\relax }{figure.caption.37}{}}
+\newlabel{sub@fig:nonlinear-c1-N-10-D-10}{{d}{15}{$D=10$, $N=10$\relax }{figure.caption.37}{}}
+\newlabel{fig:nonlinear-c1-N-10-D-50}{{14e}{15}{$D=50$, $N=10$\relax }{figure.caption.37}{}}
+\newlabel{sub@fig:nonlinear-c1-N-10-D-50}{{e}{15}{$D=50$, $N=10$\relax }{figure.caption.37}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces The Expected Error for changing noise standard deviation $c_1$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref  {fig:nonlinear-c1-N-1-D-1}, \ref  {fig:nonlinear-c1-N-10-D-1}, \ref  {fig:nonlinear-c1-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref  {fig:nonlinear-c1-N-10-D-1}, \ref  {fig:nonlinear-c1-N-10-D-10}, \ref  {fig:nonlinear-c1-N-10-D-50}.\relax }}{15}{figure.caption.37}\protected@file@percent }
+\newlabel{fig:nonlinear-c1}{{14}{15}{The Expected Error for changing noise standard deviation $c_1$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref {fig:nonlinear-c1-N-1-D-1}, \ref {fig:nonlinear-c1-N-10-D-1}, \ref {fig:nonlinear-c1-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref {fig:nonlinear-c1-N-10-D-1}, \ref {fig:nonlinear-c1-N-10-D-10}, \ref {fig:nonlinear-c1-N-10-D-50}.\relax }{figure.caption.37}{}}

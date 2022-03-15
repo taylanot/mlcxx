@@ -1,30 +1,105 @@
-Throughout this work uppercase bold letters (\eg $\mathbf{X}$), lowercase bold letters (\eg $\mathbf{x}$) and lowercase letters (\eg ${x}$) are used for matricies, vectors and scalars. Moreover, the vectors are assumed to be stored in columns.
+Throughout this work uppercase bold letters (\eg $\mathbf{X}$), lowercase bold letters (\eg $\mathbf{x}$) and lowercase letters (\eg ${x}$) are used for matricies, vectors and scalars respectively. Moreover, the vectors are assumed to be stored in columns. Finally, the $\I_{D}$ represents a $D\times D$ identity matrix. Moreover, the $\ones_{D}$ and $\zeros_{D}$ represents $D\times 1$ vector of ones and zeros respectively.
 
+\subsection{Learning Problems}
 
-\subsection{Linear Regression Problem}
+\subsubsection{Linear Regression}\label{sec:Linear}
 
-Consider the conventional linear regression setting in $\R^D$
+Consider the conventional linear regression problem in $\R^D$ is given by
 \begin{equation}\label{eq:linearreg}
-  \lab = \trans{\feat}\task+\noise
+  \lab = \trans{\inp}\scaletask+\noise
 \end{equation}
-where, $\lab\in\R$, $\feat\in\R^D$, $\task\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of $\task$ corresponds to a task 
+where, $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of a scale term $\scaletask$ corresponds to a task $\task$  observed in the environment and each set of observed $N$ input ($\inp$) and its corresponding label ($\lab$) is represented by a dataset $\dataset_{j}:=(\inp, \lab)_{i=1}^{N}$. 
+
+\subsubsection{Nonlinear Regression}\label{sec:Nonlinear}
+
+Consider a nonlinear regression problem in $\R^D$ is given by
+\begin{equation}\label{eq:nonlinearreg}
+  \lab = \trans{\sine(\inp+\phasetask)}\scaletask+\noise
+\end{equation}
+where, $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of scale term $\scaletask$ and $\phasetask$ corresponds to a task observed in the environment $\task$ and each set of observed $N$ input ($\inp$) and its corresponding label ($\lab$) is represented by a dataset $\dataset_{j}:=(\inp_i, \lab_i)_{i=1}^{N}$.
+
+\subsubsection{General Problem Setting}
+For both problems presented in sections \ref{sec:Linear} and \ref{sec:Nonlinear} sample distribution is given by $\prob_\dataset$ for a given $\task_{k}$ and the task distribution is represented by $\prob_\task$. A model parametrized by $\param$\footnote{Bar on top of the parameters are used to indicate the bias terms inclusion.} is represented by $\model(\inp, \param):\inp\to\lab$. An estimator that is trained with $\dataset_{j}$ that is obtained from the $\task_k$ is represented by $\estim(\inp)$. The discrepancy between the prediction of the estimator $\estim$ and $\lab$ is measured in terms of squared loss $\loss:=(\estim(x)-\lab)^2$. The main loss that this paper tries to investigate is the expected error of an estimator $\estim$ over the $\prob_{\task}$. Then the expected error is represented as
+
+\begin{equation}\label{eq:ee}
+  \EE:= \iiint(\estim(x) - y)^2\prob(\inp, y)\prob_{\dataset}\prob_{\task} d\inp d\lab d\dataset d\task.
+\end{equation}
+
+For the defined expected error and the problem definitions the \textit{Bayes error} is given by $\sigma^2$ that is coming from the noise term, which represents a model that is a perfect estimator.
+
+\subsubsection{Experimental Assumptions}
+For all the problems the input distribution is given by $\prob_\inp\sim\normal{0,k\I}$ where $k$ is a parameter for the variance of the inputs. For the linear problem the $\prob_\task:=\prob(\scaletask)\sim\normal{{m\ones_{D}},{c\I_{D}}}$ and for nonlinear problem the task distribution takes the form of a joint distribution $\prob_\task:=\prob(\scaletask, \phasetask)$ where $\prob_{\scaletask}\sim\normal{\ones_{D},c_1\I_{D}}$ and $\prob_{\phasetask}\sim\normal{\zeros_{D},c_2\I_{D}}$
 
 
-\begin{figure}
-     \centering
-     \begin{subfigure}[b]{0.45\textwidth}
-         \centering
-        \input{Figures/tikz/lin_eg.tex}
-         \caption{$\lab = \trans{\feat}\task$}
-         \label{fig:y equals x}
-     \end{subfigure}
-     \hfill
-     \begin{subfigure}[b]{0.45\textwidth}
-         \centering
-          \input{Figures/tikz/nonlin_eg.tex}
-         \caption{$\lab = \trans{\sine(\feat+\phase)}\task$}
-         \label{fig:three sin x}
-     \end{subfigure}
-  \caption{100 sample tasks drawn from $\prob_\task$ for linear and $\prob_{\task,\phase}$ nonlinear tasks}
-
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures/methods/lin_eg.tikz}
+    \caption{$\lab = \trans{\inp}\scaletask$}
+    \label{fig:lintasks}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures/methods/nonlin_eg.tikz}
+    \caption{$\lab = \trans{\sine(\inp+\phasetask)}\scaletask$}
+    \label{fig:nonlintasks}
+  \end{subfigure}
+  \caption{100 sample tasks drawn from $\prob_\task$ for both linear ($m=0$ and $c=1$) and nonlinear ($c_1=1$ and $c_2=1$) problems.}
 \end{figure}
+
+\subsection{Models} 
+
+\subsubsection{Single Task Learning Models}
+
+Assuming a linear model in the form of $\model(\inp,\slope,\bias):=\inp\slope+\bias$ or $\model(\inp, \param):=\inpbias\param$ with $\inp\in\R^{1\times D}$, $\slope\in\R^{D\times 1}$, $\inpbias\in\R^{1\times D+1}$ and $\param\in\R^{D+1\times}$ where $\param:=\trans{[\slope, \bias]}$ and $\inpbias:=[\inp, 1]$. The optimum collection of parameters ($\opt$) for different models are obtained as follow:
+
+\paragraph{Linear Estimator} is given by the least-squares solution, $\opt:=(\inv{\trans{\design}\design)}\trans{\design}\labs$, where $\design\in\R^{N\times D}$ is the design matrix where the observed input data is stored in rows.
+
+\paragraph{Ridge Estimator} is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}\trans{\design}\labs$ which is obtained by minimizing the squared loss with the additional term of $\ridge\norm{\param}{2}^2$.
+
+\paragraph{General Ridge Estimator} is a version of \textit{Ridge Estimator} with the capability to penalize towards a given vector instead of a zero vector. It is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}(\trans{\design}\labs+\ridge\genridge)$ by minimizing the squared loss with the additional term $\ridge\norm{\param-\genridge}{2}^2$, where $\genridge\in\R^{D\times 1}$.   
+
+\paragraph{Kernel Ridge Estimator} is given by $\param = \trans{\design}\weight$ where $\weight:=\inv{(\gram+\ridge\I_{N})}\lab$ where $\gram\in\R^{N\times N}$ is the  \textit{Gram Matrix} obtained by replacing $\trans{\design}\design$ inner product by a kernel $\kernel(\design, \design)$. Then, the prediction of the estimator takes the form $\estim(\pred,\param)=\trans{\weight}\kernel(\pred,\design)$ where $\pred\in\R^{D\times 1}$.
+
+\paragraph{Gradient Descent Estimator} for a given number of iterations $\iter$ the gradient descent estimator is given by $\slope_{j+1}=\slope_{j} - \lr\sum_i^{N}\inp_i(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$ and $\bias_{j+1}=\bias_{j} - \lr\sum_i^{N}(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$.
+
+\subsubsection{Meta Learning Models}
+
+\paragraph{Model-Agnostic Meta Learning (MAML)} aims to obtain an intermediate model that is able to generalize well after adaptation to a dataset $\dataset$ observed from a new and unseen task $\task_i$ drawn from $\prob_\task$ where the number of training points $K$ and number of iterations $\iter$ are limited. The general procedure for supervised learning problems is given in Algorithm \ref{alg:MAML}.
+
+\begin{algorithm}
+  \caption{MAML\cite{Finn2017} Algorithm}\label{alg:MAML}
+  \KwData{$\prob_{\task}$, $\alpha$, $\beta$}
+  \KwResult{Intermediate Model $\model(\param_{meta})$}
+  initialize $\param$ randomly; \\
+  \While{not done}
+  {
+    sample a batch of tasks $\task_i$ from $\prob_{\task}$\\
+    \ForAll{$\task_i$}
+    {
+      Obtain future gradients: $\grad{\param}\loss_{\task_i}(\model(\param))$ wrt. $\dataset_K$ \\
+      Possible future parameters: $\param_i^\prime = \param_i -\alpha\grad{\param}\loss_{\task_i}(\model(\param))$
+    }
+    Update: $\param \leftarrow \param- \beta\grad{\param}\sum\loss_{\task_i}(\model(\param_i^\prime))$
+  }
+\end{algorithm}
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures/methods/lin_maml.tikz}
+    \caption{Linear Problem}
+    \label{fig:lin_maml}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures/methods/nonlin_maml.tikz}
+    \caption{Nonlinear Problem}
+    \label{fig:nonlin_maml}
+  \end{subfigure}
+  \caption{Visualizing the MAML intermediate model. 100 sample tasks drawn from $\prob_\task$ for both linear ($m=0$ and $c=1$) and nonlinear ($c_1=2$ and $c_2=2$) problems shown transparent and intermediate model trained (obtained from MAML algorithm) for 1D cases of the experimentation given with solid dark orange line.}
+\end{figure}
+
+

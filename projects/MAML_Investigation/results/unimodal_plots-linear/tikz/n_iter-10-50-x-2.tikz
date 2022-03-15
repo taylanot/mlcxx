@@ -1,0 +1,92 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate217952}{RGB}{217,95,2}
+\definecolor{darkcyan27158119}{RGB}{27,158,119}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
+\definecolor{lightslategray117112179}{RGB}{117,112,179}
+\definecolor{olivedrab10216630}{RGB}{102,166,30}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=none},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={\(\displaystyle n\)},
+xmin=0, xmax=80,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Expected Error},
+ymin=0.75508274230607, ymax=11.5176554525493,
+ytick style={color=black}
+]
+\addplot [semithick, darkcyan27158119]
+table {%
+0 10.8643227049792
+10 1.30264702485407
+20 1.27898488969847
+30 1.28358354249911
+40 1.29062835599866
+50 1.29336012947113
+60 1.29313886133164
+70 1.28811089224953
+80 1.28544374192371
+90 1.28803444049909
+};
+\addlegendentry{GD-$\eta$:0.2223}
+\addplot [semithick, chocolate217952]
+table {%
+0 1.28283761822388
+10 1.2821630573923
+20 1.28637454459375
+30 1.29666062488459
+40 1.28423435559167
+50 1.28190980232084
+60 1.28930203646874
+70 1.28841366666548
+80 1.27883059685225
+90 1.29032418232842
+};
+\addlegendentry{Ridge-$\lambda$:2.2223}
+\addplot [semithick, lightslategray117112179, dashed]
+table {%
+0 1.24614173695473
+20 1.24684876580357
+40 1.24429059277167
+60 1.25012795414682
+80 1.24791067253349
+};
+\addlegendentry{Bayes}
+\addplot [semithick, deeppink23141138]
+table {%
+0 11.0284476020837
+10 1.27973217276018
+20 1.28540821831848
+30 1.28531771660341
+40 1.28806432300703
+50 1.28812612553632
+60 1.29123331123801
+70 1.2900164318019
+80 1.28917008656963
+90 1.29331539237872
+};
+\addlegendentry{MAML-$\eta$:0.3334}
+\addplot [semithick, olivedrab10216630]
+table {%
+0 1.27351724660639
+10 1.2768239856897
+20 1.27715501196858
+30 1.27272540452456
+40 1.27695392368917
+50 1.27802200460453
+60 1.27393028002149
+70 1.27801977713018
+80 1.27591020123755
+90 1.27908619887938
+};
+\addlegendentry{General Ridge-$\lambda$:17.7778}
+\end{axis}
+
+\end{tikzpicture}

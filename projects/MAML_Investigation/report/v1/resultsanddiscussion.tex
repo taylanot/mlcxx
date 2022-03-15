@@ -1,0 +1,344 @@
+This section is dedicated to the expected error results of certain meta-learning models and some individual task learning models with the aim to see their performance differences certain scenarios. The utilized models that have meta information are;
+\begin{itemize}
+  \item \textbf{GD}: corresponds to gradient descent with $\iter$ with the adjustable parameters obtained from the mean of the tasks $\mathbb{E}[\prob_{\task}]$. (\eg considering the linear problem the with $\prob_{\slope}\sim\normal{\zeros}{\I}$, the initial starting point of the linear model is $\param=\zeros$.)
+  \item \textbf{MAML}(for linear problem): corresponds to gradient descent with $\iter$ with the adjustable parameters obtained from the mean of the tasks $\mathbb{E}[\prob_{\task}]$ with small perturbation $\delta\sim\normal{\zeros}{0.1\I}$. (In \cite{Nakkiran2020b} it is shown that the learning rate can have a regularizing effect in a similar fashion one might conjecture that the learning rate and the stopping point of the meta-training phase can have a similar effect. Moreover, in a more realistic scenario the stopping point is rather arbitrary. Thus, this model is especially interesting to investigate.)
+  \item \textbf{MAML}(for nonlinear problem): MAML algorithm trained with the information given in \cite{Finn2017} for the sinusoidal regression problem. It should be noted that network architecture and all the other hyper-parameters are taken from the paper exactly.
+  \item \textbf{General Ridge}: unlike the conventional regularization additional $\genridge$ is needed for this method which is taken to be the $\mathbb{E}[\prob_{\task}]$. In \cite{Denevi2018a}, a framework is presented on how to find the $\genridge$, however, in our experimentation we assume it to be known a priori. This is similar to GD and MAML models presented above.
+\end{itemize} 
+Models without the meta information are;
+\begin{itemize}
+  \item \textbf{Linear}: standard least squares solution.
+  \item \textbf{Ridge}: standard least squares solution with $L_2-regularization$.
+  \item \textbf{random GD}: gradient descent with $\iter$ with the adjustable parameters starting from a random initialization.
+  \item \textbf{Kernel Ridge}: kernalized (with Radial Basis Function Kernel) 
+\end{itemize}
+
+It should be noted that the hyper-parameters of the utilized models, if there are any, are not tuned, properly as it would increase the computational burden of the problem to another level. However, a simple grid search is employed with 20 different values and only the one with the lowest mean expected error over the parameter under investigation is presented for the results. 
+
+\subsection{Linear Problem}
+The linear problem introduced in Section \ref{sec:Linear} has the parameters controlling the dimensionality $D$, number of training samples $N$, number of gradient steps $\iter$, the task variance $c$ and task mean $m$, and the variance of the input samples $k$. For the sake of brevity only some of the parameters are discussed in this section. Unless the parameter in configuration is under investigation, the default values are utilized. And, the default values are given as,
+\begin{itemize}
+  \item $\sigma=1$,
+  \item $m=0$,
+  \item $k=1$,
+  \item $c=1$,
+  \item $\iter=1$.
+\end{itemize}
+Moreover, the number of tasks drawn ($N_{\task}$), and dataset draws ($N_{\dataset})$  for approximating the expected error given in Equation \ref{eq:ee} are taken to be $100$ each. Finally, the test set size is taken as 1000.
+
+\paragraph{Effect of Training Samples $N$:} The results of this experiment can be found in Figure \ref{fig:linear-N} for increasing problem dimensionality ($D:1\to50$). It can be seen that the "Linear" model suffers from singularities, however, it is able to have comparable performance over all the selected problem dimensionalities. Moreover, for the increasing training samples case the Ridge regression variants perform much better as for all the cases they Converge towards the "Bayes" error. However, for the gradient descent variant models whether there exists task information (\eg MAML, GD) are unable converge towards the Bayes error. Which can be attributed to the regularizing effect of the gradient steps ($\iter$) allowed for the models. Overall, the improvement that the addition task related information brings to the gradient based models, as the "random GD" model is orders of magnitude higher expected error. Although, task information performance increase the number of gradient step limitation hinders the gradient based models capability to decrease the expected error further.
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/N/Ntrn-1-1-x-0.tikz}
+      \caption{$D=1$}
+      \label{fig:linear-N-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/N/Ntrn-10-1-x-0.tikz}
+      \caption{$D=10$}
+      \label{fig:linear-N-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/N/Ntrn-50-1-x-0.tikz}
+      \caption{$D=50$}
+      \label{fig:linear-N-D-50}
+    \end{subfigure}
+  \caption{The Expected Error for changing number of training samples for various dimensional problems.}\label{fig:linear-N}
+\end{figure}
+
+
+\paragraph{Effect of Dimensionality $D$:} This results are quite similar to the ones obtained with training samples. It can be observed from Figure \ref{fig:linear-D}, aside from singularities the "Linear" model variants yield lower expected error compared to the gradient descent variants and this gap increases as the dimensionality of the problem or the number of training samples increases. Looking at Figure \ref{fig:linear-N-D-10} it can be observed that for number of training samples around the dimensionality of the problem "Ridge" variant models perform much better, but as the dimensionality of the problem increases the gap between the performances of the "Ridge" variants and the gradient descent variants.
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/dim/dim-1-x-0.tikz}
+      \caption{$N=1$}
+      \label{fig:linear-D-N-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/dim/dim-10-x-0.tikz}
+      \caption{$N=10$}
+      \label{fig:linear-D-N-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/dim/dim-50-x-0.tikz}
+      \caption{$N=50$}
+      \label{fig:linear-D-N-50}
+    \end{subfigure}
+  \caption{The Expected Error for changing number of dimensions for various number of training points.}\label{fig:linear-D}
+\end{figure}
+
+
+\paragraph{Effect of Task Variance $c$:} The results of increasing task variance for various problem dimensions and various number of training samples can be found in Figure \ref{fig:linear-c}. The increasing task variance for all the models that utilizes gradient descent, results in increasing expected error, whereas the "Linear" and "Ridge" variants are only effected by this phenomenon only for problem dimensionality $D\geq N$. In the light of this, observation another important result is the fact that for $N\geq D$  for small task variance the gradient descent variants, other than randomly initialized model, the expected error is lower than the "Ridge" variants. Although this performance diminishes with increasing problem dimensionality and the increasing number of training points. It is interesting to see a better performance from just one gradient step. That is why an extra mini-experimentation is done for the GD and MAML models to investigate if there is a performance improvement with the additional. The results of this experimentation is given in Table \ref{tab:zoom}. It is clear from the table that there exists point at which the gradient steps are hurting the expected error one would get in this range after the second gradient step. Then, it can be conjectured that the number of gradient steps have a regularizing effect for the small variance tasks. Although, this surprising performance of MAML like algorithms, the performance of "Ridge" variants is much stable and performs reasonably better than gradient based methods. 
+
+\begin{table}
+  \centering
+  \caption{Mean Expected Error for the range $c:[0,1]$ range with various gradient steps for the MAML and GD models with $\lr=0.334$. Note that only $D=1$, $N=10$ case (see Figure \ref{fig:linear-c-N-10-D-1}) is presented.}\label{tab:zoom}
+  \begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|}
+    \cline{2-11}
+     & \multicolumn{10}{|c|}{$\iter$}\\
+    \cline{2-11}
+     & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
+    \hline
+    \multicolumn{1}{|c|}{GD} & 1.2152 &  \textbf{1.1936} & 1.2048 & 1.2140 &  1.2268 & 1.2390 & 1.2604 & 1.2970 &1.3825 & 1.5748\\
+    \hline
+    \multicolumn{1}{|c|}{MAML} & 1.2132 & \textbf{1.1938} & 1.2067 & 1.2171 & 1.2318 & 1.2476 & 1.2773 & 1.3330 & 1.4622 & 1.7556  \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/c/c-1-1-x-0.tikz}
+      \caption{$D=1$, $N=1$}
+      \label{fig:linear-c-N-1-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/c/c-1-10-x-0.tikz}
+      \caption{$D=1$, $N=10$}
+      \label{fig:linear-c-N-10-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/c/c-1-50-x-0.tikz}
+      \caption{$D=1$, $N=50$}
+      \label{fig:linear-c-N-50-D-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/c/c-10-10-x-0.tikz}
+      \caption{$D=10$, $N=10$}
+      \label{fig:linear-c-N-10-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/c/c-50-10-x-0.tikz}
+      \caption{$D=50$, $N=10$}
+      \label{fig:linear-c-N-10-D-50}
+    \end{subfigure}  
+
+  \caption{The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref{fig:linear-c-N-1-D-1}, \ref{fig:linear-c-N-10-D-1}, \ref{fig:linear-c-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref{fig:linear-c-N-10-D-1}, \ref{fig:linear-c-N-10-D-10}, \ref{fig:linear-c-N-10-D-50}.}\label{fig:linear-c}
+\end{figure}
+
+\paragraph{Effect of Number of Gradient Steps $\iter$:} Looking at the interesting results observed from the task variance $c$  the effect of number of gradient steps taken become more relevant. These results can be seen in Figure \ref{fig:linear-n_iter}. It can be observed from Figure \ref{fig:linear-n_iter-N-1-D-1} that for low number of training samples the gradient steps taken has little to no influence. But as the number of training samples increase for a given problem dimensionality the effect $\iter$ on the expected  error gets much prominent. It is evident that compared to single task learning with gradient descent from a random initialization starting from a more informative point (\eg near the task mean) decreases the number of gradient steps for the convergence. Moreover, for the $D=N$ case it even improves generalization after convergence too (see Figures \ref{fig:linear-n_iter-N-10-D-10} and \ref{fig:linear-n_iter-N-1-D-1}). Overall, it can be observed that the increasing $\iter$ converges towards the "Ridge" model variants with the exception of $D=1$ and $N=1$ case.
+ 
+\begin{figure}[h!]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/n_iter/n_iter-1-1-x-0.tikz}
+      \caption{$D=1$, $N=1$}
+      \label{fig:linear-n_iter-N-1-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/n_iter/n_iter-1-10-x-0.tikz}
+      \caption{$D=1$, $N=10$}
+      \label{fig:linear-n_iter-N-10-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/n_iter/n_iter-1-50-x-0.tikz}
+      \caption{$D=1$, $N=50$}
+      \label{fig:linear-n_iter-N-50-D-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/n_iter/n_iter-10-10-x-0.tikz}
+      \caption{$D=10$, $N=10$}
+      \label{fig:linear-n_iter-N-10-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/n_iter/n_iter-50-10-x-0.tikz}
+      \caption{$D=50$, $N=10$}
+      \label{fig:linear-n_iter-N-10-D-50}
+    \end{subfigure}  
+
+  \caption{The Expected Error for changing number of gradient steps $\iter$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref{fig:linear-n_iter-N-1-D-1}, \ref{fig:linear-n_iter-N-10-D-1}, \ref{fig:linear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref{fig:linear-n_iter-N-10-D-1}, \ref{fig:linear-n_iter-N-10-D-10}, \ref{fig:linear-n_iter-N-10-D-50}.}\label{fig:linear-n_iter}
+\end{figure}
+
+
+\paragraph{Effect of Task Mean $m$:} The results can be seen in Figure \ref{fig:linear-m}. The most important observation from this experimentation is that the "Ridge" model has increasing expected error for the cases of $N\leq D$ cases (see Figures \ref{fig:linear-m-N-1-D-1}, \ref{fig:linear-m-N-10-D-10} and \ref{fig:linear-m-N-10-D-50}) and mostly the best $\lambda$ from the trials is found to be the lowest value, which makes the "Ridge" model behave same as the "Linear" model. However, "General Ridge" model that has prior information regarding the task centroid does not suffer from this. Furthermore, other models which have prior task information does not seem to be effected from the task mean shifting in the task space, as expected. Again, superiority of including information from the task space is observed.
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/m/m-1-1-x-0.tikz}
+      \caption{$D=1$, $N=1$}
+      \label{fig:linear-m-N-1-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/m/m-1-10-x-0.tikz}
+      \caption{$D=1$, $N=10$}
+      \label{fig:linear-m-N-10-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/m/m-1-50-x-0.tikz}
+      \caption{$D=1$, $N=50$}
+      \label{fig:linear-m-N-50-D-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/m/m-10-10-x-0.tikz}
+      \caption{$D=10$, $N=10$}
+      \label{fig:linear-m-N-10-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/linres/m/m-50-10-x-0.tikz}
+      \caption{$D=50$, $N=10$}
+      \label{fig:linear-m-N-10-D-50}
+    \end{subfigure}  
+
+  \caption{The Expected Error for changing task mean $m$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref{fig:linear-m-N-1-D-1}, \ref{fig:linear-m-N-10-D-1}, \ref{fig:linear-m-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref{fig:linear-m-N-10-D-1}, \ref{fig:linear-m-N-10-D-10}, \ref{fig:linear-m-N-10-D-50}.}\label{fig:linear-m}
+\end{figure}
+
+\subsection{Nonlinear Problem}
+
+The nonlinear problem introduced in Section \ref{sec:Nonlinear} has the parameters controlling the dimensionality $D$, number of training samples $N$, number of gradient steps $\iter$, the task variances and means $m_1$ and $m_2$, $c_1$ and $c_2$, and the variance of the input samples $k$. For the sake of brevity only some of the parameters are discussed in this section. Unless the parameter in configuration is under investigation, the default values are utilized. And, the default values are given as,
+\begin{itemize}
+  \item $\sigma=1$,
+  \item $m_1=1$,
+  \item $m_2=0$,
+  \item $c_1=2$,
+  \item $c_2=2$,
+  \item $k=1$,
+  \item $\iter=5$.
+\end{itemize}
+Moreover, the number of tasks drawn ($N_{\task}$), and dataset draws ($N_{\dataset})$  for approximating the expected error given in Equation \ref{eq:ee} are taken to be $50$ each. Finally, the test set size is taken as 1000.
+
+\paragraph{Effect of Training Samples $N$:} By looking at Figure \ref{ref:nonlinear-N} it can be seen that for all the given dimensionalities there exists a training sample amount where the expected error of the "Kernel Ridge" is higher than the "MAML". The most notable behaviour for this experiment is that "Kernel Ridge" models tends towards the Bayes error while the "MAML" converges to a certain value and stays there. This might be again attributed to the fact that the number of gradient steps limitation. Although the expected error are quite high for increasing dimensionality, the results obtained for $D=1$ (Figure \ref{fig:nonlinear-N-D-1}) is still and effective result that shows that for a small number of training samples with limited gradient steps MAML will outperform a convex model "Kernel Ridge".
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/N/Ntrn-1-1-x-0.tikz}
+      \caption{$D=1$}
+      \label{fig:nonlinear-N-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/N/Ntrn-10-1-x-0.tikz}
+      \caption{$D=10$}
+      \label{fig:nonlinear-N-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/N/Ntrn-50-1-x-0.tikz}
+      \caption{$D=50$}
+      \label{fig:nonlinear-N-D-50}
+    \end{subfigure}
+  \caption{The Expected Error for changing number of training samples for various dimensional problems.}\label{ref:nonlinear-N}
+\end{figure}
+
+
+\paragraph{Effect of Number of Gradient Steps $\iter$:} Above presented learning curves, beg the investigation of the effect of $\iter$.  As it can be seen from Figure \ref{fig:nonlinear-n_iter-N-1-D-1}, the single realization of "Kernel Ridge" can have lower expected error for an extreme value of $1$ training sample. However, as the number of training samples increase for a given problem dimensionality "MAML" model starts showing a better expected error. However, the lowest expected error is not realized for a fairly large $\iter$. Moreover, it can be observed that for $N\leq D$ "Kernel Ridge" can achieve lower expected error, and for all the other cases one might find a better "MAML" model given that sufficient gradient steps are allowed. Finally, it should be noted that the number of gradient steps required to perform better than "Kernel Ridge" is fairly low.
+
+\begin{figure}[!htb]
+  \centering
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/n_iter/n_iter-1-1-x-0.tikz}
+      \caption{$D=1$, $N=1$}
+      \label{fig:nonlinear-n_iter-N-1-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/n_iter/n_iter-1-10-x-0.tikz}
+      \caption{$D=1$, $N=10$}
+      \label{fig:nonlinear-n_iter-N-10-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/n_iter/n_iter-1-50-x-0.tikz}
+      \caption{$D=1$, $N=50$}
+      \label{fig:nonlinear-n_iter-N-50-D-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/n_iter/n_iter-10-10-x-0.tikz}
+      \caption{$D=10$, $N=10$}
+      \label{fig:nonlinear-n_iter-N-10-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.3\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/n_iter/n_iter-50-10-x-0.tikz}
+      \caption{$D=50$, $N=10$}
+      \label{fig:nonlinear-n_iter-N-100-D-50}
+    \end{subfigure}  
+  \caption{The Expected Error for changing number of gradient steps $\iter$ with various training samples and various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref{fig:nonlinear-n_iter-N-1-D-1}, \ref{fig:nonlinear-n_iter-N-10-D-1}, \ref{fig:nonlinear-n_iter-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref{fig:nonlinear-n_iter-N-10-D-1}, \ref{fig:nonlinear-n_iter-N-10-D-10}, \ref{fig:nonlinear-n_iter-N-10-D-50}.}\label{fig:nonlinear-n_iter}
+\end{figure}
+
+
+\paragraph{Effect of Phase Task Variance $c_2$:} Remembering that the task variance effect for the linear problem had some interesting properties where even a single gradient step resulted in better expected error values. One might wonder if that is the case for the nonlinear problem as well. As can be seen in Figure \ref{fig:nonlinear-c2} a similar effect is observed for the nonlinear problem too for small training sample size $N$ values. For problem dimensionality of $1$ and  $10$ there is a clear expected error rise between task variance $[0,2]$ as shown in Figures \ref{fig:nonlinear-c2-N-1-D-1},\ref{fig:nonlinear-c2-N-10-D-1},\ref{fig:nonlinear-c2-N-50-D-1} and \ref{fig:nonlinear-c2-N-10-D-10}. Which indicates that the "MAML" even with a limited number of gradient step provide a clear benefit compared to a model that has analytical solution. However, mostly this superiority vanishes as the task variance increases as the increased values of variance lead to worse expected error compared to "Kernel Ridge".
+
+\begin{figure}[!h]
+  \centering
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/c_phase/c_phase-1-1-x-0.tikz}
+      \caption{$D=1$, $N=1$}
+      \label{fig:nonlinear-c2-N-1-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/c_phase/c_phase-1-10-x-0.tikz}
+      \caption{$D=1$, $N=10$}
+      \label{fig:nonlinear-c2-N-10-D-1}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/c_phase/c_phase-1-50-x-0.tikz}
+      \caption{$D=1$, $N=50$}
+      \label{fig:nonlinear-c2-N-50-D-1}
+    \end{subfigure}
+
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/c_phase/c_phase-10-10-x-0.tikz}
+      \caption{$D=10$, $N=10$}
+      \label{fig:nonlinear-c2-N-10-D-10}
+    \end{subfigure}
+    \begin{subfigure}{0.33\textwidth}
+      \centering
+      \includetikz{\textwidth}{Figures/nonlinres/c_phase/c_phase-50-10-x-0.tikz}
+      \caption{$D=50$, $N=10$}
+      \label{fig:nonlinear-c2-N-10-D-50}
+    \end{subfigure}  
+
+  \caption{The Expected Error for changing number of training samples for various dimensional problems. For the given parameter the effect of increasing number of training samples can be seen by looking at Figures \ref{fig:nonlinear-c2-N-1-D-1}, \ref{fig:nonlinear-c2-N-10-D-1}, \ref{fig:nonlinear-c2-N-50-D-1} and the effect of increasing dimensionality can be seen by looking at Figures \ref{fig:nonlinear-c2-N-10-D-1}, \ref{fig:nonlinear-c2-N-10-D-10}, \ref{fig:nonlinear-c2-N-10-D-50}.}\label{fig:nonlinear-c2}
+\end{figure}
+
+\subsubsection{Overall Discussion of the Results}
+
+\paragraph{The extend of generalization of MAML:} It is observed that the MAML in linear and nonlinear problem settings might provided extra generalization performance although the gradient steps are limited. However, this generalization in the linear setting can be topped by biased Ridge regression method introduced in \cite{Denevi2018a}. However, given enough training samples and enough gradient steps MAML variant models can reach the performance of the biased Ridge regression. 
+
+\paragraph{Model-agnosticism of MAML:} It has been observed that the MAML is agnostic to linear models as well as there is clear benefit of its utilization compared to single task learning. This benefit increases in the nonlinear problem setting.
+
+\paragraph{Generalization as a result of non-convexity:} It is still not clear if the non-convexity is the cause of the generalization, but it is conjectured that it might be one of the factors as the expected error difference in the nonlinear setting between the convex and non-convex models has increased compared to the linear problem setting where both models had convex losses.
+
+\paragraph{Additional Remarks:} It is observed that the generalization improvement for the MAML variants that uses a few gradient steps after observing a few data from the task we are interested in. This validates some of the findings in \cite{Fallah2021}, where it is found out that under strong convexity assumptions if the training and test task distributions are close enough there is generalization improvement. Moreover, this finding is also observed in the non-convex setting. Moreover, it is observed that for the nonlinear problem setting number of gradient steps as there is a clear optimum expected error for $\iter$. Another, important comparison is the comparison between two different meta-learning approaches in linear problem setting (MAML \cite{Finn2017} and biased regularization based meta learning \cite{Denevi2018}.) It is observed that given an extreme limitation on the gradient step in most of the cases biased regularization outperforms MAML variant models. Only in the aforementioned case of small tasks variance MAML variant models provided and improvement over the expected error.
+
+
+

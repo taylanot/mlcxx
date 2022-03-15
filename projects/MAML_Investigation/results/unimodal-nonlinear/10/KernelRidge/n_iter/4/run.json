@@ -1,0 +1,81 @@
+{
+  "artifacts": [
+    "result-4-KernelRidge.npy"
+  ],
+  "command": "main",
+  "experiment": {
+    "base_dir": "/home/oturan/projects/MAML_Investigation/nonlinear",
+    "dependencies": [
+      "matplotlib==3.4.3",
+      "numpy==1.20.2",
+      "sacred==0.8.2",
+      "torch==1.10.2"
+    ],
+    "mainfile": "EE.py",
+    "name": "unimodal-nonlinear",
+    "repositories": [],
+    "sources": [
+      [
+        "EE.py",
+        "_sources/EE_2c32c1d6fad918e85bb45a51631822da.py"
+      ],
+      [
+        "models.py",
+        "_sources/models_7d56799fa7d127b9b97de24933a2b5de.py"
+      ],
+      [
+        "networks.py",
+        "_sources/networks_a9ff992d69e818570d400603e2c6f240.py"
+      ]
+    ]
+  },
+  "heartbeat": "2022-02-28T10:04:56.376430",
+  "host": {
+    "ENV": {},
+    "cpu": "Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz",
+    "hostname": "n06-151",
+    "os": [
+      "Linux",
+      "Linux-3.10.0-1160.53.1.el7.x86_64-x86_64-with-glibc2.17"
+    ],
+    "python_version": "3.8.6"
+  },
+  "meta": {
+    "command": "main",
+    "options": {
+      "--beat-interval": null,
+      "--capture": null,
+      "--comment": null,
+      "--debug": false,
+      "--enforce_clean": false,
+      "--file_storage": null,
+      "--force": false,
+      "--help": false,
+      "--loglevel": null,
+      "--mongo_db": null,
+      "--name": null,
+      "--pdb": false,
+      "--print-config": false,
+      "--priority": null,
+      "--queue": false,
+      "--s3": null,
+      "--sql": null,
+      "--tiny_db": null,
+      "--unobserved": false,
+      "COMMAND": null,
+      "UPDATE": [
+        "model_tag=KernelRidge",
+        "run_tag=n_iter",
+        "config.Ntrn=10",
+        "config.dim=10"
+      ],
+      "help": false,
+      "with": true
+    }
+  },
+  "resources": [],
+  "result": null,
+  "start_time": "2022-02-28T09:29:14.699225",
+  "status": "COMPLETED",
+  "stop_time": "2022-02-28T10:04:56.373645"
+}

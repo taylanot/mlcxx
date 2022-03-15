@@ -1,0 +1,290 @@
+{
+  "NAME": "Unimodal_Experiments-correction",
+  "SUPPORTED_MODELS": [
+    "Bayes",
+    "SGD",
+    "Linear",
+    "Ridge",
+    "MAML",
+    "GeneralRidge"
+  ],
+  "config": {
+    "Na": 100,
+    "Ntrn": 1,
+    "Ntst": 1000,
+    "Nz": 100,
+    "alpha": [
+      0.0001,
+      2.2223111111111113,
+      4.444522222222222,
+      6.666733333333333,
+      8.888944444444444,
+      11.111155555555555,
+      13.333366666666667,
+      15.555577777777778,
+      17.77778888888889,
+      20.0
+    ],
+    "b": 1.0,
+    "c": 1.0,
+    "dim": 2,
+    "lr": [
+      0.0001,
+      0.11120000000000001,
+      0.2223,
+      0.33340000000000003,
+      0.4445,
+      0.5556,
+      0.6667000000000001,
+      0.7778,
+      0.8889,
+      1.0
+    ],
+    "m": 0.0,
+    "n_iter": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90
+    ],
+    "std_y": 1
+  },
+  "k": "n_iter",
+  "model_tag": "GeneralRidge",
+  "numba_config": {
+    "_dict_type": {
+      "py/reduce": [
+        {
+          "py/function": "numba.core.types.abstract._type_reconstructor"
+        },
+        {
+          "py/tuple": [
+            {
+              "py/function": "copyreg._reconstructor"
+            },
+            {
+              "py/tuple": [
+                {
+                  "py/type": "numba.core.types.containers.DictType"
+                },
+                {
+                  "py/type": "builtins.object"
+                },
+                null
+              ]
+            },
+            {
+              "_code": 511,
+              "_initial_value": null,
+              "key_type": {
+                "py/reduce": [
+                  {
+                    "py/function": "numba.core.types.abstract._type_reconstructor"
+                  },
+                  {
+                    "py/tuple": [
+                      {
+                        "py/function": "copyreg._reconstructor"
+                      },
+                      {
+                        "py/tuple": [
+                          {
+                            "py/type": "numba.core.types.misc.UnicodeType"
+                          },
+                          {
+                            "py/type": "builtins.object"
+                          },
+                          null
+                        ]
+                      },
+                      {
+                        "_code": 8,
+                        "name": "unicode_type"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "keyvalue_type": {
+                "py/reduce": [
+                  {
+                    "py/function": "numba.core.types.abstract._type_reconstructor"
+                  },
+                  {
+                    "py/tuple": [
+                      {
+                        "py/function": "copyreg._reconstructor"
+                      },
+                      {
+                        "py/tuple": [
+                          {
+                            "py/type": "numba.core.types.containers.Tuple"
+                          },
+                          {
+                            "py/type": "builtins.object"
+                          },
+                          null
+                        ]
+                      },
+                      {
+                        "_code": 510,
+                        "count": 2,
+                        "dtype": {
+                          "py/reduce": [
+                            {
+                              "py/function": "numba.core.types.abstract._type_reconstructor"
+                            },
+                            {
+                              "py/tuple": [
+                                {
+                                  "py/function": "copyreg._reconstructor"
+                                },
+                                {
+                                  "py/tuple": [
+                                    {
+                                      "py/type": "numba.core.types.containers.UnionType"
+                                    },
+                                    {
+                                      "py/type": "builtins.object"
+                                    },
+                                    null
+                                  ]
+                                },
+                                {
+                                  "_code": 509,
+                                  "name": "Union[array(float64, 1d, A),unicode_type]",
+                                  "types": {
+                                    "py/tuple": [
+                                      {
+                                        "py/id": 7
+                                      },
+                                      {
+                                        "py/id": 6
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "name": "Tuple(unicode_type, array(float64, 1d, A))",
+                        "types": {
+                          "py/tuple": [
+                            {
+                              "py/id": 6
+                            },
+                            {
+                              "py/id": 7
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "name": "DictType[unicode_type,array(float64, 1d, A)]<iv=None>",
+              "value_type": {
+                "py/reduce": [
+                  {
+                    "py/function": "numba.core.types.abstract._type_reconstructor"
+                  },
+                  {
+                    "py/tuple": [
+                      {
+                        "py/function": "copyreg._reconstructor"
+                      },
+                      {
+                        "py/tuple": [
+                          {
+                            "py/type": "numba.core.types.npytypes.Array"
+                          },
+                          {
+                            "py/type": "builtins.object"
+                          },
+                          null
+                        ]
+                      },
+                      {
+                        "_code": 508,
+                        "dtype": {
+                          "py/reduce": [
+                            {
+                              "py/function": "numba.core.types.abstract._type_reconstructor"
+                            },
+                            {
+                              "py/tuple": [
+                                {
+                                  "py/function": "copyreg._reconstructor"
+                                },
+                                {
+                                  "py/tuple": [
+                                    {
+                                      "py/type": "numba.core.types.scalars.Float"
+                                    },
+                                    {
+                                      "py/type": "builtins.object"
+                                    },
+                                    null
+                                  ]
+                                },
+                                {
+                                  "_code": 23,
+                                  "bitwidth": 64,
+                                  "name": "float64"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "layout": "A",
+                        "name": "array(float64, 1d, A)",
+                        "ndim": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "_opaque": {
+      "py/object": "_nrt_python._MemInfo"
+    },
+    "py/object": "numba.typed.typeddict.Dict"
+  },
+  "numba_config_runner": {
+    "_dict_type": {
+      "py/id": 5
+    },
+    "_opaque": {
+      "py/object": "_nrt_python._MemInfo"
+    },
+    "py/object": "numba.typed.typeddict.Dict"
+  },
+  "res": 50,
+  "res_hyper": 10,
+  "run_tag": "n_iter",
+  "seed": 24,
+  "v": [
+    0,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90
+  ]
+}

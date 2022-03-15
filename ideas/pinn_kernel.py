@@ -80,11 +80,13 @@ def loss_BC(model, x):
     return loss_func(model(x),torch.zeros_like(x))
 
 def train(model, xb, x, epochs):
-    optimizer = torch.optim.Adam(model.parameters(),lr=1e-1)
+    optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
     for epoch in range(epochs):
       optimizer.zero_grad()
 
-      loss = loss_BC(model, xb) + loss_PDE(model, x)
+      #loss = torch.tanh(loss_BC(model, xb)) + torch.tanh(loss_PDE(model, x)) 
+      
+      loss = (loss_BC(model, xb)) + (loss_PDE(model, x))
 
       loss.backward()
 
@@ -93,13 +95,14 @@ def train(model, xb, x, epochs):
       print(loss)
 
 
-x_domain = torch.linspace(0.2,0.8,10).reshape(-1,1)
+x_domain = torch.linspace(0.2,0.8,100).reshape(-1,1)
 x_dbc = torch.tensor([0.,1.]).reshape(-1,1)
 
-#model = PINN(2)
-model = PIKR(x_domain, RBF(1))
+model = PINN(1)
+#model = PIKR(x_domain, RBF(1))
 loss_func = torch.nn.MSELoss()
 train(model, x_dbc, x_domain,3000)
+print(x_domain)
 #train_kernel(model1, model2, x_dbc, x_domain,1000)
 
 
@@ -108,8 +111,9 @@ train(model, x_dbc, x_domain,3000)
 
 import matplotlib.pyplot as plt
 x_domain = torch.linspace(0.,1.,100).reshape(-1,1)
-plt.plot(x_domain.detach().numpy(), (model(x_domain)).detach().numpy())
-plt.plot(x_domain.detach().numpy(), (-0.5*x_domain**2+0.5*x_domain).detach().numpy())
+plt.plot(x_domain.detach().numpy(), (model(x_domain)).detach().numpy(), label='pred')
+plt.plot(x_domain.detach().numpy(), (-0.5*x_domain**2+0.5*x_domain).detach().numpy(), label='actual')
+plt.legend()
 plt.savefig('pinn.pdf')
 #N = 10
 #f = lambda x: torch.sin(x) #+ torch.FloatTensor(x.shape[0],1).normal_(0,0.1)

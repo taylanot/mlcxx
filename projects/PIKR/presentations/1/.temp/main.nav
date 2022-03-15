@@ -56,8 +56,12 @@
 \headcommand {\slideentry {3}{0}{3}{10/10}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {10}{10}}
-\headcommand {\beamer@partpages {1}{10}}
-\headcommand {\beamer@subsectionpages {8}{10}}
-\headcommand {\beamer@sectionpages {8}{10}}
-\headcommand {\beamer@documentpages {10}}
-\headcommand {\gdef \inserttotalframenumber {10}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {3}{0}{4}{11/11}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {11}{11}}
+\headcommand {\beamer@partpages {1}{11}}
+\headcommand {\beamer@subsectionpages {8}{11}}
+\headcommand {\beamer@sectionpages {8}{11}}
+\headcommand {\beamer@documentpages {11}}
+\headcommand {\gdef \inserttotalframenumber {11}}

@@ -1,0 +1,23 @@
+INFO - unimodal-nonlinear - Running command 'main'
+INFO - unimodal-nonlinear - Started run with ID "25"
+[tensor(3.2828)]
+[tensor(3.2828), tensor(2.9708)]
+[tensor(5.7377)]
+[tensor(5.7377), tensor(4.7707)]
+[tensor(12.1360)]
+[tensor(12.1360), tensor(10.4782)]
+[tensor(22.4278)]
+[tensor(22.4278), tensor(20.0776)]
+[tensor(36.6318)]
+[tensor(36.6318), tensor(33.5654)]
+[tensor(1.2440e+08)]
+[tensor(1.2440e+08), tensor(62255468.)]
+[tensor(102849.2188)]
+[tensor(102849.2188), tensor(625034.4375)]
+[tensor(84673816.)]
+[tensor(84673816.), tensor(42336916.)]
+[tensor(1.3907e+11)]
+[tensor(1.3907e+11), tensor(6.9535e+10)]
+[tensor(2.2617e+09)]
+[tensor(2.2617e+09), tensor(1.1309e+09)]
+INFO - unimodal-nonlinear - Completed after 0:00:00

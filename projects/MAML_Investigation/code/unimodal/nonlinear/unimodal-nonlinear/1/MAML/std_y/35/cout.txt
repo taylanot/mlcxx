@@ -1,0 +1,4 @@
+INFO - unimodal-nonlinear - Running command 'main'
+INFO - unimodal-nonlinear - Started run with ID "35"
+[[ 3.12678075  5.25422049 11.30706024 21.25265503 35.09860992]]
+INFO - unimodal-nonlinear - Completed after 0:00:00

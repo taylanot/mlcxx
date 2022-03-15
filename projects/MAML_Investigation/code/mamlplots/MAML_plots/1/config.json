@@ -1,0 +1,30 @@
+{
+  "config": {
+    "a_info": [
+      0,
+      1
+    ],
+    "alpha": 0.01,
+    "beta": 0.001,
+    "bias": true,
+    "dim": 1,
+    "epochs": 70000,
+    "fo": false,
+    "k": 5,
+    "network": {
+      "py/type": "networks.LinearNetwork"
+    },
+    "pT": {
+      "py/type": "task_generator.LinearTasks"
+    },
+    "show_weights": false,
+    "std_y": 0.0,
+    "task_batch_size": 10,
+    "x_info": [
+      0,
+      2
+    ]
+  },
+  "problem": "linear",
+  "seed": 24
+}

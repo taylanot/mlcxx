@@ -1,0 +1,92 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate217952}{RGB}{217,95,2}
+\definecolor{darkcyan27158119}{RGB}{27,158,119}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
+\definecolor{lightslategray117112179}{RGB}{117,112,179}
+\definecolor{olivedrab10216630}{RGB}{102,166,30}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=none},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={\(\displaystyle n\)},
+xmin=0, xmax=80,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Expected Error},
+ymin=9.07568668639336, ymax=12.3813105305651,
+ytick style={color=black}
+]
+\addplot [semithick, darkcyan27158119]
+table {%
+0 10.3919517925441
+10 12.2310549012846
+20 11.0377389171399
+30 11.4272854361746
+40 10.468540133152
+50 10.0654469865025
+60 11.0305612149149
+70 9.89274136326889
+80 10.1275322707234
+90 10.8716698564519
+};
+\addlegendentry{GD-$\eta$:0.0001}
+\addplot [semithick, chocolate217952]
+table {%
+0 10.4096074705498
+10 9.87729196600678
+20 10.1333222020269
+30 10.4549603339288
+40 10.2304983954816
+50 10.0764037102328
+60 9.25047568958174
+70 10.0507897054002
+80 9.77645438056427
+90 10.2143847578229
+};
+\addlegendentry{Ridge-$\lambda$:4.4445}
+\addplot [semithick, lightslategray117112179, dashed]
+table {%
+0 9.54239525706949
+20 11.2507465931673
+40 10.1888064320132
+60 10.5864054018527
+80 9.76285091266496
+};
+\addlegendentry{Bayes}
+\addplot [semithick, deeppink23141138]
+table {%
+0 10.4034440331259
+10 10.5487861204577
+20 10.8435854208835
+30 10.2262340110487
+40 10.7425916948921
+50 10.786954377339
+60 10.1731242264615
+70 10.7175709016895
+80 10.7768532095583
+90 10.8812531627099
+};
+\addlegendentry{MAML-$\eta$:0.0001}
+\addplot [semithick, olivedrab10216630]
+table {%
+0 10.3747269973741
+10 9.84834624027291
+20 10.0982517594311
+30 10.4192996465777
+40 10.1987409947821
+50 10.0471424444774
+60 9.22594231567389
+70 10.0139608251325
+80 9.74847943017198
+90 10.1830760248433
+};
+\addlegendentry{General Ridge-$\lambda$:4.4445}
+\end{axis}
+
+\end{tikzpicture}

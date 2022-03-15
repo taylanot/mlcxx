@@ -1,0 +1,102 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate217952}{RGB}{217,95,2}
+\definecolor{darkcyan27158119}{RGB}{27,158,119}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
+\definecolor{lightslategray117112179}{RGB}{117,112,179}
+\definecolor{olivedrab10216630}{RGB}{102,166,30}
+\definecolor{orange2301712}{RGB}{230,171,2}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, at={(0.91,0.5)}, anchor=east, draw=none},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={\(\displaystyle n\)},
+xmin=0, xmax=80,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Expected Error},
+ymin=1.50901402291466, ymax=4.01990712167184,
+ytick style={color=black}
+]
+\addplot [semithick, darkcyan27158119]
+table {%
+0 1.97175984367883
+10 2.00500632983108
+20 2.00521237512338
+30 1.93173823308217
+40 2.12482060183052
+50 1.95519995981071
+60 1.81166282156938
+70 1.90501571812849
+80 1.96097228076709
+90 1.81512720594132
+};
+\addlegendentry{GD-$\eta$:0.0001}
+\addplot [semithick, chocolate217952]
+table {%
+0 1.92743230706342
+10 1.79844818349808
+20 1.82723197331102
+30 1.90937581972393
+40 1.95403641570234
+50 1.65597916473835
+60 1.96342739499647
+70 1.87086238374383
+80 1.74325531872071
+90 1.85319469816131
+};
+\addlegendentry{Ridge-$\lambda$:20.0}
+\addplot [semithick, lightslategray117112179, dashed]
+table {%
+0 1.62314552740363
+20 1.69918176896445
+40 1.65562754396204
+60 1.63709882482127
+80 1.73381987064494
+};
+\addlegendentry{Bayes}
+\addplot [semithick, deeppink23141138]
+table {%
+0 3.90577561718288
+20 3.24763870175845
+40 3.24113433549276
+60 3.2081385400028
+80 3.45228346524425
+};
+\addlegendentry{random GD-$\eta$:0.1054}
+\addplot [semithick, olivedrab10216630]
+table {%
+0 1.98161878104997
+10 1.97894166787626
+20 2.15275429859935
+30 1.78499085592224
+40 1.94220132421568
+50 1.94176859393871
+60 1.88286331580356
+70 1.93490831626839
+80 1.88119844334788
+90 2.0317958253203
+};
+\addlegendentry{MAML-$\eta$:0.0001}
+\addplot [semithick, orange2301712]
+table {%
+0 1.93049964723712
+10 1.80562696659955
+20 1.84149519829584
+30 1.86738250411613
+40 1.93051735885258
+50 1.7120128653658
+60 1.94118398261597
+70 1.91422419432312
+80 1.78962284789404
+90 1.86233849857675
+};
+\addlegendentry{General Ridge-$\lambda$:20.0}
+\end{axis}
+
+\end{tikzpicture}

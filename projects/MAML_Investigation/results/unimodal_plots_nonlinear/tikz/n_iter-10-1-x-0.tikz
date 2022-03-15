@@ -1,0 +1,67 @@
+% This file was created with tikzplotlib v0.10.1.
+\begin{tikzpicture}
+
+\definecolor{chocolate217952}{RGB}{217,95,2}
+\definecolor{darkcyan27158119}{RGB}{27,158,119}
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{lightslategray117112179}{RGB}{117,112,179}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, at={(0.91,0.5)}, anchor=east, draw=none},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={\(\displaystyle n_{iter}\)},
+xmin=-4.5, xmax=94.5,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Expected Error},
+ymin=0.256437605619431, ymax=16.6206193506718,
+ytick style={color=black}
+]
+\addplot [semithick, darkcyan27158119]
+table {%
+0 15.684775352478
+10 15.684775352478
+20 15.684775352478
+30 15.684775352478
+40 15.684775352478
+50 15.684775352478
+60 15.684775352478
+70 15.684775352478
+80 15.684775352478
+90 15.684775352478
+};
+\addlegendentry{KernelRidge-$\lambda$:2.2223}
+\addplot [semithick, chocolate217952, dashed]
+table {%
+0 1.00026404857635
+10 1.00026404857635
+20 1.00026404857635
+30 1.00026404857635
+40 1.00026404857635
+50 1.00026404857635
+60 1.00026404857635
+70 1.00026404857635
+80 1.00026404857635
+90 1.00026404857635
+};
+\addlegendentry{Bayes}
+\addplot [semithick, lightslategray117112179]
+table {%
+0 15.8767929077148
+10 14.2611093521118
+20 13.3624219894409
+30 12.8401012420654
+40 12.1850290298462
+50 11.9111471176147
+60 11.5279531478882
+70 11.3435411453247
+80 11.2827892303467
+90 11.1983814239502
+};
+\addlegendentry{MAML-lr:0.0001}
+\end{axis}
+
+\end{tikzpicture}

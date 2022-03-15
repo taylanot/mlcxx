@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import torch
 import torch.distributions as dist
+import numpy as np
 # Models
 from models import * 
 from networks import NonlinearNetwork
@@ -27,9 +28,9 @@ def my_config():
 
     model_tag = 'MAML'
 
-    res = 50               # Resolution of the experiments! make 0 for just one 
+    res = 20               # Resolution of the experiments! make 0 for just one 
 
-    res_hyper = 1         # Resolution of the hypers!
+    res_hyper = 10        # Resolution of the hypers!
 
     seed = 24               # KOBEEEEEE!
 
@@ -72,7 +73,7 @@ def my_config():
     if run_tag == 'Ntrn':
         config['Ntrn'] = torch.arange(1, 50).tolist()
 
-    config['Ntst'] = 1000
+    config['Ntst'] = 10
 
     config['n_iter'] = 10
     if run_tag == 'n_iter':
@@ -82,6 +83,11 @@ def my_config():
         config['model_ids'] = {1:1, 2:2, 10:3, 50:4}
         config['model_path'] = os.path.join('MAML_Training_noiseless', 'artifacts',\
                 str(config['model_ids'][config['dim']]), 'model.pt')
+
+    if run_tag == 'dim': 
+        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
+    else:
+        ex.observers.append(FileStorageObserver.create(NAME+'/'+str(config['dim'])+'/'+str(model_tag)+'/'+str(run_tag)+'/'))
 
 
 def set_seed(value):
@@ -174,7 +180,7 @@ def EE_MAML(config, seed, hyper):
     loss_fn = torch.nn.MSELoss()
     ez = []
     ea = []
-    model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=5, activation_tag='relu')
+    model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
     model.load(var.model_path)
     for i in range(var.Na):
         for j in range(var.Nz):
@@ -186,7 +192,6 @@ def EE_MAML(config, seed, hyper):
 def EE(model_tag, run_tag, config, seed):
     run_config = config.copy()
     overall_ee = []
-    err = []
     if model_tag == 'KernelRidge' or model_tag == 'MAML':
         if model_tag == 'KernelRidge':
             name = 'alpha'
@@ -195,24 +200,30 @@ def EE(model_tag, run_tag, config, seed):
             name = 'lr'
             Error = EE_MAML
         for hyper in config[name]:
+            err = []
             for value in config[run_tag]:
                 run_config[run_tag] = value
                 err.append(Error(run_config, seed, hyper))
             overall_ee.append(err)
-        return overall_ee
+        return np.array(overall_ee)
     else:
         for value in config[run_tag]:
             run_config[run_tag] = value
             err.append(EE_Bayes(run_config, seed))
         overall_ee.append(err)
-        return overall_ee
+        return np.array(overall_ee)
 
-@ex.main
+@ex.capture
+def get_info(_run):
+    return _run._id, _run.experiment_info["name"]
+
+@ex.automain
 def main(seed, config, model_tag, run_tag, SUPPORTED_MODELS):
     assert model_tag in SUPPORTED_MODELS
-    return EE(model_tag, run_tag, config, seed)
-
-
-
-
+    result = EE(model_tag, run_tag, config, seed)
+    print(result.shape)
+    _id, _name = get_info()
+    filename = 'result-'+str(_id)+'-'+model_tag+'.npy'
+    np.save(filename, result)
+    ex.add_artifact(filename)
 
