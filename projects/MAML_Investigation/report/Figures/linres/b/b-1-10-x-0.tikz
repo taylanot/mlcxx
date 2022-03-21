@@ -23,7 +23,7 @@ legend style={
 tick align=outside,
 tick pos=left,
 x grid style={darkgray176},
-xlabel={\(\displaystyle b\)},
+xlabel={\(\displaystyle k\)},
 xmin=0.8, xmax=5.2,
 xtick style={color=black},
 y grid style={darkgray176},

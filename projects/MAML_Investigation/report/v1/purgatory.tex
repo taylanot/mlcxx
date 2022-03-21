@@ -32,11 +32,11 @@ Assuming the same model given in Section \ref{section:Linear} the $L_2$-regulari
 where $\lambda$ is the regularization parameter that is regularizing both $\mathbf{w}$ and the $\mathbf{b}$.
 
 \subsection{Bayes}
-Knowing the distribution of the tasks give us the exact posterior that one would expect for $N\to\infty$ after starting even from an uninformative prior such as $\mathcal{N}\sim(\mathbf{0}, \mathbf{I})$.
+Knowing the distribution of the tasks gives us the exact posterior that one would expect for $N\to\infty$ after starting even from an uninformative prior such as $\mathcal{N}\sim(\mathbf{0}, \mathbf{I})$.
 
 \subsection{MAML}
-This model considers the approach taken in MAML paper. For this simple setting what MAML implicitly does is that it takes the intermadiate model near the vicinity of the mean of the task distribution and leave the model there for a quick adaptation.
+This model considers the approach taken in the MAML paper. For this simple setting what MAML implicitly does is that it takes the intermediate model near the vicinity of the mean of the task distribution and leaves the model there for a quick adaptation.
 \subsection*{Experiments}
 \begin{itemize}
-  \item All the models are trained with same training points and tested with the same training points.
-n\end{itemize}
+  \item All the models are trained with the same training points and tested with the same training points.
+\end{itemize}

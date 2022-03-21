@@ -1,8 +1,8 @@
-Throughout this work uppercase bold letters (\eg $\mathbf{X}$), lowercase bold letters (\eg $\mathbf{x}$) and lowercase letters (\eg ${x}$) are used for matricies, vectors and scalars respectively. Moreover, the vectors are assumed to be stored in columns. Finally, the $\I_{D}$ represents a $D\times D$ identity matrix. Moreover, the $\ones_{D}$ and $\zeros_{D}$ represents $D\times 1$ vector of ones and zeros respectively.
+Throughout this work uppercase bold letters (\eg $\mathbf{X}$), lowercase bold letters (\eg $\mathbf{x}$), and lowercase letters (\eg ${x}$) are used for matrices, vectors and scalars respectively. Moreover, the vectors are assumed to be stored in columns. Finally, the $\I_{D}$ represents a $D\times D$ identity matrix. Moreover, the $\ones_{D}$ and $\zeros_{D}$ represents $D\times 1$ vector of ones and zeros respectively.
 
 \subsection{Learning Problems}
 
-\subsubsection{Linear Regression}\label{sec:Linear}
+\subsubsection{Linear Problem}\label{sec:Linear}
 
 Consider the conventional linear regression problem in $\R^D$ is given by
 \begin{equation}\label{eq:linearreg}
@@ -10,7 +10,7 @@ Consider the conventional linear regression problem in $\R^D$ is given by
 \end{equation}
 where, $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of a scale term $\scaletask$ corresponds to a task $\task$  observed in the environment and each set of observed $N$ input ($\inp$) and its corresponding label ($\lab$) is represented by a dataset $\dataset_{j}:=(\inp, \lab)_{i=1}^{N}$. 
 
-\subsubsection{Nonlinear Regression}\label{sec:Nonlinear}
+\subsubsection{Nonlinear Problem}\label{sec:Nonlinear}
 
 Consider a nonlinear regression problem in $\R^D$ is given by
 \begin{equation}\label{eq:nonlinearreg}
@@ -19,13 +19,13 @@ Consider a nonlinear regression problem in $\R^D$ is given by
 where, $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of scale term $\scaletask$ and $\phasetask$ corresponds to a task observed in the environment $\task$ and each set of observed $N$ input ($\inp$) and its corresponding label ($\lab$) is represented by a dataset $\dataset_{j}:=(\inp_i, \lab_i)_{i=1}^{N}$.
 
 \subsubsection{General Problem Setting}
-For both problems presented in sections \ref{sec:Linear} and \ref{sec:Nonlinear} sample distribution is given by $\prob_\dataset$ for a given $\task_{k}$ and the task distribution is represented by $\prob_\task$. A model parametrized by $\param$\footnote{Bar on top of the parameters are used to indicate the bias terms inclusion.} is represented by $\model(\inp, \param):\inp\to\lab$. An estimator that is trained with $\dataset_{j}$ that is obtained from the $\task_k$ is represented by $\estim(\inp)$. The discrepancy between the prediction of the estimator $\estim$ and $\lab$ is measured in terms of squared loss $\loss:=(\estim(x)-\lab)^2$. The main loss that this paper tries to investigate is the expected error of an estimator $\estim$ over the $\prob_{\task}$. Then the expected error is represented as
+For both problems presented in Sections \ref{sec:Linear} and \ref{sec:Nonlinear} sample distribution is given by $\prob_\dataset$ for a given $\task_{k}$ and the task distribution is represented by $\prob_\task$. A model parameterized by $\param$\footnote{Bar on top of the parameters are used to indicate the bias terms inclusion.} is represented by $\model(\inp, \param):\inp\to\lab$. An estimator that is trained with $\dataset_{j}$ that is obtained from the $\task_k$ is represented by $\estim(\inp)$. The discrepancy between the prediction of the estimator $\estim$ and $\lab$ is measured in terms of squared loss $\loss:=(\estim(x)-\lab)^2$. The main loss that this paper tries to investigate is the \textit{Expected Error} of an estimator $\estim$ over the $\prob_{\task}$. Then the expected error is represented as
 
 \begin{equation}\label{eq:ee}
   \EE:= \iiint(\estim(x) - y)^2\prob(\inp, y)\prob_{\dataset}\prob_{\task} d\inp d\lab d\dataset d\task.
 \end{equation}
 
-For the defined expected error and the problem definitions the \textit{Bayes error} is given by $\sigma^2$ that is coming from the noise term, which represents a model that is a perfect estimator.
+For the defined expected error and the problem definitions, the \textit{Bayes Error} is given by $\sigma^2$ that is coming from the noise term, which represents a model that is the perfect estimator.
 
 \subsubsection{Experimental Assumptions}
 For all the problems the input distribution is given by $\prob_\inp\sim\normal{0,k\I}$ where $k$ is a parameter for the variance of the inputs. For the linear problem the $\prob_\task:=\prob(\scaletask)\sim\normal{{m\ones_{D}},{c\I_{D}}}$ and for nonlinear problem the task distribution takes the form of a joint distribution $\prob_\task:=\prob(\scaletask, \phasetask)$ where $\prob_{\scaletask}\sim\normal{\ones_{D},c_1\I_{D}}$ and $\prob_{\phasetask}\sim\normal{\zeros_{D},c_2\I_{D}}$
@@ -56,17 +56,16 @@ Assuming a linear model in the form of $\model(\inp,\slope,\bias):=\inp\slope+\b
 
 \paragraph{Linear Estimator} is given by the least-squares solution, $\opt:=(\inv{\trans{\design}\design)}\trans{\design}\labs$, where $\design\in\R^{N\times D}$ is the design matrix where the observed input data is stored in rows.
 
-\paragraph{Ridge Estimator} is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}\trans{\design}\labs$ which is obtained by minimizing the squared loss with the additional term of $\ridge\norm{\param}{2}^2$.
+\paragraph{Ridge Estimator} is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}\trans{\design}\labs$ which is obtained by minimizing the squared loss with the additional term of $\ridge\norm{\param}{2}^2$. Thus, overall loss takes the form $\loss+\ridge\norm{\param}{2}^2$.
 
-\paragraph{General Ridge Estimator} is a version of \textit{Ridge Estimator} with the capability to penalize towards a given vector instead of a zero vector. It is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}(\trans{\design}\labs+\ridge\genridge)$ by minimizing the squared loss with the additional term $\ridge\norm{\param-\genridge}{2}^2$, where $\genridge\in\R^{D\times 1}$.   
 
 \paragraph{Kernel Ridge Estimator} is given by $\param = \trans{\design}\weight$ where $\weight:=\inv{(\gram+\ridge\I_{N})}\lab$ where $\gram\in\R^{N\times N}$ is the  \textit{Gram Matrix} obtained by replacing $\trans{\design}\design$ inner product by a kernel $\kernel(\design, \design)$. Then, the prediction of the estimator takes the form $\estim(\pred,\param)=\trans{\weight}\kernel(\pred,\design)$ where $\pred\in\R^{D\times 1}$.
 
-\paragraph{Gradient Descent Estimator} for a given number of iterations $\iter$ the gradient descent estimator is given by $\slope_{j+1}=\slope_{j} - \lr\sum_i^{N}\inp_i(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$ and $\bias_{j+1}=\bias_{j} - \lr\sum_i^{N}(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$.
+\paragraph{Gradient Descent Estimator for the Linear Model} for a given number of iterations $\iter$ the gradient descent estimator is given by $\slope_{j+1}=\slope_{j} - \lr\sum_i^{N}\inp_i(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$ and $\bias_{j+1}=\bias_{j} - \lr\sum_i^{N}(\estim(\inp,\param_j)-\lab_i)_{j=0}^{\iter-1}$.
 
 \subsubsection{Meta Learning Models}
 
-\paragraph{Model-Agnostic Meta Learning (MAML)} aims to obtain an intermediate model that is able to generalize well after adaptation to a dataset $\dataset$ observed from a new and unseen task $\task_i$ drawn from $\prob_\task$ where the number of training points $K$ and number of iterations $\iter$ are limited. The general procedure for supervised learning problems is given in Algorithm \ref{alg:MAML}.
+\paragraph{Model-Agnostic Meta-Learning (MAML)} aims to obtain an intermediate model that can generalize well after adaptation to a dataset $\dataset$ observed from a new and unseen task $\task_i$ drawn from $\prob_\task$ where the number of training points $K$ and the number of iterations $\iter$ is limited. The general procedure for supervised learning problems is given in Algorithm \ref{alg:MAML}.
 
 \begin{algorithm}
   \caption{MAML\cite{Finn2017} Algorithm}\label{alg:MAML}
@@ -84,6 +83,8 @@ Assuming a linear model in the form of $\model(\inp,\slope,\bias):=\inp\slope+\b
     Update: $\param \leftarrow \param- \beta\grad{\param}\sum\loss_{\task_i}(\model(\param_i^\prime))$
   }
 \end{algorithm}
+
+\paragraph{General Ridge Estimator} is a version of \textit{Ridge Estimator} with the capability to penalize towards a given vector instead of a zero vector. It is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}(\trans{\design}\labs+\ridge\genridge)$ by minimizing the squared loss with the additional term $\ridge\norm{\param-\genridge}{2}^2$, where $\genridge\in\R^{D\times 1}$. Then, the overall loss takes the form $\loss+\ridge\norm{\param-\genridge}{2}^2$.
 
 \begin{figure}[ht!]
   \centering
