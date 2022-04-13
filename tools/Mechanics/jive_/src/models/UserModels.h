@@ -17,7 +17,7 @@
 
 void declareUserModels  ();
 void declareTestModel   ();
-//void declareStressModel ();
+void declareStressModel ();
 
 
 #endif

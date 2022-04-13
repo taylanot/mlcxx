@@ -1,0 +1,220 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+\preamble{%
+\newcommand{\noopsort}[1]{}
+}
+
+  \entry{chen1995}{article}{}
+    \name{author}{2}{}{%
+      {{hash=CT}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Tianping},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=CH}{%
+         family={Chen},
+         familyi={C\bibinitperiod},
+         given={Hong},
+         giveni={H\bibinitperiod},
+      }}%
+    }
+    \keyw{Computer networks,H infinity control,Integral
+  equations,Kernel,Mathematics,Neural networks,Nonlinear dynamical
+  systems,Polynomials,Sufficient conditions,Sun}
+    \strng{namehash}{CTCH1}
+    \strng{fullhash}{CTCH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1995}
+    \field{labeldatesource}{}
+    \field{sortinit}{C}
+    \field{sortinithash}{C}
+    \field{abstract}{%
+    The purpose of this paper is to investigate neural network capability
+  systematically. The main results are: 1) every Tauber-Wiener function is
+  qualified as an activation function in the hidden layer of a three-layered
+  neural network; 2) for a continuous function in S'(R/sup 1/) to be a
+  Tauber-Wiener function, the necessary and sufficient condition is that it is
+  not a polynomial; 3) the capability of approximating nonlinear functionals
+  defined on some compact set of a Banach space and nonlinear operators has
+  been shown; and 4) the possibility by neural computation to approximate the
+  output as a whole (not at a fixed point) of a dynamical system, thus
+  identifying the system.{$<>$}%
+    }
+    \verb{doi}
+    \verb 10.1109/72.392253
+    \endverb
+    \field{issn}{1941-0093}
+    \field{number}{4}
+    \field{pages}{911\bibrangedash 917}
+    \field{title}{Universal Approximation to Nonlinear Operators by Neural
+  Networks with Arbitrary Activation Functions and Its Application to Dynamical
+  Systems}
+    \field{volume}{6}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/GQM6C26Y/Chen and Chen - 1995 - Univers
+    \verb al approximation to nonlinear operators by .pdf;/home/taylanot/Zotero
+    \verb /storage/ENWG9QEF/392253.html
+    \endverb
+    \field{journaltitle}{IEEE Transactions on Neural Networks}
+    \field{month}{07}
+    \field{year}{1995}
+  \endentry
+
+  \entry{hornik1989}{article}{}
+    \name{author}{3}{}{%
+      {{hash=HK}{%
+         family={Hornik},
+         familyi={H\bibinitperiod},
+         given={Kurt},
+         giveni={K\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={Stinchcombe},
+         familyi={S\bibinitperiod},
+         given={Maxwell},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=WH}{%
+         family={White},
+         familyi={W\bibinitperiod},
+         given={Halbert},
+         giveni={H\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HKSMWH1}
+    \strng{fullhash}{HKSMWH1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{1989}
+    \field{labeldatesource}{}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{abstract}{%
+    This paper rigorously establishes thut standard rnultiluyer feedforward
+  networks with as f\&v us one hidden layer using arbitrary squashing functions
+  ure capable of upproximating uny Bore1 measurable function from one finite
+  dimensional space to another to any desired degree of uccuracy, provided
+  sujficirntly muny hidden units are available. In this sense, multilayer
+  feedforward networks are u class of universul rlpproximators.%
+    }
+    \verb{doi}
+    \verb 10.1016/0893-6080(89)90020-8
+    \endverb
+    \field{issn}{08936080}
+    \field{number}{5}
+    \field{pages}{359\bibrangedash 366}
+    \field{title}{Multilayer Feedforward Networks Are Universal Approximators}
+    \field{volume}{2}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/LP8BI3WK/Hornik et al. - 1989 - Multila
+    \verb yer feedforward networks are universal appr.pdf
+    \endverb
+    \field{journaltitle}{Neural Networks}
+    \field{month}{01}
+    \field{year}{1989}
+  \endentry
+
+  \entry{lu2021a}{article}{}
+    \name{author}{3}{}{%
+      {{hash=LL}{%
+         family={Lu},
+         familyi={L\bibinitperiod},
+         given={Lu},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=JP}{%
+         family={Jin},
+         familyi={J\bibinitperiod},
+         given={Pengzhan},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=KGE}{%
+         family={Karniadakis},
+         familyi={K\bibinitperiod},
+         given={George\bibnamedelima Em},
+         giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod},
+      }}%
+    }
+    \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
+    \strng{namehash}{LLJPKGE1}
+    \strng{fullhash}{LLJPKGE1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2021}
+    \field{labeldatesource}{}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{abstract}{%
+    While it is widely known that neural networks are universal approximators
+  of continuous functions, a less known and perhaps more powerful result is
+  that a neural network with a single hidden layer can approximate accurately
+  any nonlinear continuous operator [5]. This universal approximation theorem
+  is suggestive of the potential application of neural networks in learning
+  nonlinear operators from data. However, the theorem guarantees only a small
+  approximation error for a sufficient large network, and does not consider the
+  important optimization and generalization errors. To realize this theorem in
+  practice, we propose deep operator networks (DeepONets) to learn operators
+  accurately and efficiently from a relatively small dataset. A DeepONet
+  consists of two sub-networks, one for encoding the input function at a fixed
+  number of sensors xi, i = 1, . . . , m (branch net), and another for encoding
+  the locations for the output functions (trunk net). We perform systematic
+  simulations for identifying two types of operators, i.e., dynamic systems and
+  partial differential equations, and demonstrate that DeepONet significantly
+  reduces the generalization error compared to the fully-connected networks. We
+  also derive theoretically the dependence of the approximation error in terms
+  of the number of sensors (where the input function is defined) as well as the
+  input function type, and we verify the theorem with computational results.
+  More importantly, we observe high-order error convergence in our
+  computational tests, namely polynomial rates (from half order to fourth
+  order) and even exponential convergence with respect to the training dataset
+  size.%
+    }
+    \verb{doi}
+    \verb 10.1038/s42256-021-00302-5
+    \endverb
+    \verb{eprint}
+    \verb 1910.03193
+    \endverb
+    \field{issn}{2522-5839}
+    \field{number}{3}
+    \field{pages}{218\bibrangedash 229}
+    \field{shorttitle}{{{DeepONet}}}
+    \field{title}{{{DeepONet}}: {{Learning}} Nonlinear Operators for
+  Identifying Differential Equations Based on the Universal Approximation
+  Theorem of Operators}
+    \field{volume}{3}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/6YCTZ8ML/Lu et al. - 2021 - DeepONet Le
+    \verb arning nonlinear operators for identif.pdf;/home/taylanot/Zotero/stor
+    \verb age/CEQTTP2Q/Lu et al. - 2021 - Learning nonlinear operators via Deep
+    \verb ONet based on.pdf
+    \endverb
+    \field{journaltitle}{Nature Machine Intelligence}
+    \field{eprinttype}{arxiv}
+    \field{month}{03}
+    \field{year}{2021}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+\enddatalist
+\endinput

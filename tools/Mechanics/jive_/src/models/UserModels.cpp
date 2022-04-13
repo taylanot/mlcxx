@@ -31,5 +31,5 @@
 void declareUserModels  ()
 {
   declareTestModel    ();
-  //declareStressModel  ();
+  declareStressModel  ();
 }
