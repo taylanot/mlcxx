@@ -1,0 +1,421 @@
+% Beamer template
+% Author: Ozgur Taylan TURAN
+% Delft University of Technology
+
+\documentclass[aspectratio=169]{beamer}
+% PACKAGES
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{animate}
+%\usepackage{calc}
+\usepackage{calligra}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[T1]{fontenc}
+%\usefonttheme{serif}
+\usefonttheme{professionalfonts}
+\usepackage{amsmath}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{graphicx}
+%\usepackage{subfig}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}
+%\usefonttheme{serif}
+%\usepackage{titling}
+\usepackage{graphicx}
+\graphicspath{{Figures/}} %Setting the graphicspath
+%\usepackage{subfig}
+%\usepackage{tikz}
+%\usetikzlibrary{shapes,arrows}
+\usepackage{mathtools}
+\usepackage{cancel}
+\usepackage{tikz}
+\usepackage{pgfplots}
+% CUSTOM PACKAGES
+\usepackage{/home/taylanot/texmf/tex/beamerthemetot}
+\input{/home/taylanot/texmf/presentation/tune.tex}
+
+ % COVER PAGE INFO   
+\newcommand{\mytitle}{\color{White}\huge{\textbf{Lab Talk \#2}}}
+\newcommand{\mysubtitle}{\color{Pink}\Large{\textbf{Expected Loss of Model-Agnostic Meta-Learning (MAML)}}}
+\newcommand{\myauthor}{\color{White}\textcalligra{\LARGE Ozgur Taylan Turan}}
+\newcommand{\authorlabel}{\small O.T. Turan}
+\author{\authorlabel}
+
+
+\begin{document}
+% COVER PAGE
+
+\input{/home/taylanot/texmf/presentation/cover/cover.tex}
+
+\begin{frame}
+	\centering
+	\mysubtitle
+\end{frame}
+
+\section{Outline}
+\begin{frame}
+  \begin{itemize}
+    \item How and Why did I ended up here?
+    \item Learning-to-Learn
+    \item MAML vs Biased Ridge
+    \item Some Results/Conclusions
+    \item What is next?
+  \end{itemize}
+\end{frame}
+
+\section{How and Why?}
+\begin{frame}{Constitutive Modeling}
+\begin{minipage}{0.45\textwidth}
+  \includegraphics<1>[width=\textwidth]{Figures/intro/scales.pdf} 
+  \includegraphics<3>[width=\textwidth]{Figures/intro/link.png} 
+\end{minipage}%
+\begin{minipage}{0.55\textwidth}
+  \color{Pink} Composite Materials  \color{Black}
+  \begin{itemize}
+    \item<1-3> Why?
+    \item<1-3> How? \only<2>{\color{Pink} Experimental $\to$ time and money}
+                    \only<3>{\color{Pink} Computational $\to$ time}
+  \end{itemize}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Computational Constitutive Modeling (Relationship between force and displacement}
+\begin{minipage}{0.5\textwidth}
+
+  \only<1-2>{\centering\color{Pink} Macro-scale Problem}
+  \includegraphics<1-2>[width=\textwidth]{Figures/intro/link.png} 
+  \only<3>
+  {
+    \begin{itemize}
+      \item Inversion of a matrix (dof$\times$dof) at each step (\color{Pink} time\color{Black}) 
+    \end{itemize}
+  }
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \only<1-2>{\centering \color{Pink} Micro-scale Problem}
+
+  \includegraphics<2>[width=0.8\textwidth]{Figures/intro/rve81.pdf} 
+
+  \includegraphics<3>[width=0.8\textwidth]{Figures/intro/nonlinear.pdf} 
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Review}
+\begin{minipage}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{Figures/FE2.pdf}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \begin{itemize}
+    \item Computationally model composites
+    \item Time is the bottleneck of the model
+  \end{itemize}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Machine Learning to the Rescue}
+\begin{minipage}{0.5\textwidth}
+  \includegraphics<1>[width=\textwidth]{Figures/FE2.pdf}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \includegraphics<1>[width=\textwidth]{Figures/FE2-ML.pdf}
+\end{minipage}
+\end{frame}
+
+\begin{frame}{Machine Learning to the Rescue}
+\begin{minipage}{0.5\textwidth}
+  \begin{itemize}
+    \item $\mathbf{P}^\Omega=\mathcal{C}(\mathbf{F}^\Omega, \{c\}_{i=1}^t)$
+    \item Current Appplication: Focus on one curve to create a surrogate
+    \item Why not consider other curves that might come from some other source!
+  \end{itemize}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \includegraphics<1>[width=\textwidth]{Figures/example.pdf}
+\end{minipage}
+\end{frame}
+
+\section{Learning-to-Learn}
+
+\begin{frame}{Learning-to-Learn Intro}
+\begin{minipage}{0.5\textwidth}
+  \color{Pink} Learning \color{Black}
+  \begin{itemize}
+    \item<1> Task $\to$ $f:\mathbf{x}\mapsto y$
+    \item<1> Training experience $\to$ $\mathcal{Z}=\{\mathbf{x}_i,y_i\}_{i=0}^N$
+    \item<1> Error measure $\to$ $\mathcal{L}:=\sum_j^M(\mathcal{M}_j-y_j)^2$
+  \end{itemize}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \color{Pink} Learning-to-learn \color{Black}
+  \begin{itemize}
+    \item<2> Family of Tasks $\to$ $\{f_k:\mathbf{x}\mapsto y\}_{k=1}^{K}$
+    \item<2> Training experience for $f_k$ $\to$ $\mathcal{Z}_k$
+    \item<2> Error measure for each task $\to$ $\mathcal{L}_k$
+  \end{itemize}
+\end{minipage}
+  \begin{itemize}
+  \centering
+    \item<3> Learning a function vs learning a functional (space of functions!)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Learning-to-learn Intro}
+  \centering
+  \includegraphics[width=0.75\textwidth]{singlevsmeta}
+\end{frame}
+
+\begin{frame}{Learning-to-learn}
+  \begin{itemize}
+    \item since 90's 
+    \item rooted with LSTM type of meta-learners 
+    \item Now, gradient descent based adaptation based NN's $\to$ $MAML$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Questions?}
+  \begin{itemize}
+      \item Does the claims for generalization hold?
+      \item Can this framework outperform a single-task learner in expectation?
+  \end{itemize}
+\end{frame}
+
+\section{MAML vs Biased Ridge}
+\begin{frame}{Problem Setting-1}
+  \begin{minipage}{0.5\textwidth}
+    \color{Pink} Linear Problem \color{Black}
+    \begin{itemize}
+      \item<1> $ \mathbf{a} \in \mathbb{R}^d \to p_\mathcal{T} \sim \mathcal{N}(m\mathbf{1},c\mathbf{I})$
+      \item<1>$ \mathbf{x} \in \mathbb{R}^d \to p_\mathbf{x} \sim \mathcal{N}(\mathbf{0},k\mathbf{1})$
+      \item<1>$ \varepsilon \sim \mathcal{N}(0,\sigma^2)$
+      \item<1>$ y = \mathbf{a}^\text{T}\mathbf{x} + \varepsilon \quad \in \mathbb{R}$
+      \item<1>$ \mathcal{Z}:= ((x_i,y_i))_{i=1}^N$
+      \item<1>$ \hat{\mathcal{M}} \to $ an estimator trained with $\mathcal{Z}$
+    \end{itemize}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics<1>[width=0.9\textwidth]{lintask}
+  \end{minipage}
+
+\dotfill
+
+  \color{Pink} Expected Error for an estimator: \color{Black}
+  \centering
+  $ \mathcal{E}:=\int \int \int (\hat{\mathcal{M}}-y)^2p(x,y)dxdyp_\mathcal{Z}d\mathcal{Z}p_\mathcal{T}d\mathcal{T}$
+\end{frame}
+
+\begin{frame}{Problem Setting-2}
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics<1>[width=0.9\textwidth]{nonlintask}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+     \color{Pink} Nonlinear Problem \color{Black}
+    \begin{itemize}
+      \item<1> $ \mathbf{a} \in \mathbb{R}^d \to p_\mathbf{a} \sim \mathcal{N}(\mathbf{1},c_1\mathbf{I})$
+      \item<1> $ \boldsymbol{\phi} \in \mathbb{R}^d \to p_{\boldsymbol{\phi}} \sim \mathcal{N}(\mathbf{0},c_2\mathbf{I})$
+      \item<1> $ \mathbf{x} \in \mathbb{R}^d \to p_x \sim \mathcal{N}(\mathbf{0},k\mathbf{1})$
+      \item<1> $ \varepsilon \sim \mathcal{N}(0,\sigma^2)$
+      \item<1> $ y = \mathbf{a}^\text{T}\text{sin}(\mathbf{x}+\phi) + \varepsilon \quad \in \mathbb{R}$
+      \item<1> $ \mathcal{Z}:= ((x_i,y_i))_{i=1}^N$
+      \item<1> $ \hat{\mathcal{M}} \to $ an estimator trained with $N$ training points
+    \end{itemize}
+  \end{minipage}
+
+\dotfill
+
+  \color{Pink} Expected Error for an estimator: \color{Black}
+  \centering
+  $ \mathcal{E}:=\int \int \int (\hat{\mathcal{M}}-y)^2p(x,y)dxdyp_\mathcal{Z}d\mathcal{Z}p_\mathcal{T}d\mathcal{T}$
+\end{frame}
+
+\begin{frame}{Models}
+  \begin{block}{\color{White} Problem Setting-1}
+  \begin{itemize}
+    \item Linear Model $\to$ Least-Squares and Gradient Descent
+    \item Ridge $\to$ with bias and without bias
+    \item MAML
+  \end{itemize}
+  \end{block}
+
+ \begin{block}{\color{White} Problem Setting-2}
+  \begin{itemize}
+    \item Kernel Ridge
+    \item MAML
+  \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{MAML\cite{Finn2017}}
+\begin{minipage}{0.5\textwidth}
+  \includegraphics<1>[width=\textwidth]{maml}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \begin{itemize}
+    \item<1> Sample Tasks 
+    \item<1> Sample training experiences from that tasks
+    \item<1> Check the possible loses 
+    \item<1> Take average step
+  \end{itemize}
+\end{minipage}
+\centering
+  \only<1> {For a model $\mathcal{M}$ parametrized by $(\mathbf{w})$}
+\end{frame}
+
+\begin{frame}{MAML\cite{Finn2017}}
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics<1>[width=\textwidth]{maml_linear}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics<1>[width=\textwidth]{maml_nonlinear}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}{Biased Ridge\cite{Denevi2018a}}
+\begin{minipage}{0.5\textwidth}
+  \includegraphics<1>[width=0.95\textwidth]{ridge}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \begin{itemize}
+    \item<1> Sample Tasks 
+    \item<1> Sample training experiences from that tasks
+    \item<1> adjust the bias
+  \end{itemize}
+\end{minipage}
+\centering
+  \only<1>{ For a model $\mathcal{M}$ parametrized by $(\mathbf{w})$ minimize $\mathcal{L}+\lambda||\mathbf{w}-\mathbf{h}||^2_2$}
+
+\end{frame}
+
+\section{Results/Conclusions}
+\begin{frame}{Problem Setting-1}
+  \centering
+  \only<1>{
+  Limit the number of gradient steps for adaptation to 1 and other parameters regarding the problem is defaulted to 1 as well.
+  }
+
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics<1>[width=0.8\textwidth]{c_1_1}
+
+    \only<1>{N=1}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics<1>[width=0.8\textwidth]{c_1_10}
+
+    \only<1>{N=10}
+  \end{minipage}
+
+  \only<2>{
+
+
+    \color{Pink} Only consider the $c=[0,1]$ \color{Black}
+  \begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|}
+    \cline{2-11}
+     & \multicolumn{10}{|c|}{number of gradient steps}\\
+    \cline{2-11}
+     & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
+    \hline
+    \multicolumn{1}{|c|}{MAML} & 1.21& \textbf{1.19} & 1.20& 1.21& 1.23& 1.24& 1.27& 1.33& 1.46& 1.75\\
+    \hline
+  \end{tabular}
+
+  }
+\end{frame}
+
+\begin{frame}{Problem Setting-2}
+  Every other parameter is defaulted to 1, and the adaptation steps used is 5.
+  \begin{minipage}{0.33\textwidth}
+    \centering
+    \includegraphics<1>[width=\textwidth]{c2_1_1}
+    N=1
+  \end{minipage}%
+  \begin{minipage}{0.33\textwidth}
+    \centering
+    \includegraphics<1>[width=\textwidth]{c2_1_10}
+    N=10
+  \end{minipage}%
+  \begin{minipage}{0.33\textwidth}
+    \centering
+    \includegraphics<1>[width=\textwidth]{c2_1_50}
+    N=50
+  \end{minipage}%
+\end{frame}
+
+\begin{frame}{Conclusions}
+  \begin{minipage}{0.5\textwidth}
+    \begin{itemize}
+      \item<1> Benefit of MAML only for $p_\mathcal{T}$ with small variance...
+      \item<2> Number of gradient steps taken is a clear regularizing effect...
+      \item<2> Not, a huge gain though???
+    \end{itemize}
+  \end{minipage}%
+  \begin{minipage}{0.5\textwidth}
+    \includegraphics<1>[width=\textwidth]{task_variance}
+  \end{minipage}
+\end{frame}
+
+
+\begin{frame}{So, the question is...}
+  \begin{itemize}
+    \item Can we come up with a meta kernel ridge model that can outperform MAML?
+    \item I think yes we, can
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Remember Kernel Ridge}
+Thanks to Nonparameteric Representer Theorem for $g\to\mathbb{R}$ be strictly increasing and $\mathcal{L}$ being a loss function that is monotonic, then $${min}_{f\in\mathcal{H}}\quad\mathcal{L} + g(||f||_\mathcal{H})$$  has the solution in the form, $$f(\cdot)=\sum^N_i\alpha_i k(\cdot,\mathbf{x}_i).$$ 
+$\mathcal{L}=\sum_i^N(f(\mathbf{x}_i)-y_i)^2$.
+ For $g(||f||_\mathcal{H}):=\lambda||f||^2$, the optimal solution is given by:
+	$$\boldsymbol{\alpha}=(\mathbf{K}+\lambda \mathbf{I})^{-1}\mathbf{y}$$
+\end{frame}
+
+\begin{frame}{Semiparametric Kernel Ridge}
+In the Semiparameteric Representer Theorem  $\tilde{f}:= f + h$ where $h\in span\{\psi_p\}$ where $\{\psi_p\}_{p=1}^M$ are real valued functions and $\mathcal{L}=\sum_i^N(\tilde{f}(\mathbf{x}_i)-y_i)^2$. Then the solution to 
+ $${min}_{f\in\mathcal{H}}\quad\mathcal{L} + g(||f||_\mathcal{H})$$  has the form $$f(\cdot)=\sum^N_i\alpha_i k(\cdot,\mathbf{x}_i)+\sum_j^M\beta_j\psi_j(\cdot).$$ 
+ For $g(||f||_\mathcal{H}):=\lambda||f||^2$, the optimal solution is given by:
+	$$\boldsymbol{\alpha}=(\mathbf{K}+\lambda\mathbf{I})^{-1}(\mathbf{y}-\boldsymbol{\psi}\boldsymbol{\beta})$$   
+  $$\boldsymbol{\beta}=\boldsymbol{\psi}^{-1}(\mathbf{y}-\mathbf{K}\boldsymbol{\alpha})$$
+\end{frame}
+
+\begin{frame}{Simple Example Case}
+  \begin{minipage}{0.45\textwidth}
+  \begin{itemize}
+    \item Consider the Problem Setting-2
+    \item Assume 10 ground-truth tasks are provided as for $D=1$ $\psi(x)=\mathbf{a}^\text{T}\text{sin}(\mathbf{x}+\phi)$
+  \end{itemize}
+  \end{minipage}%
+  \begin{minipage}{0.55\textwidth}
+    \input{Figures/phi_4.tikz}
+  \end{minipage}
+\end{frame}
+
+
+\section{What is next?}
+\begin{frame}
+  \begin{itemize}
+    \item Experiment more with Semi-Parametric Kernel Ridge Method
+    \item Other estimators for $\psi$? Importance of data for those intermediate models?
+    \item Derivation of Biased Kernel Ridge Method with $g(||f||)=\lambda||f-f_0||^2$ 
+    \item Look at the Learning Curves and apply to mechanics data!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \centering
+  \color{Pink} Thanks!
+\end{frame}
+
+\section{Additional}
+\begin{frame}
+  \centering
+  \includegraphics[width=0.5\textwidth]{Figures/maml.png}
+\end{frame}
+
+% Write down the Nonlinear Ridge Regression
+% Write give an Example of the our method! 
+% Describe the problem setting and just put some results!
+\end{document}

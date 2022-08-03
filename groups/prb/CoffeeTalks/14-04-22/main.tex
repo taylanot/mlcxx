@@ -34,7 +34,7 @@
 \usepackage{/home/taylanot/texmf/tex/beamerthemetot}
 \input{/home/taylanot/texmf/presentation/tune.tex}
 
- % COVER PAGE INFO   
+% COVER PAGE INFO   
 \newcommand{\mytitle}{\color{White}\huge{\textbf{Coffee Talk \#6}}}
 \newcommand{\mysubtitle}{\color{Pink}\Large{\textbf{DeepONet:Learning nonlinear operators for identifying differential equations based on the universal approximation theorem of operators}}}
 \newcommand{\myauthor}{\color{White}\textcalligra{\LARGE Ozgur Taylan Turan}}
@@ -48,15 +48,15 @@
 \input{/home/taylanot/texmf/presentation/cover/cover.tex}
 
 \begin{frame}
-	\centering
-	\mysubtitle\cite{lu2021a}
+  \centering
+  \mysubtitle\cite{lu2021a}
 \end{frame}
 
 \begin{frame}{Why this paper?}
-	\centering
-	  \begin{itemize}
-      \item Badly written, but has an interesting problem to tackle!
-    \end{itemize}
+  \centering
+  \begin{itemize}
+    \item Badly written, but has an interesting problem to tackle!
+  \end{itemize}
 \end{frame}
 
 
@@ -65,20 +65,25 @@
     \color{Pink}{Function}\color{Black}
     \centering
 
-      $f:=\mathcal{V}\to\mathcal{V}$
+    $f:=\mathcal{V}\to\mathcal{V}$
   \end{minipage}%
   \begin{minipage}{0.5\textwidth}
     \color{Pink}{Operator}\color{Black}
     \centering
 
-      $G:=\mathcal{F}\to\mathcal{V}$
+    $G:=\mathcal{F}\to\mathcal{V}$
   \end{minipage}
-  
+
   \centering
 
   $\mathcal{V}$: Vector Space
 
   $\mathcal{F}$: Function Space
+
+  \begin{itemize}
+    \item $G(u):=s(x)$, where $u$ is a function of $x$ 
+    \item At a location $y$ the operator evaluation is given by $G(u)(y):=s(y)$
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Universal Approximation Theorems}
@@ -101,26 +106,31 @@
 
 \begin{frame}{What does it look like?}
   \centering
-    \includegraphics[width=0.65\textwidth]{Figures/pic.png}
+  \includegraphics[width=0.65\textwidth]{Figures/pic.png}
 \end{frame}
 
 \begin{frame}{What does it look like?}
   \begin{minipage}{0.5\textwidth}
     \centering
-     Try to find the following operator:
+    Try to find the following operator:
 
-      $G:=u(x)\to s(x)=\int_0^x u(\tau)d\tau$
+    $G:=u(x)\to s(x)=\int_0^x u(\tau)d\tau$
 
   \end{minipage}%
   \begin{minipage}{0.5\textwidth}
     \centering
-     Procedure:
-     \begin{itemize}
-       \item \textbf{Sample $u$ from Gaussian  Random Field at locations $(x_i)_{i=1}^m$}
-       \item For every function obtain some of the exact outputs $y$ of operator $G$
-       \item Train with the given architecture
-     \end{itemize}
+    Procedure:
+    \begin{itemize}
+      \item \textbf{Sample $(u_k)_{k=1}^{p}$ from Gaussian  Random Field at locations $(x_i)_{i=1}^m$}
+      \item For every function obtain some of the exact outputs at $y$ of function $G(u)$
+      \item Train with the given structure and selected hyper-parameters 
+    \end{itemize}
   \end{minipage}
+\end{frame}
+
+\begin{frame}{Training Curve}
+  \centering
+  \includegraphics[width=0.85\textwidth]{Figures/res.png}
 \end{frame}
 
 \begin{frame}{No Results?}
@@ -130,12 +140,11 @@
 \end{frame}
 
 \begin{frame}{Why is this a cool idea?}
-
-    \begin{itemize}
-       \item Solving ODEs/SODEs can be challenging...
-       \item Previous data usage for fast prediction for dynamical systems
+  \begin{itemize}
+    \item Solving ODEs/SODEs can be challenging...
+    \item Previous data usage for fast prediction for dynamical systems
+    \item Combination of pre-trained DeepONets with the PINNs allow faster adaptations for unknown functions...
      \end{itemize} 
-
 \end{frame}
 
 
@@ -143,11 +152,6 @@
     \color{Pink} 
     \centering
      THANKS!
-\end{frame}
-
-\begin{frame}{Extra}
-  \centering
-    \includegraphics[width=0.85\textwidth]{Figures/res.png}
 \end{frame}
 
 

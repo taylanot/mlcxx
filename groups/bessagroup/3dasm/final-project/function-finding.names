@@ -1,0 +1,157 @@
+1. Title of Database: Case Studies in Scientific Function Finding
+
+2. Sources
+   -- Donor: Cullen Schaffer
+             Department of Computer Science
+             Rutgers University
+             New Brunswick, NJ  08903
+             schaffer@paul.rutgers.edu
+
+   -- Source: Cullen Schaffer, Domain-Independent Scientific Function
+              Finding.  PhD Thesis, Department of Computer Science, Rutgers
+              University, 1990 (Technical Report LCSR-TR-149).
+
+   -- Date Received: Sept. 1, 1990
+
+3. Past Usage:
+   -- See Cullen Schaffer, "A Proven Domain-Independent Scientific
+      Function-Finding Algorithm," in AAAI-90 for a brief account
+      of the results of the original study based on this collection
+      or the PhD thesis cited above for an in-depth report.
+
+      Schaffer's work includes (1) development of an algorithm E*
+      designed to find functional relationships of scientific
+      significance in data of the kind collected in this database
+      (2) analysis of previous scientific function-finding algorithms
+      in the light of real data and (3) a general inquiry into the
+      nature of scientific function finding as practiced by scientists.
+
+4. Overview:
+
+   [Please note the use of Latex format here for algebraic expressions.
+   See Leslie Lamport, Latex: A Document Preparation System,
+   Addison-Wesley, 1986 for details.]
+
+   This database contains 352 bivariate numeric data sets collected from
+   diverse sources and resulting, with a few exceptions, from investigations
+   in physical science. For each data set, the collection includes:
+
+     1. Source: Bibliographic information for the source of the data.
+     2. Description: Identification of the variables $x$ and $y$.  Except
+        in a few clearly identified instances, the abbreviated format
+        $y$ vs. $x$ is employed.  An entry of the form
+
+              Description: Force vs. separation.
+  
+        indicates that $x$ is a separation and $y$ is a force.  In some
+        cases--when the information was readily available--the description
+        also includes the units in which the data was originally reported.
+     3. Reference relation: The functional relationship proposed by the
+        reporting scientist in the original source.
+     4. Comments (optional): Additional information pertaining to the case.
+
+   In recording reference relations, the database often omits details of
+   parameter values.  If a scientist proposes $y=23.1x-.0014$, the
+   reference relation may be given as just $y=k_{1}x+k_{2}$.  Also, since
+   algebraic transformations have been employed freely, the same relation
+   might be given as $y/x=k_{2}/x+k_{1}$.
+
+   In general, data collected here is given in full as it appeared in the
+   original source.  Fractions have been converted to decimals, numbers
+   have been freely translated to and from scientific notation and zeros
+   have sometimes been added to decimal numbers to facilitate tabulation.
+   Any additional deviations from verbatim transcription are noted in the
+   Comments entry of the associated case.  Note in particular that, in a
+   few clearly identified cases, apparent typographical errors have been
+   corrected and that, in others, data points identified by the reporting
+   scientist as *not* conforming to the proposed relationship have been
+   omitted.
+
+5. Database organization:
+
+   The 352 data sets in this collection are organized into 217 cases, each
+   case normally consisting of one to four data sets reported in support
+   of a common hypothesized relationship.  An example is Case 91, which
+   consists of two data sets--91a and 91b--reported to show the linear
+   dependence of electric force on the inverse root of the radius of a
+   conducting wire.  With a very few exceptions, cases are formed from
+   data sets reported together in a single article or other publication.
+
+   Cases are numbered in order of collection.  A few early cases
+   consisted of data for which no reference relation was proposed and
+   these have been omitted here.  Hence, for example, the collection does
+   not include Case 26.  A complete listing of the case numbers appearing
+   in this collection is listed at the end of this file.
+
+   Briefly, the cases are organized as follows (as explained below):
+
+     Cases 1 through 62 are "Selected":
+     -- These were willfully chosen as useful, notable or interesting
+        from a wide variety of sources including handbooks, theses,
+        journal articles, textbooks, student laboratory reports and
+        others.
+     Cases 63 through 222 are "Sampled":
+     -- These were obtained by scanning issues of the journal Physical Review
+        from the early years of this century and recording {\em all} examples
+        of scientific function finding satisfying four conditions:
+
+         1. The source reported a governing functional relationship.
+         2. This relationship was bivariate.
+         3. The data was reported in tabular rather than graphic form.
+         4. The data was measured rather than theoretically postulated.
+
+        The rationale for these conditions is given in Chapter 1 of the
+        thesis cited above.  Chapter 3 gives a detailed account of
+        methodological difficulties encountered in attempting to apply
+        the conditions objectively to obtain a representative sample of
+        scientific function-finding problems.  Finally, Appendix D lists
+        a large number of data sets *not* collected for various specified
+        reasons.  ANYONE INTENDING TO EMPLOY THE DATA SETS IN THIS DATABASE
+        IN A SERIOUS RESEARCH PROGRAM IS STRONGLY ADVISED TO CONSULT THESE
+        CHAPTERS AND APPENDIX, SINCE THEY CONTAIN A HOST OF IMPORTANT
+        CAVEATS REGARDING THE COLLECTION.
+
+6. A note on use of the collection:
+
+   This is, to date, the only collection of its kind in existence and as
+   such it may be of use to researchers studying scientific function
+   finding.  Schaffer, for example, designed his E* function-finding
+   algorithm on the basis of experience with Cases 1 though 122 and then
+   tested the algorithm prospectively on Cases 123 through 222 to see how
+   often it proposed the reference relation and how often it proposed
+   other, presumably spurious relationships.  Future researchers may wish
+   to use the same data for similar purposes, but they must be careful to
+   avoid "testing on the training set"--designing algorithms on the basis
+   of this collection of problems and then reporting performance on the
+   same problems.  By contrast, Cases 123 through 222 were fresh data for
+   Schaffer, since he collected them after E* was fixed.  Researchers
+   intending to use such a subset of cases for testing should refrain
+   from examining them in any fashion prior to the test.
+
+7. Maintenance: Send comments or corrections to Cullen Schaffer at the
+   addresses listed above.
+
+8. Case Numbers Appearing in this Database:
+     1,2,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
+     25,27,28,30a,30b,31,35,36,37a,37b,38,39,40,41a,41b,41c,41d,42,
+     43a,43b,43c,44,45,46a,46b,47,48,49,50,51,52,53,54,55,56a,56b,
+     56c,58,59,60,61a,61b,62a,62b,63,64,66,67,68,69,70a,70b,71a,71b,
+     72,73,74,75,76a,76b,76c,77,78,79,80a,80b,81a,81b,82a,82b,83,84a,
+     84b,84c,84d,85,86,87,88,89,90,91a,91b,92,93,94,95,96a,96b,97,
+     98a,98b,98c,98d,99a,99b,100a,100b,100c,100d,101a,101b,102,103,104a,
+     104b,105,106a,106b,106c,107,108a,108b,108c,108d,109,110,111a,111b,
+     111c,112a,112b,113a,113b,113c,114,115,116,117,118,119,120,121,
+     122a,122b,122c,122d,123,124,125a,125b,126a,126b,127a,127b,127c,128a,
+     128b,128c,128d,129a,129b,129c,130a,130b,130c,131a,131b,131c,132,133,
+     134a,134b,135a,135b,135c,135d,136a,136b,136c,136d,137,138a,138b,139,
+     140,141,142,143,144a,144b,145a,145b,146,147,148a,148b,148c,148d,
+     149,150,151,152a,152b,152c,153a,153b,153c,153d,154,155,156,157,
+     158a,158b,158c,159a,159b,160,161a,161b,162,163,164,165,166a,166b,
+     167,168,169,170a,170b,171a,171b,171c,172,173a,173b,174,175,176a,
+     176b,177,178a,178b,178c,179a,179b,180,181a,181b,181c,181d,182a,182b,
+     182c,182d,183a,183b,183c,184,185,186a,186b,186c,186d,187a,187b,187c,,
+     187d.188,189,190a,190b,190c,191,192,193,194a,194b,194c,194d,195a,195b,
+     196a,196b,196c,196d,197a,197b,197c,197d,198,199a,199b,200a,200b,200c,
+     200d,201,202,203,204a,204b,204c,204d,205,206a,206b,206c,206d,207,
+     208,209a,209b,209c,209d,210,211,212a,212b,212c,213a,213b,214a,214b,
+     214c,214d,215,216,217,218a,218b,218c,218d,219,220,221,222
