@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: splncs04.bst
+Database file #1: /home/taylanot/Dropbox/archive_bib/mylibrary.bib
+Warning--empty journal in flennerhag2019
+You've used 18 entries,
+            2850 wiz_defined-function locations,
+            676 strings with 7410 characters,
+and the built_in function-call counts, 8612 in all, are:
+= -- 623
+> -- 337
+< -- 1
++ -- 139
+- -- 120
+* -- 559
+:= -- 1178
+add.period$ -- 14
+call.type$ -- 18
+change.case$ -- 113
+chr.to.int$ -- 0
+cite$ -- 19
+duplicate$ -- 820
+empty$ -- 806
+format.name$ -- 137
+if$ -- 1783
+int.to.chr$ -- 0
+int.to.str$ -- 18
+missing$ -- 161
+newline$ -- 61
+num.names$ -- 37
+pop$ -- 379
+preamble$ -- 2
+purify$ -- 96
+quote$ -- 0
+skip$ -- 136
+stack$ -- 0
+substring$ -- 393
+swap$ -- 354
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 70
+warning$ -- 1
+while$ -- 55
+width$ -- 20
+write$ -- 161
+(There was 1 warning)

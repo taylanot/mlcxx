@@ -22,7 +22,7 @@ ex =  Experiment('unimodal-nonlinear')
 def my_config():
     NAME = "unimodal-nonlinear"
 
-    SUPPORTED_MODELS = ['Bayes', 'KernelRidge', 'MAML']
+    SUPPORTED_MODELS = ['Bayes', 'KernelRidge', 'MAML', 'GD']
 
     run_tag = 'std_y' 
 
@@ -189,16 +189,39 @@ def EE_MAML(config, seed, hyper):
         ea.append(torch.mean(torch.Tensor(ez)))
     return torch.mean(torch.Tensor(ea)).item()
 
+def EE_GD(config, seed, hyper):
+    tasks, trains, tests = create_Z(config, seed)
+    xtests, ytests = tests
+    xtrains, ytrains= trains
+    var = Namespace(**config)
+    a1, a2 = tasks
+    loss_fn = torch.nn.MSELoss()
+    ez = []
+    ea = []
+    model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
+    #model.load(var.model_path)
+    for i in range(var.Na):
+        for j in range(var.Nz):
+            model.fit((xtrains[i][j],ytrains[i][j]), lr=hyper, load=False, n_iter=var.n_iter)
+            ez.append(loss_fn(model.predict(xtests[i][j]), ytests[i][j]))
+        ea.append(torch.mean(torch.Tensor(ez)))
+    return torch.mean(torch.Tensor(ea)).item()
+
+
 def EE(model_tag, run_tag, config, seed):
     run_config = config.copy()
     overall_ee = []
-    if model_tag == 'KernelRidge' or model_tag == 'MAML':
+    if model_tag == 'KernelRidge' or model_tag == 'MAML' or model_tag == 'GD':
         if model_tag == 'KernelRidge':
             name = 'alpha'
             Error = EE_KernelRidge 
         elif model_tag == 'MAML':
             name = 'lr'
             Error = EE_MAML
+        elif model_tag == 'GD':
+            name = 'lr'
+            Error = EE_GD
+
         for hyper in config[name]:
             err = []
             for value in config[run_tag]:

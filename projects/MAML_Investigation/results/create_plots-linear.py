@@ -148,6 +148,7 @@ dims = [1,2,10,50]
 ntrns = [1,2,10,50]
 #run_tag = 'n_iter'
 exs = [[],['Linear'],['Linear', 'randomSGD']]#,['Linear', 'Ridge', 'randomSGD'],['Linear','SGD'],['Linear','randomSGD']]
+exs = [['General_Ridge']]#,['Linear', 'Ridge', 'randomSGD'],['Linear','SGD'],['Linear','randomSGD']]
 #exs = [[]]#,['Linear'],['Linear', 'Ridge', 'randomSGD'],['Linear','randomSGD']]
 #ex = []
 #ex = ['Linear']
@@ -158,7 +159,7 @@ for dim in dims:
     for Ntrn in ntrns:
         for run_tag in run_tags:
             for id_, ex in enumerate(exs):
-                plot_result(id_=id_,run_tag=run_tag, dim=dim, Ntrn=Ntrn, ex=ex, save=True, name='unimodal_plots-linear')
+                plot_result(id_=id_,run_tag=run_tag, dim=dim, Ntrn=Ntrn, ex=ex, save=True, name='unimodal_plots-linear-v2')
                 plt.close()
 
 #plot_result(id_=0,run_tag='m', dim=1, Ntrn=10, ex=['randomSGD'], save=False, name='test')

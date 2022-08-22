@@ -1,4 +1,0 @@
-INFO - unimodal-nonlinear - Running command 'main'
-INFO - unimodal-nonlinear - Started run with ID "46"
-(10, 20)
-INFO - unimodal-nonlinear - Completed after 0:00:07

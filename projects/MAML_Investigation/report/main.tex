@@ -25,7 +25,7 @@
 \newcommand{\includetikz}[2]{ \resizebox{#1}{!}{\input{#2}}}
 
 \usepackage{pgfplots}
-\graphicspath{{Figures/}}     % organize your images and other figures under media/ folder
+\graphicspath{{Figures_v2/}}     % organize your images and other figures under media/ folder
 %\usepackage{float}
 %\usepackage[cochineal,bigdelims,cmintegrals,vvarbb]{newtxmath}
 \usepackage{amsmath}       % blackboard math symbols
@@ -82,7 +82,8 @@
 \newcommand{\eg}{\textit{e.g.}}
 
 %% Title
-\title{Expected Loss of MAML:A Comperative Study}
+%\title{Expected Loss of MAML:A Comperative Study}
+\title{Quick Adapting MAML vs Slow Adapting Conventional Learners}
 %%%% Cite as
 %%%% Update your official citation here when published 
 %\thanks{\textit{\underline{Citation}}: 
@@ -119,7 +120,10 @@
   %% \texttt{email} \\
 }
 
-\newcommand{\version}{v1/}
+% For version 1 
+%\newcommand{\version}{v1/}
+% For version 2 
+\newcommand{\version}{v2/}
 
 \begin{document}
 \maketitle
@@ -131,14 +135,14 @@
 
 
 % keywords can be removed
-\keywords{meta-learning \and expected error \and biased ridge \and model-agnostic meta-learning}
+\keywords{meta-learning \and expected performance \and model-agnostic meta-learning}
 
 \section{Introduction}\label{sec:intro}
   \input{\version/introduction}
+\section{Experimental Setting}\label{sec:methods}
+  \input{\version/methods}
 \section{Related Work}\label{sec:rw}
   \input{\version/relatedwork}
-\section{Problem Setting}\label{sec:methods}
-  \input{\version/methods}
 \section{Results and Discussion}\label{sec:resdis}
   \input{\version/resultsanddiscussion}
 \section{Conclusion}\label{sec:conc}
@@ -146,7 +150,7 @@
 \section*{Acknowledgments}
 %Bibliography
 \bibliographystyle{unsrt}  
-\bibliography{../../../../../Dropbox/archive_bib/library.bib}  
+\bibliography{/home/taylanot/Dropbox/archive_bib/mylibrary.bib}  
 \newpage
 \section{Appendix}
   \input{\version/appendix}

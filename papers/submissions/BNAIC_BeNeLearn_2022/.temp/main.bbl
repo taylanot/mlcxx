@@ -1,0 +1,83 @@
+\providecommand{\noopsort}[1]{}
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{antoniou2019}
+Antoniou, A., Edwards, H., Storkey, A.: How to train your {{MAML}} (Mar 2019)
+
+\bibitem{behl2019}
+Behl, H.S., Baydin, A.G., Torr, P.H.S.: Alpha {{MAML}}: {{Adaptive
+  Model-Agnostic Meta-Learning}} (May 2019)
+
+\bibitem{collins2020}
+Collins, L., Mokhtari, A., Shakkottai, S.: Task-{{Robust Model-Agnostic
+  Meta-Learning}}. arXiv:2002.04766 [cs, math, stat]  (Jun 2020)
+
+\bibitem{denevi2018}
+Denevi, G., Ciliberto, C., Stamos, D., Pontil, M.: Incremental
+  {{Learning-to-Learn}} with {{Statistical Guarantees}}. arXiv:1803.08089 [cs,
+  stat]  (Mar 2018)
+
+\bibitem{fallah2021}
+Fallah, A., Mokhtari, A., Ozdaglar, A.: Generalization of {{Model-Agnostic
+  Meta-Learning Algorithms}}: {{Recurring}} and {{Unseen Tasks}}.
+  arXiv:2102.03832 [cs, math, stat]  (Nov 2021)
+
+\bibitem{finn2017}
+Finn, C., Abbeel, P., Levine, S.: Model-{{Agnostic Meta-Learning}} for {{Fast
+  Adaptation}} of {{Deep Networks}}. arXiv:1703.03400 [cs]  (Jul 2017)
+
+\bibitem{finn2019}
+Finn, C., Xu, K., Levine, S.: Probabilistic {{Model-Agnostic Meta-Learning}}.
+  arXiv:1806.02817 [cs, stat]  (Oct 2019)
+
+\bibitem{flennerhag2019}
+Flennerhag, S., Moreno, P.G., Lawrence, N.D., Damianou, A.: {{TRANSFERRING
+  KNOWLEDGE ACROSS LEARNING PROCESSES}} p.~23 (2019)
+
+\bibitem{grant2018}
+Grant, E., Finn, C., Levine, S., Darrell, T., Griffiths, T.: Recasting
+  {{Gradient-Based Meta-Learning}} as {{Hierarchical Bayes}}. arXiv:1801.08930
+  [cs]  (Jan 2018)
+
+\bibitem{guiroy2019}
+Guiroy, S., Verma, V., Pal, C.: Towards {{Understanding Generalization}} in
+  {{Gradient-Based Meta-Learning}}. arXiv:1907.07287 [cs, stat]  (Jul 2019)
+
+\bibitem{lake2019}
+Lake, B.M., Salakhutdinov, R., Tenenbaum, J.B.: The {{Omniglot}} challenge: A
+  3-year progress report (May 2019)
+
+\bibitem{li2017}
+Li, D., Yang, Y., Song, Y.Z., Hospedales, T.M.: Deeper, {{Broader}} and
+  {{Artier Domain Generalization}}. arXiv:1710.03077 [cs]  (Oct 2017)
+
+\bibitem{li2017b}
+Li, Z., Zhou, F., Chen, F., Li, H.: Meta-{{SGD}}: {{Learning}} to {{Learn
+  Quickly}} for {{Few-Shot Learning}}. arXiv:1707.09835 [cs]  (Sep 2017)
+
+\bibitem{nakkiran2020}
+Nakkiran, P.: Learning {{Rate Annealing Can Provably Help Generalization}},
+  {{Even}} for {{Convex Problems}}. arXiv:2005.07360 [cs, stat]  (May 2020)
+
+\bibitem{nichol2018}
+Nichol, A., Achiam, J., Schulman, J.: On {{First-Order Meta-Learning
+  Algorithms}}. arXiv:1803.02999 [cs]  (Oct 2018)
+
+\bibitem{raghu2020}
+Raghu, A., Raghu, M., Bengio, S., Vinyals, O.: Rapid {{Learning}} or {{Feature
+  Reuse}}? {{Towards Understanding}} the {{Effectiveness}} of {{MAML}} (Feb
+  2020)
+
+\bibitem{rajasegaran2020}
+Rajasegaran, J., Khan, S., Hayat, M., Khan, F.S., Shah, M.: {{iTAML}}: {{An
+  Incremental Task-Agnostic Meta-learning Approach}}. arXiv:2003.11652 [cs,
+  stat]  (Mar 2020)
+
+\bibitem{thrun1998}
+Thrun, S., Pratt, L. (eds.): Learning to {{Learn}}. {Springer US}, {Boston, MA}
+  (1998). \doi{10.1007/978-1-4615-5529-2}
+
+\end{thebibliography}
