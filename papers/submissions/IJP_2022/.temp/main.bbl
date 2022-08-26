@@ -1,0 +1,59 @@
+\providecommand{\noopsort}[1]{}
+\begin{thebibliography}{5}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Article
+\bibitem[{Adeli()}]{adeli}
+\bibinfo{author}{Adeli, H.}, .
+\newblock \bibinfo{title}{Knowledge engineering}.
+\newblock \bibinfo{journal}{Knowledge Engineering} , \bibinfo{pages}{18}.
+%Type = Article
+\bibitem[{Arenas et~al.(2021)Arenas, Herrera, Mu{\~n}oz and Munoz}]{arenas2021}
+\bibinfo{author}{Arenas, C.}, \bibinfo{author}{Herrera, G.},
+  \bibinfo{author}{Mu{\~n}oz, E.}, \bibinfo{author}{Munoz, R.C.},
+  \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{The breakdown of {{Moore}}'s law induced by weak
+  {{Anderson}} localization and by size effects in nano-scale metallic
+  connectors}.
+\newblock \bibinfo{journal}{Materials Research Express} \bibinfo{volume}{8},
+  \bibinfo{pages}{015026}.
+\newblock \DOIprefix\doi{10.1088/2053-1591/abd422}.
+%Type = Article
+\bibitem[{Bishop and James(1993)}]{bishop1993}
+\bibinfo{author}{Bishop, C.}, \bibinfo{author}{James, G.},
+  \bibinfo{year}{1993}.
+\newblock \bibinfo{title}{Analysis of multiphase flows using dual-energy gamma
+  densitometry and neural networks}.
+\newblock \bibinfo{journal}{Nuclear Instruments and Methods in Physics Research
+  Section A: Accelerators, Spectrometers, Detectors and Associated Equipment}
+  \bibinfo{volume}{327}, \bibinfo{pages}{580--593}.
+\newblock \DOIprefix\doi{10.1016/0168-9002(93)90728-Z}.
+%Type = Article
+\bibitem[{Reich(1997)}]{reich1997}
+\bibinfo{author}{Reich, Y.}, \bibinfo{year}{1997}.
+\newblock \bibinfo{title}{Machine {{Learning Techniques}} for {{Civil
+  Engineering Problems}}}.
+\newblock \bibinfo{journal}{Computer-Aided Civil and Infrastructure
+  Engineering} \bibinfo{volume}{12}, \bibinfo{pages}{295--310}.
+\newblock \DOIprefix\doi{10.1111/0885-9507.00065}.
+%Type = Article
+\bibitem[{Reich and Travitzky(1995)}]{reich1995}
+\bibinfo{author}{Reich, Y.}, \bibinfo{author}{Travitzky, N.},
+  \bibinfo{year}{1995}.
+\newblock \bibinfo{title}{Machine learning of material behaviour knowledge from
+  empirical data}.
+\newblock \bibinfo{journal}{Materials \& Design} \bibinfo{volume}{16},
+  \bibinfo{pages}{251--259}.
+\newblock \DOIprefix\doi{10.1016/0261-3069(96)00007-6}.
+
+\end{thebibliography}
