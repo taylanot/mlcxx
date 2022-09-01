@@ -20,13 +20,13 @@ ex =  Experiment('unimodal-nonlinear')
 
 @ex.config
 def my_config():
-    NAME = "unimodal-nonlinear-fix"
+    NAME = "unimodal-nonlinear-personal-2"
 
     SUPPORTED_MODELS = ['Bayes', 'KernelRidge', 'MAML', 'GD']
 
-    run_tag = 'std_y' 
+    run_tag = 'Ntrn' 
 
-    model_tag = 'KernelRidge'
+    model_tag = 'MAML'
 
     res = 20               # Resolution of the experiments! make 0 for just one 
 
@@ -38,7 +38,7 @@ def my_config():
     
     config['dim'] = 1
     if run_tag == 'dim':
-        config['dim'] = torch.arange(1, 50).tolist()
+        config['dim'] = torch.arange(1, res).tolist()
 
     config['m_amplitude'] = 1.
 
@@ -56,8 +56,8 @@ def my_config():
     if run_tag == 'b':
         config['b'] = torch.linspace(1,5, res).tolist()
 
-    config['Na'] = 2
-    config['Nz'] = 2
+    config['Na'] = 50
+    config['Nz'] = 50
 
     config['std_y'] = 1
     if run_tag == 'std_y':
@@ -81,7 +81,7 @@ def my_config():
 
     if model_tag == 'MAML':
         config['model_ids'] = {1:1, 2:2, 10:3, 50:4}
-        config['model_path'] = os.path.join('MAML_Training_noiseless', 'artifacts',\
+        config['model_path'] = os.path.join('MAML_intermediate_model', 'artifacts',\
                 str(config['model_ids'][config['dim']]), 'model.pt')
 
     if run_tag == 'dim': 
@@ -180,10 +180,13 @@ def EE_MAML(config, seed, hyper):
     loss_fn = torch.nn.MSELoss()
     ez = []
     ea = []
-    model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
-    model.load(var.model_path)
     for i in range(var.Na):
         for j in range(var.Nz):
+            model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
+            model.load(var.model_path)
+            #for name, param in model.state_dict().items():
+            #    if name=='layers.output.bias':
+            #        print(name, param)
             model.fit((xtrains[i][j],ytrains[i][j]), lr=hyper, load=False, n_iter=var.n_iter)
             ez.append(loss_fn(model.predict(xtests[i][j]), ytests[i][j]))
         ea.append(torch.mean(torch.Tensor(ez)))
@@ -198,10 +201,12 @@ def EE_GD(config, seed, hyper):
     loss_fn = torch.nn.MSELoss()
     ez = []
     ea = []
-    model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
-    #model.load(var.model_path)
     for i in range(var.Na):
         for j in range(var.Nz):
+            model = NonlinearNetwork(in_feature=var.dim, n_neuron=40, out_feature=1, n_hidden=2, activation_tag='relu')
+            #for name, param in model.state_dict().items():
+            #    if name=='layers.output.bias':
+            #        print(name, param)
             model.fit((xtrains[i][j],ytrains[i][j]), lr=hyper, load=False, n_iter=var.n_iter)
             ez.append(loss_fn(model.predict(xtests[i][j]), ytests[i][j]))
         ea.append(torch.mean(torch.Tensor(ez)))
@@ -224,6 +229,7 @@ def EE(model_tag, run_tag, config, seed):
             Error = EE_GD
         for hyper in config[name]:
             for value in config[run_tag]:
+                print(value)
                 run_config[run_tag] = value
                 err.append(Error(run_config, seed, hyper))
             overall_ee.append(err)

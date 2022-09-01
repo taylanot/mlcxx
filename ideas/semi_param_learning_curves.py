@@ -151,17 +151,15 @@ class func_gen():
     def __call__(self, x):
         return np.hstack(([np.multiply(self.a, np.sin(x+self.phi))]))
 
-
 ### Block-2 ####
 a =  np.random.normal(1,1)
 phi =  np.random.normal(0,1)
 x_train_single, y_train_single = sample_test(a=a,phi=phi, N=1000)
 kernel = rbf()
 model_base = KernelRidge(1, kernel)
-for num in range(2, 24,4):
+for num in range(2, 8,4):
     funcs = func_gen(num=num)
     model = SemiParamKernelRidge2(1., kernel, funcs)
-
     #model.fit(x_train_single,y_train_single)
     #model_base.fit(x_train_single,y_train_single)
     def plot_learning_curve(estimators):
@@ -182,8 +180,9 @@ for num in range(2, 24,4):
 
     plt.figure()
     plot_learning_curve([model_base, model])
-    plt.savefig('learning'+str(num)+'.pdf')
-plt.show()
+    #plt.savefig('learning'+str(num)+'.pdf')
+    plt.show()
+
 #plt.scatter(x_train_single, y_train_single)
 #x_train_single, y_train_single = sample_test(a=a, N=500)
 #plt.plot(x_train_single,model.predict(x_train_single), label='ours')

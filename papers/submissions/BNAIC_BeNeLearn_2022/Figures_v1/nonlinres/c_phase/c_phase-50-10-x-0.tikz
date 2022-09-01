@@ -4,6 +4,7 @@
 \definecolor{chocolate217952}{RGB}{217,95,2}
 \definecolor{darkcyan27158119}{RGB}{27,158,119}
 \definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
 \definecolor{lightslategray117112179}{RGB}{117,112,179}
 
 \begin{axis}[
@@ -17,7 +18,7 @@ xmin=-0.498949999950128, xmax=10.4999499999976,
 xtick style={color=black},
 y grid style={darkgray176},
 ylabel={Expected Error},
-ymin=-2.653980499506, ymax=77.7226673424244,
+ymin=-2.73767724633217, ymax=79.480299025774,
 ytick style={color=black}
 ]
 \addplot [semithick, darkcyan27158119]
@@ -43,7 +44,7 @@ table {%
 9.47373676300049 71.5787811279297
 10 71.7147598266602
 };
-\addlegendentry{Kernel Ridge-$\lambda$:0.0001}
+\addlegendentry{KernelRidge-$\lambda$:0.0001}
 \addplot [semithick, chocolate217952, dashed]
 table {%
 0.00100000004749745 0.999503493309021
@@ -92,6 +93,7 @@ table {%
 10 66.7858200073242
 };
 \addlegendentry{MAML-lr:0.1112}
+
 \end{axis}
 
 \end{tikzpicture}

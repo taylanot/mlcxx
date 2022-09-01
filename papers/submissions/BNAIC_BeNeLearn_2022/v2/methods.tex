@@ -1,0 +1,83 @@
+Throughout this work uppercase bold letters (\eg $\mathbf{X}$), lowercase bold letters (\eg $\mathbf{x}$), and lowercase letters (\eg ${x}$) are used for matrices, vectors, and scalars respectively. Moreover, the vectors are assumed to be stored in columns. Finally, the $\I_{D}$ represents a $D\times D$ identity matrix, the $\ones_{D}$ and $\zeros_{D}$ represents $D\times 1$ vector of ones and zeros respectively.
+
+\subsection{Learning Problems}
+
+In this work, two families of regression tasks are considered; a linear and a nonlinear regression task family.
+
+% Maybe we can explain why we choose these...
+
+Consider the conventional linear regression problem
+
+\begin{equation}\label{eq:linearreg}
+  \lab = \trans{\inp}\scaletask+\noise, 
+\end{equation}
+where $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Each realization of the slope $\scaletask$ corresponds to a task $\task$ and the collection of $N$ observations is represented by $\dataset:=\{\inp_i, \lab_i\}_{i=1}^{N}$. 
+
+For the nonlinear problem family, the regression function is defined as a weighted combination of sinusoidal functions:
+
+\begin{equation}\label{eq:nonlinearreg}
+  \lab = \trans{\sine(\inp+\phasetask)}\scaletask+\noise, 
+\end{equation}
+where $\lab\in\R$, $\inp\in\R^D$, $\scaletask\in\R^D$ and $\noise\sim\normal{0}{\var}$. Assuming that the each realization of scale term $\scaletask$ and $\phasetask$ corresponds to a task observed in the environment $\task$ and each set of observed $N$ input ($\inp$) and its corresponding label ($\lab$) is represented by a dataset $\dataset:=\{\inp_i, \lab_i\}_{i=1}^{N}$.
+
+%For both linear and nonlinear problems presented sample distribution is given by $\prob_\dataset$ for a given $\task$ and the task, distribution is represented by $\prob_\task$. 
+A model parameterized by $\param$ is represented by $\model(\inp, \param):\inp\to\lab$. A model $\model(\inp, \param)$ that is trained with $\dataset$ obtained from  task $\task$ is represented by $\estim(\inp)$. Noting that $\estim(\inp)$ for a base learner is only exposed to a single task $\task$ and a single dataset $\dataset$, whereas a meta learner, in this case, MAML, are exposed to multiple tasks from $\prob_\task$ and multiple datasets $\dataset$ in the meta-learning stage and then the adaptation is done as in the case of a base learner with just a single task $\task$ and a single dataset $\dataset$.  The discrepancy between the prediction of the estimator $\estim$ and $\lab$ is measured in terms of squared loss $\loss:=(\estim(\inp)-\lab)^2$. The main loss that this paper tries to investigate is the \textit{Expected Squared Loss} of an estimator $\estim$ over the $\prob_{\task}$. Then the expected squared loss can be represented as
+
+\begin{equation}\label{eq:ee}
+  \EE:= \iiint(\estim(\inp) - y)^2\prob(\inp, y)\prob_{\dataset}\prob_{\task} d\inp d\lab d\dataset d\task.
+\end{equation}
+
+% Maybe this can be elaborated!
+
+This performance measure gives rise to the \textit{Bayes Error} to be given by $\sigma^2$ that is coming from the noise term, which represents a model that is the perfect estimator, referred to as oracle in some of the meta-learning literature.
+
+For all the problems the input distribution is given by $\prob_\inp\sim\normal{0}{k\I}$ where $k$ is a parameter for the variance of the inputs. For the linear problem the $\prob_\task:=\prob(\scaletask)\sim\normal{{m\ones_{D}}}{{c\I_{D}}}$ and for nonlinear problem the task distribution takes the form of a joint distribution $\prob_\task:=\prob(\scaletask, \phasetask)$ where $\prob_{\scaletask}\sim\normal{\ones_{D}}{c_1\I_{D}}$ and $\prob_{\phasetask}\sim\normal{\zeros_{D}}{c_2\I_{D}}$
+
+\begin{figure}[ht!]
+  \centering
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures_v1/methods/lin_maml.tikz}
+    \caption{$\lab = \trans{\inp}\scaletask$}
+    \label{fig:lintasks}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.49\textwidth}
+    \centering
+    \includetikz{\textwidth}{Figures_v1/methods/nonlin_maml.tikz}
+    \caption{$\lab = \trans{\sine(\inp+\phasetask)}\scaletask$}
+    \label{fig:nonlintasks}
+  \end{subfigure}
+  \caption{100 sample tasks drawn from $\prob_\task$ for both linear ($m=0$ and $c=1$) and nonlinear ($c_1=1$ and $c_2=1$) problems with low opacity and the intermediate models for MAML trained with respective $\prob_\task$.}
+\end{figure}
+
+\subsection{Models} 
+
+For the linear problems $\model(\inp, \param):=\inpbias\param$ with $\inpbias\in\R^{1\times D+1}$ and $\param\in\R^{D+1\times 1}$ where $\param:=\trans{[\slope, \bias]}$ and $\inpbias:=[\inp, 1]$ is utilized. The optimum parameters ($\opt$) for different linear models are obtained as follows:
+
+\paragraph{Linear Estimator} is given by the least-squares solution, $\opt:=(\inv{\trans{\design}\design)}\trans{\design}\labs$, where $\design\in\R^{N\times D}$ is the design matrix where the observed input data is stored in rows.
+
+\paragraph{Ridge Estimator} is given by $\opt:=(\inv{\trans{\design}\design+\ridge \I_{D})}\trans{\design}\labs$ which is obtained by minimizing the squared loss with the additional term of $\ridge\norm{\param}{2}^2$. %Thus, overall loss takes the form $\loss+\ridge\norm{\param}{2}^2$.
+
+\paragraph{Kernel Ridge Estimator} is given by $\opt= \trans{\design}\weight$ where $\weight:=\inv{(\gram+\ridge\I_{N})}\lab$ where $\gram\in\R^{N\times N}$ is the  \textit{Gram Matrix} obtained by replacing $\trans{\design}\design$ inner product by a kernel $\kernel(\design, \design)$. Then, the prediction of the estimator takes the form $\estim(\pred,\param)=\trans{\weight}\kernel(\pred,\design)$ where $\pred\in\R^{D\times 1}$.
+
+For both linear and nonlinear models, gradient descent can be utilized to update the parameters of a model $\model$. Then,
+
+\paragraph{Gradient Descent} for any given model $\model(\inp, \param)$ and a given number of iterations $\iter$ the gradient descent estimator is given by $\{\param_{j+1}=\param_{j} - \lr\sum_i^{N}\inp_i(\model(\inp,\param_j)-\lab_i)\}_{j=0}^{\iter}$. In other words for any given value of $\param$ one gradient update is given by the gradient with respect to $\param$ with a scaling parameter $\lr$. 
+
+All the models investigated can be divided into two sub-categories the models that have information regarding the task space and the ones that have not. The labels  used in Section \ref{sec:resdis} of the models that have information regarding the task space are as follows:
+\begin{itemize}
+  \item \textbf{MAML} (for linear problem): corresponds to gradient descent with $\iter$ with the adjustable parameters obtained from the mean of the tasks $\mathbb{E}[\prob_{\task}]$ with small perturbation $\delta\sim\normal{\zeros}{0.1\I}$ since the MAML procedure for a linear model goes to the mean of the task distribution. 
+  \item \textbf{MAML} (for nonlinear problem): an intermediate model trained with the network and meta-learning procedure  given in \cite{finn2017} for the sinusoidal regression problem. After which gradient descent with $\iter$ is used for adaptation to a certain task.
+\end{itemize} 
+
+Finally, the following model labels have information from a single task:
+\begin{itemize}
+  \item \textbf{Linear}: standard least squares solution.
+  \item \textbf{Ridge}: standard least squares solution with $L_2-regularization$.
+  \item \textbf{random GD}: gradient descent with $\iter$ with the adjustable parameters starting from random initialization.
+  \item \textbf{Kernel Ridge}: kernelized (with Radial Basis Function Kernel) 
+\end{itemize}
+
+For the linear problem setting, it should be noted that the optimum can always be reached when the gradient descent is utilized with an infinitely small learning rate and an infinite number of gradient steps. Thus, allowing us to investigate the difference between taking limited steps or allowing the model to go towards the optimum directly.
+
+It should be noted that the hyper-parameters of the utilized models, if there are any, are selected with a simple grid search with 20 different values and only the one with the lowest mean expected performance over the parameter under investigation is presented in the results. 

@@ -4,11 +4,19 @@
 \definecolor{chocolate217952}{RGB}{217,95,2}
 \definecolor{darkcyan27158119}{RGB}{27,158,119}
 \definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
 \definecolor{lightslategray117112179}{RGB}{117,112,179}
 
 \begin{axis}[
 legend cell align={left},
-legend style={fill opacity=0.8, draw opacity=1, text opacity=1, at={(0.91,0.5)}, anchor=east, draw=none},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.5,0.5)},
+  anchor=center,
+  draw=none
+},
 tick align=outside,
 tick pos=left,
 x grid style={darkgray176},
@@ -17,7 +25,7 @@ xmin=-4.5, xmax=94.5,
 xtick style={color=black},
 y grid style={darkgray176},
 ylabel={Expected Error},
-ymin=0.854072701931, ymax=4.06270037889481,
+ymin=0.843641567230225, ymax=4.28175420761108,
 ytick style={color=black}
 ]
 \addplot [semithick, darkcyan27158119]
@@ -50,18 +58,32 @@ table {%
 \addlegendentry{Bayes}
 \addplot [semithick, lightslategray117112179]
 table {%
-0 3.91685366630554
-10 3.71002292633057
-20 3.53517150878906
-30 3.42863440513611
-40 3.32466959953308
-50 3.19156646728516
-60 3.40881776809692
-70 3.38936591148376
-80 3.44150638580322
-90 3.69759702682495
+0 3.9180269241333
+10 2.92362546920776
+20 2.20539379119873
+30 2.03120732307434
+40 2.02484583854675
+50 2.06001091003418
+60 2.08942532539368
+70 2.1427059173584
+80 2.17815208435059
+90 2.22306418418884
 };
-\addlegendentry{MAML-lr:0.0001}
+\addlegendentry{MAML-lr:0.1112}
+\addplot [semithick, deeppink23141138]
+table {%
+0 4.12547636032104
+10 4.10491466522217
+20 4.08492469787598
+30 4.06532764434814
+40 4.04587078094482
+50 4.02629947662354
+60 4.00634145736694
+70 3.98581600189209
+80 3.96456909179688
+90 3.94249439239502
+};
+\addlegendentry{GD-lr:0.0001}
 \end{axis}
 
 \end{tikzpicture}

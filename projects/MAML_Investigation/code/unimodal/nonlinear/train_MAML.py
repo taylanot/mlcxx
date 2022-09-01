@@ -10,7 +10,7 @@ from task_generator import *
 from networks import LinearNetwork, NonlinearNetwork
 from MAML import MAML
 
-ex =  Experiment('MAML_Training')
+ex =  Experiment('MAML_intermediate_model')
 
 @ex.config
 def my_config():
@@ -20,7 +20,7 @@ def my_config():
     torch.manual_seed(seed)
     problem = 'nonlinear'
     config['dim'] = 1
-    config['std_y'] = 0.
+    config['std_y'] = 1.
     config['x_info'] = [0,2]
     if problem == 'linear':
         config['bias'] = True

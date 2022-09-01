@@ -4,6 +4,7 @@
 \definecolor{chocolate217952}{RGB}{217,95,2}
 \definecolor{darkcyan27158119}{RGB}{27,158,119}
 \definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
 \definecolor{lightslategray117112179}{RGB}{117,112,179}
 
 \begin{axis}[
@@ -43,7 +44,7 @@ table {%
 9.47373676300049 2.40465116500854
 10 2.40467357635498
 };
-\addlegendentry{Kernel Ridge-$\lambda$:8.8889}
+\addlegendentry{KernelRidge-$\lambda$:8.8889}
 \addplot [semithick, chocolate217952, dashed]
 table {%
 0.00100000004749745 0.99954879283905
@@ -92,6 +93,8 @@ table {%
 10 2.07933592796326
 };
 \addlegendentry{MAML-lr:0.0001}
+
+
 \end{axis}
 
 \end{tikzpicture}

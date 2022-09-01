@@ -16,7 +16,7 @@ n = 8
 color = plt.cm.Dark2(np.linspace(0, 1,n))
 mpl.rcParams['axes.prop_cycle'] = cycler.cycler('color', color)
 
-Experiment_Directory = 'unimodal-nonlinear'
+Experiment_Directory = 'unimodal-nonlinear-fix-final'
 run_file = 'run.json'
 config_file = 'config.json'
 Ntrns = np.array([1,2,10,50])
@@ -28,7 +28,7 @@ def get_results(exp_dir=Experiment_Directory, model='Linear', run_tag='std_y', d
         ID = np.where(Ntrns==Ntrn)[0][0]+1
 
     result_file = 'result-'+str(ID)+'-'+str(model)+'.npy'
-    if model=='MAML':
+    if model=='MAML' or model=='GD':
         result_file = 'result-'+str(ID)+'-'+str(model)+str(run_tag)+'.npy'
     if run_tag != 'dim':
         run = os.path.join(exp_dir, str(dim), model, run_tag, str(ID), run_file)
@@ -64,7 +64,7 @@ def get_results(exp_dir=Experiment_Directory, model='Linear', run_tag='std_y', d
         y = ys[select]
         if model == 'KernelRidge':
             label_ext = '-$\lambda$:'+str(round(config_info['config']['alpha'][select],4))
-        elif model == 'MAML':
+        elif model == 'MAML' or model=='GD':
             label_ext = '-lr:'+str(round(config_info['config']['lr'][select],4))
     tag = model+label_ext
     return x, y, tag
@@ -108,7 +108,7 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
         os.makedirs(png_dir)
     fig, ax = plt.subplots(figsize=(6,6))
     if run_tag != 'n_iter':
-        models = ['KernelRidge', 'Bayes', 'MAML']
+        models = ['KernelRidge', 'Bayes', 'MAML', 'GD']
         for model in models:
             if model not in ex:
                 x,y,tag = get_results(model=model, run_tag=run_tag,dim=dim, Ntrn=Ntrn)
@@ -128,7 +128,7 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
         else:
             plt.show()
     else:
-        models=['KernelRidge', 'Bayes', 'MAML']
+        models=['KernelRidge', 'Bayes', 'MAML', 'GD']
         for model in models:
             if model not in ex:
                 x,y,tag = get_results(model=model, run_tag=run_tag,dim=dim, Ntrn=Ntrn)
@@ -149,7 +149,7 @@ def plot_result(id_, run_tag, dim, Ntrn, log=False, ex=[], save=False, name='tes
             plt.show()
 
 
-run_tags = ['std_y', 'c_phase', 'c_amplitude', 'Ntrn', 'n_iter']
+run_tags = ['std_y', 'c_phase', 'c_amplitude', 'n_iter', 'Ntrn']
 dims = [1,2,10,50]
 ntrns = [1,2,10,50]
 #run_tag = 'n_iter'
@@ -168,7 +168,7 @@ for dim in dims:
                 plot_result(id_=id_,run_tag=run_tag, dim=dim, Ntrn=Ntrn, ex=ex, save=True, name='unimodal_plots_nonlinear')
                 plt.close()
 
-#plot_result(id_=0,run_tag='std_y', dim=1, Ntrn=10, ex=['MAML'], save=False, name='test')
+#plot_result(id_=0,run_tag='Ntrn', dim=1, Ntrn=10, ex=exs, save=False, name='test')
 #plt.show()
 #plot_result(run_tag, dim=1, Ntrn=2)
 

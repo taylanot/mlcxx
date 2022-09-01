@@ -1,0 +1,48 @@
+{
+  "NAME": "unimodal-nonlinear-test",
+  "SUPPORTED_MODELS": [
+    "Bayes",
+    "KernelRidge",
+    "MAML",
+    "GD"
+  ],
+  "config": {
+    "Na": 1,
+    "Ntrn": 5,
+    "Ntst": 1000,
+    "Nz": 1,
+    "alpha": [
+      9.999999747378752e-05
+    ],
+    "b": 2.0,
+    "c_amplitude": 2.0,
+    "c_phase": 2.0,
+    "dim": 1,
+    "empty": [],
+    "l": [
+      9.999999747378752e-05
+    ],
+    "lr": [
+      9.999999747378752e-05
+    ],
+    "m_amplitude": 1.0,
+    "m_phase": 0.0,
+    "model_ids": {
+      "json://1": 1,
+      "json://10": 3,
+      "json://2": 2,
+      "json://50": 4
+    },
+    "model_path": "MAML_Training_noiseless/artifacts/1/model.pt",
+    "n_iter": 10,
+    "std_y": [
+      0.0,
+      5.0
+    ]
+  },
+  "model_tag": "MAML",
+  "res": 2,
+  "res_hyper": 1,
+  "run_tag": "std_y",
+  "seed": 24
+}

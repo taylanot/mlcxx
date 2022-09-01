@@ -4,6 +4,7 @@
 \definecolor{chocolate217952}{RGB}{217,95,2}
 \definecolor{darkcyan27158119}{RGB}{27,158,119}
 \definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{deeppink23141138}{RGB}{231,41,138}
 \definecolor{lightslategray117112179}{RGB}{117,112,179}
 
 \begin{axis}[
@@ -99,6 +100,7 @@ table {%
 10 6.08373785018921
 };
 \addlegendentry{MAML-lr:0.0001}
+
 \end{axis}
 
 \end{tikzpicture}
