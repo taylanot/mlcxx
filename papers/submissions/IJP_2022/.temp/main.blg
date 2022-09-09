@@ -4,44 +4,46 @@ The top-level auxiliary file: main.aux
 The style file: cas-model2-names.bst
 Database file #1: /home/taylanot/Dropbox/archive_bib/aleksandr_colab.bib
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 5 entries,
+Warning--empty journal in kaczmarczyk
+You've used 26 entries,
             2990 wiz_defined-function locations,
-            772 strings with 7286 characters,
-and the built_in function-call counts, 3135 in all, are:
-= -- 249
-> -- 90
-< -- 4
-+ -- 37
-- -- 30
-* -- 323
-:= -- 459
-add.period$ -- 19
-call.type$ -- 5
-change.case$ -- 35
-chr.to.int$ -- 5
-cite$ -- 5
-duplicate$ -- 238
-empty$ -- 243
-format.name$ -- 45
-if$ -- 579
-int.to.chr$ -- 1
+            919 strings with 12223 characters,
+and the built_in function-call counts, 17883 in all, are:
+= -- 1356
+> -- 734
+< -- 10
++ -- 290
+- -- 255
+* -- 2038
+:= -- 2605
+add.period$ -- 97
+call.type$ -- 26
+change.case$ -- 217
+chr.to.int$ -- 25
+cite$ -- 27
+duplicate$ -- 1305
+empty$ -- 1283
+format.name$ -- 335
+if$ -- 3281
+int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 44
-newline$ -- 45
-num.names$ -- 20
-pop$ -- 79
+missing$ -- 255
+newline$ -- 165
+num.names$ -- 106
+pop$ -- 448
 preamble$ -- 2
-purify$ -- 30
+purify$ -- 189
 quote$ -- 0
-skip$ -- 69
+skip$ -- 360
 stack$ -- 0
-substring$ -- 156
-swap$ -- 162
-text.length$ -- 0
+substring$ -- 747
+swap$ -- 969
+text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 45
-warning$ -- 0
-while$ -- 23
+type$ -- 228
+warning$ -- 1
+while$ -- 111
 width$ -- 0
-write$ -- 92
+write$ -- 414
+(There was 1 warning)

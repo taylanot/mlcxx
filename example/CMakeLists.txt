@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-project(example-app)
+project(example)
 
 list(APPEND CMAKE_PREFIX_PATH "/home/libtorch/")
 find_package(Torch REQUIRED)
-find_package(Boost 1.40 COMPONENTS program_options REQUIRED
+find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_executable(example example.cpp)
 target_link_libraries(example "${TORCH_LIBRARIES}")
-target_link_libraries(example "${TORCH_LIBRARIES}")
-target_link_libraries(anyExecutable Boost::program_options)
+target_link_libraries(example Boost::program_options)
+#target_link_libraries(example Boost::program_options)
 set_property(TARGET example PROPERTY CXX_STANDARD 14)
 
 ## The following code block is suggested to be used on Windows.

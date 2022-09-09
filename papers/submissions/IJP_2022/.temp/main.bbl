@@ -1,5 +1,5 @@
 \providecommand{\noopsort}[1]{}
-\begin{thebibliography}{5}
+\begin{thebibliography}{26}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\href}[2]{#2}
@@ -29,6 +29,18 @@
   \bibinfo{pages}{015026}.
 \newblock \DOIprefix\doi{10.1088/2053-1591/abd422}.
 %Type = Article
+\bibitem[{Bessa et~al.(2017)Bessa, Bostanabad, Liu, Hu, Apley, Brinson, Chen
+  and Liu}]{bessa2017}
+\bibinfo{author}{Bessa, M.}, \bibinfo{author}{Bostanabad, R.},
+  \bibinfo{author}{Liu, Z.}, \bibinfo{author}{Hu, A.}, \bibinfo{author}{Apley,
+  D.W.}, \bibinfo{author}{Brinson, C.}, \bibinfo{author}{Chen, W.},
+  \bibinfo{author}{Liu, W.K.}, \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{A framework for data-driven analysis of materials
+  under uncertainty: {{Countering}} the curse of dimensionality}.
+\newblock \bibinfo{journal}{Computer Methods in Applied Mechanics and
+  Engineering} \bibinfo{volume}{320}, \bibinfo{pages}{633--667}.
+\newblock \DOIprefix\doi{10.1016/j.cma.2017.03.037}.
+%Type = Article
 \bibitem[{Bishop and James(1993)}]{bishop1993}
 \bibinfo{author}{Bishop, C.}, \bibinfo{author}{James, G.},
   \bibinfo{year}{1993}.
@@ -38,6 +50,158 @@
   Section A: Accelerators, Spectrometers, Detectors and Associated Equipment}
   \bibinfo{volume}{327}, \bibinfo{pages}{580--593}.
 \newblock \DOIprefix\doi{10.1016/0168-9002(93)90728-Z}.
+%Type = Article
+\bibitem[{Chen(2021)}]{chen2021b}
+\bibinfo{author}{Chen, G.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Recurrent neural networks ({{RNNs}}) learn the
+  constitutive law of viscoelasticity}.
+\newblock \bibinfo{journal}{Computational Mechanics} , \bibinfo{pages}{11}.
+%Type = Article
+\bibitem[{Ferreira et~al.(2021)Ferreira, Pires and Bessa}]{ferreira2021}
+\bibinfo{author}{Ferreira, B.P.}, \bibinfo{author}{Pires, F.M.A.},
+  \bibinfo{author}{Bessa, M.A.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Adaptive {{Clustering-based Reduced-Order Modeling
+  Framework}}: {{Fast}} and accurate modeling of localized history-dependent
+  phenomena}.
+\newblock \bibinfo{journal}{arXiv:2109.11897 [cond-mat]}
+  \href{http://arxiv.org/abs/2109.11897}{\tt arXiv:2109.11897}.
+%Type = Article
+\bibitem[{Kaczmarczyk et~al.()Kaczmarczyk, Ullah, Lewandowski, Zhou,
+  Athanasiadis, Nguyen, {Chalons-Mouriesse}, Richardson, Shvarts, Wakeni and
+  Pearce}]{kaczmarczyk}
+\bibinfo{author}{Kaczmarczyk, {\L}.}, \bibinfo{author}{Ullah, Z.},
+  \bibinfo{author}{Lewandowski, K.}, \bibinfo{author}{Zhou, X.Y.},
+  \bibinfo{author}{Athanasiadis, I.}, \bibinfo{author}{Nguyen, H.},
+  \bibinfo{author}{{Chalons-Mouriesse}, C.A.}, \bibinfo{author}{Richardson,
+  E.J.}, \bibinfo{author}{Shvarts, A.G.}, \bibinfo{author}{Wakeni, M.},
+  \bibinfo{author}{Pearce, C.J.}, .
+\newblock \bibinfo{title}{{{MoFEM}}: {{An}} open source, parallel finite
+  element library} , \bibinfo{pages}{8}.
+%Type = Article
+\bibitem[{Lejeune(2020)}]{lejeune2020b}
+\bibinfo{author}{Lejeune, E.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Mechanical {{MNIST}}: {{A}} benchmark dataset for
+  mechanical metamodels}.
+\newblock \bibinfo{journal}{Extreme Mechanics Letters} \bibinfo{volume}{36},
+  \bibinfo{pages}{100659}.
+\newblock \DOIprefix\doi{10.1016/j.eml.2020.100659}.
+%Type = Misc
+\bibitem[{Lejeune and Zhao(2020)}]{lejeune2020a}
+\bibinfo{author}{Lejeune, E.}, \bibinfo{author}{Zhao, B.},
+  \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Exploring the potential of transfer learning for
+  metamodels of heterogeneous material deformation}.
+\newblock \href{http://arxiv.org/abs/2010.16260}{\tt arXiv:2010.16260}.
+%Type = Article
+\bibitem[{Li et~al.(2019)Li, Roth and Mohr}]{li2019}
+\bibinfo{author}{Li, X.}, \bibinfo{author}{Roth, C.C.}, \bibinfo{author}{Mohr,
+  D.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Machine-learning based temperature- and
+  rate-dependent plasticity model: {{Application}} to analysis of fracture
+  experiments on {{DP}} steel}.
+\newblock \bibinfo{journal}{International Journal of Plasticity}
+  \bibinfo{volume}{118}, \bibinfo{pages}{320--344}.
+\newblock \DOIprefix\doi{10.1016/j.ijplas.2019.02.012}.
+%Type = Article
+\bibitem[{Liu et~al.(2016)Liu, Bessa and Liu}]{liu2016}
+\bibinfo{author}{Liu, Z.}, \bibinfo{author}{Bessa, M.}, \bibinfo{author}{Liu,
+  W.K.}, \bibinfo{year}{2016}.
+\newblock \bibinfo{title}{Self-consistent clustering analysis: {{An}} efficient
+  multi-scale scheme for inelastic heterogeneous materials}.
+\newblock \bibinfo{journal}{Computer Methods in Applied Mechanics and
+  Engineering} \bibinfo{volume}{306}, \bibinfo{pages}{319--341}.
+\newblock \DOIprefix\doi{10.1016/j.cma.2016.04.004}.
+%Type = Article
+\bibitem[{Liu et~al.(2019a)Liu, Wu and Koishi}]{liu2019b}
+\bibinfo{author}{Liu, Z.}, \bibinfo{author}{Wu, C.T.}, \bibinfo{author}{Koishi,
+  M.}, \bibinfo{year}{2019}a.
+\newblock \bibinfo{title}{A deep material network for multiscale topology
+  learning and accelerated nonlinear modeling of heterogeneous materials}.
+\newblock \bibinfo{journal}{Computer Methods in Applied Mechanics and
+  Engineering} \bibinfo{volume}{345}, \bibinfo{pages}{1138--1168}.
+\newblock \DOIprefix\doi{10.1016/j.cma.2018.09.020},
+  \href{http://arxiv.org/abs/1807.09829}{\tt arXiv:1807.09829}.
+%Type = Article
+\bibitem[{Liu et~al.(2019b)Liu, Wu and Koishi}]{liu2019c}
+\bibinfo{author}{Liu, Z.}, \bibinfo{author}{Wu, C.T.}, \bibinfo{author}{Koishi,
+  M.}, \bibinfo{year}{2019}b.
+\newblock \bibinfo{title}{Transfer learning of deep material network for
+  seamless structure\textendash property predictions}.
+\newblock \bibinfo{journal}{Computational Mechanics} \bibinfo{volume}{64},
+  \bibinfo{pages}{451--465}.
+\newblock \DOIprefix\doi{10.1007/s00466-019-01704-4}.
+%Type = Book
+\bibitem[{Logg et~al.(2012)Logg, Mardal and Wells}]{logg2012a}
+\bibinfo{editor}{Logg, A.}, \bibinfo{editor}{Mardal, K.A.},
+  \bibinfo{editor}{Wells, G.} (Eds.), \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{Automated {{Solution}} of {{Differential Equations}}
+  by the {{Finite Element Method}}}. volume~\bibinfo{volume}{84} of
+  \textit{\bibinfo{series}{Lecture {{Notes}} in {{Computational Science}} and
+  {{Engineering}}}}.
+\newblock \bibinfo{publisher}{{Springer}}, \bibinfo{address}{{Berlin,
+  Heidelberg}}.
+\newblock \DOIprefix\doi{10.1007/978-3-642-23099-8}.
+%Type = Article
+\bibitem[{Lu et~al.(2021)Lu, Jin and Karniadakis}]{lu2021a}
+\bibinfo{author}{Lu, L.}, \bibinfo{author}{Jin, P.},
+  \bibinfo{author}{Karniadakis, G.E.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{{DeepONet}}: {{Learning}} nonlinear operators for
+  identifying differential equations based on the universal approximation
+  theorem of operators}.
+\newblock \bibinfo{journal}{Nature Machine Intelligence} \bibinfo{volume}{3},
+  \bibinfo{pages}{218--229}.
+\newblock \DOIprefix\doi{10.1038/s42256-021-00302-5},
+  \href{http://arxiv.org/abs/1910.03193}{\tt arXiv:1910.03193}.
+%Type = Article
+\bibitem[{Mozaffar et~al.(2019)Mozaffar, Bostanabad, Chen, Ehmann, Cao and
+  Bessa}]{mozaffar2019}
+\bibinfo{author}{Mozaffar, M.}, \bibinfo{author}{Bostanabad, R.},
+  \bibinfo{author}{Chen, W.}, \bibinfo{author}{Ehmann, K.},
+  \bibinfo{author}{Cao, J.}, \bibinfo{author}{Bessa, M.A.},
+  \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Deep learning predicts path-dependent plasticity}.
+\newblock \bibinfo{journal}{Proceedings of the National Academy of Sciences}
+  \bibinfo{volume}{116}, \bibinfo{pages}{26414--26420}.
+\newblock \DOIprefix\doi{10.1073/pnas.1911815116}.
+%Type = Article
+\bibitem[{Pan and Yang(2010)}]{pan2010a}
+\bibinfo{author}{Pan, S.J.}, \bibinfo{author}{Yang, Q.}, \bibinfo{year}{2010}.
+\newblock \bibinfo{title}{A {{Survey}} on {{Transfer Learning}}}.
+\newblock \bibinfo{journal}{IEEE Transactions on Knowledge and Data
+  Engineering} \bibinfo{volume}{22}, \bibinfo{pages}{1345--1359}.
+\newblock \DOIprefix\doi{10.1109/TKDE.2009.191}.
+%Type = Article
+\bibitem[{Perdikaris et~al.(2017)Perdikaris, Raissi, Damianou, Lawrence and
+  Karniadakis}]{perdikaris2017a}
+\bibinfo{author}{Perdikaris, P.}, \bibinfo{author}{Raissi, M.},
+  \bibinfo{author}{Damianou, A.}, \bibinfo{author}{Lawrence, N.D.},
+  \bibinfo{author}{Karniadakis, G.E.}, \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{Nonlinear information fusion algorithms for
+  data-efficient multi-fidelity modelling}.
+\newblock \bibinfo{journal}{Proceedings of the Royal Society A: Mathematical,
+  Physical and Engineering Sciences} \DOIprefix\doi{10.1098/rspa.2016.0751}.
+%Type = Article
+\bibitem[{Perdikaris et~al.(2015)Perdikaris, Venturi, Royset and
+  Karniadakis}]{perdikaris2015}
+\bibinfo{author}{Perdikaris, P.}, \bibinfo{author}{Venturi, D.},
+  \bibinfo{author}{Royset, J.O.}, \bibinfo{author}{Karniadakis, G.E.},
+  \bibinfo{year}{2015}.
+\newblock \bibinfo{title}{Multi-fidelity modelling via recursive co-kriging and
+  {{Gaussian}}\textendash{{Markov}} random fields}.
+\newblock \bibinfo{journal}{Proceedings of the Royal Society A: Mathematical,
+  Physical and Engineering Sciences} \bibinfo{volume}{471},
+  \bibinfo{pages}{20150018}.
+\newblock \DOIprefix\doi{10.1098/rspa.2015.0018}.
+%Type = Article
+\bibitem[{Raissi et~al.(2019)Raissi, Perdikaris and Karniadakis}]{raissi2019b}
+\bibinfo{author}{Raissi, M.}, \bibinfo{author}{Perdikaris, P.},
+  \bibinfo{author}{Karniadakis, G.}, \bibinfo{year}{2019}.
+\newblock \bibinfo{title}{Physics-informed neural networks: {{A}} deep learning
+  framework for solving forward and inverse problems involving nonlinear
+  partial differential equations}.
+\newblock \bibinfo{journal}{Journal of Computational Physics}
+  \bibinfo{volume}{378}, \bibinfo{pages}{686--707}.
+\newblock \DOIprefix\doi{10.1016/j.jcp.2018.10.045}.
 %Type = Article
 \bibitem[{Reich(1997)}]{reich1997}
 \bibinfo{author}{Reich, Y.}, \bibinfo{year}{1997}.
@@ -55,5 +219,44 @@
 \newblock \bibinfo{journal}{Materials \& Design} \bibinfo{volume}{16},
   \bibinfo{pages}{251--259}.
 \newblock \DOIprefix\doi{10.1016/0261-3069(96)00007-6}.
+%Type = Article
+\bibitem[{Rocha et~al.(2020)Rocha, Kerfriden and {\noopsort{meer}}{van der
+  Meer}}]{Rocha2020}
+\bibinfo{author}{Rocha, I.}, \bibinfo{author}{Kerfriden, P.},
+  \bibinfo{author}{{\noopsort{meer}}{van der Meer}, F.}, \bibinfo{year}{2020}.
+\newblock \bibinfo{title}{Micromechanics-based surrogate models for the
+  response of composites: {{A}} critical comparison between a classical
+  mesoscale constitutive model, hyper-reduction and neural networks}.
+\newblock \bibinfo{journal}{European Journal of Mechanics - A/Solids}
+  \bibinfo{volume}{82}, \bibinfo{pages}{103995}.
+\newblock \DOIprefix\doi{10.1016/j.euromechsol.2020.103995}.
+%Type = Article
+\bibitem[{Rocha et~al.(2021)Rocha, Kerfriden and {\noopsort{meer}}{van der
+  Meer}}]{Rocha2021}
+\bibinfo{author}{Rocha, I.}, \bibinfo{author}{Kerfriden, P.},
+  \bibinfo{author}{{\noopsort{meer}}{van der Meer}, F.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{On-the-fly construction of surrogate constitutive
+  models for concurrent multiscale mechanical analysis through probabilistic
+  machine learning}.
+\newblock \bibinfo{journal}{Journal of Computational Physics: X}
+  \bibinfo{volume}{9}, \bibinfo{pages}{100083}.
+\newblock \DOIprefix\doi{10.1016/j.jcpx.2020.100083}.
+%Type = Article
+\bibitem[{Sakaridis et~al.(2022)Sakaridis, Karathanasopoulos and
+  Mohr}]{sakaridis2022}
+\bibinfo{author}{Sakaridis, E.}, \bibinfo{author}{Karathanasopoulos, N.},
+  \bibinfo{author}{Mohr, D.}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{Machine-learning based prediction of crash response
+  of tubular structures}.
+\newblock \bibinfo{journal}{International Journal of Impact Engineering}
+  \bibinfo{volume}{166}, \bibinfo{pages}{104240}.
+\newblock \DOIprefix\doi{10.1016/j.ijimpeng.2022.104240}.
+%Type = Book
+\bibitem[{Thrun and Pratt(1998)}]{thrun1998}
+\bibinfo{editor}{Thrun, S.}, \bibinfo{editor}{Pratt, L.} (Eds.),
+  \bibinfo{year}{1998}.
+\newblock \bibinfo{title}{Learning to {{Learn}}}.
+\newblock \bibinfo{publisher}{{Springer US}}, \bibinfo{address}{{Boston, MA}}.
+\newblock \DOIprefix\doi{10.1007/978-1-4615-5529-2}.
 
 \end{thebibliography}
