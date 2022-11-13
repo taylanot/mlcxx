@@ -191,6 +191,6 @@ Split(const arma::Mat<T>& input,
 }
 
 } // namespace data
-} // namespace mlpack
+} // namespace utils
 
 #endif

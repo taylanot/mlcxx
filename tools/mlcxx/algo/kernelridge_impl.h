@@ -6,8 +6,8 @@
  *
  * TODO: Weighted regression example, bias addition
  */
-#ifndef KERNEL_RIDGE_IMPL_H
-#define KERNEL_RIDGE_IMPL_H
+#ifndef KERNELRIDGE_IMPL_H
+#define KERNELRIDGE_IMPL_H
 
 // mlpack
 #include <mlpack/core.hpp>
@@ -16,7 +16,7 @@
 #include "utils/covmat.h"
 
 using namespace mlpack;
-using namespace models::regression;
+using namespace algo::regression;
 
 template<class T>
 template<class... Ts>

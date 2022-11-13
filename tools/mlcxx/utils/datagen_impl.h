@@ -24,6 +24,7 @@ namespace utils {
 namespace data {
 namespace regression {
 
+  Dataset::Dataset( ) { }
   Dataset::Dataset(size_t D, size_t N, double noise_std)
   {
     this -> size = N;
@@ -46,6 +47,7 @@ namespace regression {
                                         +arma::randn(dimension,size)*noise_std);
     }
   }
+
   void Dataset::Save(std::string filename)
   {
     arma::mat data = arma::join_cols(inputs, labels);
@@ -55,5 +57,46 @@ namespace regression {
 } // namespace regression
 } // namespace data
 } // namespace utils
+
+namespace utils {
+namespace data {
+namespace regression {
+
+  SineGen::SineGen( ) { }
+  SineGen::SineGen(size_t M)
+  {
+    this -> size = M;
+
+    this -> a = arma::rowvec(size, arma::fill::randn);
+    this -> p = arma::rowvec(size, arma::fill::randn);
+  }
+
+  arma::mat SineGen::Predict(arma::mat inputs, std::string type) const 
+  {
+    arma::mat labels(size, inputs.n_cols);
+    if (type == "Phase")
+    {
+      for (size_t i=0; i<size; i++)
+        labels.row(i) = arma::sin(inputs+p(i));
+      return labels;
+    }
+    else if (type == "Amplitude")
+    {
+      for (size_t i=0; i<size; i++)
+        labels.row(i) = a(i) * arma::sin(inputs);
+      return labels;
+    }
+    else if (type == "PhaseAmplitude")
+    {
+      for (size_t i=0; i<size; i++)
+        labels.row(i) = a(i)*arma::sin(inputs+p(i));
+      return labels;
+    }
+  }
+
+} // namespace regression
+} // namespace data
+} // namespace utils
+
 
 #endif

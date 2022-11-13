@@ -1,6 +1,6 @@
 program = mlcxx
 
-#subdirs = utils src #mlpack_models
+#subdirs = utils src model algo data  
 
 #include $(JEMDIR)/makefiles/prog.mk
 #include $(JEMDIR)/makefiles/packages/*.mk

@@ -18,23 +18,26 @@
 #include <tuple>
 #include <iostream>
 #include <omp.h>
+#include <string>
 // mlpack
 #include <mlpack/core/cv/simple_cv.hpp>
 // boost
 #include <boost/assert.hpp>
 // local
 #include <utils/split_data.h>
+#include <utils/save.h>
 
 //=============================================================================
-// LearningCurve_HPT 
+// LCurve_HPT 
 //=============================================================================
 template<class MODEL,
          class LOSS, 
          template<typename, typename, typename, typename, typename> class CV>
-class LearningCurve_HPT
+class LCurve_HPT
 {
 public:
-  LearningCurve_HPT<MODEL,LOSS,CV>(const arma::irowvec& Ns,
+  LCurve_HPT<MODEL,LOSS,CV>(const std::string filename,
+                                   const arma::irowvec& Ns,
                                    const double& repeat,
                                    const double& tune_ratio);
 
@@ -46,19 +49,21 @@ private:
   double tune_ratio_;
   size_t repeat_;
   arma::irowvec Ns_;
+  std::string filename_;
   arma::mat test_errors_;
   arma::mat train_errors_;
 };
 
 //=============================================================================
-// LearningCurve 
+// LCurve 
 //=============================================================================
 template<class MODEL,
          class LOSS>
-class LearningCurve
+class LCurve
 {
 public:
-  LearningCurve<MODEL,LOSS>(const arma::irowvec& Ns,
+  LCurve<MODEL,LOSS>(const std::string filename,
+                            const arma::irowvec& Ns,
                             const double& repeat);
 
   template<class... Ts>
@@ -69,6 +74,7 @@ private:
 
   size_t repeat_;
   arma::irowvec Ns_;
+  std::string filename_;
   arma::mat test_errors_;
   arma::mat train_errors_;
 };

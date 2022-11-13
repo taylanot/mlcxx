@@ -1,19 +1,27 @@
+/**
+ * @file data_prep.h
+ * @author Ozgur Taylan Turan
+ *
+ * Function that prepares data from input file arguments
+ *
+ *
+ */
+
+#ifndef DATA_PREP_H
+#define DATA_PREP_H
 
   
-template<class T>
-auto DataPrepare(const T& props)
+auto DataPrepare(jem::util::Properties& dataProps)
 {
-  jem::util::Properties dataProps = props.findProps(DATA_PROP);
+  
   jem::String type = "regression"; jem::String genfunc; 
   jem::String filename;  
 
   bool generate = dataProps.find(genfunc,   "genfunc");
   bool read     = dataProps.find(filename,  "filename");
-
   if ((type == "regression") && generate)
   { 
     int D = 1; int Ntrn = 10; int Ntst = 1000;
-
     double a = 1.; double p = 0.; double eps = 0.1;
 
     dataProps.find(D,     "D");
@@ -43,3 +51,5 @@ auto DataPrepare(const T& props)
   }
 
 }
+
+#endif

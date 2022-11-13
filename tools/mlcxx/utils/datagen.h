@@ -22,6 +22,7 @@
 namespace utils {
 namespace data {
 namespace regression {
+
 struct Dataset 
 {
   size_t size;
@@ -31,12 +32,29 @@ struct Dataset
   arma::mat inputs;
   arma::mat labels;
 
+  Dataset ( );
   Dataset ( size_t D, size_t N, double noise_std );
 
   void Generate ( double scale, double phase, std::string type );
 
   void Save( std::string filename );
 };
+
+struct SineGen
+{
+  size_t size;
+  size_t dimension;
+
+  arma::rowvec a;
+  arma::rowvec p;
+
+  SineGen ( );
+  SineGen ( size_t M );
+
+  arma::mat Predict ( arma::mat inputs, std::string type ) const;
+
+};
+
 } // regression 
 } // namespace data
 } // namespace utils

@@ -29,12 +29,12 @@
      inkscape:snap-bbox-edge-midpoints="false"
      inkscape:snap-bbox-midpoints="false"
      inkscape:zoom="1"
-     inkscape:cx="409.5"
+     inkscape:cx="882"
      inkscape:cy="560.5"
      inkscape:window-width="2560"
-     inkscape:window-height="1376"
+     inkscape:window-height="1383"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="20"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
@@ -345,102 +345,102 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend);marker-start:url(#Arrow1Lstart)"
-       d="M 15.866121,96.077682 H 115.81938"
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
+       d="M 68.981984,95.572787 H 168.93524"
        id="path892" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend);marker-start:url(#Arrow1Lstart)"
-       d="M 65.975042,145.92202 V 45.968763"
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart);marker-end:url(#Arrow1Lend)"
+       d="M 119.09091,145.41713 V 45.463868"
        id="path892-6" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.529167"
        id="path1422"
-       cx="65.842751"
-       cy="96.077682"
+       cx="118.95861"
+       cy="95.572784"
        r="17.977886" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.249169"
        id="path1422-58"
-       cx="65.842751"
-       cy="96.077682"
+       cx="118.95861"
+       cy="95.572784"
        r="8.4652567" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.11912"
        id="path1422-58-7"
-       cx="65.842751"
-       cy="96.077682"
+       cx="118.95861"
+       cy="95.572784"
        r="4.046989" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:1.03426"
        id="path1422-5"
-       cx="121.6802"
-       cy="-29.354744"
+       cx="153.97404"
+       cy="-71.52887"
        rx="66.332657"
        ry="18.61344"
        transform="rotate(52.013147)" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:0.698282"
        id="path1422-5-4"
-       cx="121.6802"
-       cy="-29.354744"
+       cx="153.97404"
+       cy="-71.52887"
        rx="44.784603"
        ry="12.566895"
        transform="rotate(52.013147)" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:0.404644"
        id="path1422-5-4-3"
-       cx="121.6802"
-       cy="-29.354744"
+       cx="153.97404"
+       cy="-71.52887"
        rx="25.952023"
        ry="7.2823315"
        transform="rotate(52.013147)" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart-1);marker-end:url(#Arrow1Lend-8)"
-       d="M 143.34464,95.487549 H 243.2979"
+       d="m 331.13043,97.583335 h 99.95326"
        id="path892-9" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow1Lstart-1);marker-end:url(#Arrow1Lend-8)"
-       d="M 193.32127,145.46417 V 45.510924"
+       d="M 381.10706,147.55996 V 47.60671"
        id="path892-6-7" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.529167"
        id="path1422-9"
-       cx="211.56374"
-       cy="95.487549"
+       cx="399.34952"
+       cy="97.583336"
        r="17.977886" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.249169"
        id="path1422-58-9"
-       cx="211.56374"
-       cy="95.487549"
+       cx="399.34952"
+       cy="97.583336"
        r="8.4652567" />
     <circle
        style="fill:none;stroke:#3cb1c3;stroke-width:0.11912"
        id="path1422-58-7-3"
-       cx="211.56374"
-       cy="95.487549"
+       cx="399.34952"
+       cy="97.583336"
        r="4.046989" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:1.03426"
        id="path1422-5-2"
-       cx="210.90353"
-       cy="-144.56824"
+       cx="328.13385"
+       cy="-291.28207"
        rx="66.332657"
        ry="18.61344"
        transform="rotate(52.013147)" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:0.698282"
        id="path1422-5-4-4"
-       cx="210.90353"
-       cy="-144.56824"
+       cx="328.13385"
+       cy="-291.28207"
        rx="44.784603"
        ry="12.566895"
        transform="rotate(52.013147)" />
     <ellipse
        style="fill:none;stroke:#d63384;stroke-width:0.404644"
        id="path1422-5-4-3-3"
-       cx="210.90353"
-       cy="-144.56824"
+       cx="328.13385"
+       cy="-291.28207"
        rx="25.952023"
        ry="7.2823315"
        transform="rotate(52.013147)" />
@@ -456,59 +456,59 @@
        style="line-height:1.25;font-family:'TYPO COMICS DEMO';font-size:24px;-inkscape-font-specification:'TYPO COMICS DEMO, Normal';letter-spacing:0px;word-spacing:0px;font-variant-ligatures:none;white-space:pre;shape-inside:url(#rect16356)" />
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,-0.48411826,26.726908)"
+       transform="matrix(0.26458333,0,0,0.26458333,52.631745,26.222013)"
        id="text28926"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect28928)"><tspan
          x="224.05273"
          y="62.274749"
-         id="tspan76328">w<tspan
+         id="tspan1091">w<tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan76326">2</tspan></tspan></text>
+   id="tspan1089">2</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,124.41494,29.629375)"
+       transform="matrix(0.26458333,0,0,0.26458333,312.20073,31.725161)"
        id="text28926-9"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect28928-4)"><tspan
          x="224.05273"
          y="62.274749"
-         id="tspan76332">w<tspan
+         id="tspan1095">w<tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan76330">2</tspan></tspan></text>
+   id="tspan1093">2</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,56.45445,85.984729)"
+       transform="matrix(0.26458333,0,0,0.26458333,109.57031,85.479834)"
        id="text28926-0"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect28928-7)"><tspan
          x="224.05273"
          y="62.274749"
-         id="tspan76336">w<tspan
+         id="tspan1099">w<tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan76334">1</tspan></tspan></text>
+   id="tspan1097">1</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,183.54936,83.779963)"
+       transform="matrix(0.26458333,0,0,0.26458333,371.33515,85.875749)"
        id="text28926-0-3"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect28928-7-0)"><tspan
          x="224.05273"
          y="62.274749"
-         id="tspan76340">w<tspan
+         id="tspan1103">w<tspan
    style="font-size:65%;baseline-shift:sub"
-   id="tspan76338">1</tspan></tspan></text>
+   id="tspan1101">1</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,25.400663,-3.6233092)"
+       transform="matrix(0.26458333,0,0,0.26458333,78.516526,-4.1282041)"
        id="text71767"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect71769)"><tspan
          x="129.34961"
          y="621.23373"
-         id="tspan76342">Ridge</tspan></text>
+         id="tspan1105">Ridge</tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,145.84712,-4.4964044)"
+       transform="matrix(0.26458333,0,0,0.26458333,333.63291,-2.4006182)"
        id="text71767-8"
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect71769-7)"><tspan
          x="129.34961"
          y="621.23373"
-         id="tspan76344">Biased Ridge</tspan></text>
+         id="tspan1107">Biased Ridge</tspan></text>
   </g>
 </svg>

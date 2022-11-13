@@ -19,13 +19,13 @@ def sample_train(Na=1,N=50):
     a = np.random.normal(1, 1, (1,Na))
     phi = np.random.normal(0, 1, (1,Na))
     x = np.random.normal(0, 1, (N,Na))
-    y = np.multiply(a, np.sin(x+phi)) + np.random.normal(0,1,(N,Na))
+    y = np.multiply(a, np.sin(x+phi)) #+ np.random.normal(0,1,(N,Na))
     return x, y , a
 
 def sample_test(a=100,phi=np.pi,N=50):
     x = np.random.normal(0,10, N).reshape(-1,1)
     x = np.sort(x,axis=0)
-    y = np.multiply(a, np.sin(x+phi)) + np.random.normal(0,1,(N,1))
+    y = np.multiply(a, np.sin(x+phi)) #+ np.random.normal(0,1,(N,1))
     return x, y 
 
 def pairwise_l2_distance(x,y):
@@ -178,6 +178,8 @@ class SemiParamKernelRidge2():
         for i in range(itr):
             self.alpha = np.linalg.pinv( K + self.lmbda*np.eye(X.shape[0])).\
                     dot(Y-psi_.dot(self.beta))
+                    
+            #print((Y-K.dot(self.alpha)).shape)
             self.beta = np.linalg.pinv(psi_).dot(Y-K.dot(self.alpha))
             #print(self.alpha)
             #print(self.beta)
@@ -189,7 +191,7 @@ class SemiParamKernelRidge2():
 class func_gen():
     def __init__(self, num=10):
         self.num = num
-        self.a = np.random.normal(1,1,num)
+        self.a = 1#np.random.normal(1,1,num)
         self.phi = np.random.normal(1,1,num)
         counter = 0 
 
@@ -238,7 +240,7 @@ class func_gen():
 #plt.show()
 
 ### Block-2 ####
-a =  np.random.normal(1,1)
+a =  1.#*np.random.normal(1,1)
 phi =  np.random.normal(0,1)
 x_train_single, y_train_single = sample_test(a=a,phi=phi, N=4)
 kernel = rbf()
@@ -251,14 +253,14 @@ model_base.fit(x_train_single,y_train_single)
 
 plt.scatter(x_train_single, y_train_single)
 x_train_single, y_train_single = sample_test(a=a, N=500)
-plt.plot(x_train_single,model.predict(x_train_single), label='ours')
-plt.plot(x_train_single,model_base.predict(x_train_single), label='base')
-plt.plot(x_train_single,a*np.sin(x_train_single+phi), label='truth')
+plt.plot(x_train_single,model.predict(x_train_single), label='meta')
+plt.plot(x_train_single,model_base.predict(x_train_single), label='standard')
+plt.plot(x_train_single,a*np.sin(x_train_single+phi), ':', label='sine')
 plt.xlabel('x')
 plt.xlabel('y')
 plt.legend()
-tikzplotlib.save('phi_4.tex')
-#plt.show()
+#tikzplotlib.save('phi_4.tex')
+plt.show()
 
 
 #for i in range(x_train.shape[1]):

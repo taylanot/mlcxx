@@ -23,13 +23,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.77771465"
-     inkscape:cx="396.67505"
-     inkscape:cy="561.25984"
-     inkscape:window-width="2560"
-     inkscape:window-height="1376"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:zoom="0.5499273"
+     inkscape:cx="220.93829"
+     inkscape:cy="886.48081"
+     inkscape:window-width="1080"
+     inkscape:window-height="1863"
+     inkscape:window-x="1080"
+     inkscape:window-y="20"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      inkscape:snap-bbox="false"
@@ -115,6 +115,50 @@
        width="88.571745"
        height="98.770439"
        id="rect79973-6-6-0" />
+    <rect
+       x="164.3477"
+       y="77.655785"
+       width="167.15941"
+       height="147.59349"
+       id="rect79973-17" />
+    <rect
+       x="164.3477"
+       y="77.655785"
+       width="52.962322"
+       height="51.511345"
+       id="rect79973-1-8" />
+    <rect
+       x="164.3477"
+       y="77.655785"
+       width="245.50486"
+       height="155.6583"
+       id="rect79973-1-3" />
+    <rect
+       x="164.3477"
+       y="77.655785"
+       width="226.70599"
+       height="196.30976"
+       id="rect79973-1-1" />
+    <rect
+       x="164.3477"
+       y="77.655785"
+       width="52.962322"
+       height="51.511345"
+       id="rect79973-1-80" />
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend-7"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1004-9" />
+    </marker>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -129,6 +173,12 @@
        id="path76706"
        cx="146.45316"
        cy="156.30519"
+       r="3.337671" />
+    <circle
+       style="fill:#d63384;stroke:#92235a;stroke-width:0.765;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path76706-9"
+       cx="173.35095"
+       cy="153.01091"
        r="3.337671" />
     <circle
        style="fill:#560dcb;stroke:#450ba5;stroke-width:0.765;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none"
@@ -150,6 +200,10 @@
        style="fill:#c8a9fa;stroke:#c8a9fa;stroke-width:0.565;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="M 110.99405,53.889104 101.628,91.093237"
        id="path76881" />
+    <path
+       style="fill:#c8a9fa;stroke:#ea95bf;stroke-width:0.583492;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend-7)"
+       d="m 184.28691,110.46314 -9.60228,38.7031"
+       id="path76881-9" />
     <path
        style="fill:none;stroke:#c8a9fa;stroke-width:0.565;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m 110.99405,53.889104 40.15708,13.542962"
@@ -173,9 +227,9 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973)"><tspan
          x="164.34766"
          y="105.21789"
-         id="tspan170659"><tspan
+         id="tspan29617"><tspan
            style="font-size:32px"
-           id="tspan170657">w</tspan></tspan></text>
+           id="tspan29615">w</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,118.96011,11.972919)"
@@ -183,13 +237,13 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-6)"><tspan
          x="164.34766"
          y="105.96875"
-         id="tspan170667"><tspan
+         id="tspan29625"><tspan
            style="font-size:32px"
-           id="tspan170661">∇</tspan><tspan
+           id="tspan29619">∇</tspan><tspan
            style="font-size:32px"
-           id="tspan170663">L</tspan><tspan
+           id="tspan29621">L</tspan><tspan
            style="font-size:32px;baseline-shift:sub"
-           id="tspan170665">A</tspan></tspan></text>
+           id="tspan29623">A</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,110.82659,46.193274)"
@@ -197,13 +251,13 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-6-6)"><tspan
          x="164.34766"
          y="105.96875"
-         id="tspan170675"><tspan
+         id="tspan29633"><tspan
            style="font-size:32px"
-           id="tspan170669">∇</tspan><tspan
+           id="tspan29627">∇</tspan><tspan
            style="font-size:32px"
-           id="tspan170671">L</tspan><tspan
+           id="tspan29629">L</tspan><tspan
            style="font-size:32px;baseline-shift:sub"
-           id="tspan170673">B</tspan></tspan></text>
+           id="tspan29631">B</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,59.569862,70.837894)"
@@ -211,13 +265,13 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-6-6-0)"><tspan
          x="164.34766"
          y="105.96875"
-         id="tspan170683"><tspan
+         id="tspan29641"><tspan
            style="font-size:32px"
-           id="tspan170677">∇</tspan><tspan
+           id="tspan29635">∇</tspan><tspan
            style="font-size:32px"
-           id="tspan170679">L</tspan><tspan
+           id="tspan29637">L</tspan><tspan
            style="font-size:32px;baseline-shift:sub"
-           id="tspan170681">C</tspan></tspan></text>
+           id="tspan29639">C</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,90.908638,138.95379)"
@@ -225,11 +279,23 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-1)"><tspan
          x="164.34766"
          y="105.21789"
-         id="tspan170689"><tspan
+         id="tspan29647"><tspan
            style="font-size:32px"
-           id="tspan170685">w</tspan><tspan
+           id="tspan29643">w</tspan><tspan
            style="font-size:65%;baseline-shift:sub"
-           id="tspan170687">1</tspan></tspan></text>
+           id="tspan29645">1</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,122.35002,136.28936)"
+       id="text79971-2-3"
+       style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-1-1)"><tspan
+         x="164.34766"
+         y="105.21789"
+         id="tspan29653"><tspan
+           style="font-size:32px"
+           id="tspan29649">w</tspan><tspan
+           style="font-size:65%;baseline-shift:sub"
+           id="tspan29651">target</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,177.74663,138.599)"
@@ -237,11 +303,11 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-1-0)"><tspan
          x="164.34766"
          y="105.21789"
-         id="tspan170695"><tspan
+         id="tspan29659"><tspan
            style="font-size:32px"
-           id="tspan170691">w</tspan><tspan
+           id="tspan29655">w</tspan><tspan
            style="font-size:65%;baseline-shift:sub"
-           id="tspan170693">2</tspan></tspan></text>
+           id="tspan29657">2</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,204.80385,66.644484)"
@@ -249,10 +315,27 @@
        style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-1-4)"><tspan
          x="164.34766"
          y="105.21789"
-         id="tspan170701"><tspan
+         id="tspan29665"><tspan
            style="font-size:32px"
-           id="tspan170697">w</tspan><tspan
+           id="tspan29661">w</tspan><tspan
            style="font-size:65%;baseline-shift:sub"
-           id="tspan170699">3</tspan></tspan></text>
+           id="tspan29663">3</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,139.93491,99.187946)"
+       id="text79971-4"
+       style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-17)"><tspan
+         x="164.34766"
+         y="105.21789"
+         id="tspan29671"><tspan
+           style="font-size:32px"
+           id="tspan29667">w</tspan><tspan
+           style="font-size:65%;baseline-shift:sub"
+           id="tspan29669">meta</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,139.15952,133.83836)"
+       id="text79971-2-7"
+       style="font-size:24px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect79973-1-3)" />
   </g>
 </svg>

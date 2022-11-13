@@ -12,7 +12,7 @@
 
 #include <mlpack/prereqs.hpp>
 
-namespace models { // Add your model to mlpack::regression namespace
+namespace algo { 
 namespace regression {
 
 template<class T>
@@ -36,7 +36,8 @@ class KernelRidge
   /**
    * Non-working model 
    */
-  KernelRidge<T>() : lambda_(0.0) { }
+  template<typename... Ts>
+  KernelRidge<T>(const Ts&... args) : cov_(args...), lambda_(0.0) { }
 
   /**
    * @param inputs X

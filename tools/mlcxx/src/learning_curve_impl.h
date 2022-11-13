@@ -17,10 +17,12 @@
 template<class MODEL,
          class LOSS, 
          template<typename, typename, typename, typename, typename> class CV>
-LearningCurve_HPT<MODEL,LOSS,CV>::LearningCurve_HPT(const arma::irowvec& Ns,
-                                                const double& repeat,
-                                                const double& tune_ratio)
+LCurve_HPT<MODEL,LOSS,CV>::LCurve_HPT(const std::string filename,
+                                                    const arma::irowvec& Ns,
+                                                    const double& repeat,
+                                                    const double& tune_ratio)
 {
+  filename_ = filename;
   tune_ratio_ = tune_ratio;
   Ns_ = Ns;   
   test_errors_.resize(repeat,Ns_.n_elem);
@@ -33,7 +35,7 @@ template<class MODEL,
          template<typename, typename, typename, typename, typename> class CV>
 template<class... Ts>
 std::tuple<arma::mat, arma::mat> 
-  LearningCurve_HPT<MODEL,LOSS,CV>::Generate(const arma::mat& inputs,
+  LCurve_HPT<MODEL,LOSS,CV>::Generate(const arma::mat& inputs,
                                              const arma::rowvec& labels,
                                              const Ts&... args)
 {
@@ -57,10 +59,14 @@ std::tuple<arma::mat, arma::mat>
       train_errors_(j,i) = hpt.BestObjective();
     }
   }
+
     arma::mat train = arma::join_cols(arma::mean(train_errors_),
                                       arma::stddev(train_errors_));
     arma::mat test = arma::join_cols(arma::mean(test_errors_),
                                      arma::stddev(test_errors_));
+    arma::mat results = 
+      arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
+    utils::Save(filename_,results);
 
     return std::make_tuple(std::move(train),
                            std::move(test));
@@ -68,9 +74,11 @@ std::tuple<arma::mat, arma::mat>
 
 template<class MODEL,
          class LOSS>
-LearningCurve<MODEL,LOSS>::LearningCurve(const arma::irowvec& Ns,
+LCurve<MODEL,LOSS>::LCurve(const std::string filename,
+                                         const arma::irowvec& Ns,
                                          const double& repeat)
 {
+  filename_ = filename;
   Ns_ = Ns;   
   test_errors_.resize(repeat,Ns_.n_elem);
   train_errors_.resize(repeat,Ns_.n_elem);
@@ -81,13 +89,14 @@ template<class MODEL,
          class LOSS>
 template<class... Ts>
 std::tuple<arma::mat, arma::mat> 
-  LearningCurve<MODEL,LOSS>::Generate(const arma::mat& inputs,
+  LCurve<MODEL,LOSS>::Generate(const arma::mat& inputs,
                                       const arma::rowvec& labels,
                                       const Ts&... args)
 {
 
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
+
   #pragma omp parallel for collapse(2)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
@@ -107,6 +116,9 @@ std::tuple<arma::mat, arma::mat>
                                       arma::stddev(train_errors_));
     arma::mat test = arma::join_cols(arma::mean(test_errors_),
                                      arma::stddev(test_errors_));
+    arma::mat results = 
+      arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
+    utils::Save(filename_,results);
 
     return std::make_tuple(std::move(train),
                            std::move(test));
