@@ -3,6 +3,7 @@
 \usepackage{mathrsfs}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage{subcaption}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
@@ -51,13 +52,13 @@ Well, the story of meta-learning starts with LSTMs, etc. But these days they tur
 
 \requ If we can create a model like that can we give statistical guarantees under specific assumptions that the expected risk of this model will be better than its conventional counterpart on a given learning task?
 
-Well, I acknowledge that it might be too ambitious for a research question, and in the end what I am doing ended up not being a convex problem but still I believe there are still some interesting research questions moving forward. \color{red} (Apparently it is not that ambitious for some of you. Then, I wonder why I do not see any method like this? And although it is not ambitious then I still find it hard to come up with a model that is capable of solving this type of problem.) So, please bear with me maybe I can convince you at least to a certain extent that meta-learning can be useful in certain extrapolation problems. \color{black}
+Well, I acknowledge that it might be too ambitious for a research question, and in the end what I am doing ended up not being a convex problem but still I believe there are still some interesting research questions moving forward. (Apparently it is not that ambitious for some of you. Then, I wonder why I do not see any method like this? And although it is not ambitious then I still find it hard to come up with a model that is capable of solving this type of problem.) So, please bear with me maybe I can convince you at least to a certain extent that meta-learning can be useful in certain extrapolation problems. 
 
 \section{Basic Setup}
 
 A task $T_a$ is a $d$-dimensional regression problem in which the input-output relation is given by
 
-\begin{equation}
+\begin{equation}\label{eq:data}
 y = f_a(\mathbf{x}) + \varepsilon,
 \end{equation}
 where $y\in\mR$, $\mathbf{x} \in \mR^d$, and $\varepsilon$ is taken to be standard normal.  The task space is defined by a distribution $p_f$ over functions. 
@@ -71,7 +72,7 @@ Z_a:=\left((\mathbf{x}_i,y_i)\right)_{i=1}^{N_a}.
 
 For the time being, the loss we consider is the standard least squares loss, as for now my interest lies with the regression problems ($\mathcal{L}_a=\sum_i^{N_a}(\hat{f}(\mathbf{x}_i)-y_i)^2$).
 
-\rem Now, with Marco's reading suggestions I ended up finding the two approaches to incorporate the information gained from tasks $p_f$ (noting that I am still not specifying $p_f$ on purpose) to improve the prediction of $T_a$. The first method uses the Semi-parametric Representer Theorem and the second method is Biased Regularization. \color{red} The reason we are only considering these two approaches is to see if we can extend the "Learning Around a Common Mean" paper to a nonlinear setting while still preserving the convex problem setting. In the end, we might need to of course select other methods to compare our method, but for now, there are two options that I suspect have the stability and the performance of their linear counterpart which can perform better than most used meta-learning problems in the nonlinear setting. I have not encountered any kernel-based meta-learning model, especially with the construction that I have in mind. I am wondering why other people have not pursued this path.{\color{black}
+\rem Now, with Marco's reading suggestions I ended up finding the two approaches to incorporate the information gained from tasks $p_f$ (noting that I am still not specifying $p_f$ on purpose) to improve the prediction of $T_a$. The first method uses the Semi-parametric Representer Theorem and the second method is Biased Regularization. The reason we are only considering these two approaches is to see if we can extend the "Learning Around a Common Mean" paper to a nonlinear setting while still preserving the convex problem setting. In the end, we might need to of course select other methods to compare our method, but for now, there are two options that I suspect have the stability and the performance of their linear counterpart which can perform better than most used meta-learning problems in the nonlinear setting. I have not encountered any kernel-based meta-learning model, especially with the construction that I have in mind. I am wondering why other people have not pursued this path.
 
 Let us first start with the method that uses Semi-parametric Representer Theorem. 
 
@@ -93,23 +94,25 @@ has the form $\tilde{f}(\cdot)=\sum^N_i\alpha_i k(\cdot,\mathbf{x}_i)+\sum_j^M\b
 
 In other words, on top of our observed dataset, $Z_a\triangleq Z$ we are given real-valued functions $\{\psi_p\}_{p=1}^M$ and our final estimator will use data points and extra information coming from multiple functions for the estimator $\tilde{f}$. 
 
-\color{red}
-\rem  You might wonder; "Why are we doing this?",  "What does it mean in the sense of meta-learning?". Well, as I have stated earlier we have access to the observations from the task space. Because of this, we might be able to put meta-information via those functions $\{\psi_p\}_{p=1}^M$ for now I am not specifying anything again. However, one might imagine that we might use trained models, simple interpolation (If there is enough data available of course), or exact functions if we have access to those. Then with this procedure, we will be technically weighing them with the observed data to come up with our estimator for a specific task at hand. \color{black}
+\rem  You might wonder; "Why are we doing this?",  "What does it mean in the sense of meta-learning?". Well, as I have stated earlier we have access to the observations from the task space. Because of this, we might be able to put meta-information via those functions $\{\psi_p\}_{p=1}^M$ for now I am not specifying anything again. However, one might imagine that we might use trained models, simple interpolation (If there is enough data available of course), or exact functions if we have access to those. Then with this procedure, we will be technically weighing them with the observed data to come up with our estimator for a specific task at hand.
 
 Well after some tiny bit of taking derivatives and equating to zero for $g(||f||_\mathcal{H}):=\lambda||f||^2$, the optimal solutions are given by:
 
+\text{Nonparametric Representer Theorem}:
 \begin{equation}
-  \text{Nonparametric Representer Theorem}: \boldsymbol{\alpha}=(\mathbf{K}+\lambda \mathbf{I})^{-1}\mathbf{y}
+ \hat{\boldsymbol{\alpha}}=(\mathbf{K}+\lambda \mathbf{I})^{-1}\mathbf{y}
 \end{equation}
-and 
+
+and \\
+
+\text{Semiparameteric Representer Theorem}: 
 \begin{align}
-\text{Semiparameteric Representer Theorem}: \boldsymbol{\alpha}&=(\mathbf{K}+\lambda\mathbf{I})^{-1}(\mathbf{y}-\boldsymbol{\psi}\boldsymbol{\beta}) \\ 
-\boldsymbol{\beta}&=\boldsymbol{\psi}^{-1}(\mathbf{y} - \mathbf{K}\boldsymbol{\alpha})
+  \hat{\boldsymbol{\alpha}}&=(\mathbf{K}\mathbf{K}+\lambda\mathbf{K}-\mathbf{K}\boldsymbol{\psi}(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}\boldsymbol{\psi}^\text{T}\mathbf{K})^{-1}(\mathbf{K}-\mathbf{K}\boldsymbol{\psi}(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}\boldsymbol{\psi})\mathbf{y} \\ 
+  \hat{\boldsymbol{\beta}}&=(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}(\boldsymbol{\psi}^\text{T}\mathbf{y}-\boldsymbol{\psi}^\text{T}\mathbf{K}\hat{\boldsymbol{\alpha}})
 \label{eq:optimum}
 \end{align}
 
 \rem Again, abusing the notations to the fullest extent but the bold letters represent the collections of the values of the non-bold versions in row vectors as follows;
-\color{red}
 $\boldsymbol{\alpha}\in\mR^{N_a\times 1}$, $\boldsymbol{\beta}\in\mR^{M\times 1}$, $\boldsymbol{\psi}\in\mR^{N_a\times M}$, $\mathbf{K}\in\mR^{N_a\times N_a}$ and $\mathbf{y}\in\mR^{N_a\times 1}$.
 
 \rem Well, I could convince Marco neither that this problem is convex nor my derivation is correct so let me elaborate a tiny bit more. Our objective function with the observed samples takes the form
@@ -126,17 +129,10 @@ With little manipulations we end up with the above optimum for $\boldsymbol{\alp
 \end{equation}
 Now, again with a little manipulation, we end up with the optimum expression for $\boldsymbol{\beta}$. Well, here I would like to emphasize again that the $\psi$ is not an exact inverse operation (I am utilizing pseudo-inverse, in my implementation.). Thus, it is visible now that you cannot get a simple expression without $\boldsymbol{\beta}$. 
 
-\color{black}
 
 \rem Now, with this derivation we  can see that the solution to $\tilde{f}(\cdot)$ is not necessarily convex, (BOOOO!!) But with David's suggestion, we can get a reasonable estimate by starting with a random vector and iteratively following the optimum (HURRAYYY!!!). 
 
 Let me show you with an example, why I am a bit hyped about this approach. Note that I will utilize the above remark on iteratively going from optimums like David suggested. In Figure \ref{fig:point} I am sampling 10 $(M=10)$ different sine functions with random phases for $\{\psi_p\}_{p=1}^M$. Then observing a random sine function again with a different random phase for my test case and from that sine function, I observe 3 random points without noise $N_a=3$. Note that I am using 2 points for training and looking at the third point performance for adjusting my kernel length-scale and regularization parameter, see how we can get the sine function now. Isn't it cool to predict a random sine function with 3 points? Moreover, you see the standard Kernel Ridge performance as well which is only good in the interpolation regime.
-
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{Figures/marco.pdf}
-  \caption{Quite nice results}
-  \label{fig:point}
-\end{figure}
 
 \rem Well, up until now I have not specified anything regarding the functions $\{\psi_p\}_{p=1}^M$. If we are to assume these functions are observed tasks $\psi_p= f_a$ the relation to the meta-learning setting becomes obvious (at least for me). We can go one step further and assume that we do not have access to the underlying functions $\{f_a\}_a=1^{M}$ but have access to estimators obtained for tasks $\{\hat{f}_a\}_a=1^{M}$ too. But, let's keep it simple for now and say we have access to the exact underlying functions of each task!
 
@@ -164,9 +160,362 @@ My initial hypotheses for a given task $T_a$ with observed $N_a$
 
 \rem I am keeping the biased regularization case for now for the sake of brevity, but according to David and my initial investigation, we end up with a similar type of expression. But for now, let's focus on the given problem at hand.
 
-\color{red}
 \rem You might think this is a trivial extension for our BNAIC paper. I do not know what is not trivial if you are basically following a path of thoughts ending up here was not trivial but next step from a certain point can definitely be trivial. For me the setting I am sketching now might seem trivial, but putting this into a real meta-learning framework, where the functions $\{\psi_p\}_{p=1}^M$ are inferred from the task distribution itself does not seem trivial for me. Especially, if we can give statistical guarantees for our proposed method. Moreover, if we can make this type of method memory and time efficient we might have ourselves a better performing and much more interpretable meta-learning model in our hands. And we have our initial study to compare our performance to.
-\color{black}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{Figures/noise_1}
+    \caption{Optimized hyper-parameters}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/no_opt}
+    \caption{No hyper-parameter tuning with small length scale and no regularization.}
+   \end{subfigure}
+    \caption{Demonstration}
+\end{figure}
+
+\section{Marco's Suggested Formulation}
+
+\begin{itemize}
+  \item Concatenated formulation gives the same result with my derivations, just machine precision differences.
+\end{itemize}
+
+The derivation is as follows,
+\begin{equation}
+  (\mathbf{A}\mathbf{w}-\mathbf{y})^\text{T}(\mathbf{A}\mathbf{w}-\mathbf{y}) + \lambda\mathbf{w}^\text{T}\mathbf{B}\mathbf{w},
+\end{equation}
+
+$\mathbf{A}:=[\mathbf{K}\boldsymbol{\psi}]\in \mR^{N\times(N+M)}$ and $B:=[\mathbf{K},0;0,0] \in \mR^{(N+M)\times(N+M)}$
+
+Then the optimum parameters is found to be
+\begin{equation}
+  \hat{\mathbf{w}}=(\mathbf{A}^\text{T}\mathbf{A} + \lambda \mathbf{B}^\text{T})^{-1}\mathbf{A}^\text{T}\mathbf{y}.
+\end{equation}
+
+
+\section{Learning Curves and Additional Function Curve Effect}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoiseless/learningcurve2}
+     \caption{$M=2$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoiseless/learningcurve9}
+     \caption{$M=9$}
+   \end{subfigure}
+   \caption{Noiseless Learning Curves for $M=2$ and $M=9$ Hyperparameters tuned and the drawn objective task is not present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoiseless/learningcurve2}
+     \caption{$M=2$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoiseless/learningcurve9}
+     \caption{$M=9$}
+   \end{subfigure}
+   \caption{Noiseless data Learning Curves for $M=2$ and $M=82$ Hyperparameters tuned and the drawn objective task is present in $\boldsymbol{\psi}$. }
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoisy/learningcurve2}
+     \caption{$M=2$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoisy/learningcurve9}
+     \caption{$M=9$}
+   \end{subfigure}
+   \caption{Noisy data Learning Curves for $M=2$ and $M=9$ Hyperparameters tuned and the drawn objective task is not present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoisy/learningcurve2}
+     \caption{$M=2$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoisy/learningcurve9}
+     \caption{$M=9$}
+   \end{subfigure}
+   \caption{Noisy data Learning Curves for $M=2$ and $M=9$ Hyperparameters tuned and the drawn objective task is present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoiseless/Mcurve5}
+     \caption{$N=5$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoiseless/Mcurve9}
+     \caption{$N=9$}
+   \end{subfigure}
+   \caption{Noiseless data Complexity Curves for $N=5$ and $N=9$ Hyperparameters tuned and the drawn objective task is not present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoisy/Mcurve5}
+     \caption{$N=5$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/unknownnoisy/Mcurve9}
+     \caption{$N=9$}
+   \end{subfigure}
+   \caption{Noisy data Complexity Curves for $N=5$ and $N=9$ Hyperparameters tuned and the drawn objective task is not present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoiseless/Mcurve5}
+     \caption{$N=5$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoiseless/Mcurve9}
+     \caption{$N=9$}
+   \end{subfigure}
+   \caption{Noiseless data Complexity Curves for $N=5$ and $N=9$ Hyperparameters tuned and the drawn objective task is present in $\boldsymbol{\psi}$.}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoisy/Mcurve5}
+     \caption{$N=5$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/knownnoisy/Mcurve9}
+     \caption{$N=9$}
+   \end{subfigure}
+   \caption{Noisy data Complexity Curves for $N=5$ and $N=9$ Hyperparameters tuned and the drawn objective task is present in $\boldsymbol{\psi}$.}
+\end{figure}
+\begin{itemize}
+  \item Benefit of additional functions is evident.
+  \item Looking at additional functions for unknown function case after having two functions we can almost go to zero test error. 
+\end{itemize}
+
+\section{Functional PCA}
+
+Given the amount of functionals that can be present identifying  some form of representative form with less space but more information we can use dimensionality reduction techniques for functionals.
+
+\begin{itemize}
+  \item I am reading the Book Functional Data Analysis by Ramsay and Silverman.
+  \item Smoothing and interpolation before using the data is essential.
+  \item All the functionals have to be evaluated at the same input points $\{x_i\}_{i=1}^{N}$. In other words, we need to have the same grid. After putting them in to $\{f_i(\cdot)\}_{i=1}^P$
+  \item For the functional PCA we want to find a set of K orthonormal functions so that the expension of each curve in terms of these basis functions approximates the curve as closely as possible.
+  \item I do not see the point of writing the formulations I see in the book, but here is in a broad mathematical sense waht we are doing. Lets say our functions can be represented with linear combination of the values.
+    \begin{equation}
+      f_i = \{\sum_{j=1}^p \beta_j x_{ji}\}_{i=1}^N
+    \end{equation}
+  \item What functional PCA tries to do is to find the $\beta_j$ that maximizes the MSE with the constraint $||\beta_j||=1$ is satsified for every functional value.
+  \item This way the largest variational modes are identified.
+\end{itemize}
+
+\begin{figure}[h!]
+   \centering
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/functional_pca_res/illustration}
+     \caption{$P=2$}
+   \end{subfigure}
+   \hfill
+   \begin{subfigure}[b]{0.45\textwidth}
+     \centering
+     \includegraphics[width=\textwidth]{Figures/functional_pca_res/illustration-2}
+     \caption{$P=9$}
+   \end{subfigure}
+   \caption{Observing the functional PCA results with 99\% of variance for different number of available functionals. Note that $P$ introduced here is analogous to $M$ in our above setting for SemiParametric method.}
+\end{figure}
+
+\begin{itemize}
+  \item It is obvious that we can represent the whole range of sine to cosine with just two eigenfunctions. 
+  \item What is more interesting is that we observed that for unknown task after $M=2$ we are able to obtain almost zero test error.
+  \item After this observation I would like to use these PCA components as my $\psi_j(\cdot)$. But, know the same input point assumption is hindering flexibility.
+\end{itemize}
+
+\color{red}
+\section{Learning Curves}
+
+Some ideas on the similar method applied to learning curves.
+\begin{itemize}
+  \item Get learning curves for multiple hyper parameters for the same dataset then try to extrapolate one of them with the help of others.
+  \item Try to extrapolate from untuned models to a tuned model.
+\end{itemize}
+
+\subsection{Ridge Regression Learning Curves}
+
+From the Equation \ref{eq:data} observe data with $p(x)\sim\mathcal{N}(0,1)$ and $\epsilon\sim\mathcal{N}(0,1)$. Obtain the learning curves for different ridge parameters $\lambda$ for $N:{5,...,100}$
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lr_learning_curves.pdf}
+   \caption{Learning Curves for Ridge Regression varying $\lambda$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lc_pca.pdf}
+   \caption{PCA 99\% covering principle components (not smoothed!)$\lambda$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/smooth_pca.pdf}
+   \caption{PCA 99\% covering principle components (smoothed!)$\lambda$}
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lc_pred_funcs_1.pdf}
+   \caption{Semi Parametric Kernel Ridge by using 1 other function. }
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lc_funcs_3.pdf}
+   \caption{Semi Parametric Kernel Ridge by using 3 other functions. }
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lr_2_pca.pdf}
+   \caption{Semi Parametric Kernel Ridge by using 2 PCA component. }
+\end{figure}
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lr_6_pca.pdf}
+   \caption{Semi Parametric Kernel Ridge by using 6 PCA components. }
+\end{figure}
+
+NOTE: After the PCA mean of the functions are added to all the components.  The first principle component can deal relatively well with this thus the weight for it becomes just close to one! 
+
+\begin{figure}[h!]
+   \centering
+   \includegraphics[width=\textwidth]{Figures/initial_study/lr_mean.pdf}
+   \caption{Semi Parametric Kernel Ridge by using mean of the all components.}
+\end{figure}
+
+
+%\section{What does $\boldsymbol{\alpha}$ and $\boldsymbol{\beta}$}
+%\begin{itemize}
+%  \item $\boldsymbol{\alpha}$ by itself show the opposite behaviour that I would expect in Kernel Ridge. 
+%  \item $\boldsymbol{\beta}$ is able to predict the objective easily.
+%  \item Given that objective exists in $\boldsymbol{\psi}$ this method is able to find the internally best fit.
+%  \item However, if the function is not representative of the underlying function the contribution of the additional information is not canceled.
+%\end{itemize}
+%
+%\begin{figure}
+%   \centering
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/alpha}
+%     \caption{Objective is present in $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \hfill
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/alpha_2}
+%     \caption{Objective is not present in $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \caption{$\boldsymbol{\alpha}$ Observations}
+%\end{figure}
+%
+%\begin{figure}
+%   \centering
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/beta}
+%     \caption{Objective is present in $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \hfill
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/beta_2}
+%     \caption{Objective is present in $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \caption{$\boldsymbol{\beta}$ Observations}
+%\end{figure}
+%
+%\begin{figure}
+%  \includegraphics[width=0.5\textwidth]{Figures/linear_funcs}
+%   \caption{Objective is present in $\boldsymbol{\psi}$}
+%\end{figure}
+%
+%\section{Learning Curves for Varying $M$}
+%
+%\begin{itemize}
+%  \item Hyper-parameters are tuned.
+%  \item Some non-monotonic behaviour. I have no idea why that happens, need to put it to my own learning curve generator, to make sure not to have scikit learn bug.
+%\end{itemize}
+%
+%\begin{figure}[!h]
+%   \centering
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/learning2}
+%     \caption{2 functions for $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \hfill
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/learning22}
+%     \caption{22 functions for $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/learning42}
+%     \caption{42 functions for $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \hfill
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/learning62}
+%     \caption{62 functions for $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%   \begin{subfigure}[b]{0.45\textwidth}
+%     \centering
+%     \includegraphics[width=\textwidth]{Figures/learning82}
+%     \caption{82 functions for $\boldsymbol{\psi}$}
+%   \end{subfigure}
+%\end{figure}
 
 
 \end{document}

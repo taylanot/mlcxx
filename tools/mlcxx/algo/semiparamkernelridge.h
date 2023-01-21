@@ -38,7 +38,7 @@ class SemiParamKernelRidge
    */
   template<typename... Ts>
   SemiParamKernelRidge<T,F>(const Ts&... args) : cov_(args...), lambda_(0.0),
-                                  num_funcs_(size_t(0)), func_(size_t(0))  { }
+                                  M_(size_t(0)), func_(size_t(0))  { }
 
   /**
    * @param inputs X
@@ -56,11 +56,9 @@ class SemiParamKernelRidge
                arma::rowvec& labels) const;
 
 
-  //const arma::vec& DataParameters() const { return data_parameters_; }
-  //const arma::vec& FuncParameters() const { return data_parameters_; }
+  const arma::vec& Parameters() const { return parameters_; }
 
-  //arma::vec& DataParameters() { return data_parameters_; }
-  //arma::vec& FuncParameters() { return func_parameters_; }
+  arma::vec& Parameters() { return parameters_; }
 
   double Lambda() const { return lambda_; }
 
@@ -72,9 +70,9 @@ class SemiParamKernelRidge
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int /* version */)
   {
-    ar & BOOST_SERIALIZATION_NVP(data_parameters_);
-    ar & BOOST_SERIALIZATION_NVP(func_parameters_);
-    ar & BOOST_SERIALIZATION_NVP(num_funcs_);
+    ar & BOOST_SERIALIZATION_NVP(parameters_);
+    ar & BOOST_SERIALIZATION_NVP(M_);
+    ar & BOOST_SERIALIZATION_NVP(N_);
     ar & BOOST_SERIALIZATION_NVP(lambda_);
     ar & BOOST_SERIALIZATION_NVP(cov_);
     ar & BOOST_SERIALIZATION_NVP(func_);
@@ -86,12 +84,12 @@ class SemiParamKernelRidge
   arma::mat cov_predict_; // for check
 
   arma::mat train_inp_;   // for later usage
-  arma::vec data_parameters_;
-  arma::vec func_parameters_;
+  arma::vec parameters_;
   arma::mat psi_;
   utils::covmat<T> cov_;
   double  lambda_;
-  size_t num_funcs_;
+  size_t M_;
+  size_t N_;
   F func_;
 };
 

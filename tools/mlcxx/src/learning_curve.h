@@ -36,22 +36,23 @@ template<class MODEL,
 class LCurve_HPT
 {
 public:
-  LCurve_HPT<MODEL,LOSS,CV>(const std::string filename,
-                                   const arma::irowvec& Ns,
-                                   const double& repeat,
-                                   const double& tune_ratio);
+  LCurve_HPT<MODEL,LOSS,CV>(  const arma::irowvec& Ns,
+                              const double& repeat,
+                              const double& tune_ratio    );
 
   template<class... Ts>
-  std::tuple<arma::mat, arma::mat> Generate(const arma::mat& inputs,
-                                            const arma::rowvec& labels,
-                                            const Ts&... args);
+  std::tuple<arma::mat, arma::mat> Generate(  const std::string filename,
+                                              const arma::mat& inputs,
+                                              const arma::rowvec& labels,
+                                              const Ts&... args           );
 private:
   double tune_ratio_;
   size_t repeat_;
   arma::irowvec Ns_;
-  std::string filename_;
+public:
   arma::mat test_errors_;
   arma::mat train_errors_;
+  std::tuple<arma::mat, arma::mat>  stats_;
 };
 
 //=============================================================================
@@ -62,21 +63,23 @@ template<class MODEL,
 class LCurve
 {
 public:
-  LCurve<MODEL,LOSS>(const std::string filename,
-                            const arma::irowvec& Ns,
-                            const double& repeat);
+  LCurve<MODEL,LOSS>(  const arma::irowvec& Ns,
+                       const double& repeat      );
 
   template<class... Ts>
-  std::tuple<arma::mat, arma::mat> Generate(const arma::mat& inputs,
-                                            const arma::rowvec& labels,
-                                            const Ts&... args);
+  std::tuple<arma::mat, arma::mat> Generate(  const std::string filename,
+                                              const arma::mat& inputs,
+                                              const arma::rowvec& labels,
+                                              const Ts&... args           );
 private:
 
   size_t repeat_;
   arma::irowvec Ns_;
-  std::string filename_;
+public:
   arma::mat test_errors_;
   arma::mat train_errors_;
+  std::tuple<arma::mat, arma::mat>  stats_;
+
 };
 #include "learning_curve_impl.h"
 

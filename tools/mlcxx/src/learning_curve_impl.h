@@ -17,12 +17,10 @@
 template<class MODEL,
          class LOSS, 
          template<typename, typename, typename, typename, typename> class CV>
-LCurve_HPT<MODEL,LOSS,CV>::LCurve_HPT(const std::string filename,
-                                                    const arma::irowvec& Ns,
-                                                    const double& repeat,
-                                                    const double& tune_ratio)
+LCurve_HPT<MODEL,LOSS,CV>::LCurve_HPT(  const arma::irowvec& Ns,
+                                        const double& repeat,
+                                        const double& tune_ratio    )
 {
-  filename_ = filename;
   tune_ratio_ = tune_ratio;
   Ns_ = Ns;   
   test_errors_.resize(repeat,Ns_.n_elem);
@@ -35,9 +33,10 @@ template<class MODEL,
          template<typename, typename, typename, typename, typename> class CV>
 template<class... Ts>
 std::tuple<arma::mat, arma::mat> 
-  LCurve_HPT<MODEL,LOSS,CV>::Generate(const arma::mat& inputs,
-                                             const arma::rowvec& labels,
-                                             const Ts&... args)
+  LCurve_HPT<MODEL,LOSS,CV>::Generate(  const std::string filename,
+                                        const arma::mat& inputs,
+                                        const arma::rowvec& labels,
+                                        const Ts&... args            )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -50,8 +49,8 @@ std::tuple<arma::mat, arma::mat>
       const auto res = utils::data::Split(inputs, labels, Ns_(i));
       arma::mat Xtrn = std::get<0>(res);
       arma::mat Xtst = std::get<1>(res);
-      arma::mat ytrn = std::get<2>(res);
-      arma::mat ytst = std::get<3>(res);
+      arma::rowvec ytrn = std::get<2>(res);
+      arma::rowvec ytst = std::get<3>(res);
       mlpack::hpt::HyperParameterTuner<MODEL, LOSS, CV> hpt(0.2, Xtrn, ytrn);
       hpt.Optimize(args...);
       MODEL bestmodel = hpt.BestModel();
@@ -66,19 +65,18 @@ std::tuple<arma::mat, arma::mat>
                                      arma::stddev(test_errors_));
     arma::mat results = 
       arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
-    utils::Save(filename_,results);
+    utils::Save(filename,results);
 
-    return std::make_tuple(std::move(train),
-                           std::move(test));
+    stats_ = std::make_tuple(std::move(train),
+                             std::move(test));
+    return stats_;
 }
 
 template<class MODEL,
          class LOSS>
-LCurve<MODEL,LOSS>::LCurve(const std::string filename,
-                                         const arma::irowvec& Ns,
-                                         const double& repeat)
+LCurve<MODEL,LOSS>::LCurve(  const arma::irowvec& Ns,
+                             const double& repeat      )
 {
-  filename_ = filename;
   Ns_ = Ns;   
   test_errors_.resize(repeat,Ns_.n_elem);
   train_errors_.resize(repeat,Ns_.n_elem);
@@ -89,9 +87,10 @@ template<class MODEL,
          class LOSS>
 template<class... Ts>
 std::tuple<arma::mat, arma::mat> 
-  LCurve<MODEL,LOSS>::Generate(const arma::mat& inputs,
-                                      const arma::rowvec& labels,
-                                      const Ts&... args)
+  LCurve<MODEL,LOSS>::Generate( const std::string filename,
+                                const arma::mat& inputs,
+                                const arma::rowvec& labels,
+                                const Ts&... args           )
 {
 
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
@@ -105,23 +104,25 @@ std::tuple<arma::mat, arma::mat>
       const auto res = utils::data::Split(inputs, labels, Ns_(i));
       arma::mat Xtrn = std::get<0>(res);
       arma::mat Xtst = std::get<1>(res);
-      arma::mat ytrn = std::get<2>(res);
-      arma::mat ytst = std::get<3>(res);
+      arma::rowvec ytrn = std::get<2>(res);
+      arma::rowvec ytst = std::get<3>(res);
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = model.ComputeError(Xtst, ytst);
       train_errors_(j,i) = model.ComputeError(Xtrn, ytrn);
     }
   }
+
     arma::mat train = arma::join_cols(arma::mean(train_errors_),
                                       arma::stddev(train_errors_));
     arma::mat test = arma::join_cols(arma::mean(test_errors_),
                                      arma::stddev(test_errors_));
     arma::mat results = 
       arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
-    utils::Save(filename_,results);
+    utils::Save(filename,results);
 
-    return std::make_tuple(std::move(train),
-                           std::move(test));
+    stats_ = std::make_tuple(std::move(train),
+                             std::move(test));
+    return stats_;
 }
 
 #endif

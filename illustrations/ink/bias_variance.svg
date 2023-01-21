@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (1:1.1+202202050852+0a00cf5339)"
+   sodipodi:docname="bias_variance.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:bbox-paths="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:object-paths="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-center="true"
+     inkscape:zoom="0.77771465"
+     inkscape:cx="338.17031"
+     inkscape:cy="561.25984"
+     inkscape:window-width="2560"
+     inkscape:window-height="1383"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="356.47439"
+       y="66.440622"
+       width="500.28564"
+       height="94.065318"
+       id="rect10248" />
+    <inkscape:path-effect
+       effect="mirror_symmetry"
+       start_point="281.52473,61.256848"
+       end_point="281.52473,169.51559"
+       center_point="281.52473,115.38622"
+       id="path-effect2877"
+       is_visible="true"
+       lpeversion="1.1"
+       mode="free"
+       discard_orig_path="false"
+       fuse_paths="false"
+       oposite_fuse="false"
+       split_items="true"
+       split_open="false" />
+    <inkscape:path-effect
+       effect="mirror_symmetry"
+       start_point="267.77957,59.158572"
+       end_point="267.77957,168.64728"
+       center_point="267.77957,113.90293"
+       id="path-effect1342"
+       is_visible="true"
+       lpeversion="1.1"
+       mode="free"
+       discard_orig_path="false"
+       fuse_paths="false"
+       oposite_fuse="false"
+       split_items="false"
+       split_open="false" />
+    <rect
+       x="356.4744"
+       y="66.44062"
+       width="500.28564"
+       height="94.065315"
+       id="rect10248-7" />
+    <rect
+       x="356.4744"
+       y="66.44062"
+       width="500.28564"
+       height="94.065315"
+       id="rect10248-9" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g25023"
+       transform="matrix(1.1350851,0,0,1.1350851,7.3551771,-1.3183094)">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1.69272;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 3.281161,147.4489 H 227.05456"
+         id="path857" />
+      <path
+         style="fill:none;stroke:#975cf6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 158.29086,59.158572 c 0,101.494788 60.52253,109.488708 109.48871,109.488708 M 377.26828,59.158572 c 0,101.494788 -60.52253,109.488708 -109.48871,109.488708"
+         id="path1233-7"
+         inkscape:path-effect="#path-effect1342"
+         inkscape:original-d="m 158.29086,59.158572 c 0,101.494788 60.52253,109.488708 109.48871,109.488708"
+         transform="matrix(0.76908091,0,0,0.76908091,-86.3326,-0.7956096)" />
+      <path
+         style="fill:none;stroke:#250657;stroke-width:1.42592;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 34.69699,169.24715 c 74.17442,0 180.67862,6.52501 220.67984,-44.76464 21.91013,-28.093206 26.1479,-63.225662 26.1479,-63.225662"
+         id="path1797"
+         sodipodi:nodetypes="csc"
+         inkscape:path-effect="#path-effect2877"
+         inkscape:original-d="m 34.69699,169.24715 c 74.17442,0 180.67862,6.52501 220.67984,-44.76464 21.91013,-28.093206 26.1479,-63.225662 26.1479,-63.225662"
+         transform="matrix(0.76908091,0,0,0.76908091,0.5521629,10.000087)" />
+      <path
+         id="mirror-path-effect2877"
+         d="m 204.39404,140.16484 c -57.04613,0 -138.956477,5.01826 -169.720647,-34.42763 C 17.822723,84.131261 14.563533,57.111559 14.563533,57.111559"
+         style="fill:none;stroke:#af83f8;stroke-width:1.09665;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         xml:space="preserve"
+         transform="matrix(0.20348599,0,0,0.20348599,25.365163,93.618924)"
+         id="text10246"
+         style="font-size:44px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect10248);fill:#975cf6;stroke:#975cf6"><tspan
+           x="356.47461"
+           y="104.33867"
+           id="tspan25062">Total Error</tspan></text>
+      <text
+         xml:space="preserve"
+         transform="matrix(0.20348599,0,0,0.20348599,-70.394434,29.397381)"
+         id="text10246-4"
+         style="font-size:44px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect10248-7);fill:#af83f8;stroke:#af83f8"><tspan
+           x="356.47461"
+           y="104.33867"
+           id="tspan25066">Bias<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan25064">2</tspan></tspan></text>
+      <text
+         xml:space="preserve"
+         transform="matrix(0.20348599,0,0,0.20348599,139.2077,29.718575)"
+         id="text10246-1"
+         style="font-size:44px;line-height:1.25;font-family:'TYPO COMICS DEMO';-inkscape-font-specification:'TYPO COMICS DEMO, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect10248-9);fill:#250657;stroke:#250657"><tspan
+           x="356.47461"
+           y="104.33867"
+           id="tspan25068">Variance
+</tspan></text>
+    </g>
+  </g>
+</svg>

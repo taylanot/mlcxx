@@ -1,0 +1,70 @@
+\documentclass{tran-l}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\theoremstyle{remark}
+\newtheorem{qu}{Question}
+\newtheorem{so}{Solution}
+
+\numberwithin{equation}{section}
+
+\usepackage{enumitem}
+
+\newcommand{\mR}{\mathbb{R}}
+
+\title{Machine Learning-1 Exam Trial Question}
+
+\begin{document}
+\maketitle
+
+\section{Linear Regression}
+
+\qu In this problem we will consider a regression problem. We will assume that we know certain aspects of the problem from the start and determine our modeling choices according to that knowledge. 
+
+Let's assume that we know the data generation process which is given by
+
+\begin{equation*}
+  y=x+\varepsilon,
+\end{equation*}
+where $y\in\mR$, $x\in\mR$, and $\varepsilon\sim\mathcal{N}(0,1)$. According to this relation the training and test sets are obtained. For this particular problem we will work with the following sets.
+%According to this underlying relation training ($Z_{\text{train}}:\{(xi,yi)\}_{i=1}^{Ntrn}$) and test sets ($Z_{\text{tests}}:\{(xi,yi)\}_{i=1}^{Ntst}$) are drawn.
+\begin{align*}
+  Z_{\text{train}} &= \{(-1,-1), (1,1)\} \\
+  Z_{\text{test}} &= \{(-2,-2)\} \\
+\end{align*}
+
+We will try to model this underlying process with the linear model $M(x,w_1,w_2) = w_1\times x+w_2$, where $w_1\in\mR$ and $w_2\in\mR$.
+
+\begin{enumerate}[label=\alph*]
+% AIM: Easy entry question, test linear algebra a bit or if they are able to understand what OLS does intuitively.
+\item What are the model parameters for the Ordinary Least Squares (OLS) solution?
+% AIM: Test weather they understand they can go through the motion of a Bayesian approach for a simple model. 
+\item Assuming and uninformative prior $p(\mathbf{w})\sim(\mathbf{0},10^{6} \mathbf{I})$ on the weights $\mathbf{w}:=[w_1, w_2]$, where $\mathbf{I}\in\mR^{2\times 2}$ is the identity matrix. What is the posterior ($p(\mathbf{w},Z_{\text{train}})$ for the weights of our model? 
+% AIM: ML solution and OLS relation coming from uninformative prior. 
+\item What can you say about the Bayes and OLS solutions for the given problem. 
+% AIM: To understand how you make predictions with Bayes error. And understanding the cause of the variance for the predictions. 
+\item What is the expected error and variance of your error for both Bayes and OLS solutions for the test set, given that error measure is absolute error ($\hat{y}-y$). 
+
+\end{enumerate}
+
+P.S.: You can work with one significant digit for your calculations.
+
+\so For none of the problems matrix inversion is needed (due to identity inversion) every calculation can be done by hand. 
+
+\begin{enumerate}[label=\alph*]
+  \item $\mathbf{w}=[1,0]$. It is visible or can be computed by $(\mathbf{X}^\text{T}\mathbf{X})^{-1}X^\text{T}\mathbf{Y}$ where $\mathbf{X}:=\begin{bmatrix}-1 & 1 \\1 & 1  \end{bmatrix}$ and $\mathbf{Y}:=\begin{bmatrix}-1\\1\end{bmatrix}$. 
+  \item Noting $\alpha:=10^{-6}$ and $\beta=1$ the posterior can be easily obtained by plugging in the formulation given in Bishop Eqns(3.53-3.54) $p(\mathbf{w}|Z_\text{train})\sim\mathcal{N}(\mathbf{m}, \mathbf{V})$ where
+  \begin{align*}
+    \mathbf{m} &:= \beta \mathbf{V}X^\text{T}\mathbf{Y} = \begin{bmatrix}-1\\0\end{bmatrix} \\
+    \mathbf{V} &:= (\alpha \mathbf{I} + \beta \mathbf{X}^\text{T}\mathbf{X})^{-1} = \begin{bmatrix}0.5 & 0 \\0 & 0.5  \end{bmatrix}
+  \end{align*}
+  \item With and uninformative prior given in the question posterior distribution reduces to the maximum likelihood solution and we know that the maximum likelhood solution is equal to OLS solution.
+  \item Expected Error for both of the models is $0$ and the variance is $0$ for OLS solution, but for the Bayes version we get the variance as $3.5$ that is coming from the posterior predictive distribution.
+
+\begin{equation*}
+  p(y|x,Z_\text{train},\alpha,\beta) \sim \mathcal(\mathbf{m}\mathbf{X}^\text{T}, \sigma^2),
+\end{equation*}
+where $\mathbf{X}:=\begin{bmatrix} -2 & 1 \end{bmatrix}$ and $\sigma = 1/\beta+\mathbf{X}\mathbf{V}\mathbf{X}^{T}=3.5$
+  
+\end{enumerate}
+
+\end{document}

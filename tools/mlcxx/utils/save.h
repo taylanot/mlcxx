@@ -56,7 +56,7 @@ namespace utils {
 
     if (ext == "csv")
     {
-      data.save(filename,arma::file_type::csv_ascii);
+      data.save(filename,arma::csv_ascii);
     }
 
   }
@@ -70,7 +70,6 @@ namespace utils {
     T data = Combine(data1,data2);
 
     Save(filename, data, transpose);
-
   }
 
 } // namespace utils

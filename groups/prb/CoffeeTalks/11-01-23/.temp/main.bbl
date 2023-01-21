@@ -1,0 +1,286 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+\preamble{%
+\providecommand{\noopsort}[1]{}
+}
+
+  \entry{jacot2020a}{misc}{}
+    \name{author}{3}{}{%
+      {{hash=JA}{%
+         family={Jacot},
+         familyi={J\bibinitperiod},
+         given={Arthur},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=GF}{%
+         family={Gabriel},
+         familyi={G\bibinitperiod},
+         given={Franck},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=HC}{%
+         family={Hongler},
+         familyi={H\bibinitperiod},
+         given={Clément},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Machine Learning,Computer Science - Neural and
+  Evolutionary Computing,Mathematics - Probability,Statistics - Machine
+  Learning}
+    \strng{namehash}{JAGFHC1}
+    \strng{fullhash}{JAGFHC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2020}
+    \field{labeldatesource}{}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{abstract}{%
+    At initialization, artificial neural networks (ANNs) are equivalent to
+  Gaussian processes in the infinite-width limit (16; 4; 7; 13; 6), thus
+  connecting them to kernel methods. We prove that the evolution of an ANN
+  during training can also be described by a kernel: during gradient descent on
+  the parameters of an ANN, the network function fθ (which maps input vectors
+  to output vectors) follows the kernel gradient of the functional cost (which
+  is convex, in contrast to the parameter cost) w.r.t. a new kernel: the Neural
+  Tangent Kernel (NTK). This kernel is central to describe the generalization
+  features of ANNs. While the NTK is random at initialization and varies during
+  training, in the infinite-width limit it converges to an explicit limiting
+  kernel and it stays constant during training. This makes it possible to study
+  the training of ANNs in function space instead of parameter space.
+  Convergence of the training can then be related to the positive-definiteness
+  of the limiting NTK. We prove the positive-definiteness of the limiting NTK
+  when the data is supported on the sphere and the non-linearity is
+  non-polynomial.%
+    }
+    \verb{eprint}
+    \verb 1806.07572
+    \endverb
+    \field{number}{arXiv:1806.07572}
+    \field{shorttitle}{Neural {{Tangent Kernel}}}
+    \field{title}{Neural {{Tangent Kernel}}: {{Convergence}} and
+  {{Generalization}} in {{Neural Networks}}}
+    \verb{url}
+    \verb http://arxiv.org/abs/1806.07572
+    \endverb
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/5JK6QAS9/Jacot et al. - 2020 - Neural T
+    \verb angent Kernel Convergence and Generalizat.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs, math, stat}
+    \field{day}{10}
+    \field{month}{02}
+    \field{year}{2020}
+    \field{urlday}{06}
+    \field{urlmonth}{01}
+    \field{urlyear}{2023}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+
+  \entry{mallinar2022}{misc}{}
+    \name{author}{6}{}{%
+      {{hash=MN}{%
+         family={Mallinar},
+         familyi={M\bibinitperiod},
+         given={Neil},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=SJB}{%
+         family={Simon},
+         familyi={S\bibinitperiod},
+         given={James\bibnamedelima B.},
+         giveni={J\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=AA}{%
+         family={Abedsoltan},
+         familyi={A\bibinitperiod},
+         given={Amirhesam},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=PP}{%
+         family={Pandit},
+         familyi={P\bibinitperiod},
+         given={Parthe},
+         giveni={P\bibinitperiod},
+      }}%
+      {{hash=BM}{%
+         family={Belkin},
+         familyi={B\bibinitperiod},
+         given={Mikhail},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=NP}{%
+         family={Nakkiran},
+         familyi={N\bibinitperiod},
+         given={Preetum},
+         giveni={P\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Artificial Intelligence,Computer Science -
+  Computer Vision and Pattern Recognition,Computer Science - Machine
+  Learning,Statistics - Machine Learning}
+    \strng{namehash}{MNSJBAAPPBMNP1}
+    \strng{fullhash}{MNSJBAAPPBMNP1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{M}
+    \field{sortinithash}{M}
+    \field{abstract}{%
+    The practical success of overparameterized neural networks has motivated
+  the recent scienti c study of interpolating methods, which perfectly t their
+  training data. Certain interpolating methods, including neural networks, can
+  t noisy training data without catastrophically bad test performance, in de
+  ance of standard intuitions from statistical learning theory. Aiming to
+  explain this, a body of recent work has studied benign over tting, a
+  phenomenon where some interpolating methods approach Bayes optimality, even
+  in the presence of noise. In this work we argue that while benign over tting
+  has been instructive and fruitful to study, many real interpolating methods
+  like neural networks do not t benignly: modest noise in the training set
+  causes nonzero (but non-in nite) excess risk at test time, implying these
+  models are neither benign nor catastrophic but rather fall in an intermediate
+  regime. We call this intermediate regime tempered over tting, and we initiate
+  its systematic study. We rst explore this phenomenon in the context of kernel
+  (ridge) regression (KR) by obtaining conditions on the ridge parameter and
+  kernel eigenspectrum under which KR exhibits each of the three behaviors. We
+  nd that kernels with powerlaw spectra, including Laplace kernels and ReLU
+  neural tangent kernels, exhibit tempered over tting. We then empirically
+  study deep neural networks through the lens of our taxonomy, and nd that
+  those trained to interpolation are tempered, while those stopped early are
+  benign. We hope our work leads to a more re ned understanding of over tting
+  in modern learning.%
+    }
+    \verb{eprint}
+    \verb 2207.06569
+    \endverb
+    \field{number}{arXiv:2207.06569}
+    \field{shorttitle}{Benign, {{Tempered}}, or {{Catastrophic}}}
+    \field{title}{Benign, {{Tempered}}, or {{Catastrophic}}: {{A Taxonomy}} of
+  {{Overfitting}}}
+    \verb{url}
+    \verb http://arxiv.org/abs/2207.06569
+    \endverb
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/TWMHE62L/Mallinar et al. - 2022 - Benig
+    \verb n, Tempered, or Catastrophic A Taxonomy of O.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs, stat}
+    \field{day}{13}
+    \field{month}{07}
+    \field{year}{2022}
+    \field{urlday}{26}
+    \field{urlmonth}{09}
+    \field{urlyear}{2022}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+
+  \entry{simon2022}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=SJB}{%
+         family={Simon},
+         familyi={S\bibinitperiod},
+         given={James\bibnamedelima B.},
+         giveni={J\bibinitperiod\bibinitdelim B\bibinitperiod},
+      }}%
+      {{hash=DM}{%
+         family={Dickens},
+         familyi={D\bibinitperiod},
+         given={Madeline},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=KD}{%
+         family={Karkada},
+         familyi={K\bibinitperiod},
+         given={Dhruva},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=DMR}{%
+         family={DeWeese},
+         familyi={D\bibinitperiod},
+         given={Michael\bibnamedelima R.},
+         giveni={M\bibinitperiod\bibinitdelim R\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
+    \strng{namehash}{SJBDMKDDMR1}
+    \strng{fullhash}{SJBDMKDDMR1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{abstract}{%
+    We derive a simple unified framework giving closed-form estimates for the
+  test risk and other generalization metrics of kernel ridge regression (KRR).
+  Relative to prior work, our derivations are greatly simplified and our final
+  expressions are more readily interpreted. These improvements are enabled by
+  our identification of a sharp conservation law which limits the ability of
+  KRR to learn any orthonormal basis of functions. Test risk and other objects
+  of interest are expressed transparently in terms of our conserved quantity
+  evaluated in the kernel eigenbasis. We use our improved framework to: i)
+  provide a theoretical explanation for the “deep bootstrap” of Nakkiran et
+  al. (2020), ii) generalize a previous result regarding the hardness of the
+  classic parity problem, iii) fashion a theoretical tool for the study of
+  adversarial robustness, and iv) draw a tight analogy between KRR and a
+  well-studied system in statistical physics.%
+    }
+    \verb{eprint}
+    \verb 2110.03922
+    \endverb
+    \field{number}{arXiv:2110.03922}
+    \field{shorttitle}{The {{Eigenlearning Framework}}}
+    \field{title}{The {{Eigenlearning Framework}}: {{A Conservation Law
+  Perspective}} on {{Kernel Regression}} and {{Wide Neural Networks}}}
+    \verb{url}
+    \verb http://arxiv.org/abs/2110.03922
+    \endverb
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/SCACLZCG/Simon et al. - 2022 - The Eige
+    \verb nlearning Framework A Conservation Law Pe.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs, stat}
+    \field{day}{12}
+    \field{month}{10}
+    \field{year}{2022}
+    \field{urlday}{28}
+    \field{urlmonth}{12}
+    \field{urlyear}{2022}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+\enddatalist
+\endinput

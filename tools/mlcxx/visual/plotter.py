@@ -19,17 +19,22 @@ from read import *
 mpl.rcParams['axes.prop_cycle'] = cycler.cycler('color',
                                             plt.cm.Dark2(np.linspace(0, 1, 8)))
 
-def lcurve(ax, data):
-    ax.fill_between(data[:,0],
-                    data[:,1] - data[:,2],
-                    data[:,1] + data[:,2],
-                    alpha=0.1)
-    ax.plot(data[:,0], data[:,1], '-o', label="Test-Error")
-    ax.fill_between(data[:,0],
-                    data[:,3] - data[:,4],
-                    data[:,3] + data[:,4],
-                    alpha=0.1)
-    ax.plot(data[:,0], data[:,3], '-o', label="Train-Error")
+def lcurve(ax, data, error=True, dots=True):
+    if error:
+        ax.fill_between(data[:,0],
+                        data[:,1] - data[:,2],
+                        data[:,1] + data[:,2],
+                        alpha=0.1)
+        ax.fill_between(data[:,0],
+                        data[:,3] - data[:,4],
+                        data[:,3] + data[:,4],
+                        alpha=0.1)
+    if dots: 
+        ax.plot(data[:,0], data[:,1], '-o', linewidth=0.2, label="Train-Error")
+        ax.plot(data[:,0], data[:,3], '-o', linewidth=0.2, label="Test-Error")
+    else:
+        ax.plot(data[:,0], data[:,1], linewidth=0.2, label="Train-Error")
+        ax.plot(data[:,0], data[:,3], linewidth=0.2, label="Test-Error")
 
 def data(ax,data,din,dout, label='Train'):
     if label == "Train":

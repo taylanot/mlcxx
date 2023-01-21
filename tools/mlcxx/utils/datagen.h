@@ -11,13 +11,6 @@
 
 #ifndef DATAGEN_H
 #define DATAGEN_H
-// standard
-#include <tuple>
-#include <string>
-// armadillo
-#include <armadillo>
-// locall
-#include "save.h"
 
 namespace utils {
 namespace data {
@@ -36,6 +29,7 @@ struct Dataset
   Dataset ( size_t D, size_t N, double noise_std );
 
   void Generate ( double scale, double phase, std::string type );
+  void Generate ( size_t M, std::string type );
 
   void Save( std::string filename );
 };

@@ -2,7 +2,7 @@
  * @file kernelridge_impl.h
  * @author Ozgur Taylan Turan
  *
- * Simple Kernelized Ridge Regression
+ * Simple Kernelized Ridge Regression & Kernel Regression(Smoothing)
  *
  * TODO: Weighted regression example, bias addition
  */
@@ -18,12 +18,16 @@
 using namespace mlpack;
 using namespace algo::regression;
 
+///////////////////////////////////////////////////////////////////////////////
+// Kernel Ridge Regression
+///////////////////////////////////////////////////////////////////////////////
+
 template<class T>
 template<class... Ts>
 KernelRidge<T>::KernelRidge(const arma::mat& inputs,
-                                   const arma::rowvec& labels,
-                                   const double lambda,
-                                   const Ts&... args) :
+                            const arma::rowvec& labels,
+                            const double lambda,
+                            const Ts&... args) :
     cov_(args...), lambda_(lambda)
 {
   Train(inputs, labels);
@@ -52,35 +56,68 @@ void KernelRidge<T>::Predict(const arma::mat& inputs,
   labels = (k_xpx * parameters_).t();
 }
 
-//template<class T>
-//template<class... Ts>
-//double KernelRidge<T>::ComputeError(const arma::mat& inputs,
-//                                    const arma::rowvec& labels,
-//                                    const Ts&... args) const
-//{
-//  arma::rowvec temp;
-//  Predict(inputs, temp, args...);
-//  const size_t n_points = inputs.n_cols;
-//
-//  temp = labels - temp;
-//
-//  const double cost = arma::dot(temp, temp) / n_points;
-//
-//  return cost;
-//}
+template<class T>
+double KernelRidge<T>::ComputeError(const arma::mat& inputs,
+                                    const arma::rowvec& labels) const
+{
+  arma::rowvec temp;
+  Predict(inputs, temp);
+  const size_t n_points = inputs.n_cols;
 
+  temp = labels - temp;
+
+  const double cost = arma::dot(temp, temp) / n_points;
+
+  return cost;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Kernel Regression
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+template<class... Ts>
+Kernel<T>::Kernel(const arma::mat& inputs,
+                  const arma::rowvec& labels,
+                  const Ts&... args) :
+    cov_(args...)
+{
+  Train(inputs, labels);
+}
+
+
+template<class T>
+void Kernel<T>::Train(const arma::mat& inputs,
+                      const arma::rowvec& labels)
+{
+  this -> train_inp_ = inputs.t();
+  this -> train_lab_ = labels;
+}
+
+template<class T>
+void Kernel<T>::Predict(const arma::mat& inputs,
+                        arma::rowvec& labels) const
+{
+  arma::mat sim = cov_.GetMatrix(train_inp_, inputs.t());
+  const size_t N = sim.n_rows;
+  for(size_t i=0; i<N; i++)
+  {
+    sim.row(i) /= arma::sum(sim,0);  
+  }
+  labels = train_lab_ * sim;
+}
+
+template<class T>
+double Kernel<T>::ComputeError(const arma::mat& inputs,
+                               const arma::rowvec& labels) const
+{
+  arma::rowvec temp;
+  Predict(inputs, temp);
+  const size_t n_points = inputs.n_cols;
+
+  temp = labels - temp;
+
+  const double cost = arma::dot(temp, temp) / n_points;
+
+  return cost;
+}
 #endif 
-///** DECLARATIONS for available mlpack kernels...
-// *
-// *  NOTE: if you add another kernel type you must declare it here otherwise you 
-// *  will get an error for undefined reference!
-//*/
-//template class KernelRidge<mlpack::kernel::CauchyKernel>;
-//template class KernelRidge<mlpack::kernel::LinearKernel>;
-//template class KernelRidge<mlpack::kernel::GaussianKernel>;
-//template class KernelRidge<mlpack::kernel::SphericalKernel>;
-//template class KernelRidge<mlpack::kernel::LaplacianKernel>;
-//template class KernelRidge<mlpack::kernel::TriangularKernel>;
-//template class KernelRidge<mlpack::kernel::PolynomialKernel>;
-//template class KernelRidge<mlpack::kernel::EpanechnikovKernel>;
-//template class KernelRidge<mlpack::kernel::HyperbolicTangentKernel>;

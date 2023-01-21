@@ -11,14 +11,6 @@
  */
 #ifndef DATAGEN_IMPL_H
 #define DATAGEN_IMPL_H
-// standard
-#include <tuple>
-#include <string>
-// armadillo
-#include <armadillo>
-// local
-#include "datagen.h"
-#include "save.h"
 
 namespace utils {
 namespace data {
@@ -45,6 +37,21 @@ namespace regression {
       this -> inputs = (arma::randn(dimension,size) + phase);
       this -> labels = (scale * arma::sin(inputs)
                                         +arma::randn(dimension,size)*noise_std);
+    }
+  }
+
+  void Dataset::Generate(size_t M, std::string type)
+  {
+    BOOST_ASSERT_MSG( dimension == 1, "FunctionalData input dim. != 1!");
+    this -> labels.resize(M,size);  
+
+    if (type == "SineFunctional")
+    {
+      this -> inputs = arma::sort(arma::randn(dimension,size),"ascend",1);
+      arma::rowvec phase(M,arma::fill::randn);
+      for( size_t i=0; i<M; i++ )
+         this->labels.row(i) = arma::sin(inputs+phase(i))+
+                                        arma::randn(dimension,size)*noise_std;
     }
   }
 
