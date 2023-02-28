@@ -106,6 +106,8 @@ class func_pca():
         self.grid = funcdata.argvals['input_dim_0']
         #self.eigenfunctions = self.fpca.eigenfunctions.values
         _,self.eigenfunctions,_ = eig_alt(self.grid, funcdata.values,npc=comp)#,mean_sub=mean_sub)
+        self.eigenfunctions += np.mean(funcdata.values, axis=0)
+
     def __call__(self, xs):
         index = []
         for x in xs:
@@ -128,6 +130,20 @@ class func_mean():
             index.append(np.where(self.grid == x)[0][0])
         #return np.array([self.eigenfunctions[i, index] for i in range(self.comp)]).reshape(-1,self.comp)
         return self.eigenfunctions[index].reshape(-1,1)
+
+class func_raw():
+    def __init__(self, funcdata, comp=1, mean_sub=False):
+        self.funcdata = funcdata
+        self.fpca = UFPCA(n_components=comp)
+        self.comp = comp
+        self.fpca.fit(funcdata)
+        self.grid = funcdata.argvals['input_dim_0']
+        self.eigenfunctions = self.funcdata.values
+    def __call__(self, xs):
+        index = []
+        for x in xs:
+            index.append(np.where(self.grid == x)[0][0])
+        return np.array([self.eigenfunctions[i, index] for i in range(self.comp)]).reshape(-1,self.comp)
 
 class SemiParamKernelRidge(BaseEstimator):
     def __init__(self, lmbda, kernel, funcs):
@@ -162,14 +178,16 @@ class SemiParamKernelRidge(BaseEstimator):
         index = np.where(error == np.amin(error))
         self.kernel.l = ls[index[0][0]]
         self.lmbda = lmbdas[index[1][0]]
+        #print(self.kernel.l)
+        #print(self.lmbda)
 
 
     def optim(self, X, Y, psi_):
         K = self.kernel(X,X)
         A = np.block([[K,psi_]])
         B = np.block([[K,np.zeros((X.shape[0],psi_.shape[1]))],[np.zeros((psi_.shape[1],X.shape[0]+psi_.shape[1]))]])
-        
-        self.w = np.linalg.pinv(A.T.dot(A)+self.lmbda+B.T).dot(A.T.dot(Y))
+        self.w = np.linalg.pinv(A.T.dot(A)+self.lmbda*B.T).dot(A.T.dot(Y))
+        self.beta = self.w[X.shape[0]:]
 
 
     def predict(self, X):
@@ -200,10 +218,13 @@ class rbf():
         alpha = pairwise_l2_distance(x,xp)
         return np.exp(-alpha/self.l**2)
 
-M = 6
+M = 60
+func_id = -1
+Ntrn = 60
 l = 1
 lmbda = 0
-filename = "LR-LearningCurves/notune"
+
+filename = "LearningCurves/1D/LR-LearningCurves/notune"
 
 file_ids = [ f for f in os.listdir(filename)\
      if os.path.isfile(os.path.join(filename,f)) ]
@@ -220,25 +241,27 @@ x = datas[0][:,0].reshape(-1,1)
 dataset = np.array(dataset).T
 
 funcdata = DenseFunctionalData({'input_dim_0':x.flatten()}, dataset.T)
+#funcdata = funcdata.smooth(10,10)
 #funcdata = funcdata.smooth(50,10)
+
 Y = funcdata.values
 X = funcdata.argvals['input_dim_0']
-funcy = func_mean(funcdata,comp=M, mean_sub=False)
-func_id = -10
 
-x_train = np.arange(5,20,1).reshape(-1,1); y_train=dataset[0:x_train.shape[0],func_id]
+x_train = np.arange(5,Ntrn,1).reshape(-1,1); y_train=dataset[0:x_train.shape[0],func_id]
 x_test = x; y_test = dataset[:,func_id]
 
-#funcs = func_gen2(x, dataset, M)
+#funcs = func_mean(funcdata,comp=M, mean_sub=False)
 funcs = func_pca(funcdata, M)
-plot(funcdata)
-plt.show()
+#funcs = func_raw(funcdata, M)
+#plot(funcdata)
+#plt.show()
 
 kernel = rbf(l=l)
-model = SemiParamKernelRidge(lmbda, kernel, funcy)
-model.fit(x_train,y_train)
-print(model.w)
-
+model = SemiParamKernelRidge(lmbda, kernel, funcs)
+model.fit_inter(x_train,y_train)
+#print(np.linalg.norm(model.beta,2))
+print(model.beta)
+#model.beta *= 0.5
 plt.scatter(x_train, y_train, label='training')
 plt.plot(x_test,model.predict(x_test), label='meta')
 plt.plot(x_test, y_test,label='test')
@@ -246,6 +269,7 @@ plt.xlabel('N')
 plt.ylabel('Error')
 plt.legend()
 plt.show()
+
 #funcy = func_pca(funcdata,comp=M, mean_sub=True)
 #
 #funcs = funcy(X)

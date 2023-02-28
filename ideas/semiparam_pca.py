@@ -153,7 +153,7 @@ class SemiParamKernelRidge(BaseEstimator):
         #                    (K.dot(psi_.dot(psi_inv.dot(psi_.T))) - K).dot(Y))
 
         #self.beta = np.dot(psi_inv, psi_.T.dot(Y)- psi_.T.dot(K.dot(self.alpha)))
-        self.w = np.linalg.pinv(A.T.dot(A)+self.lmbda+B.T).dot(A.T.dot(Y))
+        self.w = np.linalg.pinv(A.T.dot(A)+self.lmbda*B.T).dot(A.T.dot(Y))
 
 
     def predict(self, X):

@@ -153,7 +153,7 @@ void test_lc()
 
 void lrlc(bool tune)
 {
-  int D, N; D=1; N = 1000;
+  int D, N; D=50; N = 1000;
   double a, p, eps; a = 1.0; p = 0.; eps = 1.;
   utils::data::regression::Dataset dataset(D, N, eps);
 
@@ -166,11 +166,12 @@ void lrlc(bool tune)
   
   std::string filename, rawfilename, dir, rawdir;
 
-  arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,10.,100);
+  arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,1.,100);
+  //arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,10.,100);
   if (!tune)
   {
-    dir = "LR-LearningCurves/notune";
-    rawdir = "LR-LearningCurves/notune/raw";
+    dir = "50D-extra/LR-LearningCurves/notune";
+    rawdir = "50D-extra/LR-LearningCurves/notune/raw";
     utils::create_dirs(dir);
     utils::create_dirs(rawdir);
     for(int i=0; i < lambdas.n_cols; i++)
@@ -187,8 +188,8 @@ void lrlc(bool tune)
   }
   else
   {
-    dir = "LR-LearningCurves/tune";
-    rawdir = "LR-LearningCurves/tune/raw";
+    dir = "50D-extra/LR-LearningCurves/tune";
+    rawdir = "50D-extra/LR-LearningCurves/tune/raw";
     utils::create_dirs(dir);
     utils::create_dirs(rawdir);
     LCurve_HPT<mlpack::regression::LinearRegression,
@@ -205,9 +206,6 @@ void lrlc(bool tune)
   }
 }
 
-
-
-
 //-----------------------------------------------------------------------
 //  genlrlc
 //-----------------------------------------------------------------------
@@ -218,3 +216,23 @@ void genlrlc()
   lrlc(true);
 }
 
+//-----------------------------------------------------------------------
+// read_data
+//-----------------------------------------------------------------------
+
+void read_data()
+{
+  //arma::mat A;
+  //arma::Mat<std::string> B;
+  //arma::field<std::string> header(1);
+  //header(0) = "Sepal.Length";  // etc
+  //A.load(arma::csv_name("datasets/iris.csv",header),arma::csv_ascii);
+  //B.load(arma::csv_name("datasets/iris.csv",header),arma::csv_ascii);
+  //std::cout << A << std::endl;
+  //std::cout << B << std::endl;
+  arma::mat matrix;
+  //mlpack::data::DatasetInfo info;
+  using namespace mlpack;
+  data::Load("iris.csv", matrix);
+  //std::cout << B << std::endl;
+}

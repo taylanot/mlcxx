@@ -24,6 +24,8 @@
 #include <mlpack/methods/linear_regression/linear_regression.hpp>
 #include <mlpack/core/cv/simple_cv.hpp>
 #include <mlpack/core/data/save.hpp>
+#include <mlpack/core/data/load.hpp>
+//#include <mlpack/core/data/dataset_mapper.hpp>
 #include <mlpack/core/hpt/hpt.hpp>
 #include <mlpack/core/cv/k_fold_cv.hpp>
 #include <mlpack/core/cv/metrics/mse.hpp>

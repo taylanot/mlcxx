@@ -192,7 +192,8 @@ l = 1.
 lmbda = 0.
 M = 4
 
-filename = "LR-LearningCurves/notune"
+#filename = "LR-LearningCurves/notune"
+filename = "LearningCurves/1D-extra/LR-LearningCurves/notune"
 
 file_ids = [ f for f in os.listdir(filename)\
      if os.path.isfile(os.path.join(filename,f)) ]

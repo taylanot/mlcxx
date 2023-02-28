@@ -293,18 +293,18 @@ class SemiParamKernelRidge4():
         A = np.block([[K,psi_]])
         B = np.block([[K,np.zeros((X.shape[0],psi_.shape[1]))],[np.zeros((psi_.shape[1],X.shape[0]+psi_.shape[1]))]])
         
-        psi_inv  = np.linalg.inv((psi_.T).dot(psi_)+(1e-8)*np.eye(psi_.shape[1]))
+        #psi_inv  = np.linalg.inv((psi_.T).dot(psi_)+(1e-8)*np.eye(psi_.shape[1]))
 
         #self.alpha = np.dot(np.linalg.inv(K - psi_.dot(psi_inv).dot(psi_.T).dot(K) + (self.lmbda+1e-6)*np.eye(X.shape[0])) \
         #         ,(Y - np.dot(psi_.dot(psi_inv), psi_.T.dot(Y))))
 
         #self.beta = np.dot(psi_inv, (psi_.T.dot(Y) - psi_.T.dot(K.dot(Y))))
 
-        KK = K.dot(K)
-        self.alpha = np.dot(np.linalg.inv(KK + self.lmbda*K - K.dot(psi_.dot(psi_inv.dot(psi_.T.dot(K))))), \
-                            (K.dot(psi_.dot(psi_inv.dot(psi_.T))) - K).dot(Y))
+        #KK = K.dot(K)
+        #self.alpha = np.dot(np.linalg.inv(KK + self.lmbda*K - K.dot(psi_.dot(psi_inv.dot(psi_.T.dot(K))))), \
+        #                    (K.dot(psi_.dot(psi_inv.dot(psi_.T))) - K).dot(Y))
 
-        self.beta = np.dot(psi_inv, psi_.T.dot(Y)- psi_.T.dot(K.dot(self.alpha)))
+        #self.beta = np.dot(psi_inv, psi_.T.dot(Y)- psi_.T.dot(K.dot(self.alpha)))
         self.w = np.linalg.inv(A.T.dot(A)+(1e-6+self.lmbda)*B.T).dot(A.T.dot(Y))
 
 
@@ -372,12 +372,12 @@ class func_gen():
 a =  1. #*np.random.normal(1,1)
 
 kernel = rbf()
-funcs = func_gen(num=0)
+funcs = func_gen(num=2)
 
 phi =  np.random.normal(0,1)
 #phi =  funcs.phi[0]
 
-noise = True
+noise = False
 
 x_train_single, y_train_single = sample_test(a=a, phi=phi, N=10,sort=True,noise=noise)
 
@@ -387,15 +387,15 @@ model2 = SemiParamKernelRidge4(1., kernel, funcs)
 model_base = KernelRidge(1, kernel)
 
 model.fit(x_train_single,y_train_single)
-#model2.fit(x_train_single,y_train_single)
+model2.fit(x_train_single,y_train_single)
 model_base.fit(x_train_single,y_train_single)
-print(model.alpha)
-print(model.beta)
+#print(model.alpha)
+#print(model.beta)
 #print(model2.w)
 
 plt.scatter(x_train_single, y_train_single)
 x_train_single, y_train_single = sample_test(a=a, phi=phi, N=10000, width=20)
-plt.plot(x_train_single,model.predict2(x_train_single), label='meta')
+plt.plot(x_train_single,model2.predict(x_train_single), label='meta')
 plt.plot(x_train_single,model_base.predict(x_train_single), label='standard')
 plt.plot(x_train_single,a*np.sin(x_train_single+phi), ':', label='sine')
 plt.xlabel('x')

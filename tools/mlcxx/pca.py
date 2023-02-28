@@ -152,29 +152,39 @@ class func_pca():
         return np.array([self.eigenfunctions[i, index] for i in range(self.comp)]).reshape(-1,self.comp)
         
 
-filename = "LR-LearningCurves/notune"
+filename = "LearningCurves/10D-extra/LR-LearningCurves/notune"
+filename2 = "LearningCurves/20D-extra/LR-LearningCurves/notune"
 
 file_ids = [ f for f in os.listdir(filename)\
-             if os.path.isfile(os.path.join(filename,f)) ]
+     if os.path.isfile(os.path.join(filename,f)) ]
 
 datas = [load_csv(os.path.join(filename,file_id))\
-                for file_id in file_ids]
+        for file_id in file_ids]
 
-train = []
-test = []
+file2_ids = [ f for f in os.listdir(filename2)\
+     if os.path.isfile(os.path.join(filename2,f)) ]
 
+datas2 = [load_csv(os.path.join(filename2,file_id))\
+        for file_id in file_ids]
+
+
+dataset = []
 for data in datas:
-    train.append(data[:,1])
-    test.append(data[:,3])
+    dataset.append(data[:,3])
+dataset2 = []
+for data in datas2:
+    dataset2.append(data[:,3])
 
-train = np.array(train)
-test = np.array(test)
-grid = datas[0][:,0]
-funcdata = DenseFunctionalData({'input_dim_0':grid}, test)
+
+x = datas[0][:,0].reshape(-1,1)
+dataset1 = np.array(dataset).T
+dataset2 = np.array(dataset2).T
+
+dataset = np.hstack((dataset1, dataset2))
+funcdata = DenseFunctionalData({'input_dim_0':x.flatten()}, dataset.T)
 funcdata = funcdata.smooth(50,10)
 
 #data_smooth = funcdata.smooth(points=20, neighborhood=10)
-# Perform a univariate FPCA on dailyTemp.
 # Perform a univariate FPCA on dailyTemp.
 fpca = UFPCA(n_components=0.99)
 fpca.fit(funcdata)

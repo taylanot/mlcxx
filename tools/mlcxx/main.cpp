@@ -75,6 +75,7 @@ int main ( int argc, char** argv )
   m["test_functional"] = test_functional;
   m["test_lc"] = test_lc;
   m["genlrlc"] = genlrlc;
+  m["read_data"] = read_data;
 
   jem::String log_file;
 

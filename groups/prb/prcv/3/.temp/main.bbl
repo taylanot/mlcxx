@@ -1,0 +1,268 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+\preamble{%
+\providecommand{\noopsort}[1]{} \providecommand{\noopsort}[1]{}
+}
+
+  \entry{dekhovich2022}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=DA}{%
+         family={Dekhovich},
+         familyi={D\bibinitperiod},
+         given={Aleksandr},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TDMJ}{%
+         family={Tax},
+         familyi={T\bibinitperiod},
+         given={David M.\bibnamedelima J.},
+         giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim
+  J\bibinitperiod},
+      }}%
+      {{hash=SMHF}{%
+         family={Sluiter},
+         familyi={S\bibinitperiod},
+         given={Marcel H.\bibnamedelima F.},
+         giveni={M\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim
+  F\bibinitperiod},
+      }}%
+      {{hash=BMA}{%
+         family={Bessa},
+         familyi={B\bibinitperiod},
+         given={Miguel\bibnamedelima A.},
+         giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Artificial Intelligence,Computer Science -
+  Computer Vision and Pattern Recognition,Computer Science - Machine Learning}
+    \strng{namehash}{DATDMJSMHFBMA1}
+    \strng{fullhash}{DATDMJSMHFBMA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2022}
+    \field{extradate}{1}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{abstract}{%
+    The human brain is capable of learning tasks sequentially mostly without
+  forgetting. However, deep neural networks (DNNs) suffer from catastrophic
+  forgetting when learning one task after another. We address this challenge
+  considering a class-incremental learning scenario where the DNN sees test
+  data without knowing the task from which this data originates. During
+  training, Continual-Prune-andSelect (CP\&S) finds a subnetwork within the DNN
+  that is responsible for solving a given task. Then, during inference, CP\&S
+  selects the correct subnetwork to make predictions for that task. A new task
+  is learned by training available neuronal connections of the DNN (previously
+  untrained) to create a new subnetwork by pruning, which can include
+  previously trained connections belonging to other subnetwork(s) because it
+  does not update shared connections. This enables to eliminate catastrophic
+  forgetting by creating specialized regions in the DNN that do not conflict
+  with each other while still allowing knowledge transfer across them. The
+  CP\&S strategy is implemented with different subnetwork selection strategies,
+  revealing superior performance to state-of-the-art continual learning methods
+  tested on various datasets (CIFAR-100, CUB-200-2011, ImageNet-100 and
+  ImageNet1000). In particular, CP\&S is capable of sequentially learning 10
+  tasks from ImageNet-1000 keeping an accuracy around 94\% with negligible
+  forgetting, a first-of-its-kind result in class-incremental learning.2 To the
+  best of the authors' knowledge, this represents an improvement in accuracy
+  above 20\% when compared to the best alternative method.%
+    }
+    \verb{eprint}
+    \verb 2208.04952
+    \endverb
+    \field{number}{arXiv:2208.04952}
+    \field{shorttitle}{Continual {{Prune-and-Select}}}
+    \field{title}{Continual {{Prune-and-Select}}: {{Class-incremental}}
+  Learning with Specialized Subnetworks}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/DZMCQ2LI/Dekhovich et al. - 2022 - Cont
+    \verb inual Prune-and-Select Class-incremental lear.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs}
+    \field{month}{08}
+    \field{year}{2022}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+
+  \entry{dekhovich2022a}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=DA}{%
+         family={Dekhovich},
+         familyi={D\bibinitperiod},
+         given={Aleksandr},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TDMJ}{%
+         family={Tax},
+         familyi={T\bibinitperiod},
+         given={David M.\bibnamedelima J.},
+         giveni={D\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim
+  J\bibinitperiod},
+      }}%
+      {{hash=SMHF}{%
+         family={Sluiter},
+         familyi={S\bibinitperiod},
+         given={Marcel H.\bibnamedelima F.},
+         giveni={M\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim
+  F\bibinitperiod},
+      }}%
+      {{hash=BMA}{%
+         family={Bessa},
+         familyi={B\bibinitperiod},
+         given={Miguel\bibnamedelima A.},
+         giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Computer Vision and Pattern Recognition,Computer
+  Science - Machine Learning}
+    \strng{namehash}{DATDMJSMHFBMA1}
+    \strng{fullhash}{DATDMJSMHFBMA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2022}
+    \field{extradate}{2}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{abstract}{%
+    Current deep neural networks (DNNs) are overparameterized and use most of
+  their neuronal connections during inference for each task. The human brain,
+  however, developed specialized regions for different tasks and performs
+  inference with a small fraction of its neuronal connections. We propose an
+  iterative pruning strategy introducing a simple importance-score metric that
+  deactivates unimportant connections, tackling overparameterization in DNNs
+  and modulating the firing patterns. The aim is to find the smallest number of
+  connections that is still capable of solving a given task with comparable
+  accuracy, i.e. a simpler subnetwork. We achieve comparable performance for
+  LeNet architectures on MNIST, and significantly higher parameter compression
+  than state-of-the-art algorithms for VGG and ResNet architectures on
+  CIFAR-10/100 and Tiny-ImageNet 2. Our approach also performs well for the two
+  different optimizers considered \textendash{} Adam and SGD. The algorithm is
+  not designed to minimize FLOPs when considering current hardware and software
+  implementations, although it performs reasonably when compared to the state
+  of the art.%
+    }
+    \verb{eprint}
+    \verb 2109.10795
+    \endverb
+    \field{number}{arXiv:2109.10795}
+    \field{shorttitle}{Neural Network Relief}
+    \field{title}{Neural Network Relief: A Pruning Algorithm Based on Neural
+  Activity}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/LQM5QKCK/Dekhovich et al. - 2022 - Neur
+    \verb al network relief a pruning algorithm based o.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs}
+    \field{month}{06}
+    \field{year}{2022}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+
+  \entry{dekhovich2022b}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=DA}{%
+         family={Dekhovich},
+         familyi={D\bibinitperiod},
+         given={Aleksandr},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=TOT}{%
+         family={Turan},
+         familyi={T\bibinitperiod},
+         given={O.\bibnamedelima Taylan},
+         giveni={O\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
+      {{hash=YJ}{%
+         family={Yi},
+         familyi={Y\bibinitperiod},
+         given={Jiaxiang},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=BMA}{%
+         family={Bessa},
+         familyi={B\bibinitperiod},
+         given={Miguel\bibnamedelima A.},
+         giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Machine Learning,Condensed Matter - Materials
+  Science,Mathematics - Numerical Analysis}
+    \strng{namehash}{DATOTYJBMA1}
+    \strng{fullhash}{DATOTYJBMA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{D}
+    \field{sortinithash}{D}
+    \field{abstract}{%
+    Data-driven modeling in mechanics is evolving rapidly based on recent
+  machine learning advances, especially on artificial neural networks. As the
+  field matures, new data and models created by different groups become
+  available, opening possibilities for cooperative modeling. However,
+  artificial neural networks suffer from catastrophic forgetting, i.e. they
+  forget how to perform an old task when trained on a new one. This hinders
+  cooperation because adapting an existing model for a new task affects the
+  performance on a previous task trained by someone else. The authors developed
+  a continual learning method that addresses this issue, applying it here for
+  the first time to solid mechanics. In particular, the method is applied to
+  recurrent neural networks to predict history-dependent plasticity behavior,
+  although it can be used on any other architecture (feedforward,
+  convolutional, etc.) and to predict other phenomena. This work intends to
+  spawn future developments on continual learning that will foster cooperative
+  strategies among the mechanics community to solve increasingly challenging
+  problems. We show that the chosen continual learning strategy can
+  sequentially learn several constitutive laws without forgetting them, using
+  less data to achieve the same error as standard training of one law per
+  model.%
+    }
+    \verb{eprint}
+    \verb 2211.12971
+    \endverb
+    \field{number}{arXiv:2211.12971}
+    \field{title}{Cooperative Data-Driven Modeling}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/QI5BH57Y/Dekhovich et al. - 2022 - Coop
+    \verb erative data-driven modeling.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cond-mat}
+    \field{month}{11}
+    \field{year}{2022}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+\enddatalist
+\endinput

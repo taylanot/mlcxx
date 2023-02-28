@@ -370,7 +370,6 @@ Given the amount of functionals that can be present identifying  some form of re
   \item After this observation I would like to use these PCA components as my $\psi_j(\cdot)$. But, know the same input point assumption is hindering flexibility.
 \end{itemize}
 
-\color{red}
 \section{Learning Curves}
 
 Some ideas on the similar method applied to learning curves.
@@ -385,43 +384,43 @@ From the Equation \ref{eq:data} observe data with $p(x)\sim\mathcal{N}(0,1)$ and
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lr_learning_curves.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lr_learning_curves.pdf}
    \caption{Learning Curves for Ridge Regression varying $\lambda$}
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lc_pca.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lc_pca.pdf}
    \caption{PCA 99\% covering principle components (not smoothed!)$\lambda$}
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/smooth_pca.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/smooth_pca.pdf}
    \caption{PCA 99\% covering principle components (smoothed!)$\lambda$}
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lc_pred_funcs_1.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lc_pred_funcs_1.pdf}
    \caption{Semi Parametric Kernel Ridge by using 1 other function. }
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lc_funcs_3.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lc_funcs_3.pdf}
    \caption{Semi Parametric Kernel Ridge by using 3 other functions. }
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lr_2_pca.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lr_2_pca.pdf}
    \caption{Semi Parametric Kernel Ridge by using 2 PCA component. }
 \end{figure}
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lr_6_pca.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lr_6_pca.pdf}
    \caption{Semi Parametric Kernel Ridge by using 6 PCA components. }
 \end{figure}
 
@@ -429,9 +428,51 @@ NOTE: After the PCA mean of the functions are added to all the components.  The 
 
 \begin{figure}[h!]
    \centering
-   \includegraphics[width=\textwidth]{Figures/initial_study/lr_mean.pdf}
+   \includegraphics[width=0.5\textwidth]{Figures/initial_study/lr_mean.pdf}
    \caption{Semi Parametric Kernel Ridge by using mean of the all components.}
 \end{figure}
+
+
+In the meeting before the yearly evaluation following questions arose:
+\begin{itemize}
+  \item Do we really need PCA? Can't we just use the raw data? (Yes, especially in the case of the bimodal learning curves! Even smoothing the data does not give as good predictions! At least when $\mathbf{\beta}$ is not regularized! Otherwise norm of the $\mathbf{\beta}$ goes wild!!)
+  \item Do we need alphas? (Apparently not, if we just consider $\sum_i^M\psi_i(\cdot)\beta_i$ the prediction is as good! Still PCA is needed though!) Do we still something to write on now? Or shall we just move on the kernel design in the same setting?
+\end{itemize}
+
+
+
+\color{red}
+16-23/02/2023 Addressing the final important questions that will effect the paper's construction.
+\begin{itemize}
+  \item Now, to see when the $\mathbf{\alpha}$ is effective, the first thing that comes to mind is to see whether or not adding noise will increase the importance of it. In other words, increasing the noise level at your training data will cause $\mathbf{\alpha}$ to increase in value rather then going to zero.  This turned out to be the case.
+  \item However, a question arose "Is this difference significant?". In order to test this, the first thing that came to my mind was to conduct a hypothesis test. Since utilizing hypothesis test with the regularization parameter is going to take some time to get results analytically. Thus, I have chosen a non-parametric hypothesis testing method called Wilcoxon signed-rank test. The test statistic is obtained as,
+    \begin{equation}
+      W = \sum^K_{i=1}[sgn(r_{2,i}-r_{1,i})*R_i]
+    \end{equation}
+where $R_i$ is the rank. After conducting the analysis, I have found out that there is no significant difference between adding $\mathbf{\alpha}$, even for a noisy case.
+  \item I wanted to also do an F-statistics test to see the same thing. However, in order to do this we need to have access to the degree of freedom of the model. Since, kernel regression is a non-parametric method there is no clear answer to this question. However, after a little searching I found out a way to estimate the degree of freedom for a black-box learner via bootstrapping. (We will not be able to use the bootstrapping for the PCA version of our method, since functional analysis treats gridded data and there is no room for repeated samples. Note, that bootstrapping relies on the repeated samples from a certain training set. Although, this does not provide a consistent result for a given training set when you start averaging over multiple datasets it gets more stable. So, I decided to start with that to do F-statistics test with the found values. These results show the same case for Wilcoxon test. Thus, I decided to remove the need for the upcoming paper. (But it is still open to discussion if someone has an idea on when the $\mathbf{alpha}$ parameter can be useful? Note that F-statistics is obtained by,
+    \begin{equation}
+      F = \frac{(SS_1-SS_2)/(df_1-df_2)}{SS_2/df2}
+    \end{equation}
+  where $SS_i$ is the sum of squares and $df_i$ is the degrees of freedom of the i-th learner.
+  \item Note that Wilcoxon test is looking at performance in different datasets and the F-test is looking at the same dataset.
+\end{itemize}
+
+Main message of the paper: To show functional analysis can be utilized to predict learning curves, with its caveats.
+\begin{itemize}
+  \item Intro: Lay out the main message by tying why learning curve predictions are important. 
+  \item Related Work: Use Tom's learning curve papers and look at the recent history to check what is being done to predict learning curves. Emphasize on predicting non-monotonic learning curves.
+  \item Experimental Setting: Explain what is available and what is not at test and train time and what we are trying to estimate.
+  \item Results and Discussion:
+    \begin{itemize}
+      \item Effect of PCA vs using all available curves,
+      \item Effect of number of PCA components,
+      \item Effect of number of data points,
+      \item Non-monotone learning curve predictions,
+      \item Comparison with curve-fitting baselines.
+    \end{itemize}
+  \item Conclusions
+\end{itemize}
 
 
 %\section{What does $\boldsymbol{\alpha}$ and $\boldsymbol{\beta}$}

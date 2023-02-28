@@ -87,7 +87,7 @@ class SemiParamKernelRidge(BaseEstimator):
         self.psi_ = self.funcs(X)
         self.optim(X,Y,self.psi_)
 
-    def fit(self, X, Y):
+    def fit_inter(self, X, Y):
         self.psi_ = self.funcs(X)
         self.optim(X,Y,self.psi_)
         self.Y = Y
@@ -150,9 +150,23 @@ class func_pca():
         for x in xs:
             index.append(np.where(self.grid == x)[0][0])
         return np.array([self.eigenfunctions[i, index] for i in range(self.comp)]).reshape(-1,self.comp)
-        
 
-filename = "LR-LearningCurves/notune"
+class func_raw():
+    def __init__(self, funcdata, comp=1):
+        self.funcdata = funcdata
+        self.fpca = UFPCA(n_components=comp)
+        self.comp = comp
+        self.fpca.fit(funcdata)
+        self.grid = funcdata.argvals['input_dim_0']
+        self.eigenfunctions = funcdata.values
+    def __call__(self, xs):
+        index = []
+        for x in xs:
+            index.append(np.where(self.grid == x)[0][0])
+        return np.array([self.eigenfunctions[i, index] for i in range(self.comp)]).reshape(-1,self.comp)
+       
+
+filename = "LearningCurves/1D-extra/LR-LearningCurves/notune"
 
 file_ids = [ f for f in os.listdir(filename)\
              if os.path.isfile(os.path.join(filename,f)) ]
@@ -169,6 +183,7 @@ for data in datas:
 
 train = np.array(train)
 test = np.array(test)
+
 grid = datas[0][:,0]
 funcdata = DenseFunctionalData({'input_dim_0':grid}, test)
 
@@ -180,12 +195,13 @@ funcdata = DenseFunctionalData({'input_dim_0':grid}, test)
 
 l = 0.1
 lmbda = 0.
-
-Xtrn, Ytrn = grid[0:30].reshape(-1,1), test[0,0:30].reshape(-1,1)
-print(Xtrn,Ytrn)
+Ntrn = 50
+func_id = -20
+Xtrn, Ytrn = grid[0:Ntrn].reshape(-1,1), test[func_id,0:Ntrn].reshape(-1,1)
 Xtst, Ytst = grid.reshape(-1,1), test[0].reshape(-1,1)
 
 kernel = rbf(l=l)
+#yypfuncs = func_raw(funcdata,5)
 funcs = func_pca(funcdata,1)
 
 model = SemiParamKernelRidge(lmbda, kernel, funcs)
