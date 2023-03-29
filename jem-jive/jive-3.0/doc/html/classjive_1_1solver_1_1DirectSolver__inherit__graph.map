@@ -1,0 +1,9 @@
+<map id="jive::solver::DirectSolver" name="jive::solver::DirectSolver">
+<area shape="rect" id="node1" title="Provides an interface for classes that implement direct solution algorithms." alt="" coords="200,229,383,256"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1SkylineLU.html" title=" " alt="" coords="5,304,172,331"/>
+<area shape="rect" id="node6" href="$classjive_1_1solver_1_1SkylineSolver.html" title=" " alt="" coords="196,304,387,331"/>
+<area shape="rect" id="node7" href="$classjive_1_1solver_1_1SparseLU.html" title="Implements a direct solver that is based on sparse LU factorization with pivoting." alt="" coords="411,304,574,331"/>
+<area shape="rect" id="node2" href="$classjive_1_1solver_1_1Solver.html" title="Computes the solution of a linear system of equations." alt="" coords="220,155,363,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="243,80,340,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="227,5,355,32"/>
+</map>

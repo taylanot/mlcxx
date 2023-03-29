@@ -1,0 +1,638 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class System
+//=======================================================================
+
+/*!
+  \class System System.dox jem/base/System.h
+
+  \brief Provides access to the standard input and output streams, and
+  other system facilities.
+
+  The \c System class provides access to various system-level
+  facilities. It can be used to get and set the standard input and
+  output streams; to get information about the system; to get the
+  contents of environment variables; and to catch and print exceptions
+  thrown by the main function of a program.
+
+  The \c System class provides one input stream and five output
+  streams: one for writing error messages; one for writing warnings;
+  one for writing normal output; one for writing non-essential
+  information; and one for writing debugging information. %All input
+  and output streams are initialized when they are accessed for the
+  first time.
+
+  The input and output streams can be accessed by calling the static
+  member functions \c in(), \c err(), \c warn(), \c out(), \c info()
+  and \c debug(). %All these functions return a reference to a \c
+  io::Reader or \c io::Writer object. Although these functions are
+  reasonably fast, they may lower the speed of your program if you
+  call them repeatedly within a loop. In these situations you should
+  use a local reference to the input or output stream. Here is an
+  example:
+
+  \code
+  void printNumbers ()
+  {
+    // Store a local reference to the standard output stream
+
+    io::Writer& out = System::out ();
+    
+    int i;
+
+    for ( i = 0; i < 1000000; i++ )
+    {
+      out << i << ", ";
+    }
+  }
+  \endcode
+
+  The input and output streams are local to each thread. That is, each
+  thread may set its own input and output streams. If a thread spawns
+  another thread, the child thread inherits the input and output
+  streams from its parent thread. If the child or parent thread
+  replaces one of these streams, the new stream will only be visible
+  to that thread. The other thread will still `see' the original input
+  and output streams.
+  
+  %All member functions of the \c System class are thread safe. The
+  default input and output streams are also thread safe.
+  
+  The \c System class contains only static members; it should be
+  viewed as a sort of mini namespace.
+
+*/
+
+class System
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief A type representing a text output stream.
+
+  The \c Writer type represents a text output stream. It is simply an
+  alias for the class \c io::Writer.
+
+*/
+
+  typedef io::Writer Writer;
+
+
+/*!
+
+  \brief A type representing a text input stream.
+
+  The \c Reader type represents a text input stream. It is simply an
+  alias for the class \c io::Reader.
+
+*/
+  
+  typedef io::Reader Reader;
+
+
+//-----------------------------------------------------------------------
+//   err
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns the error output stream.
+
+  Returns a reference to the error output stream. This reference
+  remains valid until the function \c setErrStream() is called. The
+  error stream should be used to write messages that indicate critical
+  error conditions.
+
+  The default error stream -- that is created when this function is
+  called for the first time -- writes to the standard error stream
+  provided by the system. This is usual the console from which the
+  program has been started. The default error stream is not buffered.
+
+  \return A reference to the error stream.
+
+  \sa \c io::FileDescriptor::err()
+
+*/
+
+  static Writer& err ();
+
+
+//-----------------------------------------------------------------------
+//   warn
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the warning output stream.
+
+  Returns a reference to the warning output stream. This reference
+  remains valid until the function \c setWarnStream() is called. The
+  warning stream should be used to write messages that indicate
+  non-critical error conditions.
+
+  The default warning stream -- that is created when this function is
+  called for the first time -- is equal to the error stream.  That is,
+  \c warn() returns the same reference as \c err().
+
+  \return A reference to the warning stream.
+
+  \sa \c err()
+
+*/
+
+  static Writer& warn ();
+
+
+//-----------------------------------------------------------------------
+//   out
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the standard output stream.
+
+  Returns a reference to the standard output stream. This reference
+  remains valid until the function \c setOutStream() is called. The
+  standard output should be used to write messages that should be read
+  by the user of a program.
+
+  The default output stream -- that is created when this function is
+  called for the first time -- writes to the standard output provided
+  by the system. This is usual the console from which the program has
+  been started. The default output stream is line buffered.
+
+  \return A reference to the standard output stream.
+
+  \sa \c io::FileDescriptor::out(), \c io::LineBufferedWriter
+
+*/
+
+  static Writer& out ();
+
+
+//-----------------------------------------------------------------------
+//   info
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the info output stream.
+
+  Returns a reference to the info output stream. This reference
+  remains valid until the function \c setInfoStream() is called. The
+  info stream should be used to write non-essential information.
+  
+  The default info stream -- that is created when this function is
+  called for the first time -- simply discards all output. That is, it
+  does not write anything at all.
+
+  \return A reference to the info stream.
+
+  \sa \c io::NullWriter
+
+*/
+
+  static Writer& info ();
+
+
+//-----------------------------------------------------------------------
+//   debug
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the debug output stream.
+
+  Returns a reference to the debug output stream. This reference
+  remains valid until the function \c setDebugStream() is called. The
+  debug stream should be used to write debugging information.
+  
+  The default debug stream -- that is created when this function is
+  called for the first time -- is equal to the default info stream.
+  That is, \c debug() returns the same reference as \c info().
+
+  \return A reference to the debug stream.
+
+  \sa \c info()
+
+*/
+
+  static Writer& debug ();
+
+
+//-----------------------------------------------------------------------
+//   in
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the standard input stream.
+
+  Returns a reference to the standard input stream. This reference
+  remains valid until the function \c setInStream() is called.
+
+  The default input stream -- that is created when this function is
+  called for the first time -- reads from the standard input provided
+  by the system. This is usual the console from which the program has
+  been started. The default input stream is synchronized with the
+  default output stream. That is, each time data is read from the
+  standard input stream, the standard output stream is flushed.
+
+  \return A reference to the standard input stream.
+
+  \sa \c io::FileDescriptor::in(), \c io::SynchronizedReader
+
+*/
+
+  static Reader& in ();
+  
+
+//-----------------------------------------------------------------------
+//   setErrStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the error output stream.
+  
+  Sets the error output stream to the writer \a w. The new error
+  stream will only be visible to the current thread.
+  
+  \param w - the new error output stream.
+  
+  \pre <code>w != NIL</code>
+  
+  \post <code>& err() == w</code>
+
+*/
+
+  static void setErrStream ( const Ref<Writer>&  w );
+
+
+//-----------------------------------------------------------------------
+//   setWarnStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the warning output stream.
+  
+  Sets the warning output stream to the writer \a w. The new warning
+  stream will only be visible to the current thread.
+  
+  \param w - the new warning output stream.
+  
+  \pre <code>w != NIL</code>
+  
+  \post <code>& warn() == w</code>
+
+*/
+
+  static void setWarnStream ( const Ref<Writer>&  w );
+
+
+//-----------------------------------------------------------------------
+//   setOutStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the standard output stream.
+  
+  Sets the standard output stream to the writer \a w. The new standard
+  output stream will only be visible to the current thread.
+  
+  \param w - the new standard output stream.
+  
+  \pre <code>w != NIL</code>
+  
+  \post <code>& out() == w</code>
+
+*/
+
+  static void setOutStream ( const Ref<Writer>&  w );
+
+
+//-----------------------------------------------------------------------
+//   setInfoStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the info output stream.
+  
+  Sets the info output stream to the writer \a w. The new info stream
+  will only be visible to the current thread.
+  
+  \param w - the new info output stream.
+  
+  \pre <code>w != NIL</code>
+  
+  \post <code>& info() == w</code>
+
+*/
+
+  static void setInfoStream ( const Ref<Writer>&  w );
+
+
+//-----------------------------------------------------------------------
+//   setDebugStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the debug output stream.
+  
+  Sets the debug output stream to the writer \a w. The new debug
+  stream will only be visible to the current thread.
+  
+  \param w - the new debug output stream.
+  
+  \pre <code>w != NIL</code>
+  
+  \post <code>& debug() == w</code>
+
+*/
+
+  static void setDebugStream ( const Ref<Writer>&  w );
+
+
+//-----------------------------------------------------------------------
+//   setInStream
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the standard input stream.
+  
+  Sets the standard input stream to the reader \a r. The new standard
+  input stream will only be visible to the current thread.
+  
+  \param r - the new standard input stream.
+  
+  \pre <code>r != NIL</code>
+  
+  \post <code>& in() == r</code>
+
+*/
+
+  static void setInStream ( const Ref<Reader>&  r );
+
+
+//-----------------------------------------------------------------------
+//   getProperty
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a system-level property.
+  
+  Returns a system-level property associated with the key \a key. If
+  there is no property associated with the given key, the string \a
+  defaultValue is returned.
+  
+  A system-level property is a string that encodes some information
+  about the system. Below is a list of the available properties. The
+  quoted strings denote the keys that are associated with the
+  properties.
+  
+  <ul>
+    <li>\c "jem.version" - the current version of Jem.
+    
+    <li>\c "jem.date" - the date on which this version of Jem has
+         been compiled.
+         
+    <li>\c "file.separator" - the character that separates the
+         file name and the file suffix.
+         
+    <li>\c "path.separator" - the character that separates the
+        directories in a path name.
+        
+    <li>\c "user.name" - the login name of the user that has
+        started the current program.
+        
+    <li>\c "user.home" - the home directory of the user that
+        has started the current program.
+        
+    <li>\c "host.name" - the name of the host computer.
+    
+    <li>\c "os.name" - the name of the operating system running
+        on the host computer.
+
+    <li>\c "os.machine" - a description of the host computer's
+         hardware type.
+
+    <li>\c "os.version" - the operating system version.
+  </ul>
+
+  The following code fragment shows how to access one of the above
+  properties.
+
+  \code
+
+  int main ()
+  {
+    System::out() << "Hello "
+                  << System::getProperty ( "user.name" )
+                  << ". Have a nice day.\n";
+
+    return 0;
+  }
+
+  \endcode
+
+  \param key - the key associated with a property.
+  
+  \param defaultValue - the string to be returned if there is no
+  property with the specified key.
+  
+  \return The property associated with the key \a key, or
+  \a defaultValue if there is no such property defined.
+         
+*/
+
+  static String getProperty
+
+    ( const String&  key, 
+      const String&  defaultValue = String() );
+
+
+//-----------------------------------------------------------------------
+//   getenv
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the contents of a specific environment variable.
+  
+  Returns the contents of the environment variable with name \a name.
+  If there is no such environment variable defined, the string \a
+  defaultValue is returned.
+  
+  \param name - the name of an environment variable.
+  
+  \param defaultValue - the string that is returned if there is no
+  environment variable with the specified name.
+  
+  \return The contents of the environment variable with name \a name,
+  or the string \a defaultValue if there is no such environment
+  variable.
+
+*/
+  
+  static String getenv
+
+    ( const String&  name, 
+      const String&  defaultValue = String() );
+
+
+//-----------------------------------------------------------------------
+//   exec
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Calls a function and catches all exceptions thrown by that
+  function.
+
+  Calls the function \a func and catches all exceptions thrown by that
+  function. For each caught exception a consise report is written to
+  the error output stream.
+
+  This function is typically used to call the main function of a
+  program. See the overloaded version of this function for an example.
+
+  \param func - the function to be called.
+
+  \return If no exception has been caught, the return value of \a func
+  is returned. Otherwise the value \c 1 is returned.
+
+*/
+
+  static int exec ( int (*func)() );
+
+
+/*!
+
+  \brief Calls a function and catches all exceptions thrown by that
+  function.
+
+  Calls the function \a func with the arguments \a argc and \a argv,
+  and catches all exceptions thrown by that function. For each caught
+  exception a consise report is written to the error output stream.
+
+  This function is typically used to call the main function of a
+  program. Here is an example:
+
+  \code
+
+  int run ( int argc, char** argv )
+  {
+    System::out() << "You started the program " << argv[0]
+                  << " with " << argc << " arguments.\n";
+
+    throw Exception ( JEM_FUNC, "Bailing out!" );
+
+    return 0;
+  }
+
+
+  int main ( int argc, char** argv )
+  {
+    return System::exec ( & run, argc, argv );
+  }
+  
+  \endcode
+
+  \param func - the function to be called.
+
+  \param argc - the number of command-line parameters.
+
+  \param argv - the command-line parameters.
+
+  \return If no exception has been caught, the return value of \a func
+  is returned. Otherwise the value \c 1 is returned.
+
+*/
+
+  static int exec ( int (*func)(), int argc, char** argv );
+
+
+//-----------------------------------------------------------------------
+//   printException
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a description of an exception.
+
+  Writes a description of an exception to the output stream \a
+  out. The input arguments \a name, \a where, \a what specify the name
+  (type) of the exception, the context in which the exception was
+  thrown, and the reason why the exception was thrown, respectively.
+
+  \param out - a text output stream.
+
+  \param name - the name/type of the exception.
+
+  \param where - the context in which the exception was thrown.
+
+  \param what - the reason why the exception was thrown.
+
+  \sa \c Throwable
+
+*/
+
+  static void printException
+
+    ( Writer&             out,
+      const String&       name,
+      const String&       where,
+      const String&       what );
+
+};
+
+
+
+
+JEM_END_PACKAGE_BASE

@@ -1,0 +1,13 @@
+<map id="jive::geom::Shape" name="jive::geom::Shape">
+<area shape="rect" id="node1" title="Encapsulates the geometrical properties of a finite element." alt="" coords="327,81,465,108"/>
+<area shape="rect" id="node4" href="$classjive_1_1geom_1_1BoundaryShape.html" title="Encapsulates the geometrical properties of a boundary of a finite element." alt="" coords="513,31,715,57"/>
+<area shape="rect" id="node9" href="$classjive_1_1geom_1_1InterfaceShape.html" title=" " alt="" coords="515,81,713,108"/>
+<area shape="rect" id="node10" href="$classjive_1_1geom_1_1InternalShape.html" title="Encapsulates the geometrical properties of a regular, internal element." alt="" coords="519,132,709,159"/>
+<area shape="rect" id="node2" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,81,279,108"/>
+<area shape="rect" id="node3" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,81,133,108"/>
+<area shape="rect" id="node5" href="$classjive_1_1geom_1_1BoundaryPoint.html" title=" " alt="" coords="781,5,975,32"/>
+<area shape="rect" id="node6" href="$classjive_1_1geom_1_1ParametricBoundary.html" title=" " alt="" coords="763,56,993,83"/>
+<area shape="rect" id="node7" href="$classjive_1_1geom_1_1Parametric4DSurf.html" title=" " alt="" coords="1041,31,1255,57"/>
+<area shape="rect" id="node8" href="$classjive_1_1geom_1_1ParametricEdge.html" title=" " alt="" coords="1047,81,1249,108"/>
+<area shape="rect" id="node11" href="$classjive_1_1geom_1_1ParametricShape.html" title=" " alt="" coords="773,132,983,159"/>
+</map>

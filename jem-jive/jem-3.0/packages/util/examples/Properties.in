@@ -1,0 +1,30 @@
+
+
+brown = {
+  nickName = "Boogie";
+  age      = 36;
+  length   = 1.78;
+};
+
+
+meyers = {
+  nickName = none;
+  age      = none;
+  length   = none;
+};
+
+
+james = none;
+
+chapman = {
+  age      = 56;
+  length   = 1.83;
+};
+
+
+jones = {
+  nickName = "Donna";
+  age      = 29;
+  length   = 1.69;
+};
+

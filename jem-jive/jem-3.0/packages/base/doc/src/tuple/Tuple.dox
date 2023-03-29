@@ -1,0 +1,700 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class Tuple
+//=======================================================================
+
+/*!
+  \class Tuple Tuple.dox jem/base/tuple/Tuple.h
+  
+  \brief Encapsulates a fixed-size, two-dimensional array.
+
+  The class template \c Tuple implements a two-dimensional array of a
+  fixed size. The first template parameter, \a T, sepcifies the type
+  of the elements stored in a \c Tuple. The other two template
+  parameters, \a M and \a N, specify the number of rows and columns,
+  respectively, in a \c Tuple. Thus, the type \c Tuple<int,2,2>
+  represents an integer matrix with two rows and two columns. Note
+  that by default the number of columns equals one.
+
+  The elements in a \c Tuple can be accessed through two overloaded
+  subscript operators. The first has two integer arguments and enables
+  one to access a tuple as a matrix. The second one has only one
+  integer argument and alllows one to access a tuple as a
+  one-dimensional array. The latter operator is handy when either \a M
+  or \a N equals one. This operator also enables one to access a
+  particular tuple element directly and to exploit the specific way in
+  the tuple elements are stored in memory (see below).
+
+  The \c Tuple class stores its elements in a statically allocated
+  C/C++ array that is part of a \c Tuple instance. This means that the
+  construction of a tuple is a cheap operation. This also means that a
+  tuple with shape <i>(M,N)</i> requires the same amount of storage as
+  a static C/C++ array of size <i>(M * N)</i>.
+
+  The elements in a tuple are stored in column-major order. That is,
+  if <i>k</i> denotes the index within the private C/C++ array at wich
+  element <i>(i,j)</i> is stored, then <i>k = i + j * M</i>.
+
+  More specific information on the \c Tuple class is available in the
+  following sections:
+
+  \li \ref TupleExpressions - how to write expressions that operate on
+  all elements of one or more tuples.
+
+  \li \ref TupleAssignmentOperators - additional assignment operators
+  that are not members of the \c Tuple class.
+
+  \li \ref TupleUtilities - a collection of handy functions that
+  operate on tuples.
+
+  \li \ref TupleHeaders - an overview of the header files that you
+  should include into your source code.
+
+  \sa \c TupleExpr.
+
+*/
+
+
+template <class T, int M, int N = 1>
+  class Tuple
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief A random access iterator type.
+    
+  A random access iterator type pointing to elements of type \a
+  T. This iterator traverses the elements in a tuple in column-major
+  order and fulfills the requirements of the random access iterator
+  category of the standard C++ library.
+
+*/
+
+  typedef T* Iterator;
+
+
+/*!
+  
+  \brief A read-only random access iterator type.
+
+  A random access iterator type pointing to elements of type \a const
+  \a T. This iterator traverses the elements in a tuple in
+  column-major order and fulfills the requirements of the random
+  access iterator category of the standard C++ library.
+
+*/
+
+  typedef const T* ConstIterator;
+
+
+//-----------------------------------------------------------------------
+//   constants
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The size of a tuple.
+
+  The integer constant \c SIZE equals the total number of elements
+  stored in a tuple.
+
+*/
+
+  static const int SIZE = M * N;
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Default constructor.
+
+  Constructs a tuple with shape <i>(M,N)</i>. The elements of this
+  tuple are initialized by calling the default constructor of type \a
+  T.
+
+  \pre The type \a T has a default constructor.
+
+*/
+
+  inline Tuple ();
+
+
+/*!
+
+  \brief Constructs a tuple given a single element
+
+  Constructs a tuple containing the value \a a as its first element.
+
+  \param a - the first element in the constructed tuple.
+
+  \pre
+    <code>SIZE >= 1</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>(*this)[0] == a</code>
+
+  \sa \c makeTuple()
+
+*/
+
+  inline Tuple ( T a );
+
+
+/*!
+
+  \brief Constructs a tuple given the first two elements
+
+  Constructs a tuple containing the values \a a and \a b as its first
+  two elements.
+
+  \param a - the first element in the constructed tuple.
+
+  \param b - the second element in the constructed tuple.
+
+  \pre
+    <code>SIZE >= 2</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    (*this)[0] == a && <br>
+    (*this)[1] == b
+  </code>
+
+  \sa \c makeTuple()
+
+*/
+
+  inline Tuple ( T a, T b );
+
+
+/*!
+
+  \brief Constructs a tuple given the first three elements
+
+  Constructs a tuple containing the values \a a, \a b and \a c as its
+  first three elements.
+
+  \param a - the first element in the constructed tuple.
+
+  \param b - the second element in the constructed tuple.
+
+  \param c - the third element in the constructed tuple.
+
+  \pre
+    <code>SIZE >= 3</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    (*this)[0] == a && <br>
+    (*this)[1] == b && <br>
+    (*this)[2] == c
+  </code>
+
+  \sa \c makeTuple()
+
+*/
+
+  inline Tuple ( T a, T b, T c );
+
+
+/*!
+
+  \brief Constructs a tuple given the first four elements
+
+  Constructs a tuple containing the values \a a, \a b, \a c and \a d
+  as its first four elements.
+
+  \param a - the first element in the constructed tuple.
+
+  \param b - the second element in the constructed tuple.
+
+  \param c - the third element in the constructed tuple.
+
+  \param d - the fourth element in the constructed tuple.
+
+  \pre
+    <code>SIZE >= 4</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    (*this)[0] == a && <br>
+    (*this)[1] == b && <br>
+    (*this)[2] == c && <br>
+    (*this)[3] == d
+  </code>
+
+  \sa \c makeTuple()
+
+*/
+
+  inline Tuple ( T a, T b, T c, T d );
+
+
+/*!
+
+  \brief Constructs a tuple from a tuple expression.
+
+  Constructs a tuple from the tuple expression \a rhs.
+
+  \param rhs - a \ref TupleExpressions "tuple expression".
+  
+*/
+
+  inline Tuple ( const TupleExpr<T,M,N>& rhs );
+
+
+/*!
+
+  \brief Creates a copy of another tuple.
+
+  Creates a deep copy of the \a rhs tuple.
+
+  \param rhs - the \c Tuple to be copied.
+
+  \post
+    <code>(*this)[i] == rhs[i]</code> for all
+    <code>0 <= i < SIZE</code>
+
+*/
+
+  inline Tuple ( const Tuple& rhs );
+  
+
+//-----------------------------------------------------------------------
+//   begin
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the begin of this tuple.
+
+  Returns an iterator pointing to the first element in this tuple. The
+  iterator is valid as long as this tuple exists.
+
+  \return An iterator pointing to the first element in this tuple.
+
+*/
+
+  inline Iterator begin ();
+
+
+/*!
+
+  \brief Returns a const iterator pointing to the begin of this tuple.
+
+  Returns a const iterator pointing to the first element in this
+  tuple. The iterator is valid as long as this tuple exists.
+
+  \return A const iterator pointing to the first element in this
+  tuple.
+
+*/
+
+  inline ConstIterator begin () const;
+
+
+//-----------------------------------------------------------------------
+//   end
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the end of this tuple.
+
+  Returns an iterator pointing to one position past the last element
+  in this tuple. The iterator is valid as long as this tuple exists.
+
+  \return An iterator pointing to the end of this tuple.
+
+*/
+
+  inline Iterator end ();
+
+
+/*!
+
+  \brief Returns a const iterator pointing to the end of this tuple.
+
+  Returns a const iterator pointing to one position past the last
+  element in this tuple. The iterator is valid as long as this tuple
+  exists.
+
+  \return A const iterator pointing to the end of this tuple.
+
+*/
+
+  inline ConstIterator end () const;
+  
+
+//-----------------------------------------------------------------------
+//   assignment operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies a tuple expression.
+
+  Copies the elements of the tuple expression \a rhs into this tuple
+  using the assignment operator of type \a T.
+
+  \param rhs - a \ref TupleExpressions "tuple expression".
+
+  \return <code>*this</code>
+
+  \pre The type \a T has an assignment operator.
+
+*/
+  
+  inline Tuple& operator = ( const TupleExpr<T,M,N>& rhs );
+
+
+/*!
+
+  \brief Copies another tuple.
+
+  Copies the elements of the tuple \a rhs into this tuple using the
+  assignment operator of type \a T.
+
+  \param rhs - the \c Tuple to be copied.
+
+  \return <code>*this</code>
+
+  \pre The type \a T has an assignment operator.
+
+*/
+
+  inline Tuple& operator = ( const Tuple& rhs );
+
+
+/*!
+
+  \brief Sets all elements in this tuple to a specified value.
+
+  Sets all elements in this tuple to the value \a rhs using the
+  assignment operator of type \a T.
+
+  \param rhs - the value to which the elements in this tuple should be
+  set.
+
+  \return <code>*this</code>
+
+  \pre The type \a T has an assignment operator.
+
+*/
+
+  inline Tuple& operator = ( T rhs );
+  
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Swaps the elements of this tuple with another one.
+
+  Swaps the elements in this tuple with the elements in the \a rhs
+  tuple using the assignment operator of type \a T.
+
+  \param rhs - the \c Tuple wich which the elements in this tuple
+  should be swapped.
+
+  \pre The type \a T has an assignment operator.
+
+*/
+
+  inline void swap ( Tuple& rhs );
+
+
+//-----------------------------------------------------------------------
+//   subscript operators
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns a reference to an element at a given index.
+
+  Returns a reference to the \a i-th element in this tuple. The
+  reference is valid as long as this tuple exists.
+
+  \param i - a valid index.
+
+  \return <code>this->addr()[i]</code>
+
+  \pre <code>i >= 0 && i < SIZE</code>
+
+*/
+
+  inline T& operator [] ( int i );
+
+
+/*!
+
+  \brief Returns a const reference to an element at a given index.
+
+  Returns a const reference to the \a i-th element in this tuple. The
+  reference is valid as long as this tuple exists.
+  
+  \param i - a valid index.
+
+  \return <code>this->addr()[i]</code>
+
+  \pre <code>i >= 0 && i < SIZE</code>
+
+*/
+
+  inline const T& operator [] ( int i ) const;
+
+
+/*!
+
+  \brief Returns a reference to an element at a given index pair.
+
+  Returns a reference to the element at location <i>(i,j)</i> in this
+  tuple. The reference is valid as long as this tuple exists.
+
+  \param i - a valid row index.
+
+  \param j - a valid column index.
+
+  \return <code>this->addr()[i + j * M]</code>
+
+  \pre <code>i >= 0 && i < M && <br>
+             j >= 0 && j < N</code>
+
+*/
+
+  inline T& operator () ( int i, int j );
+
+
+/*!
+
+  \brief Returns a const reference to an element at a given index
+  pair.
+
+  Returns a const reference to the element at location <i>(i,j)</i> in
+  this tuple. The reference is valid as long as this tuple exists.
+
+  \param i - a valid row index.
+
+  \param j - a valid column index.
+
+  \return <code>this->addr()[i + j * M]</code>
+
+  \pre <code>i >= 0 && i < M && <br>
+             j >= 0 && j < N</code>
+
+*/
+
+  inline T& operator () ( int i, int j );
+
+
+//-----------------------------------------------------------------------
+//   transpose
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the transpose of this tuple.
+
+  Returns the transpose of this tuple. That is, the element
+  <i>(i,j)</i> in the returned tuple is a copy of the element
+  <i>(j,i)</i> in this tuple.
+
+  \pre The type \a T has an assignment operator.
+
+  \return The transpose of this tuple.
+
+*/
+
+
+  Tuple<T,N,M> transpose () const;
+
+
+//-----------------------------------------------------------------------
+//   addr
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a pointer to the elements in this tuple.
+
+  Returns a pointer to the array containing the elements stored in
+  this tuple. The pointer is valid as long as this tuple exists.
+
+  \return A pointer to the elements in this tuple.
+
+*/
+
+  inline T* addr ();
+
+
+/*!
+
+  \brief Returns a const pointer to the elements in this tuple.
+
+  Returns a const pointer to the array containing the elements stored
+  in this tuple. The pointer is valid as long as this tuple exists.
+
+  \return A const pointer to the elements in this tuple.
+
+*/
+
+  inline const T* addr () const;
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Tuple
+
+  \brief Swaps two tuples.
+
+  This function is equivalent with:
+
+  <code>lhs.swap( rhs )</code>
+
+*/
+
+template <class T, int M, int N>
+  inline void swap ( Tuple<T,M,N>& lhs, Tuple<T,M,N>& rhs );
+
+
+//-----------------------------------------------------------------------
+//   serialization operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Tuple
+
+  \brief Tuple de-serialization operator.
+
+  Extracts the tuple \a t from the data input stream \a in.
+
+  \param in - a data input stream.
+
+  \param t - the \c Tuple to be extracted from the data input stream.
+
+  \return \a in
+
+  \pre The type \a T provides a de-serialization operator.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+template <class T, int M, int N>
+  io::DataInput&  operator >> ( io::DataInput&  in,
+                                Tuple<T,M,N>&   t );
+
+/*!
+
+  \relates Tuple
+
+  \brief Tuple serialization operator.
+
+  Writes the contents of the tuple \a t to the data output stream \a
+  out.
+
+  \param out - a data output stream.
+  
+  \param t - the \c Tuple to be written to the data output stream.
+
+  \return \a out
+
+  \pre The type \a T provides a serialization operator.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+template <class T, int M, int N>
+  io::DataOutput& operator << ( io::DataOutput&      out,
+                                const Tuple<T,M,N>&  t );
+
+
+//-----------------------------------------------------------------------
+//   print operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Tuple
+
+  \brief Tuple print operator.
+
+  Prints the tuple \a t in a human-readable format to the text output
+  stream \a out.
+
+  \param out - a text output stream.
+
+  \param t - the \c Tuple to be printed to the text output stream.
+
+  \return \a out
+
+  \pre The type \a T provides a text output operator.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+template <class T, int M, int N>
+  io::TextOutput& operator << ( io::TextOutput&      out,
+                                const Tuple<T,M,N>&  t );
+
+
+
+JEM_END_PACKAGE_BASE
+

@@ -1,0 +1,223 @@
+#!/bin/dash
+
+# Generated on Wed Dec 15 18:05:32 CET 2021.
+# CHANGES TO THIS FILE WILL BE LOST.
+
+
+alias pwd='pwd -P'
+
+quote()
+{
+  echo "'$(echo "$1" | sed -e "s/'/'\''/g")'"
+}
+
+# Generated on Wed Dec 15 18:05:32 CET 2021.
+# CHANGES TO THIS FILE WILL BE LOST.
+
+CONF_ARGS='--with-mpi --mpi-libs=mpi --mpi-libdirs=/home/jem-jive/openmpi/lib --mpi-incdirs=/home/jem-jive/openmpi/include'
+SH='/bin/dash'
+SH_NAME='dash'
+AR='ar -rucs'
+OBJ_SUFFIX='.o'
+EXE_SUFFIX=''
+LIB_PREFIX='lib'
+LIB_SUFFIX='.a'
+DLL_PREFIX='lib'
+DLL_SUFFIX='.so'
+CXX='g++'
+CXX_NAME='gcc'
+CXX_VERSION='90300'
+CXX_STD_FLAGS='-O -Wall -fstrict-aliasing -m64 -msse2 -mtune=native'
+CXX_DBG_FLAGS='-g'
+CXX_PRF_FLAGS='-pg'
+CXX_DLL_FLAGS='-fPIC'
+CXX_LNK_FLAGS='-rdynamic'
+CXX_BLD_FLAG=''
+CXX_OPT_FLAGS1='-O1 -DNDEBUG -funroll-loops'
+CXX_OPT_FLAGS2='-O2 -DNDEBUG -funroll-loops'
+CXX_OPT_FLAGS3='-O3 -DNDEBUG -funroll-loops -ftree-vectorize'
+CXX_OPT_LEVEL='3'
+SYS_NAME='linux'
+SYS_IS_POSIX='1'
+SYS_IS_UNIX98='1'
+SYS_ARCH='x86_64'
+SYS_BITS='64'
+SYS_LIBS=' pthread m'
+SYS_LIBDIRS=''
+SYS_INCDIRS=''
+INDEX_TYPE='int'
+USE_THREADS='1'
+USE_CCACHE=''
+
+
+
+
+#========================================================================
+#   Global variables
+#========================================================================
+
+
+COPYRIGHT_FILE=""
+
+
+#========================================================================
+#   Functions
+#========================================================================
+
+#------------------------------------------------------------------------
+#   PrintHelp ()
+#------------------------------------------------------------------------
+
+
+PrintHelp()
+{
+  cat<<EOF
+
+Usage: $(basename "$0") [OPTIONS] [--] COPYRIGHT-FILE FILES
+
+Adds the contents of COPYRIGHT-FILE to FILES.
+
+Options:
+
+  -h, --help    : show this help.
+  -v, --verbose : show what is going on.
+
+EOF
+}
+
+
+#------------------------------------------------------------------------
+#   ProcessFile ( %file )
+#------------------------------------------------------------------------
+
+
+ProcessFile()
+{
+  local bak="${1}~"
+
+  if [ -n "$VERBOSE" ]; then
+    echo "Processing file \`$1' ..."
+  fi
+
+  if [ -f "$bak" ]; then
+    rm -f -- "$bak"
+  fi
+
+  mv -- "$1" "$bak" || return 1
+
+  if cat "$COPYRIGHT_FILE" "$bak" > "$1" ; then
+    rm -f -- "$bak"
+    return 0
+  else
+    mv -- "$bak" "$1"
+    return 1
+  fi
+}
+
+
+#------------------------------------------------------------------------
+#   ProcessDir ( %dir )
+#------------------------------------------------------------------------
+
+
+ProcessDir()
+{
+  local cmd="find"
+  local f=""
+
+  if [ -n "$VERBOSE" ]; then
+    echo "Processing directory \`$1' ..."
+  fi
+
+  if [ "$SYS_NAME" = "windows" ]; then
+    f="$(command which grep)"
+    f="$(dirname "$f")/find.exe"
+    if [ -x "$f" ]; then
+      cmd="$f"
+    fi
+  fi
+
+  "$cmd" "$1" \( -name '*.h' -o -name '*.cpp' -o -name '*.tcc' -o \
+                 -name '*.dox' \) -print | \
+  while read f ; do
+    if [ ! -d "$f" ]; then
+      ProcessFile "$f"
+    fi
+  done
+}
+
+
+#------------------------------------------------------------------------
+#   Run ( [%arg1 %arg2 ...] )
+#------------------------------------------------------------------------
+
+
+Run()
+{
+  while [ $# -gt 0 ]; do
+
+    case "$1" in
+
+      -h|--help)
+
+        PrintHelp
+        exit 0 ;;
+
+      -v|--verbose)
+
+        VERBOSE=1 ;;
+
+      --)
+
+        shift
+        break ;;
+
+      *)
+
+        break ;;
+
+    esac
+
+    shift
+
+  done
+
+  if [ $# -lt 1 ] || [ -z "$1" ]; then
+    echo "$0: no copyright file specified; try \`$0 --help'." 1>&2
+    exit 1
+  fi
+
+  COPYRIGHT_FILE="$1"
+  shift
+
+  if [ ! -e "$COPYRIGHT_FILE" ] || [ -d "$COPYRIGHT_FILE" ]; then
+    echo "$0: invalid copyright file: $COPYRIGHT_FILE." 1>&2
+    exit 1
+  fi
+
+  while [ $# -gt 0 ]; do
+
+    if [ -z "$1" ]; then
+      continue
+    fi
+
+    if   [ -d "$1" ]; then
+      ProcessDir "$1"
+    elif [ -e "$1" ]; then
+      ProcessFile "$1"
+    else
+      echo "$0: no such file or directory: $1." 1>&2
+      exit 1
+    fi
+
+    shift
+
+  done
+}
+
+
+#========================================================================
+#   Main script
+#========================================================================
+
+Run "$@"

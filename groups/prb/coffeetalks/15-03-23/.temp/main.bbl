@@ -20,5 +20,251 @@
 \preamble{%
 \providecommand{\noopsort}[1]{}
 }
+
+  \entry{bell2022}{misc}{}
+    \name{author}{4}{}{%
+      {{hash=BSJ}{%
+         family={Bell},
+         familyi={B\bibinitperiod},
+         given={Samuel\bibnamedelima J.},
+         giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+      {{hash=KOP}{%
+         family={Kampman},
+         familyi={K\bibinitperiod},
+         given={Onno\bibnamedelima P.},
+         giveni={O\bibinitperiod\bibinitdelim P\bibinitperiod},
+      }}%
+      {{hash=DJ}{%
+         family={Dodge},
+         familyi={D\bibinitperiod},
+         given={Jesse},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=LND}{%
+         family={Lawrence},
+         familyi={L\bibinitperiod},
+         given={Neil\bibnamedelima D.},
+         giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Machine Learning,Statistics - Methodology}
+    \strng{namehash}{BSJKOPDJLND1}
+    \strng{fullhash}{BSJKOPDJLND1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2022}
+    \field{labeldatesource}{}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{abstract}{%
+    Amid mounting concern about the reliability and credibility of machine
+  learning research, we present a principled framework for making robust and
+  generalizable claims: the multiverse analysis. Our framework builds upon the
+  multiverse analysis [1] introduced in response to psychology’s own
+  reproducibility crisis. To efficiently explore high-dimensional and often
+  continuous ML search spaces, we model the multiverse with a Gaussian Process
+  surrogate and apply Bayesian experimental design. Our framework is designed
+  to facilitate drawing robust scientific conclusions about model performance,
+  and thus our approach focuses on exploration rather than conventional
+  optimization. In the first of two case studies, we investigate disputed
+  claims about the relative merit of adaptive optimizers. Second, we synthesize
+  conflicting research on the effect of learning rate on the large batch
+  training generalization gap. For the machine learning community, a multiverse
+  analysis is a simple and effective technique for identifying robust claims,
+  for increasing transparency, and a step toward improved reproducibility.%
+    }
+    \verb{eprint}
+    \verb 2206.05985
+    \endverb
+    \field{number}{arXiv:2206.05985}
+    \field{title}{Modeling the {{Machine Learning Multiverse}}}
+    \verb{url}
+    \verb http://arxiv.org/abs/2206.05985
+    \endverb
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/VD2DZS8M/Bell et al. - 2022 - Modeling
+    \verb the Machine Learning Multiverse.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs, stat}
+    \field{day}{12}
+    \field{month}{10}
+    \field{year}{2022}
+    \field{urlday}{10}
+    \field{urlmonth}{03}
+    \field{urlyear}{2023}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
+
+  \entry{steegen2016}{article}{}
+    \name{author}{4}{}{%
+      {{hash=SS}{%
+         family={Steegen},
+         familyi={S\bibinitperiod},
+         given={Sara},
+         giveni={S\bibinitperiod},
+      }}%
+      {{hash=TF}{%
+         family={Tuerlinckx},
+         familyi={T\bibinitperiod},
+         given={Francis},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=GA}{%
+         family={Gelman},
+         familyi={G\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+      {{hash=VW}{%
+         family={Vanpaemel},
+         familyi={V\bibinitperiod},
+         given={Wolf},
+         giveni={W\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{SAGE Publications Inc}}%
+    }
+    \strng{namehash}{SSTFGAVW1}
+    \strng{fullhash}{SSTFGAVW1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2016}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{abstract}{%
+    Empirical research inevitably includes constructing a data set by
+  processing raw data into a form ready for statistical analysis. Data
+  processing often involves choices among several reasonable options for
+  excluding, transforming, and coding data. We suggest that instead of
+  performing only one analysis, researchers could perform a multiverse
+  analysis, which involves performing all analyses across the whole set of
+  alternatively processed data sets corresponding to a large set of reasonable
+  scenarios. Using an example focusing on the effect of fertility on
+  religiosity and political attitudes, we show that analyzing a single data set
+  can be misleading and propose a multiverse analysis as an alternative
+  practice. A multiverse analysis offers an idea of how much the conclusions
+  change because of arbitrary choices in data construction and gives pointers
+  as to which choices are most consequential in the fragility of the result.%
+    }
+    \verb{doi}
+    \verb 10.1177/1745691616658637
+    \endverb
+    \field{issn}{1745-6916}
+    \field{number}{5}
+    \field{pages}{702\bibrangedash 712}
+    \field{shortjournal}{Perspect Psychol Sci}
+    \field{title}{Increasing {{Transparency Through}} a {{Multiverse
+  Analysis}}}
+    \verb{url}
+    \verb https://doi.org/10.1177/1745691616658637
+    \endverb
+    \field{volume}{11}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/JV3C6Y72/Steegen et al. - 2016 - Increa
+    \verb sing Transparency Through a Multiverse Analy.pdf
+    \endverb
+    \field{journaltitle}{Perspectives on Psychological Science}
+    \field{day}{01}
+    \field{month}{09}
+    \field{year}{2016}
+    \field{urlday}{13}
+    \field{urlmonth}{03}
+    \field{urlyear}{2023}
+  \endentry
+
+  \entry{wilson2018}{misc}{}
+    \name{author}{5}{}{%
+      {{hash=WAC}{%
+         family={Wilson},
+         familyi={W\bibinitperiod},
+         given={Ashia\bibnamedelima C.},
+         giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod},
+      }}%
+      {{hash=RR}{%
+         family={Roelofs},
+         familyi={R\bibinitperiod},
+         given={Rebecca},
+         giveni={R\bibinitperiod},
+      }}%
+      {{hash=SM}{%
+         family={Stern},
+         familyi={S\bibinitperiod},
+         given={Mitchell},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=SN}{%
+         family={Srebro},
+         familyi={S\bibinitperiod},
+         given={Nathan},
+         giveni={N\bibinitperiod},
+      }}%
+      {{hash=RB}{%
+         family={Recht},
+         familyi={R\bibinitperiod},
+         given={Benjamin},
+         giveni={B\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{arXiv}}%
+    }
+    \keyw{Computer Science - Machine Learning,Statistics - Machine Learning}
+    \strng{namehash}{WACRRSMSNRB1}
+    \strng{fullhash}{WACRRSMSNRB1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2018}
+    \field{labeldatesource}{}
+    \field{sortinit}{W}
+    \field{sortinithash}{W}
+    \field{abstract}{%
+    Adaptive optimization methods, which perform local optimization with a
+  metric constructed from the history of iterates, are becoming increasingly
+  popular for training deep neural networks. Examples include AdaGrad, RMSProp,
+  and Adam. We show that for simple overparameterized problems, adaptive
+  methods often find drastically different solutions than gradient descent (GD)
+  or stochastic gradient descent (SGD). We construct an illustrative binary
+  classification problem where the data is linearly separable, GD and SGD
+  achieve zero test error, and AdaGrad, Adam, and RMSProp attain test errors
+  arbitrarily close to half. We additionally study the empirical generalization
+  capability of adaptive methods on several stateof-the-art deep learning
+  models. We observe that the solutions found by adaptive methods generalize
+  worse (often significantly worse) than SGD, even when these solutions have
+  better training performance. These results suggest that practitioners should
+  reconsider the use of adaptive methods to train neural networks.%
+    }
+    \verb{eprint}
+    \verb 1705.08292
+    \endverb
+    \field{number}{arXiv:1705.08292}
+    \field{title}{The {{Marginal Value}} of {{Adaptive Gradient Methods}} in
+  {{Machine Learning}}}
+    \verb{url}
+    \verb http://arxiv.org/abs/1705.08292
+    \endverb
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/PZCKHM9L/Wilson et al. - 2018 - The Mar
+    \verb ginal Value of Adaptive Gradient Methods in.pdf
+    \endverb
+    \field{eprinttype}{arxiv}
+    \field{eprintclass}{cs, stat}
+    \field{day}{21}
+    \field{month}{05}
+    \field{year}{2018}
+    \field{urlday}{13}
+    \field{urlmonth}{03}
+    \field{urlyear}{2023}
+    \warn{\item Can't use 'eprinttype' + 'archiveprefix'}
+  \endentry
 \enddatalist
 \endinput

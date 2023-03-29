@@ -1,0 +1,396 @@
+
+\chapter{The basics; writing a program with Jive and Jem}
+\label{chapter:the-basics}
+
+This chapter focuses on the technical aspects of using Jive and Jem.
+After reading this chapter you will know how to include components from
+Jive and Jem into your source code and how to translate your source code
+into an executable program.
+
+Section~\ref{section:the-basics:using-components} starts this chapter by
+explaining how to use the classes and functions provided by Jive and Jem.
+It explains how Jive and Jem are organized; where to to find the header
+file containing the declaration of a particular class or function; and
+how to refer to the name of a class or function.
+Section~\ref{section:the-basics:compilation} then shows how to compile
+your program and how to link the resulting object file with the Jive and
+Jem libraries. This section also shows how to simplify the compilation
+and linkage procedure by using portable makefiles. Finally,
+Section~\ref{section:the-basics:sample-program} presents a simple Jive
+program together with a makefile.
+
+%========================================================================
+
+\section{Using classes and functions}
+\label{section:the-basics:using-components}
+
+From a programmer's point of view, Jive -- and Jem too -- consists of a
+collection of C++ header files containing class and function declarations
+and definitions. As usual, you include the contents of a header file by
+putting an \Code{\#include} directive somewhere at the top of your source
+file. To limit the header file sizes and to speed up the compilation of a
+program, a header file typically contains only a single class definition
+and/or a limited set of related functions. This implies that any
+non-trivial program will have to include several header files, and that
+you will have to know which header file contains which class/function
+declaration.
+
+%------------------------------------------------------------------------
+
+\subsection*{Organization of Jive and Jem; working with packages}
+
+Both Jive and Jem bundle related classes and functions into modular units
+called \emph{packages}. For instance, the \Code{fem} package in Jive
+contains all classes and functions that are aimed at developing finite
+element programs. Except for a several core packages, most packages can
+be installed and removed on an individual basis\footnote{This is not
+entirely true because some packages depend on other packages.} so that
+you can easily adapt Jive and Jem to your specific needs.
+
+Here is an overview of the packages that are available in Jive:
+\begin{Description}[\Code]
+
+\item[util]    contains general utility classes, including classes for
+  storing and manipulating unstructured grid.
+
+\item[graph]   contains classes for partitioning graphs and for
+  performing other operations on graphs.
+
+\item[mp]      contains classes for exchanging data between parallel
+  threads and processes.
+
+\item[algebra] contains classes for storing and building sparse matrices,
+  and for performing matrix/vector operations.
+
+\item[geom]    contains classes for evaluating the geometrical properties
+  of basic shapes and for computing element shape functions.
+
+\item[model]   contains classes for implementing numerical models.
+
+\item[app]     contains a modular, high-level application framework.
+
+\item[gl]      contains classes for real-time data visualization.
+
+\item[solver]  contains classes for solving linear systems of
+  equations.
+
+\item[fem]     contains classes that provide specific support for finite
+  element applications.
+
+\item[femodel] contains classes that implement finite element models.
+
+\item[implict] contains classes for solving non-linear and time-dependent
+  systems of equations.
+
+\end{Description}
+
+Jem provides the following packages that are used by Jive:
+\begin{Description}[\Code]
+
+\item[base]    contains foundation classes and functions.
+
+\item[io]      contains classes for performing basic input and output
+  operations.
+
+\item[util]    contains general utility classes and containers such as
+  hash tables.
+
+\item[numeric] contains classes that provide support for numerical
+  applications.
+
+\item[mp]      contains classes for implementing parallel programs that
+  are based on the message passing programming model.
+
+\item[gl]      contains classes for managing and displaying scene
+  graphs.
+
+\item[xml]     contains classes for parsing and printing XML-formatted
+  files.
+
+\item[xutil]   contains special-purpose container classes.
+
+\end{Description}
+
+To use a class or function from a package you have to include the header
+file containing the class or function declaration. By convention, all
+header files provided by a Jive package are located in the directory
+\Code{jive/}\Symbol{package-name} (assuming that the header file search
+path of the compiler has been set up correctly; see the next section for
+more information). Likewise, the header files provided by a Jem package
+are located in the directory \Code{jem/}\Symbol{package-name}. The name
+of the header file containing a particular class declaration can
+generally be obtained by appending the suffix `\Code{.h}' to the name of
+the class. Thus, the full pathname of the header file containing the
+declaration of the class \Code{Constraints} in the package \Code{util} in
+Jive is \Code{jive/util/Constraints.h}. Note that this rule is not
+applicable to all classes; consult the reference manual to be sure.
+
+%------------------------------------------------------------------------
+
+\subsection*{Namespaces}
+
+To avoid name collisions, all members (classes, functions, etc.) of a
+Jive package are declared in the namespace
+\Code{jive::}\Symbol{package-name}. The fully qualified name of the class
+\Code{Constraints} in the Jive package \Code{util} is therefore
+\Code{jive::util::Constraints}. Jem uses a similar naming scheme: all
+members in a Jem package are declared in the namespace
+\Code{jem::}\Symbol{package-name}. The members of the Jem package
+\Code{base}, however, are declared in the namespace \Code{jem}. Thus, the
+fully qualified name of the class \Code{String} from the \Code{base}
+package is \Code{jem::String} and \emph{not}
+\Code{jem::base::String}.
+
+There are three ways to use names from a namespace: write the fully
+qualified names; write one or more \emph{using declarations}; and write
+one or more \emph{using directives}. The code fragment below shows an
+example in which all three methods are used.
+
+\IncludeSource{C++}{examples/namespaces.cpp}
+
+Writing fully qualified names is the safest method because changes in one
+part of your code can not lead to unexpected name collisions in another
+part of your code. However, writing fully qualified names becomes tedious
+pretty soon and also leads to code that is harder to read.
+
+Using directives are at the other end of the spectrum: they minimize the
+required typing effort, but they can also easily lead to name collisions
+when you make small changes to your code. What is worse, changes in
+external code, such as Jem, can also lead to name collisions in your own
+code. Using directives should therefore only be used in small programs
+with a limited lifespan.
+
+Using declarations allow you to strike a balance between convenience
+(less typing) and robustness (less chances for name collisions). They are
+best used within functions, but for convenience you can also put them at
+the top of your source files. You can also put them in header files, but
+this increases the chances of name collisions. A better approach is to
+create one header file -- named \Code{import.h}, for instance -- that
+contains forward declarations and using declarations for names that you
+use frequently throughout your program; see the example below.
+
+\IncludeSource[title=\Code{import.h}]{C++}{examples/import.h}
+
+Note that the header file \Code{import.h} uses forward class declarations
+instead of including the header files containing the full class
+definitions. This setup minimizes the compilation time for the source
+files that include \Code{import.h} and use only some of those
+classes.
+
+%========================================================================
+
+\section{Compiling and linking}
+\label{section:the-basics:compilation}
+
+Before you can run a Jive program -- or any C++ program -- you will have
+to transform the source code into an executable program. This involves
+two phases: compilation and linking. First, each source file is compiled
+into a binary \emph{object file}. All the object files are then linked
+with each other, with the Jive and Jem libraries, and with all other
+required system libraries. The result of this linking process is an
+executable program.
+
+The next two sub-sections provide a more detailed description of the
+compilation and linking processes when not using an integrated
+development environment. The sub-section after that explains how you can
+simplify the compilation and linking processes by using portable
+makefiles. It is recommended that you read these three sub-sections, even
+if you already are familiar with the compilation and linking
+processes.
+
+Some of the instructions given below involve the pathnames of the Jive
+and Jem libraries. Since these libraries may be installed anywhere in a
+filesystem, it is assumed that the environment variables \Code{JIVEDIR}
+and \Code{JEMDIR} have been set to the full pathname of the Jive library
+and Jem library, respectively. The notation \Code{\$JEMDIR} will be used
+to refer to the value of the environment variable \Code{JEMDIR}.
+
+%------------------------------------------------------------------------
+
+\subsection*{The compilation procedure}
+
+To compile a source file that includes components from Jive and/or Jem
+you have to:
+\begin{enumerate}
+
+\item append the directory \Code{\$JIVEDIR/include} to the header file
+  search path of the compiler;
+
+\item append the directory \Code{\$JEMDIR/include} to the header file
+  search path of the compiler;
+
+\item append the necessary flags to the argument list of the compiler;
+
+\item invoke the compiler.
+
+\end{enumerate}
+The command to compile a source file named \Code{source.cpp} typically
+looks something like this:
+\begin{verbatim}
+  CC -I$JIVEDIR/include -I$JEMDIR/include -O -c source.cpp
+\end{verbatim}
+with \Code{CC} the name of the C++ compiler. The flag \Code{-O} indicates
+that the compiler should turn on optimizations, and the flag \Code{-c}
+indicates that the compiler should only produce an object file.
+
+Although the above command will work with many compilers, some require
+different and/or additional arguments. Consult the manual of your
+compiler to make sure that you are using the correct arguments.
+
+%------------------------------------------------------------------------
+
+\subsection*{The linking procedure}
+
+To create an executable program from one or more object files you have
+to:
+\begin{enumerate}
+
+\item append the directories \Code{\$JIVEDIR/lib} and
+  \Code{\$JEMDIR/lib} to the directory search path of the
+  compiler;
+
+\item append the directories of any non-standard libraries that are used
+  to the directory search path of the compiler.
+
+\item link your program with all your object files;
+
+\item link your program with the required package-specific Jive
+  libraries;
+
+\item link your program with the required package-specific Jem
+  libraries;
+
+\item and link your program with the required system-specific libraries.
+
+\end{enumerate}
+Each package in Jem and Jive provides its own library containing all
+object files related to that package. .When your program uses a class or
+function from a package, you must link the program with the
+package-specific library which is named \Code{jem}\Symbol{package} or
+\Code{jive}\Symbol{package}. There are three exceptions: the packages
+\Code{base}, \Code{io} and \Code{util} from Jem are combined in a single
+library named \Code{jem}.
+
+There are two ways to determine which system libraries are required. The
+first one is to keep adding libraries until all symbols have been
+resolved. Of course, you need to be fairly familiar with the system
+libraries on your operating system for this scheme to work. Another,
+and much more elegant way is to create a portable make file as is
+explained in the next sub-section.
+
+Note that the order in which the libraries are linked with the program is
+significant with most linkers. In general, you should first list the Jive
+libraries, then the Jem libraries, and then the system-specific
+libraries.
+
+%------------------------------------------------------------------------
+
+\subsection*{Using portable makefiles}
+
+To reduce the complexity of the compilation and linking process, each
+package in Jive (and Jem too) provides a special makefile that specifies
+which Jem/Jive libraries and which system libraries are required by that
+package. They also specify which directories must be appended to the
+header file search path and the library search path of the compiler. By
+convention, a package-specific makefile is named
+\Symbol{package-name}\Code{.mk} and is located in the directory
+\Code{\$JIVEDIR/\-makefiles/\-packages} (or
+\Code{\$JEMDIR/\-makefiles/\-packages}). The package-specific makefiles
+rely on several features that are specific to GNU make. If GNU make
+is not yet installed on your system, you can download a free copy from
+the GNU website \url{www.gnu.org}.
+
+You can use the package-specific makefiles by including them into your
+own makefile. For instance, if your program uses the packages
+\Code{solver} and \Code{fem} from Jive, you should put the following into
+your makefile:
+\begin{Source}{make}
+  include $(JIVEDIR)/makefiles/packages/solver.mk
+  include $(JIVEDIR)/makefiles/packages/fem.mk
+\end{Source}
+
+Note that the order of the include statements is not important. The
+package-specific makefiles automatically resolve inter-package
+dependencies, so you do not have to know that the package \Symbol{solver}
+internally makes use of the package \Symbol{util}. This also works
+between Jive and Jem packages. That is, a package-specific makefile from
+Jive will automatically include the makefiles from the Jem packages on
+which it depends. In the case that you are lazy and do not want to keep
+track of which packages your program actually uses, you can simply put
+this into your makefile:
+\begin{Source}{make}
+  include $(JIVEDIR)/makefiles/packages/*.mk
+\end{Source}
+But laziness has its price, and this construction may result in a
+bunch of warnings from your compiler that some libraries are not used
+to resolve any symbols.
+
+When you include one or more package-specific makefiles into your
+makefile, you still need some rules to actually build an executable (or
+multiple executables) from your source files. Jive can help you out here,
+provided that you only need to build a single executable. In this
+case you only have to define the name of the executable, include all
+required package-specific makefiles, and then include the makefile
+\Code{\$JIVEDIR/\-makefiles/\-prog.mk}. The last makefile defines the
+following rules:
+\begin{Description}[\Code]
+
+\item[\$(program)] builds an executable named \Makexp{program} by
+  compiling and linking all C++ source files in the current directory.
+  The variable \Code{program} must have been defined before the makefile
+  \Code{\$JIVEDIR/\-makefiles/\-prog.mk} is included. This is the
+  default make rule.
+
+\item[opt] builds an optimized executable named
+  \Makexp{program}\Code{-opt}. This executable will run faster than the
+  standard one because it will perform less runtime checks.
+
+\item[debug] builds an executable names \Makexp{program}\Code{-dbg} that
+  contains debugging information.
+
+\item[clean] deletes all object files and core dumps in the current
+  directory. It also deletes any temporary files that may have been
+  generated by the compiler.
+
+\item[clean-all] invokes the \Code{clean} rule, and then deletes all
+  executable programs.
+
+\end{Description}
+
+Your makefile may define a variable \Code{subdirs} that lists all
+sub-directories containing source files that are part of your program.
+You must define this variable before including the makefile
+\Code{prog.mk} from Jive. Note that the names of your source files must
+be unique; you can not have two source files with the same names that are
+located in different sub-directories.
+
+The package-specific makefiles define a (large) collection of variables
+that can be used to write your own rules for compiling and linking
+programs. The Jem reference manual provides a description of these
+variables and explains how you can tune a makefile to your specific
+needs.
+
+%========================================================================
+
+\section{A sample program}
+\label{section:the-basics:sample-program}
+
+The listing below contains the source code of a simple Jive program,
+named \Code{linear}, that reads a data file, assembles and solves a
+linear system of equations, and writes an output file. Do not worry if
+you do not understand the details; the purpose of this program is not to
+show what you can do with Jive but to show what a typical Jive program
+looks like.
+
+\IncludeSource[title=\Code{linear.cpp}]{C++}{examples/linear.cpp}
+
+A makefile for this program is listed below. Note that only the makefile
+from the \Code{implict} package needs to be included because this
+makefile will include the makefiles from all other packages that are
+needed.
+
+\begin{Source}{make}
+  program = linear
+  include $(JIVEDIR)/makefiles/packages/implict.mk
+  include $(JIVEDIR)/makefiles/prog.mk
+\end{Source}

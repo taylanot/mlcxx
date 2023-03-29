@@ -1,0 +1,1102 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class DofSpace
+//=======================================================================
+
+/*!
+
+  \brief Maps degrees of freedom to a range of indices.
+
+  <code>\#include <jive/util/DofSpace.h></code>
+
+  The \c DofSpace class can be used to map degrees of freedom (dof) to
+  a contiguous range of indices or equation numbers. It essentially
+  represents a sparse integer matrix in which each row represents an
+  item in an \c ItemSet, and in which each column represents a <i>dof
+  type</i> like temperature or pressure. The value of a matrix element
+  <i>(i,j)</i> is the global index, or equation number, of the dof
+  that is attached to item <i>i</i> and has type <i>j</i>. As usual,
+  the dof indices range from zero to the total number of dofs minus
+  one.
+
+  Although it is efficient to use integers for representing dof types,
+  this scheme is not particularly intuitive when used in input and
+  output files. The \c DofSpace class therefore provides functions for
+  converting dof types from integers to strings and the other way
+  around. Thus, a dof type can be represented both by a string and by
+  an integer that ranges from zero to the total number of types minus
+  one. The string and integer representations of a dof type will be
+  referred to as the dof type name and dof type index, respectively.
+
+  The example below demonstrates how to print a vector associated with
+  a \c DofSpace.
+
+  \code
+  void printVector ( jem::io::TextOutput&  out,
+                     const Vector&         vec,
+                     const DofSpace&       dofs )
+  {
+    const ItemSet&  items = * dofs.getItems ();
+
+    String  typeName;
+    int     itemID;
+    int     iitem;
+    int     itype;
+    int     idof;
+
+    for ( idof = 0; idof < vec.size(); idof++ )
+    {
+      dofs.decodeDofIndex ( iitem, itype, idof );
+
+      typeName = dofs.getTypeName ( itype );
+      itemID   = items.getItemID  ( iitem );
+
+      out << typeName << "[" << itemID << "] = " << vec[idof];
+      out << '\n';
+    }
+  }
+  \endcode
+
+  All dofs in a \c DofSpace must be attached to items in the same \c
+  ItemSet. It is not (yet) possible to associate a \c DofSpace with
+  multiple item sets.
+
+  The \c DofSpace class declares only member functions for translating
+  item-type index pairs to dof indices, and the other way around. You
+  will have to use the \c XDofSpace if you want to add and remove dofs
+  and dof types.
+
+  \sa \c XDofSpace, \c ItemSet
+
+*/
+
+
+class DofSpace : public jem::Object
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Represents a string type.
+
+  Represents a string type.
+
+*/
+
+  typedef jem::String  String;
+
+
+/*!
+
+  \brief Represents a sparse integer matrix.
+
+  Represents a sparse integer matrix.
+
+*/
+
+  typedef jem::numeric::SparseMatrix<int>  SparseMatrix;
+
+/*!
+
+  \brief Represents a properties set.
+
+  Represents a properties set.
+
+*/
+
+  typedef jem::util::Properties  Properties;
+
+
+//-----------------------------------------------------------------------
+//   events
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that the number of dofs has changed.
+
+  Signals that the total number of dofs in this \c DofSpace has
+  changed. The first event argument is the new number of dofs, and the
+  second argument is a reference to this \c DofSpace object.
+
+*/
+
+  jem::util::Event< int, Self& >  newSizeEvent;
+
+
+/*!
+
+  \brief Signals that the dofs have been re-ordered.
+
+  Signals that the dofs in this dof space have been re-ordered. The
+  first event argument specifies how the dofs have been re-ordered. If
+  this argument is denoted by \c iperm, then <code>iperm[i]</code> is
+  the \em new index of the <i>i</i>-th dof. If <code>iperm[i]</code>
+  is a negative number, then the <i>i</i>-th dof has been deleted. The
+  second event argument is a reference to this \c DofSpace object.
+
+*/
+
+  jem::util::Event< const IntVector&, Self& >  newOrderEvent;
+
+
+//-----------------------------------------------------------------------
+//   itemCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of the item set associated with this dof
+  space.
+
+  Returns the size of the item set associated with this dof space. The
+  implementatino provided by the \c DofSpace class simply executes:
+
+  <code>return this->getItems()->size();</code>
+
+  \return The size of the item set associated with this dof space.
+
+  \sa \c getItems()
+
+*/
+
+  int  itemCount () const;
+
+
+//-----------------------------------------------------------------------
+//   typeCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of dof types.
+
+  Returns the number of dof types known to this dof space.
+
+  \return The number of dof types.
+
+*/
+
+  virtual int  typeCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   dofCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the total number of dofs.
+
+  Returns the number of dofs known to this dof space. This number is
+  equal to the number of non-zeroes in the sparse matrix
+  representation of this dof space.
+
+  Note that the number of dofs equals
+
+  <code>itemCount() * typeCount()</code>
+
+  when the matrix representation of this dof space is a dense
+  matrix. That is, when <code>typeCount()</code> dofs are attached to
+  each item.
+
+  \return The number of dofs.
+
+*/
+
+  virtual int  dofCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   findType
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a dof type with a given name.
+
+  Returns the index of the dof type named \a name, or a negative
+  number if a dof type with that name is not known to this dof space.
+
+  The implementation of this function provided by the \c DofSpace
+  class searches for the type index by repeatedly calling the \c
+  getTypeName() function. Derived classes are encouraged to provide a
+  more efficient implementation.
+
+  \param name - the name of the dof type to be found.
+
+  return The index of the dof type named \a name, or a negative
+  number.
+
+*/
+
+  virtual int  findType ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   getTypeName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a name of a dof type with a given index.
+
+  Returns the name of the dof type with index \a itype.
+
+  \param itype - a valid dof type index.
+
+  \pre <code>itype >= 0 && itype < typeCount()</code>
+
+  \return The name of the dof type with index \a itype.
+
+*/
+
+  virtual String  getTypeName ( int itype ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getTypeNames
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a array containing all dof type names.
+
+  Returns an array containing the names of all dof types known to this
+  dof space. The contents of this array should not be modified as the
+  array may share its data with one of the private data members of
+  this \c DofSpace object.
+
+  The implementation of this function provided by the \c DofSpace
+  class creates the array by repeatedly calling the \c getTypeName()
+  function.
+
+  \return An array containing all dof type names.
+
+*/
+
+  virtual StringVector  getTypeNames () const;
+
+
+//-----------------------------------------------------------------------
+//   findDofIndex
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a dof attached to a given item.
+
+  Returns the index of the dof that is attached to item \a iitem and
+  that has type \a itype. A negative number is returned if such a dof
+  does not exist.
+
+  Note that if the dof to be found exists, then this function returns
+  the element <i>(iitem,itype)</i> in the matrix representation of
+  this dof space.
+
+  \param iitem - a valid item index.
+
+  \param itype - a valid dof type index.
+
+  \pre <code>
+    iitem >= 0 && iitem < itemCount()  && <br>
+    itype >= 0 && itype < typeCount()
+  </code>
+
+  \return The index of dof <i>(iitem,itype)</i>, or a negative number.
+
+*/
+
+  virtual int  findDofIndex ( int  iitem,
+                              int  itype ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getDofIndex
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the index of a dof attached to a given item.
+
+  Returns the index of the dof that is attached to item \a iitem and
+  that has type \a itype. An exception is thrown if that dof does not
+  exist.
+
+  \param iitem - a valid item index.
+
+  \param itype - a valid dof type index.
+
+  \pre <code>
+    iitem >= 0 && iitem < itemCount()  && <br>
+    itype >= 0 && itype < typeCount()
+  </code>
+
+  \return The index of dof <i>(iitem,itype)</i>.
+
+  \throws jem::IllegalInputException - if the dof to be found does not
+  exist.
+
+  \sa \c findDofIndex()
+
+*/
+
+  inline int  getDofIndex ( int  iitem,
+                            int  itype ) const;
+
+
+//-----------------------------------------------------------------------
+//   findDofIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for the dofs attached to a given set of items.
+
+  Fills the array \a idofs with the indices of the dofs that are
+  attached to the items \a iitems and that have types \a itypes, and
+  returns the number of dofs that have been found. To be precise, this
+  function executes the following algorithm:
+
+  \code
+  int  idof;
+  int  i, j, k;
+
+  k = 0;
+
+  for ( j = 0; j < iitems.size(); j++ )
+  {
+    for ( i = 0; i < itypes.size(); i++ )
+    {
+      idof = findDofIndex ( iitems[j], itypes[i] );
+
+      if ( idof >= 0 )
+      {
+        idofs[j * itypes.size() + i] = idof;
+        k++;
+      }
+    }
+  }
+
+  return k;
+  \endcode
+
+  Note that if a dof does not exist, its entry in the array \a idofs
+  is not set.
+
+  The implementation of this function provided by the \c DofSpace
+  class executes the code shown above. Derived classes may provide a
+  more efficient implementation if that is possible.
+
+  \param idofs - an integer array to be filled with the indices of the
+  dofs to be found.
+
+  \param iitems - an integer array containing valid item indices.
+
+  \param itypes - an integer array containing valid dof type indices.
+
+  \pre <code>
+    idofs.size()  >= iitems.size() * itypes.size()     && <br>
+    min( iitems ) >= 0 && max( iitems ) < itemCount()  && <br>
+    min( itypes ) >= 0 && max( itypes ) < typeCount()
+  </code>
+
+  \return The number of dofs that have been found.
+
+*/
+  
+  virtual int  findDofIndices ( const IntVector&  idofs,
+                                const IntVector&  iitems,
+                                const IntVector&  itypes ) const;
+
+
+//-----------------------------------------------------------------------
+//   collectDofIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Collects the indices of the dofs attached to a given set of
+  items.
+
+  Fills the array \a idofs with the indices of the dofs that are
+  attached to the items \a iitems and that have types \a itypes, and
+  returns the number of dofs that have been found. To be precise, this
+  function executes the following algorithm:
+
+  \code
+  int  idof;
+  int  i, j, k;
+
+  k = 0;
+
+  for ( j = 0; j < iitems.size(); j++ )
+  {
+    for ( i = 0; i < itypes.size(); i++ )
+    {
+      idof = findDofIndex ( iitems[j], itypes[i] );
+
+      if ( idof >= 0 )
+      {
+        idofs[k++] = idof;
+      }
+    }
+  }
+
+  return k;
+  \endcode
+
+  Note that, in contrast to the member function \c findDofIndices(),
+  the dof indices are stored contiguously in the output array \a
+  idofs.
+
+  The implementation of this function provided by the \c DofSpace
+  class executes the code shown above. Derived classes may provide a
+  more efficient implementation if that is possible.
+
+  \param idofs - an integer array to be filled with the indices of the
+  dofs to be found.
+
+  \param iitems - an integer array containing valid item indices.
+
+  \param itypes - an integer array containing valid dof type indices.
+
+  \pre <code>
+    idofs.size()  >= iitems.size() * itypes.size()     && <br>
+    min( iitems ) >= 0 && max( iitems ) < itemCount()  && <br>
+    min( itypes ) >= 0 && max( itypes ) < typeCount()
+  </code>
+
+  \return The number of dof indices that have been stored in \a idofs.
+
+*/
+
+  virtual int  collectDofIndices ( const IntVector&  idofs,
+                                   const IntVector&  iitems,
+                                   const IntVector&  itypes ) const;
+
+
+//-----------------------------------------------------------------------
+//   getDofIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Gets the indices of the dofs attached to a given set of
+  items.
+
+  Fills the array \a idofs with the indices of the dofs that are
+  attached to the items \a iitems and that have types \a itypes. An
+  exception is thrown if one or more dofs are not known to this dof
+  space.
+
+  This function simply calls the function \c findDofIndices() and
+  throws an exception if the returned value is less than
+  
+  <code>iitems.size() * itypes.size()</code>.
+
+  \param idofs - an integer array to be filled with the indices of the
+  dofs to be found.
+
+  \param iitems - an integer array containing valid item indices.
+
+  \param itypes - an integer array containing valid dof type indices.
+
+  \pre <code>
+    idofs.size()  >= iitems.size() * itypes.size()     && <br>
+    min( iitems ) >= 0 && max( iitems ) < itemCount()  && <br>
+    min( itypes ) >= 0 && max( itypes ) < typeCount()
+  </code>
+
+  \throws jem::IllegalInputException - if one or more dofs to be found
+  do not exist.
+
+*/
+
+  inline void  getDofIndices ( const IntVector&  idofs,
+                               const IntVector&  iitems,
+                               const IntVector&  itypes ) const;
+  
+
+//-----------------------------------------------------------------------
+//   getDofsForItem
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns all dofs attached to a given item.
+
+  Fills the output array \a idofs with the indices of the dofs that
+  are attached to item \a iitem. The output array \a itypes is filled
+  with the dof type indices. The return value equals the number of
+  dofs attached to the item \a iitem. Note that the arrays \a idofs
+  and \a itypes must be large enough to store the dof (type) indices.
+
+  The implementation of this function provided by the \c DofSpace
+  class simply loops over all dof types as follows:
+
+  \code
+  const int  n = typeCount ();
+
+  int  itype;
+  int  idof;
+  int  i;
+
+
+  for ( i = itype = 0; itype < n; itype++ )
+  {
+    idof = findDofIndex ( iitem, itype );
+
+    if ( idof >= 0 )
+    {
+      idofs[i]  = idof;
+      itypes[i] = itype;
+      i++;
+    }
+  }
+
+  return i;
+  \endcode
+
+  Derived classes are encouraged to provide a more efficient
+  implementation.
+
+  \param idofs - an integer array to be filled with the indices of all
+  dofs attached to item \a iitem.
+
+  \param itypes - an integer array to be filled with the type indices
+  of the dofs attached to item \a iitem.
+
+  \param iitem - a valid item index.
+
+  \pre <code>
+    idofs.size()  >= typeCount()  && <br>
+    itypes.size() >= typeCount()  && <br>
+    iitem >= 0 && iitem < itemCount()
+  </code>
+
+  \return The number of dofs attached to item \a iitem.
+
+*/
+
+  virtual int  getDofsForItem ( const IntVector&  idofs,
+                                const IntVector&  itypes,
+                                int               iitem ) const;
+
+
+//-----------------------------------------------------------------------
+//   getDofsForType
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns all dofs of a given type.
+
+  Fills the array \a idofs with the indices of all dofs of type \a
+  itype, and returns the number of entries in \a idofs that have been
+  set. The array \a iitems is filled with the indices of the items to
+  which the dofs are attached. Note that the arrays \a idofs and \a
+  iitems must be large enough to store all dof and item indices.
+
+  The implementation of this function provided by the \c DofSpace
+  class simply loops over all items as follows:
+
+  \code
+  const int n = itemCount ();
+
+  int  iitem;
+  int  idof;
+  int  i;
+
+
+  for ( i = iitem = 0; iitem < n; iitem++ )
+  {
+    idof = findDofIndex ( iitem, itype );
+
+    if ( idof >= 0 )
+    {
+      idofs[i]  = idof;
+      iitems[i] = iitem;
+      i++;
+    }
+  }
+
+  return i;
+  \endcode
+
+  Derived classes should provide a more efficient implementation when
+  possible.
+
+  \param idofs - an integer array to be filled with the indices of all
+  dofs of type \a itype.
+
+  \param iitems - an integer array to be filled with the item indices
+  of the dofs of type \a itype.
+
+  \param itype - a valid dof type index.
+
+  \pre <code>
+    idofs.size()  >= typeCount()  && <br>
+    iitems.size() >= typeCount()  && <br>
+    itype >= 0 && itype < typeCount()
+  </code>
+
+  \return The number of dofs having type \a itype.
+  
+*/
+
+  virtual int  getDofsForType ( const IntVector&  idofs,
+                                const IntVector&  iitems,
+                                int               itype ) const;
+
+
+//-----------------------------------------------------------------------
+//   decodeDofIndex
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an item/type index pair given a dof index.
+
+  Returns in the integer references \a iitem and \a itype the item
+  index and type index, respectively, of the dof with index \a idof.
+  
+  \param iitem - a reference to an integer to be set to the item index
+  of the dof \a idof.
+
+  \param itype - a reference to an integer to be set to the type index
+  of dof \a idof.
+
+  \param idof - a valid dof index.
+
+  \pre <code>idof >= 0 && idof < dofCount()</code>
+
+  \post <code>idof == getDofIndex( iitem, itype )</code>
+
+*/
+
+  virtual void  decodeDofIndex ( int&  iitem,
+                                 int&  itype,
+                                 int   idof   ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   decodeDofIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns item/type index pairs given a set of dof indices.
+
+  Fills the arrays \a iitems and \a itypes with the item and type
+  indices, respectively, of the dofs with indices \a idofs. The
+  implementation of this function provided by the \c DofSpace class
+  repeatedly calls the \c decodeDofIndex() function as follows:
+
+  \code
+  int i;
+
+  for ( i = 0; i < idofs.size(); i++ )
+  {
+    decodeDofIndex ( iitems[i], itypes[i], idofs[i] );
+  }
+  \endcode
+
+  \param iitems - an integer array to be filled with the item indices
+  of the dofs \a idofs.
+
+  \param itypes - an integer array to be filled with the type indices
+  of the dofs \a idofs.
+
+  \param idofs - an integer array containing valid dof indices.
+
+  \pre <code>
+    iitems.size() >= idofs.size()     && <br>
+    itypes.size() >= idofs.size()     && <br>
+    min( idofs )  >= 0 && max( idofs ) < dofCount()
+  </code>
+
+*/
+
+  virtual void  decodeDofIndices ( const IntVector&  iitems,
+                                   const IntVector&  itypes,
+                                   const IntVector&  idofs  ) const;
+
+
+//-----------------------------------------------------------------------
+//   toMatrix
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a matrix representation of this dof space.
+
+  Returns a sparse matrix representation of this dof space. Each row
+  in the matrix is associated with an item and each column is
+  associated with a dof type. The value of a matrix element
+  <i>(i,j)</i> is the global index, or equation number, of the dof
+  that is attached to item <i>i</i> and has type <i>j</i>.
+
+  \return A sparse matrix representation of this dof space.
+
+*/
+
+  virtual SparseMatrix  toMatrix () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getItems
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the item set associated with this dof space.
+
+  Returns a pointer to the item set containing the items to which the
+  dofs in this dof space are attached. The pointer is guaranteed not
+  to be \c nullptr and to remain valid throughout the entire lifetime
+  of this \c DofSpace object.
+
+  \return A pointer to the item set associated with this dof space.
+
+*/
+
+  virtual ItemSet*  getItems () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getDofPath
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an identification string for a given dof.
+
+  Returns a descriptive string for the dof with index \a idof. This
+  string can be used to display (error) messages related to that dof.
+
+  \param idof - a valid dof index.
+
+  \pre <code>idof >= 0 && idof < dofCount()</code>
+
+  \return An identification string for the dof \a idof.
+
+*/
+
+  String  getDofPath ( int idof ) const;
+
+
+/*!
+
+  \brief Returns an identification string for a given dof.
+
+  Returns a descriptive string for the dof that is attached to item \a
+  iitem and that has type \a itype. This string can be used to display
+  (error) messages related to that dof.
+
+  \param iitem - a valid item index.
+
+  \param itype - a valid dof type index.
+
+  \pre <code>
+    iitem >= 0 && iitem < itemCount()  && <br>
+    itype >= 0 && itype < typeCount()
+  </code>
+
+*/
+
+  String  getDofPath ( int  iitem,
+                       int  itype  ) const;
+
+
+//-----------------------------------------------------------------------
+//   getContext
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a context string.
+
+  Returns a context string that can be used for displaying errors and
+  other types of messages that are related to this dof space.  The
+  returned string is typically passed as a context string to the
+  constructor of an exception class.
+
+  \return A context string.
+
+*/
+
+  String  getContext () const;
+
+
+
+//-----------------------------------------------------------------------
+//   printTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes the state of this dof space to a text output stream.
+
+  Writes a human-readable representation of this dof space to the text
+  output stream \a out. This function is mainly intended to be used as
+  a debugging aid.
+
+  \param out - a text output stream.
+
+*/
+
+  void  printTo ( jem::io::TextOutput&  out ) const;
+
+
+//-----------------------------------------------------------------------
+//   store
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Stores this dof space in a (global) data set.
+
+  Stores this dof space in the global data set \a globdat. The dof
+  space is stored both as the \em primary dof space and as the \em
+  item-specific dof space for the item set returned by the member
+  function \c getItems(). The primary dof space can be retrieved by
+  calling the static member functions \c find() and \c get() without
+  specifying a particular item set. A item-specific dof space can be
+  retrieved by calling the static member functions \c find() and \c
+  get() with an item set as the first argument.
+
+  Note that the last dof space stored in a global data set
+  automatically becomes the primary dof space.
+
+  \param globdat - a (global) data set.
+
+  \sa \c Globdat, \c find(), \c get()
+
+*/
+
+  void  store ( const Properties& globdat ) const;
+
+
+//-----------------------------------------------------------------------
+//   find
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for the primary dof space in a (global) data set.
+
+  Searches for the primary dof space in the global data set \a
+  globdat. If found, a reference to the dof space is returned, else \c
+  nullptr is returned.
+
+  \param globdat - a (global) data set.
+
+  \return A reference to the primary dof space in \a globdat, or \c
+  nullptr.
+
+  \sa \c Globdat, \c store()
+
+*/
+
+  static jem::Ref<DofSpace>  find ( const Properties&  globdat );
+
+
+/*!
+
+  \brief Searches for an item-specific dof space in a (global) data
+  set.
+
+  Searches for the item-specific dof space associated with the item
+  set \a items in the global data set \a globdat. If found, a
+  reference to the dof space is returned, else \c nullptr is returned.
+
+  \param items - a reference to an item set.
+
+  \param globdat - a (global) data set.
+
+  \pre <code>items != nullptr</code>
+
+  \return A reference to the dof space associated with the item set \a
+  items in the global data set \a globdat, or \c nullptr.
+
+  \sa \c Globdat, \c store()
+
+*/
+
+  static jem::Ref<DofSpace>   find
+
+    ( const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat );
+
+
+//-----------------------------------------------------------------------
+//   get
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the primary dof space in a (global) data set.
+
+  Returns a reference to the primary dof space in the global data set
+  \a globdat. An exception is thrown if no primary dof space has been
+  stored in \a globdat. The parameter \a context will be used as the
+  context string for the exception.
+
+  \param globdat - a global data set.
+
+  \param context - an error context string.
+
+  \return A reference to the primary dof space in \a globdat.
+
+  \throws jem::IllegalInputException - if no primary dof space has
+  been stored in \a globdat.
+
+  \sa \c Globdat, \c store()
+
+*/
+
+  static jem::Ref<DofSpace>   get
+
+    ( const Properties&         globdat,
+      const String&             context );
+
+
+/*!
+
+  \brief Returns an item-specific dof space in a (global) data set.
+
+  Returns a reference to the dof space associated with the item set \a
+  items in the global data set \a globdat. An exception is thrown if
+  \a globdat does not contain the item-specific dof space. The
+  parameter \a context will be used as the context string for the
+  exception.
+
+  \param items - a reference to an item set.
+
+  \param globdat - a global data set.
+
+  \param context - an error context string.
+
+  \pre <code>items != nullptr</code>
+
+  \return A reference to the dof space associated with the item set \a
+  items in the global data set \a globdat.
+
+  \throws jem::IllegalInputException - if \a globdat does not contain
+  the item-specific dof space.
+
+  \sa \c Globdat, \c store()
+
+*/
+
+  static jem::Ref<DofSpace>   get
+
+    ( const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat,
+      const String&             context );
+
+
+//-----------------------------------------------------------------------
+//   other functions
+//-----------------------------------------------------------------------
+
+
+  virtual String  toString  () const;
+
+
+ protected:
+
+  virtual        ~DofSpace ();
+
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   makeDofOrdering
+//-----------------------------------------------------------------------
+
+/*!
+
+  \related DofSpace
+
+  \brief Creates a dof permutation array given an item permutation
+  array.
+
+  Returns an integer array that indicates how the dofs in the dof
+  space \a dofs could be re-ordered to achieve the same effect as if
+  the items supporting the dofs were re-ordered according to the
+  permutation array \a itemPerm. Use this function to create an
+  optimal dof ordering given an optimal item ordering.
+
+  If \c dofPerm denotes the returned array, then \c dofPerm[idof]
+  yields the new index of the dof with index \c idof. Likewise, \c
+  itemPerm[iitem] should specify the new index of the item with index
+  \c iitem.
+
+  \param dofs - a \c DofSpace object.
+
+  \param itemPerm - a permutation array for the items supporting the
+  dofs in the dof space \a dofs.
+
+  \pre <code>itemPerm.size() == dofs.itemCount()</code>
+
+  \return A dof permutation array for the dof space \a dofs.
+
+*/
+
+
+IntVector  makeDofOrdering ( const DofSpace&   dofs,
+                             const IntVector&  itemPerm );
+
+
+
+
+JIVE_END_PACKAGE( util )
+

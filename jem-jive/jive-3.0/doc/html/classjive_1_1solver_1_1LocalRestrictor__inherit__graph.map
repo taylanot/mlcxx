@@ -1,0 +1,12 @@
+<map id="jive::solver::LocalRestrictor" name="jive::solver::LocalRestrictor">
+<area shape="rect" id="node1" title=" " alt="" coords="167,157,365,184"/>
+<area shape="rect" id="node3" href="$classjive_1_1solver_1_1DenseRestrictor.html" title=" " alt="" coords="415,81,620,108"/>
+<area shape="rect" id="node7" href="$classjive_1_1solver_1_1SparseRestrictor.html" title=" " alt="" coords="413,183,621,209"/>
+<area shape="rect" id="node2" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="5,157,119,184"/>
+<area shape="rect" id="node4" href="$classjive_1_1solver_1_1NullSpaceRestrictor.html" title=" " alt="" coords="670,5,899,32"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1SchurRestrictor.html" title=" " alt="" coords="685,56,885,83"/>
+<area shape="rect" id="node6" href="$classjive_1_1solver_1_1SmoothRestrictor.html" title=" " alt="" coords="677,107,892,133"/>
+<area shape="rect" id="node8" href="$classjive_1_1solver_1_1RigidBodyRestrictor.html" title=" " alt="" coords="669,157,900,184"/>
+<area shape="rect" id="node9" href="$classjive_1_1solver_1_1SimpleRestrictor.html" title=" " alt="" coords="680,208,889,235"/>
+<area shape="rect" id="node10" href="$classjive_1_1solver_1_1UserdefRestrictor.html" title=" " alt="" coords="677,259,892,285"/>
+</map>

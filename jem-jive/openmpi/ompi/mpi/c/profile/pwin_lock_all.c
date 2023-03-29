@@ -1,0 +1,1 @@
+../../../../ompi/mpi/c/win_lock_all.c

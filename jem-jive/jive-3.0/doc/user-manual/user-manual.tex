@@ -1,0 +1,94 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,english]{book}
+
+\usepackage [english]{babel}
+\usepackage {palatino}
+\usepackage {sourcecode}
+\usepackage {epsfig}
+\usepackage {amsmath}
+\pagestyle  {plain}
+
+
+\topmargin        0cm
+\headheight       0cm
+\headsep          0cm
+\textheight      24cm
+\textwidth       15cm
+\evensidemargin   0cm
+\oddsidemargin    0cm
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\include{definitions}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{Jive user manual}
+
+\author{ DRG }
+
+\date{\today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\maketitle
+
+%\tableofcontents
+
+\include{chapter-1}
+
+
+\part{Getting started}
+
+\include{chapter-2}
+\include{chapter-3}
+\include{chapter-4}
+
+\chapter{Extension of the Poisson solver}
+\label{chapter:extended-poisson-solver}
+
+
+\part{Jive components}
+
+\chapter{General utilities}
+\label{chapter:utilities}
+
+\chapter{Matrices and vectors}
+\label{chapter:matrices}
+
+\chapter{Basic geometrical shapes}
+\label{chapter:geom}
+
+\chapter{Finite element utilities}
+\label{chapter:fem}
+
+\chapter{Linear solvers}
+\label{chapter:solvers}
+
+\chapter{Input and output utilities}
+\label{chapter:io}
+
+
+\part{Solution strategies}
+
+
+
+\end{document}
+

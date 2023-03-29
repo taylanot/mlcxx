@@ -1,0 +1,72 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+/*!
+
+  \page TupleHeaders Tuple header files
+
+  The header file <code><jem/base/Tuple.h></code> exports the \c Tuple
+  class together with all related functions and operators. This file,
+  however, expands to a large amount of code so that the compilation
+  of your program may be slowed down significantly. To avoid this, jem
+  provides a collection of smaller header files which enable you to
+  include only the code that you need. The list below provides a short
+  description of each header file.
+
+  \li <code><jem/base/tuple/Tuple.h></code> - provides the \c Tuple
+  class together with the overloaded input and output
+  operators. Include this file when you do not need any additional
+  operators and functions.
+
+  \li <code><jem/base/tuple/operators.h></code> - exports overloaded
+  unary and binary operators for tuples. Include this file if you want
+  to use \ref TupleExpressions "tuple expressions".
+
+  \li <code><jem/base/tuple/intrinsics.h></code> - exports all
+  overloaded intrinsic functions such as \c sin, \c cos, etc. It also
+  exports the functions \c where and \c staticCast. Include this file
+  if you want to use tuple expressions involving intrinsic functions.
+
+  \li <code><jem/base/tuple/utilties.h></code> - exports a collection
+  of \ref TupleUtilities "utility functions" operating on
+  tuples. These functions include \c min, \c max, \c equal, etc.
+
+*/
+
+
+
+  
+
+JEM_END_PACKAGE_BASE

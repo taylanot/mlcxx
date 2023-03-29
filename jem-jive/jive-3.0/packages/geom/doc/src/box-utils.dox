@@ -1,0 +1,440 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( geom )
+
+
+/*!
+  
+  \defgroup BoxUtilities Box utility functions
+  
+  \brief Provides a collection of functions dealing with boxes.
+
+  <code>\#include <jive/geom/boxes.h></code>
+
+  This header file exports a collection of utility functions operating
+  on \ref Boxes "boxes". In particular, these functions can be used to:
+
+  \li find the largest and smallest box in a set of boxes;
+  \li compute the size of a box;
+  \li compute the center of a box;
+  \li create a box given a center point and a size;
+  \li scale a box.
+
+  All these operations, except the first, can be performed both for a
+  single box and for an array of boxes.
+
+  \sa \c BoxManager
+
+*/
+
+
+//@{
+
+
+
+//-----------------------------------------------------------------------
+//   findMinMaxBoxes
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Finds the boxes with the smallest and largest size.
+
+  Returns in the output parameters \a jmin and \a jmax the indices of
+  the smallest and largest box, respectively, in the array of boxes \a
+  boxes. That is, after calling this function, the expression
+  <code>boxes(ALL,jmin)</code> yields the corner points of the
+  smallest box, and <code>boxes(ALL,jmax)</code> yields the corner
+  points of the largest box.
+
+  If \a boxes is empty, then \a jmin and \a jmax are undefined.
+
+  \param jmin - an integer reference in which the index of the
+  smallest box is to be stored.
+
+  \param jmax - an integer reference in which the index of the largest
+  box is to be stored.
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \pre <code>boxes.size(0) % 2 == 0</code>
+
+  \sa sizeofBox()
+
+*/
+
+void  findMinMaxBoxes ( int&                 jmin,
+                        int&                 jmax,
+                        const util::Matrix&  boxes );
+
+//-----------------------------------------------------------------------
+//   sizeofBox
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Returns the size of a box.
+
+  Returns the Euclidean distance between the two corner points of the
+  box \a box.
+
+  \param box - a vector containing the corner points of a box.
+
+  \pre <code>box.size() % 2 == 0</code>
+
+  \return The size of the box \a box.
+
+*/
+
+double  sizeofBox ( const util::Vector& box );
+
+
+//-----------------------------------------------------------------------
+//   sizeofSmallestBox
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Returns the size of the smallest box in an array of boxes.
+
+  Returns the size of the smallest box in the array of boxes \a
+  boxes. If \a boxes is empty, the return value is undefined.
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \pre <code>boxes.size(0) % 2 == 0</code>
+
+  \return The size of the smallest box in \a boxes.
+
+  \sa \c findMinMaxBoxes(), \c sizeofBox()
+
+*/
+
+double  sizeofSmallestBox ( const util::Matrix& boxes );
+
+
+//-----------------------------------------------------------------------
+//   sizeofLargestBox
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Returns the size of the largest box in an array of boxes.
+
+  Returns the size of the largest box in the array of boxes \a
+  boxes. If \a boxes is empty, the return value is undefined.
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \pre <code>boxes.size(0) % 2 == 0</code>
+
+  \return The size of the largest box in \a boxes.
+
+  \sa \c findMinMaxBoxes(), \c sizeofBox()
+
+*/
+
+double  sizeofSmallestBox ( const util::Matrix& boxes );
+
+
+//-----------------------------------------------------------------------
+//   getBoxSizes
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Computes the sizes of an array of boxes.
+    
+  Returns in the output vector \c sizes the sizes of the boxes stored
+  in the input matrix \a boxes. That is, \c sizes[j] is set to the
+  size of the box stored in \c boxes(ALL,j).
+
+  \param sizes - a vector in which the sizes of the boxes are to be
+  stored.
+  
+  \param boxes - an array of boxes (stored column wise).
+  
+  \pre <code>
+    boxes.size(0) % 2 == 0  && <br>
+    boxes.size(1)     == sizes.size()
+  </code>
+
+  \sa \c sizeofBox()
+
+*/
+
+void  getBoxSizes ( const util::Vector&  sizes,
+                    const util::Matrix&  boxes );
+
+
+//-----------------------------------------------------------------------
+//   getBoxCenter
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Computes the center of a box.
+
+  Returns in the output vector \a center the coordinates of the center
+  of the box \a box.
+
+  \param center - a vector in which the center coordinates are to be
+  stored.
+
+  \param box - a vector containing the corner points of a box.
+
+  \pre <code>box.size() == 2 * center.size()</code>
+
+  \sa \c getBoxCenters()
+
+*/
+
+void  getBoxCenter ( const util::Vector&  center,
+                     const util::Vector&  box );
+
+
+//-----------------------------------------------------------------------
+//   getBoxCenters
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Computes the centers of an array of boxes.
+
+  Returns in the output matrix \a centers the coordinates of the
+  centers of the boxes stored in the input matrix \a boxes. To be
+  precise, \c centers(ALL,j) will contain the center coordinates of
+  the box stored in \c boxes(ALL,j).
+
+  \param centers - a matrix in which the center coordinates are to be
+  stored.
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \pre <code>
+    boxes.size(0) == 2 * centers.size(0) && <br>
+    bodes.size(1) ==     centers.size(1)
+  </code>
+
+*/
+
+void  getBoxCenters ( const util::Matrix&  centers,
+                      const util::Matrix&  boxes );
+
+
+//-----------------------------------------------------------------------
+//   makeBox
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Creates a box given its center and size.
+
+  Returns in the output vector \a box the corner points of a square
+  box with center \a center and size \a size.
+
+  \param box - a vector in which the corner points of the box are to
+  be stored.
+
+  \param center - the center of the box to be created.
+
+  \param size - the size of the box to be created.
+
+  \pre <code>
+    box.size() == 2 * center.size() && <br>
+    size       >= 0.0
+  </code>
+
+  \sa \c makeBoxes()
+
+*/
+
+void  makeBox ( const util::Vector&  box,
+                const util::Vector&  center,
+                double               size );
+
+
+//-----------------------------------------------------------------------
+//   makeBoxes (constant size)
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Creates an array of boxes with a constant size.
+
+  Returns in the output matrix \a boxes an array of square boxes with
+  centers \a centers and size \a size. To be precise, \c boxes(ALL,j)
+  will contain the corner points of a square box with center \c
+  centers(ALL,j) and size \a size.
+
+  \param boxes - a matrix in which the boxes are to be stored.
+
+  \param centers - the centers of the boxes to be created.
+
+  \param size - the size of the boxes to be created.
+
+  \pre <code>
+    boxes.size(0) == 2 * centers.size(0) && <br>
+    boxes.size(1) ==     centers.size(1) && <br>
+    size          >= 0.0
+  </code>
+
+*/
+
+void  makeBoxes ( const util::Matrix&  boxes,
+                  const util::Matrix&  centers,
+                  double               size );
+
+
+//-----------------------------------------------------------------------
+//   makeBoxes (varying size)
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Creates an array of boxes with varying sizes.
+
+  Returns in output matrix \a boxes an array of square boxes with
+  centers \a centers and sizes \a sizes. To be precise, \c
+  boxes(ALL,j) will contain the corner points of a square box with
+  center \c centers(ALL,j) and size \a sizes[j].
+
+  \param boxes - a matrix in which the boxes are to be stored.
+
+  \param centers - the centers of the boxes to be created.
+
+  \param sizes - the sizes of the boxes to be created.
+
+  \pre <code>
+    boxes.size(0) == 2 * centers.size(0) && <br>
+    boxes.size(1) ==     centers.size(1) && <br>
+    sizes.size()  ==     centers.size(1) && <br>
+    testall( sizes >= 0.0 )
+  </code>
+
+
+*/
+
+void  makeBoxes ( const util::Matrix&  boxes,
+                  const util::Matrix&  centers,
+                  const util::Vector&  sizes );
+
+
+//-----------------------------------------------------------------------
+//   scaleBox
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Scales a box.
+
+  Scales the box stored in the vector \a box in such a way that its
+  center remains the same and that its size has been multiplied by \a
+  scale.
+
+  \param box - a vector containing the corner points of the box to be
+  scaled.
+
+  \param scale - the factor with which the box is to be scaled.
+
+  \pre <code>box.size() % 2 == 0 && scale >= 0.0</code>
+
+*/
+
+void  scaleBox ( const util::Vector&  box,
+                 double               scale );
+
+
+//-----------------------------------------------------------------------
+//   scaleBoxes (constant scale)
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Scales an array of boxes with a constant scale factor.
+
+  Scales the boxes stored column-wise in the matrix \a boxes in such a
+  way that their centers remain the same and that their sizes have
+  been multiplied by \a scale.
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \param scale - the factor with which the boxes are to be scaled.
+
+  \pre <code>boxes.size(0) % 2 == 0 && scale >= 0.0</code>
+
+*/
+
+void  scaleBoxes ( const util::Matrix&  boxes,
+                   double               scale );
+
+
+//-----------------------------------------------------------------------
+//   scaleBoxes (varying scale)
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Scales an array of boxes with varying scale factors.
+
+  Scales the boxes stored column-wise in the matrix \a boxes in such a
+  way that their centers remain the same and that their sizes have
+  been multiplied by the scale factors stored in the vector \a
+  scales. That is, the box stored in \c boxes(ALL,j) will be scaled
+  with the factor \c scales[j].
+
+  \param boxes - an array of boxes (stored column wise).
+
+  \param scales - a vector containing the scale factors.
+
+  \pre <code>
+    boxes.size(0) % 2 == 0             && <br>
+    scales.size()     == boxes.size(1) && <br>
+    testall( scales >= 0.0 )
+  </code>
+
+*/
+
+void  scaleBoxes ( const util::Matrix&  boxes,
+                   const util::Vector&  scales );
+
+
+
+//@}
+
+
+
+JIVE_END_PACKAGE( geom )

@@ -1,0 +1,134 @@
+\documentclass[a4paper]{article}
+
+\usepackage{listings}
+\usepackage{palatino}
+\usepackage{parskip}
+\usepackage{color}
+\usepackage{url}
+
+\lstset{language={},backgroundcolor=\color[gray]{0.95},
+  basicstyle=\ttfamily}
+
+
+%========================================================================
+% Definitions
+%========================================================================
+
+
+\newcommand{\Code}[1]{\texttt{#1}}
+
+
+%========================================================================
+% Document
+%========================================================================
+
+
+\title {Jem/Jive 2.1\\[1ex]
+        Release Notes}
+\author{Dynaflow Research Group}
+\date  {11-6-2015}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+Version 2.1 of Jem/Jive is a minor release with some new features,
+improvements and bug fixes. This version should be source compatible with
+version 2.0.
+
+The following list provides an overview of the new features and
+improvements. More detailed information can be found in the following
+sections.
+
+\begin{itemize}
+
+  \item Support for quadrilateral elements with 12 nodes and cubic shape
+        functions. Use the class \Code{Quad12} to create a \Code{Shape}
+        object for calculating the shape functions.
+
+  \item Support for reading and writing HDF5 files.
+
+  \item Extension of the \Code{Properties} class with operators for
+        getting and setting properties.
+
+  \item Switch from headers provided by the standard C library to
+        the equivalent headers provided by the standard C++ library.
+
+  \item Some code changes to better conform to the recent C++ standard
+        and the latest C++ compilers.
+
+  \item Support for creating static libraries using the Makefiles
+        provided by Jem and Jive.
+
+  \item Support for the \Code{clang} compiler.
+
+  \item Better support for recent versions of MacOS~X.
+
+  \item Bug fix in the \Code{ArclenModule} so that it properly handles
+        linear constraints.
+
+  \item Various small Windows-specific bug fixes.
+
+  \item Some internal changes and code re-organisations to increase code
+        re-use.
+
+\end{itemize}
+
+%------------------------------------------------------------------------
+
+\section{Support for HDF5 files}
+
+The new Jem package \Code{hdf5} provides an interface for creating,
+modifying and reading HDF5 data files. The interface automatically
+translates Jem objects into equivalent HDF5 objects. See
+\url{www.hdfgroup.org/HDF5/} for more information about HDF5.
+
+%------------------------------------------------------------------------
+
+\section{Extension of the \Code{Properties} class}
+
+The \Code{Properties} class from Jem implements the \Code{[]} (subscript)
+operator that can be used to both get and set properties. Here is an
+example:
+
+\begin{lstlisting}
+  Properties  p;
+  String      s;
+  double      x;
+  int         i;
+
+  s = "hello";
+  x = 0.0;
+  i = 1;
+
+  p["first"]  = s;
+  p["second"] = x;
+  p["third"]  = i;
+
+  s = p["first"];
+  x = p["second"];
+  i = p["third"];
+\end{lstlisting}
+
+The operator calls are automatically translated to the equivalent calls
+the \Code{get} and \Code{set} member functions.
+
+%------------------------------------------------------------------------
+
+\section{Create static libraries}
+
+Use the \Code{lib.mk} Makefile to build a static library instead of an
+executable. Here is an example Makefile:
+
+\begin{lstlisting}
+  library = femutil
+
+  include $(JIVEDIR)/makefiles/packages/fem.mk
+  include $(JIVEDIR)/makefiles/lib.mk
+\end{lstlisting}
+
+\end{document}
+

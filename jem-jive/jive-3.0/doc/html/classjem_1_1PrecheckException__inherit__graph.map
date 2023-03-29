@@ -1,0 +1,5 @@
+<map id="jem::PrecheckException" name="jem::PrecheckException">
+<area shape="rect" id="node1" title=" " alt="" coords="5,155,184,181"/>
+<area shape="rect" id="node2" href="$classjem_1_1RuntimeException.html" title="Signals a runtime exception." alt="" coords="8,80,181,107"/>
+<area shape="rect" id="node3" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="33,5,156,32"/>
+</map>

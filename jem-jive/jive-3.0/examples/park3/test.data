@@ -1,0 +1,39 @@
+
+<NodeConstraints>
+
+  u[innerEdge] = 0.1;
+  u[outerEdge] = 0.0;
+
+</NodeConstraints>
+
+
+<NodeTable name = "Prescribed">
+
+  <Section columns="u">
+
+    innerEdge 0.4;
+
+  </Section>
+
+</NodeTable>
+
+
+<NodeTable name = "iniState">
+
+  <Section columns="u">
+
+    all 1.0;
+
+  </Section>
+
+</NodeTable>
+
+<Function name = "f">
+
+  0.0 0.0
+  1.0 1.0
+  2.0 0.0
+  3.0 1.0
+  4.0 0.0
+
+</Function>

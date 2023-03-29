@@ -1,0 +1,675 @@
+#!/bin/dash
+
+
+alias pwd='pwd -P'
+
+quote()
+{
+  echo "'$(echo "$1" | sed -e "s/'/'\\''/g")'"
+}
+
+SH='/bin/dash'
+SH_NAME='dash'
+SH_SETUP='
+alias pwd='\''pwd -P'\''
+
+quote()
+{
+  echo "'\''$(echo "$1" | sed -e "s/'\''/'\''\'\'''\''/g")'\''"
+}'
+
+
+export SH
+export SH_NAME
+export SH_SETUP
+
+#========================================================================
+#   Global variables
+#========================================================================
+
+# These variable names are scrambled a bit so that this script
+# -- hopefully -- does not interfere with its environment.
+
+_FILE_=""
+_LINE_=0
+_PPKEY_=""
+_PPARG_=""
+_ACTIVE_=1
+_OUTPUT_=""
+_FILE_LIST_=""
+
+export _FILE_
+
+
+#========================================================================
+#   Functions
+#========================================================================
+
+#------------------------------------------------------------------------
+#   PrintHelp ()
+#------------------------------------------------------------------------
+
+
+PrintHelp()
+{
+  cat<<EOF
+
+Usage: $(basename "$0") [OPTIONS] [--] SRC [DEST]
+
+Reads the file SRC, processes all pre-processing directives, and
+writes the result to the output file DEST. If DEST is not specified,
+the pre-processed file will be written to the standard output.
+
+Options:
+
+  -h, --help  : show this help.
+  -x          : make the output file an executable script.
+
+EOF
+}
+
+
+#------------------------------------------------------------------------
+#   Die ()
+#------------------------------------------------------------------------
+
+
+Die()
+{
+  if [ -n "$_OUTPUT_" ] && [ -e "$_OUTPUT_" ]; then
+    rm -f -- "$_OUTPUT_"
+  fi
+
+  exit 1
+}
+
+
+#------------------------------------------------------------------------
+#   Error ( %msg )
+#------------------------------------------------------------------------
+
+
+Error()
+{
+  if [ -z "$_FILE_" ]; then
+    echo "$0: $1."                  1>&2
+  else
+    echo "${_FILE_}:${_LINE_}: $1." 1>&2
+  fi
+
+  Die
+}
+
+
+#------------------------------------------------------------------------
+#   GetAbsPath ( %fname )
+#------------------------------------------------------------------------
+
+
+GetAbsPath()
+{
+  local curdir="$(pwd)"
+  local fpath=""
+
+  cd "$(dirname "$1")" || Die
+
+  fpath="$(pwd)"
+  fpath="${fpath%/}/$(basename "$1")"
+
+  cd "$curdir" || Die
+
+  echo "$fpath"
+}
+
+
+#------------------------------------------------------------------------
+#   ParsePPLine ( %line )
+#------------------------------------------------------------------------
+
+
+ParsePPLine()
+{
+  local line="${1#??}"
+
+  _PPKEY_="${line%%[[:space:]]*}"
+
+  if [ "$_PPKEY_" = "$line" ]; then
+    _PPARG_=""
+  else
+    _PPARG_="${line#*[[:space:]]}"
+  fi
+}
+
+
+#------------------------------------------------------------------------
+#   ExpandPPArg ()
+#------------------------------------------------------------------------
+
+
+ExpandPPArg()
+{
+  local arg=""
+
+  if arg="$(eval "echo $_PPARG_")"; then
+    _PPARG_="$arg"
+  else
+    Error "error expanding \`$_PPARG_'"
+  fi
+}
+
+
+#------------------------------------------------------------------------
+#   Scan ()
+#------------------------------------------------------------------------
+
+
+Scan()
+{
+  local name=""
+  local buf=""
+
+  while IFS="" read -r buf ; do
+
+    _LINE_=$(( $_LINE_ + 1 ))
+
+    case "$buf" in
+
+      \#\@[a-z]*)
+
+        ParsePPLine "$buf" ;;
+
+      *)
+
+        if [ -n "$_ACTIVE_" ]; then
+          echo "$buf"
+        fi
+
+        continue ;;
+
+    esac
+
+    case "$_PPKEY_" in
+
+      echo)
+
+        if [ -z "$_PPARG_" ]; then
+          Error "missing argument"
+        fi
+
+        if [ -n "$_ACTIVE_" ]; then
+          if ! (eval "echo $_PPARG_"); then
+            Error "error expanding \`$_PPARG_'"
+          fi
+        fi ;;
+
+      eval)
+
+        if [ -z "$_PPARG_" ]; then
+          Error "missing expression"
+        fi
+
+        if [ -n "$_ACTIVE_" ]; then
+          if ! (eval "$_PPARG_"); then
+            Error "error evaluating \`$_PPARG_'"
+          fi
+        fi ;;
+
+      if)
+
+        ScanIf ;;
+
+      include)
+
+        if [ -z "$_PPARG_" ]; then
+          Error "missing file name"
+        fi
+
+        if [ -n "$_ACTIVE_" ]; then
+
+          ExpandPPArg
+
+          if [ -z "$_PPARG_" ]; then
+            Error "empty file name"
+          fi
+
+          ScanFile "$_PPARG_"
+
+        fi ;;
+
+      script)
+
+        ScanScript ;;
+
+      set|setq)
+
+        if [ -z "$_PPARG_" ]; then
+          Error "missing variable assignment"
+        fi
+
+        if [ -n "$_ACTIVE_" ]; then
+
+          ExpandPPArg
+
+          name="${_PPARG_%%=*}"
+          name="${name%%[[:space:]]*}"
+
+          if [ -z "$name" ]; then
+            Error "empty variable name"
+          fi
+
+          value="${_PPARG_#*=}"
+
+          if [ "$_PPKEY_" = "set" ]; then
+            echo "${name}=$value"
+          else
+            echo "${name}=$(quote "$value")"
+          fi
+
+        fi ;;
+
+      skip)
+
+        Skip ;;
+
+      switch)
+
+        ScanSwitch ;;
+
+      *)
+
+        return ;;
+
+    esac
+
+  done
+
+  _PPKEY_=""
+  _PPARG_=""
+}
+
+
+#------------------------------------------------------------------------
+#   Skip ()
+#------------------------------------------------------------------------
+
+
+Skip()
+{
+  local active="$_ACTIVE_"
+
+  _ACTIVE_=""
+
+  Scan
+
+  if [ "$_PPKEY_" != "endskip" ]; then
+    Error "\`endskip' directive expected"
+  fi
+
+  _ACTIVE_="$active"
+}
+
+
+#------------------------------------------------------------------------
+#   ScanIf ()
+#------------------------------------------------------------------------
+
+
+ScanIf()
+{
+  local active="$_ACTIVE_"
+  local dummy=""
+  local flag=""
+
+  if [ -z "$_PPARG_" ]; then
+    Error "missing expression"
+  fi
+
+  if [ -n "$active" ]; then
+
+    if ! dummy="$(eval "$_PPARG_")"; then
+      _ACTIVE_=""
+    else
+      _ACTIVE_=1
+      flag=1
+    fi
+
+  fi
+
+  Scan
+
+  _ACTIVE_=""
+
+  while [ "$_PPKEY_" = "elif" ]; do
+
+    if [ -z "$_PPARG_" ]; then
+      Error "missing expression"
+    fi
+
+    if [ -n "$active" ] && [ -z "$flag" ]; then
+
+      if ! dummy="$(eval "$_PPARG_")"; then
+        _ACTIVE_=""
+      else
+        _ACTIVE_=1
+        flag=1
+      fi
+
+    fi
+
+    Scan
+
+    _ACTIVE_=""
+
+  done
+
+  if [ "$_PPKEY_" = "else" ]; then
+
+    if [ -n "$active" ] && [ -z "$flag" ]; then
+      _ACTIVE_=1
+    else
+      _ACTIVE=""
+    fi
+
+    Scan
+
+  fi
+
+  if [ "$_PPKEY_" != "endif" ]; then
+    Error "\`endif' directive expected"
+  fi
+
+  _PPKEY_=""
+  _PPARG_=""
+  _ACTIVE_="$active"
+}
+
+
+#------------------------------------------------------------------------
+#   ScanSwitch ()
+#------------------------------------------------------------------------
+
+
+ScanSwitch()
+{
+  local active="$_ACTIVE_"
+  local word=""
+  local flag=""
+
+  if [ -z "$_PPARG_" ]; then
+    Error "missing word"
+  fi
+
+  if [ -n "$active" ]; then
+    ExpandPPArg
+    word="$_PPARG_"
+  fi
+
+  _ACTIVE_=""
+
+  Scan
+
+  while [ "$_PPKEY_" = "case" ]; do
+
+    if [ -n "$active" ] && [ -z "$flag" ]; then
+
+      ExpandPPArg
+
+      flag="${word##$_PPARG_}"
+
+      if [ -z "$flag" ]; then
+        flag=1
+        _ACTIVE_=1
+      else
+        flag=""
+        _ACTIVE_=""
+      fi
+
+    fi
+
+    Scan
+
+    _ACTIVE_=""
+
+  done
+
+  if [ "$_PPKEY_" != "endswitch" ]; then
+    Error "\`endswitch' directive expected"
+  fi
+
+  _PPKEY_=""
+  _PPARG_=""
+  _ACTIVE_="$active"
+}
+
+
+#------------------------------------------------------------------------
+#   ScanScript ()
+#------------------------------------------------------------------------
+
+
+ScanScript()
+{
+  local text="$SH_SETUP"
+  local buf=""
+
+
+  while IFS="" read -r buf; do
+
+    _LINE_=$(( $_LINE_ + 1 ))
+
+    case "$buf" in
+
+      \#\@[a-z]*)
+
+        ParsePPLine "$buf"
+        break ;;
+
+      *)
+
+        if [ -n "$_ACTIVE_" ]; then
+          text="$text
+$buf"
+        fi
+
+    esac
+
+  done
+
+  if [ "$_PPKEY_" != "endscript" ]; then
+    Error "\`endscript' directive expected"
+  fi
+
+  if [ -n "$_ACTIVE_" ]; then
+    if ! echo "$text" | "$SH" -s; then
+      Error "error evaluating script"
+    fi
+  fi
+}
+
+
+#------------------------------------------------------------------------
+#   ScanFile ( %fname )
+#------------------------------------------------------------------------
+
+
+ScanFile()
+{
+  local curfile="$_FILE_"
+  local curline="$_LINE_"
+  local fname=""
+  local i=""
+
+
+  if [ ! -e "$1" ]; then
+    Error "no such file: $1"
+  fi
+
+  # Take a shortcut if the file does not contain any pre-processing
+  # directives.
+
+  if ! grep -q "^#@[a-z]" "$1"; then
+    cat "$1"
+    return
+  fi
+
+  fname="$(GetAbsPath "$1")"
+
+  eval "set -- $_FILE_LIST_"
+
+  for i in "$@"; do
+    if [ "xx$fname" = "xx$i" ]; then
+      return
+    fi
+  done
+
+  _LINE_=0
+  _FILE_="$fname"
+  _FILE_LIST_="$_FILE_LIST_ $(quote "$fname")"
+
+  Scan < "$fname"
+
+  if [ -n "$_PPKEY_" ]; then
+    Error "unknown directive: $_PPKEY_"
+  fi
+
+  _FILE_="$curfile"
+  _LINE_="$curline"
+}
+
+
+#------------------------------------------------------------------------
+#   ProcessFile ( %mode %fname )
+#------------------------------------------------------------------------
+
+
+ProcessFile()
+{
+  if [ "$1" = "X" ]; then
+    echo '#!'"$SH"
+  fi
+
+  case "$2" in
+
+    *.htm|*.html|*.xml)
+
+      cat<<EOF
+
+<!-- Generated on $(date).
+     CHANGES TO THIS FILE WILL BE LOST. -->
+
+EOF
+      ;;
+
+    *.h|*.c|*.cpp|*.css)
+
+      cat<<EOF
+
+/* Generated on $(date).
+   CHANGES TO THIS FILE WILL BE LOST. */
+
+EOF
+      ;;
+
+    *)
+
+      cat<<EOF
+
+# Generated on $(date).
+# CHANGES TO THIS FILE WILL BE LOST.
+
+EOF
+      ;;
+
+  esac
+
+  if [ "$1" = "X" ]; then
+    echo "$SH_SETUP"
+  fi
+
+  ScanFile "$2"
+}
+
+
+#------------------------------------------------------------------------
+#   Run ()
+#------------------------------------------------------------------------
+
+
+Run()
+{
+  local mode="N"
+  local input=""
+
+  while [ $# -gt 0 ]; do
+
+    case "$1" in
+
+      -h|--help)
+
+        PrintHelp
+        exit 0 ;;
+
+      -x)
+
+        mode="X" ;;
+
+      --)
+
+        shift
+        break ;;
+
+      -*)
+
+        Error "invalid option: $1; try \`$0 --help'"
+        exit 1 ;;
+
+      *)
+
+        break ;;
+
+    esac
+
+    shift
+
+  done
+
+  if [ $# -lt 1 ]; then
+    Error "missing input file"
+  fi
+
+  if [ $# -gt 2 ]; then
+    Error "too many input files"
+  fi
+
+  input="$1"
+
+  if [ ! -e "$input" ]; then
+    Error "no such file: $input"
+  fi
+
+  if [ -n "$2" ]; then
+
+    _OUTPUT_="$(GetAbsPath "$2")"
+
+    touch "$_OUTPUT_" || exit 1
+
+    if ProcessFile "$mode" "$input" > "$_OUTPUT_" ; then
+      if [ "$mode" = "X" ]; then
+        chmod a+x "$_OUTPUT_"
+      fi
+    else
+      Die
+    fi
+
+  else
+    ProcessFile "$mode" "$input" || Die
+  fi
+}
+
+
+#========================================================================
+#   Main script
+#========================================================================
+
+
+Run "$@"

@@ -1,0 +1,9 @@
+<map id="jem::io::PrintWriter" name="jem::io::PrintWriter">
+<area shape="rect" id="node1" title=" " alt="" coords="71,229,215,256"/>
+<area shape="rect" id="node7" href="$classjem_1_1mp_1_1GatherPrinter.html" title=" " alt="" coords="57,304,228,331"/>
+<area shape="rect" id="node2" href="$classjem_1_1io_1_1Writer.html" title="Represents a text output stream." alt="" coords="85,155,200,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="21,80,118,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,5,133,32"/>
+<area shape="rect" id="node5" href="$classjem_1_1io_1_1TextOutput.html" title="Provides an interface for writing text&#45;based output." alt="" coords="143,80,289,107"/>
+<area shape="rect" id="node6" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="159,5,273,32"/>
+</map>

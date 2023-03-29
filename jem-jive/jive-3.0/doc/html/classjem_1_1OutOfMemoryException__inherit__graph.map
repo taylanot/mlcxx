@@ -1,0 +1,6 @@
+<map id="jem::OutOfMemoryException" name="jem::OutOfMemoryException">
+<area shape="rect" id="node1" title=" " alt="" coords="5,229,216,256"/>
+<area shape="rect" id="node2" href="$classjem_1_1SystemException.html" title=" " alt="" coords="27,155,195,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="51,80,170,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="49,5,172,32"/>
+</map>

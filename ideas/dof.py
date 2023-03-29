@@ -117,7 +117,7 @@ class SemiParamKernelRidge():
         self.Y = Y
         self.X = X
 
-    def fit_them_all(self, X, Y, grid=100):
+    def fit_them_all(self, X, Y, grid=50):
         ls = np.linspace(0.001,1,grid)
         lmbdas = np.linspace(0., 10, grid)
         Xtrn, Xtst, Ytrn, Ytst = train_test_split(X,Y, test_size=0.5, random_state=2)
@@ -162,7 +162,7 @@ class SemiParamKernelRidge():
 class func_gen_pca():
     def __init__(self, num=1000):
         self.num = num
-        self.a = 1.#np.random.normal(1,0.1,num)
+        self.a = np.random.normal(1,0.1,num)
         self.phis = np.random.normal(0,1,num)
         counter = 0 
         if num == 0:
@@ -201,12 +201,13 @@ class func_gen():
         return np.sin
 
     def __call__(self, x):
-        return np.hstack(([np.multiply(self.a, np.sin(x+self.phi))]))
+        #return np.hstack(([np.multiply(self.a, np.sin(x+self.phi))]))
+        return np.hstack(([np.multiply(self.a, 1./(1.+np.exp(-x)))]))
 
 a =  1
 lmbda = 0.1
 l = 1. 
-N = 30
+N = 10
 Ntst = 1000
 M = 10
 reboot = 100

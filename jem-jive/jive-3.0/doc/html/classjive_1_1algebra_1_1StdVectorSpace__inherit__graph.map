@@ -1,0 +1,6 @@
+<map id="jive::algebra::StdVectorSpace" name="jive::algebra::StdVectorSpace">
+<area shape="rect" id="node1" title="Provides a straightforward implementation of the VectorSpace class." alt="" coords="14,229,187,271"/>
+<area shape="rect" id="node2" href="$classjive_1_1algebra_1_1VectorSpace.html" title="Computes the scalar product of two vectors." alt="" coords="5,155,196,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="52,80,149,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="37,5,165,32"/>
+</map>

@@ -1,0 +1,1896 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class Properties
+//=======================================================================
+
+/*!
+
+  \class Properties Properties.dox jem/util/Properties.h
+
+  \brief Encapsulates an hierarchical database containing name/value
+  pairs.
+
+  The \c Properties class implements an hierarchical database
+  containing a set of name/value pairs called \em properties. It is
+  typically used as a repository for configuration data.
+
+  The name of a property is represented by a \c String instance. The
+  value of a property is a variable that has one of the following
+  types: \c bool, \c int, \c double, \c String, \c Array<bool>, \c
+  Array<int>, \c Array<double>, \c Array<String>, or \c Object. The
+  value of a property can also be a \c Properties object so that you
+  can build hierarchical sets of properties. A \c Properties object
+  that is contained by another \c Properties object is called a \em
+  nested \c Properties object.
+
+  A \c Properties object can be filled by calling the member functions
+  \c parseFile() and \c parseFrom(). The former reads a set of
+  properties from a file, while the latter reads a set of properties
+  from any text input stream. The contents of a \c Properties object
+  can be printed by calling the member function \c printTo() or by
+  calling the print operator.
+
+  Individual properties can be inserted into a \c Properties object by
+  calling one of the overloaded versions of the \c set() member
+  function. They can be extracted from a \c Properties object by
+  calling one of the overloaded versions of the \c find() or \c get()
+  member functions. The difference between these two functions is that
+  the former does nothing if a property does not exist, while the
+  latter will throw an exception if a property does not
+  exist. Optionally, these functions can check if the value of a
+  property lies within a valid range. The following code fragment
+  illustrates how to set and get properties. The last statement will
+  throw an exception because the property named \c "x" does not exist.
+
+  \code
+
+  Properties  props;
+  double      x;
+  int         i;
+
+  props.set  ( "i", 1 );
+  props.get  ( i, "i" );
+  props.get  ( i, "i", 0, 10 );  // With bounds checking.
+  props.find ( x, "x" );         // Ok; no effect.
+  props.get  ( x, "x" );         // Error.
+  
+  \endcode
+
+  A property can be inserted into or extracted from a nested \c
+  Properties object by calling the \c set(), \c find() and \c get()
+  functions with a <em>compound property name</em>. Such a name
+  consists of a series of simple names concatenated by
+  <code>'.'</code> characters. Here is an example:
+
+  \code
+
+  Properties props;
+  double     length;
+
+  props.set ( "jones.age", 34 );
+  props.get ( length, "brown.length" );
+
+  \endcode
+
+  The first statement inserts the integer property "age" into the
+  nested \c Properties object named "jones". If this object does not
+  exist it is created on the fly. The second statement reads the
+  double property "length" from the nested \c Properties object named
+  "brown". An exception is thrown if this object does not exist.
+
+  A \c Properties object keeps track of its own name so that it can
+  generate meaningful error messages. The name of a \c Properties
+  object is empty by default. It is assigned a value when a \c
+  Properties object is read from another \c Properties object.
+
+  A \c Properties object stores its properties as
+  <code>String</code>/<code>Object</code> pairs in a \c Dictionary. In
+  fact, a \c Properties object is essentially a convenient wrapper
+  around a reference to a \c Dictionary object. The added value of the
+  \c Properties class is that it automatically converts property
+  values into \c Object instances and back again. An exception is
+  thrown whenever a conversion fails.
+  
+*/
+
+class Properties
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief An enumerator type.
+
+  Objects of type \c Enumerator can be used to iterate over all
+  properties in a \c Properties object. The \c Enumerator type is just
+  a convenient alias for the class \c DictionaryEnumerator.
+
+*/
+
+  typedef DictionaryEnumerator  Enumerator;
+
+
+//-----------------------------------------------------------------------
+//   constants
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Specifies that only known properties should be parsed.
+
+  A constant specifying that only known properties should be parsed.
+
+*/
+
+  static const int  PARSE_STRICT;
+  
+
+/*!
+
+  \brief Specifies that property names should be converted to upper
+  case.
+
+  A constant specifying that all property names should be converted to
+  upper case.
+
+*/
+
+  static const int  PARSE_TO_UPPER;
+
+
+/*!
+
+  \brief Specifies that files may be included when parsing a
+  properties file.
+
+  A constant specifying that files may be included (by means of the \c
+  include keyword) when parsing a properties file.
+
+*/
+
+  static const int  PARSE_INCLUDE;
+
+
+/*!
+
+  \brief Specifies that strings should be expanded.
+
+  A constant specifying that string values containing substitution
+  directives should be expanded.
+
+*/
+
+  static const int  PARSE_STRINGS;
+
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs an empty \c Properties object.
+
+  Constructs a \c Properties object with name \a name that
+  encapsulates a newly created, empty \c Dictionary object. The
+  runtime type of the \c Dictionary object is not specified.
+
+  \param name - the name of the newly constructed \c Properties
+  object.
+
+  \post <code>
+    getName() == name
+  </code>
+
+*/
+
+  explicit Properties ( const String& name = "" );
+
+
+/*!
+
+  \brief Constructs a \c Properties object given a dictionary and a
+  name.
+
+  Constructs a \c Properties object that uses the \c Dictionary \a
+  dict to store its properties. The string \a name specifies the name
+  of the \c Properties object -- as returned by \c getName().
+
+  \param dict - the \c Dictionary in which the properties are to be
+  stored.
+
+  \param name - the name of the newly constructed \c Properties
+  object.
+
+  \pre <code>dict != NIL</code>
+
+  \post <code>
+    getContents() == dict && <br>
+    getName()     == name
+  </code>
+
+*/
+ 
+  explicit Properties
+    
+    ( const Ref<Dictionary>&  dict,
+      const String&           name = "" );
+
+
+/*!
+
+  \brief Constructs a shallow copy of a \c Properties object.
+
+  Constructs a \c Properties object that points to the same \c
+  Dictionary as the \c Properties object \a rhs. The name of this \c
+  Properties object equals the name of the \a rhs \c Properties
+  object.
+
+  \param rhs - a \c Properties object.
+
+  \post <code>
+    this->getContents() == rhs.getContents()
+  </code>
+
+*/
+
+  Properties ( const Properties& rhs );
+
+
+//-----------------------------------------------------------------------
+//   assignment operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Makes a shallow copy of another \c Properties object.
+
+  Makes a shallow copy of the \c Properties object \a rhs. After
+  calling the assignment operator, both objects point to the same \c
+  Dictionary object and have the same name.
+
+  \param rhs - the \c Properties object to be copied.
+
+  \post <code>
+    this->getContents() == rhs.getContents() &&
+    this->getName()     == rhs.getName()
+  </code>
+
+*/
+
+  Properties& operator = ( const Properties& rhs );
+
+
+//-----------------------------------------------------------------------
+//   clone
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a deep copy of this properties set.
+
+  Returns a deep copy of this properties set. This function
+  essentially executes:
+
+  \code
+  return Properties (
+    checkedCast<Dictionary> ( this->getContents() ),
+    this->getName ()
+  );
+  \endcode
+
+  \return A deep copy of this properties set.
+
+*/
+
+  Properties clone () const;
+  
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Swaps the contents of two \c Properties objects.
+
+  Swaps the contents of this object with the \a rhs object. It has the
+  same effect as:
+
+  \code
+
+  Properties tmp ( *this );
+
+  *this = rhs;
+  rhs   = tmp;
+
+  \endcode
+
+  \param rhs - a \c Properties object.
+
+*/
+
+  inline void swap ( Properties& rhs );
+
+
+//-----------------------------------------------------------------------
+//   getContents
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the dictionary containing the properties.
+
+  Returns a reference to the dictionary containing the properties
+  stored in this \c Properties object.
+
+*/
+
+  inline Dictionary* getContents () const;
+
+
+//-----------------------------------------------------------------------
+//   setContents
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the dictionary encapsulated by this object.
+
+  Sets the \c Dictionary reference owned by this object to \a dict.
+
+  \param dict - a reference to the dictionary that is to be wrapped by
+  this \c Properties object.
+
+  \pre <code>dict != NIL</code>
+
+  \post <code>this->getContents() == dict</code>
+
+*/
+
+  void setContents ( const Ref<Dictionary>& dict );
+
+
+//-----------------------------------------------------------------------
+//   getName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the name of this object.
+
+  Returns the name of this \c Properties object. By default, the name
+  of a \c Properties object is an empty string. It is set whenever a
+  \c Properties object is extracted from another \c Properties object.
+
+*/
+
+  inline String getName () const;
+
+
+//-----------------------------------------------------------------------
+//   enumerate
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumeration over all properties in this object.
+
+  Returns an enumerator over all properties in this \c Properties
+  object. This function is equivalent with:
+
+  \code
+  return this->getContents()->enumerate();
+  \endcode
+
+*/
+
+  Ref<Enumerator> enumerate () const;
+
+
+//-----------------------------------------------------------------------
+//   parseFile
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads a set of properties from a file.
+
+  Reads a set of properties from the file named \a fname and adds
+  those properties to the current set of properties stored in this \c
+  Properties object. The format of the properties file is described by
+  the page \ref PropertiesFile. The input argument \a options controls
+  how the properties are parsed and added to the current set of
+  properties. See the documentation of the function \c parseFrom() for
+  the details.
+
+  Note that this function essentially creates a \c Tokenizer object
+  and then calls the function \c parseFrom().
+
+  \param fname - the name of the file from which the properties are to
+  be read.
+
+  \param options - an integer flag specifying how the properties are
+  to be parsed.
+
+  \throws ParseException - if a parse error occurs.
+
+  \throws IllegalInputException - if the properties file contains
+  semantic errors (like references to non-existing properties).
+
+  \throws PropertyException - if a property is not present in the
+  current set or if the type of a property is incorrect.
+
+  \throws io::FileNotFoundException - if the specified properties file
+  does not exist.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+  void parseFile ( const String&  fname,
+                   int            options = 0 ) const;
+
+
+//-----------------------------------------------------------------------
+//   parseFrom
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads properties from a given tokenizer.
+
+  Reads properties from the tokenizer \a input and inserts them into
+  this \c Properties object. The format of the input stream read by
+  the tokenizer is described by the page \ref PropertiesFile. This
+  function returns when the entire input stream has been parsed, or
+  when an illegal token is encountered.
+
+  The second input parameter \a source specifies the name of the input
+  stream, and is used in error messages. It is typically the name of a
+  file associated with the input stream.
+
+  The input argument \a options controls how the properties are read
+  from the tokenizer. It should be a bitwise OR of the constants \c
+  PARSE_TO_UPPER, \c PARSE_STRICT, \c PARSE_INCLUDE and \c
+  PARSE_STRINGS. The first constant indicates that all names of the
+  read properties are to be converted to uppercase characters.
+
+  The constant \c PARSE_STRICT indicates that the current set of
+  properties determines which properties may be read from the
+  tokenizer. That is, each property name read from the tokenizer is
+  looked up in the current set of properties. If a property with that
+  name exists, its type is compared with the type of the property
+  value read from the tokenizer. If both types are equal, the current
+  property is replaced by the one read from the tokenizer. An
+  exception is thrown if the two types are not equal or if the
+  property is not present in the current set of properties. Note that
+  a property read from the tokenizer may have any type if the
+  corresponding property in the current set has the value \c NIL. In
+  other words, the value \c NIL functions as a wild-card that matches
+  any type.
+  
+  If the \c PARSE_STRICT constant is not set in the argument \a
+  options, then all properties read from the tokenizer are inserted
+  into the current set of properties. A property read from the
+  tokenizer replaces an existing property if it has the same name.
+
+  The constant \c PARSE_INCLUDE indicates that files may be included
+  into the input stream by means of the \c include keyword (see the
+  page \ref PropertiesFile for the details). If the \c PARSE_INCLUDE
+  bit has not been set in the parameter \a options, then the word \c
+  include is handled as a normal property name.
+
+  The constant \c PARSE_STRINGS indicates that all strings containing
+  substitution directives of the form <code>$(name)</code> should be
+  expanded. If the \c PARSE_STRINGS bit has not been set in the \a
+  options parameter, then all string values are stored directly
+  without expanding them.
+
+  \param input - the \c Tokenizer from which a set of properties is to
+  be read.
+
+  \param source - the name of the input stream.
+
+  \param options - an integer flag that specifies how the properties
+  are to be parsed and added to the current set of properties.
+
+  \throws ParseException - if a parse error occurs.
+
+  \throws IllegalInputException - if the properties file contains
+  semantic errors (like references to non-existing properties).
+
+  \throws PropertyException - if a property is not present in the
+  current set or if the type of a property is incorrect.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+  void parseFrom ( Tokenizer&     input,
+                   const String&  source,
+                   int            options = 0 ) const;
+  
+
+//-----------------------------------------------------------------------
+//   printTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints the contents of this properties set.
+
+  Prints the contents of this \c Properties object to the formatted
+  output stream \a out. The output has the same format as the input
+  read by the member \c parseFrom(). Nested \c Properties objects are
+  printed recursively.
+
+  \throws io::IOException - if an I/O error occurs,
+
+*/
+
+  void printTo ( io::PrintWriter& out ) const;
+
+
+//-----------------------------------------------------------------------
+//   set (Object)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a property with type \c Object.
+
+  Inserts the property with name \a name and value \a value into this
+  \c Properties object. If a property with the same name already
+  exists, its value is replaced by the object \a value. If \a name is
+  a compound name -- containing one or more dots -- the property is
+  inserted into a nested \c Properties object. Non-existent nested \c
+  Property object are created on the fly, possibly replacing existing
+  properties that are not of type \c Properties. Here is an example:
+
+  \code
+
+  this->set ( "car",       "Mercedes" );
+  this->set ( "car.brand", "Mercedes" );
+
+  \endcode
+
+  The first statement inserts a property named \c "car" with the value
+  "Mercedes". The second statement replaces this property with a
+  nested \c Properties object, and then inserts the property named
+  "brand" into the nested \c Properties object.
+
+  This function calls the function \c Dictionary::insert() to insert
+  the property into the dictionary owned by this \c Properties object
+  or the dictionary of a nested \c Properties object.
+
+  \param name - the name of the property to be inserted.
+
+  \param value - the value of the property to be inserted.
+
+*/
+  
+  void set ( const String&       name,
+             const Ref<Object>&  value ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( bool )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a boolean property.
+
+  Inserts a boolean property. This function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+
+  void set ( const String&  name,
+             bool           value ) const;
+ 
+
+//-----------------------------------------------------------------------
+//   set ( int )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts an integer property.
+
+  Inserts an integer property. This function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+
+  void set ( const String&  name,
+             int            value ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( double )
+//------------------------------------------------------------------  
+
+/*!
+
+  \brief Inserts a floating point property.
+
+  Inserts a property with type \c double. This function has the same
+  effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+
+  void set ( const String&  name,
+             double         value ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( const char* )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a string property.
+
+  Inserts a property with type \c String. This function exists only to
+  avoid conversion problems (pointers are converted to booleans). It
+  is equivalent with:
+
+  <code>this->set ( name, String( value ) );</code>
+
+  \sa <code>set( const String&, const String& )</code>
+
+*/
+
+  void set ( const String&  name,
+             const char*    value ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( String )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a string property.
+
+  Inserts a string property. This function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+  
+  void set ( const String&  name,
+             const String&  value ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( Array<bool> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a boolean array property.
+
+  Inserts a property of which the value is a boolean array. This
+  function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+  
+  void set ( const String&       name,
+             const Array<bool>&  values ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( Array<int> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts an integer array property.
+
+  Inserts a property of which the value is an integer array. This
+  function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+  
+  void set ( const String&      name,
+             const Array<int>&  values ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( Array<double> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a floating point array property.
+
+  Inserts a property with type \c Array<double>. This function has the
+  same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+  
+  void set ( const String&         name,
+             const Array<double>&  values ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( Array<String> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a string array property.
+
+  Inserts a property of which the value is an array of strings. This
+  function has the same effect as
+
+  <code>this->set ( name, toObject( value ) );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+  
+  void set ( const String&         name,
+             const Array<String>&  values ) const;
+
+
+//-----------------------------------------------------------------------
+//   set ( Poperties )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a nested set of properties.
+
+  Inserts a nested set of properties. This function has the same
+  effect as
+
+  <code>this->set ( name, values.getContents() );</code>
+
+  \sa <code>set( const String&, const Ref<Object>& )</code>
+
+*/
+
+  void set ( const String&      name,
+             const Properties&  values ) const;
+  
+
+//-----------------------------------------------------------------------
+//   find ( type T )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a property.
+
+  Searches for a property with type \c T and name \a name. If the
+  property exists, its address is stored in the output parameter \a
+  value and \c true is returned. Otherwise, \a value is not modified
+  and \c false is returned. If the name of the property is a compound
+  name -- containing one or more dots -- then the property is looked
+  up in a nested set of properties.
+
+  This function calls the member function \c Dictionary::find() to
+  search for the property in the dictionary encapsulated by this \c
+  Properties object or by a nested \c Properties object.
+
+  \param value - a reference in which the address of the
+  requested property is stored.
+
+  \param name - the name of the property to be found.
+
+  \return \c true is the property has been found, and \c false
+  otherwise.
+
+  \throws PropertyException - if the property exists but is not of
+  type \c T.
+
+*/
+
+  template <class T>
+    bool find ( Ref<T>&        value,
+                const String&  name ) const;
+  
+
+//-----------------------------------------------------------------------
+//   find ( bool )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a boolean property.
+
+  Searches for a boolean property with name \a name. If the property
+  exists, its value is stored in the argument \a value, and \c true is
+  returned. Otherwise, \a value is not modified and \c false is
+  returned.
+
+  \throws PropertyException - if the property exists but is not of
+  type \c bool.
+
+  \sa <code>find ( Ref<T>&, const String& )</code>
+
+*/
+
+  bool find ( bool&          value,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( int )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for an integer property.
+
+  Searches for an integer property.
+
+  \throws PropertyException - if the property exists but is not of
+  type \c int.
+
+  \sa <code>find ( bool&, const String& )</code>
+
+*/
+
+  bool find ( int&           value,
+              const String&  name ) const;
+  
+
+
+//-----------------------------------------------------------------------
+//   find ( double )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a floating point property.
+
+  Searches for a property with type \c double.
+
+  \throws PropertyException - if the property exists but is not of
+  type \c double.
+
+  \sa <code>find ( bool&, const String& )</code>
+
+*/
+
+  bool find ( double&        value,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( String )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a string property.
+
+  Searches for a string property.
+
+  \throws PropertyException - if the property exists but is not of
+  type \c String.
+
+  \sa <code>find ( bool&, const String& )</code>
+
+*/
+  
+  bool find ( String&        value,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<bool> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a boolean array property.
+
+  Searches for a property that has type \c Array<bool> and name \a
+  name. If the property exists, then a \em shallow copy of its value
+  is stored in the argument \a values and \c true is
+  returned. Otherwise, \a values is not modified and \c false is
+  returned.
+
+  This function first searches for a generic object property
+  with name \a name by calling
+
+  <code>this->find ( obj, name );</code>
+
+  where \c obj is an object reference of type \c Ref<Object>. If the
+  call returns \c false, this function returns \c false
+  too. Else, if \c obj equals \c NIL, the argument \a values
+  is set to an empty array by executing the statement
+
+  <code>values.ref ( Array<bool>() );</code>
+
+  Else, if \c obj points to an object that can be converted to a
+  boolean array, the argument \a values is set as follows:
+
+  <code>values.ref ( toValue< Array<bool> >( obj ) );</code>
+
+  Else, if \c obj points to an object that can be converted to a
+  boolean value, then \a values is set to a new array of length one
+  containing the value of the property. Else, an exception is thrown.
+
+  Note that in the second case above the argument \a values points to
+  the \em same data as the property object stored in this \c
+  Properties object (or a nested \c Properties object). This means
+  that if the contents of the array \a values are later modified, the
+  contents of the original property object will be modified too.
+
+  Here is an example involving boolean array properties.
+
+  \code
+
+  Array<bool>  values ( 3 );  
+  Properties   props;
+
+  values = false;
+
+  props.set  ( "a", values );
+  props.set  ( "b", true   );
+  props.set  ( "c", 1.0    );
+
+  props.find ( values, "a" );  // OK
+  props.find ( values, "b" );  // OK: conversion from bool
+  props.find ( values, "c" );  // Error: invalid property value
+
+  \endcode
+
+  \param values - a boolean array that will point to the data of the
+  property if it has been found.
+
+  \param name - the name of the property to be found.
+
+  \return \c true if the property has been found, and \c false
+  otherwise.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<bool>.
+
+  \sa <code>find ( Ref<Object>&, const String& )</code>
+
+*/
+  
+  bool find ( Array<bool>&   values,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<int> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for an integer array property.
+
+  Searches for a property that has type \c Array<int>.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<int>.
+
+  \sa <code>find ( Array<bool>&, const String& )</code>
+
+*/
+  
+  bool find ( Array<int>&    values,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<double> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a floating point array property.
+
+  Searches for a property that has type \c Array<double>.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<double>.
+
+  \sa <code>find ( Array<bool>&, const String& )</code>
+
+*/
+  
+  bool find ( Array<double>&  values,
+              const String&   name ) const;
+
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<String> )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a string array property.
+
+  Searches for a property that has type \c Array<String>.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<String>.
+
+  \sa <code>find ( Array<String>&, const String& )</code>
+
+*/
+  
+  bool find ( Array<String>&  values,
+              const String&   name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Properties )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a nested set of properties.
+
+  Searches for a nested set of properties with name \a name. If the
+  nested set of properties exists, a shallow copy is assigned to the
+  argument \a values and \c true is returned. Otherwise, \c values is
+  not modified and \c false is returned.
+
+  This function first searches for a generic object property
+  with name \a name by calling
+
+  <code>this->find ( obj, name );</code>
+
+  where \c obj as an object reference of type \c Ref<Object>. If the
+  call returns \c false, this function returns \c false too. Else, if
+  the object pointed to by \c obj can be converted to an object of
+  type \c Dictionary, then the argument \a values is set as follows:
+
+  <code>values = Properties ( dynamicCast<Dictionary>( obj ) );</code>
+  
+  Else an exception is thrown to indicate the type of the property
+  named \a name is incorrect.
+
+  If this function returns \c true, then the name of the \c Properties
+  object \a values will be equal to the concatenation of the name of
+  this \c Properties object and the string \a name. To be precise, the
+  name of the \c Properties object \a values will be equal to
+
+  <code>this->getName() + "." + name</code>
+
+  provided that the name of this \c Properties object is not empty. If
+  it is, then the name of the object \a values will be equal to the
+  input argument \a name.
+
+  \param values - a reference \c Properties object that will point to
+  the nested properties set if that set has been found.
+
+  \param name - the name of the nested set of properties to be found.
+
+  \return \c true if the nested set of properties has been found, and
+  \c false otherwise.
+
+  \throws PropertyException - if the value of the property named \a
+  name can not be converted to a \c Dictionary.
+
+  \sa <code>find ( Ref<Object>&, const String& )</code>
+
+*/
+
+  bool find ( Properties&    values,
+              const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( int, with range checking )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for an integer property and checks its range.
+
+  Searches for an integer property and checks whether the value of
+  that property is larger than or equal to \a lbound and smaller than
+  or equal to \a ubound. This function is equivalent with:
+
+  \code
+
+  int tmp;
+
+  if ( ! this->find( tmp, name ) ) {
+    return false;
+  }
+
+  if ( tmp < lbound || tmp > ubound ) {
+    throw PropertyException;
+  }
+
+  value = tmp;
+
+  return true;
+  
+  \endcode
+
+  \param value - a reference to an integer that will be set to the
+  value of the property if it has been found and its range is valid.
+
+  \param name - the name of the property to be found.
+
+  \param lbound - the lower bound (inclusive) of the valid range.
+
+  \param ubound - the upper bound (inclusive) of the valid range.
+
+  \return \c true if the property has been found and is valid, and \c
+  false otherwise.
+
+  \throws PropertyException - if the property named \a name exists but
+  is not of type \c int or if its value is out of range.
+
+  \sa <code>find ( int&, const String& )</code>
+
+*/
+  
+  bool find ( int&           value,
+              const String&  name,
+              int            lbound,
+              int            ubound ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( double, with range checking )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a floating point property and checks its range.
+
+  Searches for a floating point property and checks whether the value of
+  that property is larger than or equal to \a lbound and smaller than
+  or equal to \a ubound.
+
+  \throws PropertyException - if the property named \a name exists but
+  is not of type \c double or if its value is out of range.
+
+  \sa <code>find ( int&, const String&, int, int )</code>
+
+*/
+  
+  bool find ( double&        value,
+              const String&  name,
+              double         lbound,
+              double         ubound ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<int>, with range checking )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for an integer array property and checks the range
+  of each element.
+
+  Searches for a property with type \c Array<int> and checks whether
+  all array elements are larger than or equal to \a lbound and smaller
+  than or equal to \a ubound. This function is equivalent with:
+
+  \code
+
+  Array<int> tmp;
+
+  if ( ! this->find( tmp, name ) ) {
+    return false;
+  }
+
+  if ( testany( tmp < lbound || tmp > ubound ) ) {
+    throw PropertyException;
+  }
+
+  value.ref( tmp );
+
+  return true;
+  
+  \endcode
+
+  \param values - a reference to an integer array that will be set to
+  the value of the property if it has been found and its range is
+  valid.
+
+  \param name - the name of the property to be found.
+
+  \param lbound - the lower bound (inclusive) of the valid range.
+
+  \param ubound - the upper bound (inclusive) of the valid range.
+
+  \return \c true if the property has been found and is valid, and \c
+  false otherwise.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<int> or if one of
+  the array elements is out of range.
+
+  \sa <code>find ( Array<int>&, const String& )</code>
+
+*/
+
+  bool find ( Array<int>&    values,
+              const String&  name,
+              int            lbound,
+              int            ubound ) const;
+
+
+//-----------------------------------------------------------------------
+//   find ( Array<int>, with range checking )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a floating point array property and checks the
+  range of each element.
+
+  Searches for a property with type \c Array<double> and checks
+  whether all array elements are larger than or equal to \a lbound and
+  smaller than or equal to \a ubound.
+
+  \throws PropertyException - if the property named \a name exists but
+  can not be converted to an array of type \c Array<double> or if one
+  of the array elements is out of range.
+
+  \sa <code>find ( Array<int>&, const String&, int, int )</code>
+
+*/
+  
+  bool find ( Array<double>&  values,
+              const String&   name,
+              double          lbound,
+              double          ubound ) const;
+
+
+//-----------------------------------------------------------------------
+//   get ( Object )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a property as an object.
+
+  Returns the property named \a name as an \c Object instance. This
+  function is equivalent with:
+
+  \code
+
+  Ref<Object> obj;
+
+  if ( ! this->find ( obj, name ) ) {
+    throw PropertyException;
+  }
+
+  return obj;
+
+  \endcode
+
+  \param name - the name of the property to be found.
+
+  \throws PropertyException - if the property can not be found.
+
+*/
+
+  Ref<Object> get ( const String& name   ) const;
+  
+
+//-----------------------------------------------------------------------
+//   get ( type T )
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Reads the value of a property.
+
+  Stores the value of the property named \a name into the output
+  parameter \a value. This function is equivalent with:
+
+  \code
+
+  if ( ! this->find ( value, name ) ) {
+    throw PropertyException;
+  }
+
+  \endcode
+
+  \param value - a reference to a variable of type \c T into which the
+  value of the property is to be stored.
+
+  \param name - the name of the property to be found.
+
+  \throws PropertyException - if the property can not be found or if
+  the property is not of type \c T.
+
+*/
+
+  template <class T>
+    void get ( T&             value,
+               const String&  name ) const;
+
+
+//-----------------------------------------------------------------------
+//   get ( type T with range checking )
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Reads the value of a property and checks its range.
+
+  Stores the value of the property named \a name into the output
+  parameter \a value and checks whether the value is larger than or
+  equal to \a lbound and smaller than or equal to \a ubound. This
+  function is equivalent with:
+
+  \code
+
+  if ( this->find ( value, name, lbound, ubound ) ) {
+    throw PropertyException;
+  }
+
+  \endcode
+
+  \param value - a reference to a variable of type \c T that will be
+  set to the value of the property (if it has been found and its range
+  is valid).
+
+  \param name - the name of the property to be found.
+
+  \param lbound - the lower bound (inclusive) of the valid range.
+
+  \param ubound - the upper bound (inclusive) of the valid range.
+
+  \throws PropertyException - if the property can not be found; or if
+  the property is not of type \c T; or if the value property is out of
+  range.
+
+*/
+
+  template <class T>
+    void get ( T&             value,
+               const String&  name,
+               T              lbound,
+               T              ubound ) const;
+  
+
+//-----------------------------------------------------------------------
+//   get ( Array<T>, with range checking )
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads the value of an array property and checks its range.
+
+  Stores a shallow copy of the array property named \a name into the
+  output parameter \a value and checks whether the array elements are
+  larger than or equal to \a lbound and smaller than or equal to \a
+  ubound. This function is equivalent with:
+
+  \code
+
+  if ( this->find ( value, name, lbound, ubound ) ) {
+    throw PropertyException;
+  }
+
+  \endcode
+
+  \param values - a reference to an array of type \c Array<T> that will
+  be set to the value of the property (if it has been found and its
+  range is valid).
+
+  \param name - the name of the property to be found.
+
+  \param lbound - the lower bound (inclusive) of the valid range.
+
+  \param ubound - the upper bound (inclusive) of the valid range.
+
+  \throws PropertyException - if the property can not be found; or if
+  the property is not of type \c Array<T>; or if one of the array
+  elements is out of range.
+  
+*/
+
+  template <class T>
+    void get ( Array<T>&      values,
+               const String&  name,
+               T              lbound,
+               T              ubound ) const;
+
+
+//-----------------------------------------------------------------------
+//   makeProps
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates and returns a nested set of properties.
+
+  Searches for a nested set of properties named \a name. If that
+  nested set does not exist, a new, nested properties set is
+  created. If there exists a property named \a name that is not a
+  properties object, that property will be replaced by a new, nested
+  properties set. This function returns the nested properties set that
+  has been found or that has been created.
+
+  \param name - the name of the nested properties set to be found or
+  created.
+
+  \return A nested properties set named \a name.
+
+*/
+
+  Properties makeProps ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   findProps
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a nested properties set.
+
+  Searches for and returns the nested set of properties named \a
+  name. An empty properties object is returned if this properties set
+  does not contain a property named \a name. This function is
+  equivalent with:
+
+  \code
+  Properties tmp;
+
+  this->find ( tmp, name );
+
+  return tmp;
+  \endcode
+
+  \param name - the name of the nested properties set to be found.
+
+  \return The nested properties set named \a name, or an empty
+  properties set if there is no property named \a name.
+
+  \throws PropertyException - if the property with the specified name
+  is not of type \c Properties.
+
+*/
+
+  Properties findProps ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   getProps
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a nested properties set.
+
+  Returns the nested properties set named \a name. An exception is
+  thrown if the nested properties set does not exist. This function
+  has the same effect as:
+
+  \code
+  Properties tmp;
+
+  this->get ( tmp, name );
+
+  return tmp;
+  \endcode
+
+  \param name - the name of the nested properties set to be found.
+
+  \return The nested properties set named \a name.
+
+  \throws PropertyException - if the nested properties set does not
+  exist; or if the property with the specified name is not a nested
+  properties set.
+
+*/
+
+  Properties getProps ( const String& name ) const;
+  
+//-----------------------------------------------------------------------
+//   contains
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Checks for the existence of a property.
+
+  Checks whether the property named \a name is part of this set of
+  properties. This function is equivalent with:
+
+  \code
+  
+  Ref<Object> dummy;
+
+  return this->find ( dummy, name );
+
+  \endcode
+
+  \param name - the name of a property.
+
+*/
+
+  bool contains ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   erase
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes a property.
+
+  Deletes the property named \a name from this set of properties. If
+  \a name is a compound name (containing one or more dots), then the
+  property is deleted from a nested set of properties. This function
+  has no effect if the property does not exist.
+
+  \param name - the name of a property.
+
+  \post <code>this->contains( name ) == false</code>
+
+*/
+
+  void erase ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   clear
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes all properties.
+
+  Deletes all properties from this \c Properties object. This function
+  has the same effect as
+
+  \code
+  
+  this->getContents()->clear();
+
+  \endcode
+
+*/
+
+  void clear () const;
+
+
+
+//-----------------------------------------------------------------------
+//   getContext
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a context string.
+
+  Returns a context string that can be used for displaying errors and
+  other types of messages that are related to this set of
+  properties. The returned string is typically passed as a context
+  string to the constructor of an exception class.
+
+  \return A context string.
+
+  \sa <code>getContext( const String& )</code>
+
+*/
+
+  String getContext () const;
+
+
+/*!
+
+  \brief Returns a context string.
+
+  Returns a context string that can be used for displaying errors
+  related to a property named \a name in this set of properties. The
+  returned string is typically passed as a context string to the
+  constructor of an exception class.
+
+  \param name - the name of a property.
+
+  \return A context string.
+
+  \sa \c propertyError()
+
+*/
+
+  String getContext ( const String& name ) const;
+
+
+//-----------------------------------------------------------------------
+//   propertyError
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Throws a \c PropertyException.
+
+  Throws a \c PropertyException indicating that the property named \a
+  name is invalid. The input string \a msg should explain why the
+  property is invalid.
+
+  \throws PropertyException
+
+*/
+
+  void propertyError ( const String&  name,
+                       const String&  msg ) const;
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Properties
+
+  \brief Swaps the contents of two properties sets.
+
+  Swaps the contents of the properties sets \a lhs and \a rhs. This
+  function is equivalent with:
+
+  \code
+
+  lhs.swap ( rhs );
+
+  \endcode
+
+  \param lhs - a \c Properties object.
+
+  \param rhs - another \c Properties object.
+
+*/
+
+inline void swap ( Properties&  lhs,
+                   Properties&  rhs );
+
+
+
+//-----------------------------------------------------------------------
+//   merge
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Recursively copies two properties sets.
+
+  Copies all properties in the set \a rhs into the set \a lhs. If the
+  parameter \a replace is \c true, this function will replace all
+  properties in \a lhs by the properties in \a rhs with the same
+  name. Otherwise, if \a replace equals \c false, the properties in \a
+  lhs will not be replaced by the properties in \a rhs with the same
+  name.
+
+  The \c merge function copies properties recursively. That is, if
+  both \a lhs and \a rhs contain a nested properties set with the same
+  name, then the \c merge function will copy all properties in those
+  two nested sets instead of simply replacing the nested property set
+  in \a lhs by the corresponding properties set in \a rhs.
+
+  Because properties are copied by reference, the properties sets \a
+  lhs and \a rhs may contain properties that point to the same object
+  after calling this function.
+
+  \param lhs - the destination properties set.
+  
+  \param rhs - the source properties set.
+
+  \param replace - a boolean flag that indicates whether properties in
+  \a lhs should be replaced by the equally named properties in \a rhs.
+
+*/
+
+void merge ( const Properties&  lhs,
+             const Properties&  rhs,
+             bool               replace );
+
+
+
+//-----------------------------------------------------------------------
+//   mergeNoReplace
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies two properties sets without replacing existing
+  properties.
+
+  Recursively copies all properties in the set \a rhs that do not
+  exist in the set \a lhs. This function is equivalent with:
+
+  <code>merge ( lhs, rhs, false )</code>
+
+  \sa \c merge()
+
+*/
+
+inline void mergeNoReplace ( const Properties&  lhs,
+                             const Properties&  rhs );
+
+
+//-----------------------------------------------------------------------
+//   mergeAndReplace
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies two property sets, replacing existing properties.
+
+  Recursively copies all properties in the set \a rhs into the set \a
+  lhs, replacing properties in \a lhs by properties in \a rhs with the
+  same name. This function has the same effect as:
+
+  <code>merge ( lhs, rhs, true )</code>
+
+  \sa \c merge()
+
+*/
+
+inline void mergeAndReplace ( const Properties&  lhs,
+                              const Properties&  rhs );
+
+
+//-----------------------------------------------------------------------
+//   print operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Properties
+
+  \brief Prints the contents of a set of properties.
+
+  Prints the contents of the properties set \a props to the text
+  output stream \a out. This function essentially wraps the output
+  stream into a \c jem::io::PrintWriter and then calls the member
+  function \c Properties::printTo().
+
+  \throws io::IOException - if an I/O error occurs,
+ 
+*/
+
+io::Writer& operator << ( io::Writer&        out,
+                          const Properties&  props );
+
+
+//-----------------------------------------------------------------------
+//   serialization operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Properties
+
+  \brief Properties de-serialization operator.
+
+  Reads a \c Properties object from the object input stream \a in
+  and assigns it to the output parameter \a props.
+
+  \param in - the object input stream from which the \c Properties
+  object is to be read.
+
+  \param props - the \c Properties object to be read.
+
+  \return \a in
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \throws io::SerializationException - if the object input stream is
+  corrupt.
+
+*/
+
+io::ObjectInput& operator >> ( io::ObjectInput&  in,
+                               Properties&       props );
+
+
+/*!
+
+  \relates Properties
+
+  \brief Properties serialization operator.
+
+  Writes the \c Properties object \a props to the object output stream
+  \a out. The de-serialization operator can be used to restore the \c
+  Properties object.
+
+  \param out - the object output stream to which the \c Properties
+  object is to be written.
+
+  \param props - the \c Properties object to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+
+io::ObjectOutput&  operator << ( io::ObjectOutput&  out,
+                                 const Properties&  props );
+
+
+
+
+
+JEM_END_PACKAGE( util )

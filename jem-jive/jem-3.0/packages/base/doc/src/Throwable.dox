@@ -1,0 +1,211 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class Throwable
+//=======================================================================
+
+/*!
+  \class Throwable Throwable.dox jem/base/Throwable.h
+
+  \brief Provides a single superclass for all exceptions in Jem.
+
+  %All objects thrown by jem are instances of the \c Throwable class or
+  one of its derived classes. This means that the try-block
+
+  \code
+  try
+  {
+    ...
+  }
+  catch ( const Throwable& e )
+  {
+    ...
+  }
+  \endcode
+
+  will catch all exceptions thrown by jem.
+
+  By convention, classes derived from the \c Throwable class provide a
+  constructor that takes two strings as its arguments: one that
+  describes the context in which the exception occured, and one that
+  describes the cause of the exception. The first string is typically
+  the name of a function and can be generated automatically by using
+  the macro \c JEM_FUNC. This macro expands to a static,
+  null-terminated character array containing the name of the current
+  function. Example:
+
+  \code
+  double Vector::get ( int i ) const
+  {
+    if ( i < 0 && i >= size() )
+    {
+      throw IllegalIndexException ( JEM_FUNC, "illegal array index" );
+    }
+    return elements[i];
+  }
+  \endcode
+
+  Here, the macro \c JEM_FUNC will expand to
+  `<code>Vector::get( int i ) const</code>', or something similar.
+
+*/
+
+class Throwable
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a new \c Throwable instance.
+  
+  Constructs a \c Throwable instance with a given context and message
+  string.
+
+  \param place - a string describing the context in which this \c
+  Throwable was thrown. The macro \c JEM_FUNC can be used to obtain
+  the name of the current function.
+
+  \param msg - a string describing why this \c Throwable was thrown.
+
+  \post <code>
+    this->where() == place && <br>
+    this->what()  == msg
+  </code>
+
+*/
+
+  explicit Throwable ( const String& place = String(),
+                       Const String& msg   = String() );
+  
+  
+/*!
+
+  \brief Creates a copy of another \c Throwable instance.
+   
+  Creates a copy of the Throwable \a rhs.
+  
+  \param rhs - the \c Throwable to be copied.
+
+  \post <code>
+    this->where() == rhs.where() && <br>
+    this->what()  == rhs.what()
+  </code>
+
+*/
+
+  Throwable ( const Throwable& rhs );
+
+
+/*!
+  \brief Destructor.
+   
+  Deallocates all privately allocated memory.
+
+*/
+
+  ~Throwable ();
+
+
+//-----------------------------------------------------------------------
+//   where
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a string describing the context in which this \c
+  Throwable was thrown.
+  
+  Returns a string describing the context in which this \c Throwable
+  was thrown. The default implementation provided by the \c Throwable
+  class simply returns the string that was passed as the first
+  argument in the constructor.
+   
+  \return A string describing where this \c Throwable was thrown.
+
+*/
+
+  virtual String where () const;
+
+
+//-----------------------------------------------------------------------
+//   what
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a string describing why this \c Throwable was
+  thrown.
+   
+  Returns a string describing why this \c Throwable object was
+  thrown. The default implementation provided by the \c Throwable
+  class simply returns the String that was passed as the second
+  argument in the constructor.
+
+  \return A string describing why this \c Throwable was thrown.
+
+*/
+
+  virtual String what () const;
+
+
+//-----------------------------------------------------------------------
+//   name
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the class name of this exception.
+  
+  Returns the full class name -- including namespaces -- of this \c
+  Throwable instance. This function should be overriden by derived
+  classes. For instance, a class named \c flip::FlopException should
+  return the string \c "flip::FlopException".
+
+  \return A string describing the class name of this object.
+
+*/
+
+  virtual String name () const;
+
+};
+
+
+
+JEM_END_PACKAGE_BASE

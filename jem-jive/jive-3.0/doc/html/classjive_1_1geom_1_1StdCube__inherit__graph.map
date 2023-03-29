@@ -1,0 +1,9 @@
+<map id="jive::geom::StdCube" name="jive::geom::StdCube">
+<area shape="rect" id="node1" title=" " alt="" coords="213,107,367,133"/>
+<area shape="rect" id="node3" href="$classjive_1_1geom_1_1StdCube16.html" title=" " alt="" coords="431,5,601,32"/>
+<area shape="rect" id="node4" href="$classjive_1_1geom_1_1StdCube20.html" title=" " alt="" coords="431,56,601,83"/>
+<area shape="rect" id="node5" href="$classjive_1_1geom_1_1StdCube27B.html" title=" " alt="" coords="427,107,605,133"/>
+<area shape="rect" id="node6" href="$classjive_1_1geom_1_1StdCube3Bx2x2.html" title=" " alt="" coords="415,157,617,184"/>
+<area shape="rect" id="node7" href="$classjive_1_1geom_1_1StdCube8.html" title=" " alt="" coords="435,208,597,235"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1StdShape.html" title="Encapsulates the geometrical properties of a finite element in its local coordinate system." alt="" coords="5,107,165,133"/>
+</map>

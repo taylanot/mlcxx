@@ -1,0 +1,6 @@
+<map id="jive::geom::StdTriangle" name="jive::geom::StdTriangle">
+<area shape="rect" id="node1" title=" " alt="" coords="111,80,281,107"/>
+<area shape="rect" id="node3" href="$classjive_1_1geom_1_1StdTriangle3.html" title=" " alt="" coords="5,155,184,181"/>
+<area shape="rect" id="node4" href="$classjive_1_1geom_1_1StdTriangle6.html" title=" " alt="" coords="208,155,387,181"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1StdShape.html" title="Encapsulates the geometrical properties of a finite element in its local coordinate system." alt="" coords="116,5,276,32"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="jem::gl::StdCamera" name="jem::gl::StdCamera">
+<area shape="rect" id="node1" title=" " alt="" coords="160,229,307,256"/>
+<area shape="rect" id="node8" href="$classjem_1_1gl_1_1Camera3D.html" title=" " alt="" coords="73,304,217,331"/>
+<area shape="rect" id="node9" href="$classjem_1_1gl_1_1OrthoCamera.html" title=" " alt="" coords="241,304,404,331"/>
+<area shape="rect" id="node2" href="$classjem_1_1gl_1_1Camera.html" title=" " alt="" coords="14,155,141,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1gl_1_1GfxNode.html" title=" " alt="" coords="11,80,143,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="5,5,149,32"/>
+<area shape="rect" id="node5" href="$classjem_1_1gl_1_1Pivotable.html" title=" " alt="" coords="165,155,301,181"/>
+<area shape="rect" id="node6" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="265,80,378,107"/>
+<area shape="rect" id="node7" href="$classjem_1_1gl_1_1Transformable.html" title=" " alt="" coords="325,155,493,181"/>
+<area shape="rect" id="node10" href="$classjem_1_1gl_1_1Camera2D.html" title=" " alt="" coords="157,379,301,405"/>
+<area shape="rect" id="node11" href="$classjem_1_1gl_1_1OrthoCamera3D.html" title=" " alt="" coords="326,379,506,405"/>
+</map>

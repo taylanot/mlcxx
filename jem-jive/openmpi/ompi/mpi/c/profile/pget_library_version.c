@@ -1,0 +1,1 @@
+../../../../ompi/mpi/c/get_library_version.c

@@ -1,0 +1,23 @@
+
+<NodeGroup name = "leftCorner">
+  lowerEdge & leftEdge
+</NodeGroup>
+
+<NodeGroup name = "rightCorner">
+  lowerEdge & rightEdge
+</NodeGroup>
+
+<NodeConstraints>
+  dy[leftCorner]  = 0.0;
+  dy[rightCorner] = 0.0;
+  dx[leftEdge]    = 0.0;
+</NodeConstraints>
+
+<!-- The prescribed displacement, defined as a table. -->
+
+<NodeTable name = "disp">
+  <Section columns = "dx">
+    rightEdge 0.0001;
+  </Section>
+</NodeTable>
+

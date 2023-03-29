@@ -1,0 +1,61 @@
+
+#@script
+
+sentry="JEM_$(echo $PKG_NAME | tr a-z A-Z)_MAKEDEFS_MK"
+
+cat<<EOF
+ifndef $sentry
+       $sentry = 1
+
+ifndef JEMPATH
+  JEMPATH := \$(JEMDIR)
+endif
+EOF
+
+if [ "xx$PKG_NAME" = "xxbase" ]; then
+  echo "include \$(JEMPATH)/makefiles/jem.mk"
+fi
+
+for p in $PKG_DEPS; do
+  echo "include \$(JEMPATH)/makefiles/packages/${p}.mk"
+done
+
+echo ""
+echo "JEM_PACKAGES += $PKG_NAME"
+
+case "$PKG_NAME" in
+
+  base|io|std|util)
+
+    echo "" ;;
+
+  *)
+
+    echo "JEM_LIBS     := jem${PKG_NAME} \$(JEM_LIBS)"
+    echo "" ;;
+
+esac
+
+if [ -n "$MY_LIBS" ]; then
+  echo "SYS_LIBS     := $MY_LIBS \$(SYS_LIBS)"
+fi
+
+if [ -n "$MY_LIBDIRS" ]; then
+  echo "SYS_LIBDIRS  := $MY_LIBDIRS \$(SYS_LIBDIRS)"
+fi
+
+if [ -n "$MY_INCDIRS" ]; then
+  echo "SYS_INCDIRS  := $MY_INCDIRS \$(SYS_INCDIRS)"
+fi
+
+if [ -e "$PKG_DIR"/debug/Makefile ]; then
+  fname="${PKG_NAME}_debug\$(OBJ_SUFFIX)"
+  echo "DBG_TOOLS    += \$(JEMPATH)/lib/$fname"
+fi
+
+printf "$EXTRA_MAKE_DEFS"
+
+echo ""
+echo "endif"
+
+#@endscript

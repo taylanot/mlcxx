@@ -1,0 +1,238 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+/*!
+
+  \defgroup Utilities General utility classes and functions
+
+  \brief A collection of handy classes and functions.
+
+  This header file provides a collection of simple classes and
+  functions that can be used for various purposes. Note that some of
+  these functions (like \c min and \c max) are also provided by the
+  standard C++ library. They are defined here too so that you do not
+  have to include the rather large header files of the standard
+  library.
+
+*/
+
+
+//@{
+
+
+//-----------------------------------------------------------------------
+//   class Nil
+//-----------------------------------------------------------------------
+
+/*!
+  \class Nil utilities.dox jem/base/utilities.h
+
+  \brief Represents a null pointer.
+
+  The empty class \c Nil represents a null pointer. It is mainly used
+  to implement overloaded members of classes that behave like
+  pointers. For convenience, there exists am global instance of this
+  class that is named \c NIL.
+
+  \sa \c Ref
+
+*/
+
+class Nil {};
+
+
+/*!
+
+  \brief A pre-defined instance of the class \c Nil.
+
+  A pre-defined instance of the class \c Nil.
+
+*/
+
+extern const Nil NIL;
+
+
+//-----------------------------------------------------------------------
+//   class BoolType
+//-----------------------------------------------------------------------
+
+/*!
+  \class BoolType utilities.dox jem/base/utilities.h
+
+  \brief Provides support for writing meta-programs.
+
+  The template class \c BoolType can be used to write `meta-programs'
+  that are run during the compilation of a program. The boolean
+  template parameter \c TruthValue should be an expression that
+  evaluates to either \c true or \c false at compile-time.
+
+  Here is an example:
+
+  \code
+  inline void compute ( BoolType<true> )
+  {
+    computeWithTinyInts ();
+  }
+
+  inline void compute ( BoolType<false> )
+  {
+    computeWithLongInts ();
+  }
+
+  inline void compute ()
+  {
+    compute ( BoolType<(sizeof(int) < 4)>() );
+  }
+  \endcode
+
+*/
+
+template <bool TruthValue>
+  class BoolType
+{
+ public:
+
+/*!
+
+  \brief The truth value of this \c BoolType class.
+
+  A static boolean that equals the truth value of this \c BoolType
+  class.
+
+*/
+
+  static const bool VALUE = TruthValue;
+
+};
+
+
+//-----------------------------------------------------------------------
+//   abort
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a message and aborts the current program.
+
+  Prints a message to \c stderr and aborts the program by calling \c
+  ::abort(). The message is composed of the two parameters \a where
+  and \a what.
+
+  \param where - a null-terminated character array that identifies the
+  section of code that calls this function.
+
+  \param what - a null-terminated character array that describes why
+  the program is being aborted.
+
+*/
+
+void abort ( const char* where, const char* what );
+
+
+//-----------------------------------------------------------------------
+//   min
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Returns the minimum of two values.
+  
+  Returns the minimum of the two values \a lhs and \a rhs.
+   
+  \param lhs - an object of type \a T.
+  \param rhs - another object of type \a T.
+  
+  \return <code>(lhs < rhs) ? lhs : rhs</code>
+
+  \pre The type \a T implements the \c < operator.
+
+*/
+
+
+template <class T>
+  inline const T& min ( const T& lhs, const T& rhs );
+
+
+//-----------------------------------------------------------------------
+//   max
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Returns the maximum of two values.
+  
+  Returns the maximum of the two values \a lhs and \a rhs.
+   
+  \param lhs - an object of type \a T.
+  \param rhs - another object of type \a T.
+
+  \return <code>(rhs < lhs) ? lhs : rhs</code>
+   
+  \pre The type \a T implements the \c < operator.
+
+*/
+
+
+template <class T>
+  inline const T&   max( const T& lhs, const T& rhs );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Interchanges two objects.
+   
+  The function \c swap interchanges its two arguments: \a lhs becomes
+  \a rhs, and the other way around.
+   
+  \param lhs - an object of type \a T.
+  \param rhs - another object of type \a T.
+   
+  \pre The type \a T has a default contructor and an assignment
+  operator.
+
+*/
+
+template <class T>
+  inline void swap ( T& lhs, T& rhs );
+
+
+//@}
+
+JEM_END_PACKAGE_BASE
+

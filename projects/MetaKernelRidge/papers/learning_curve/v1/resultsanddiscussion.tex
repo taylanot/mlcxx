@@ -1,0 +1,27 @@
+\subsection{Learning Monotone Learning Curves}
+
+\subsubsection{Learning curve prediction for changing hyper-parameters of the same model and same dataset}\label{sec:same}
+\begin{itemize}
+  \item The results of this experiment I have already shown. 
+  \item It is possible to extrapolate with little error
+  \item Needs to write the experimentation one last time in a reproducible way.
+\end{itemize}
+\subsubsection{Learning curve prediction for tuned hyper-parameter of the same model and different datasets}\label{sec:diff-dataset}
+\begin{itemize}
+  \item We do not have it yet but after the Section \ref{sec:same} experiments are written again it will be easy to obtain.
+  \item I suspect this will be a bit more problematic as the tuned curves have a bit different variations.
+\end{itemize}
+
+\subsection{Learning Non-monotone Learning Curves}
+\begin{itemize}
+  \item We have linear ridge regression for varying lambdas which is non-monotonic.
+  \item This method was able to fairly accurately predict even bimodal curves. (Bimodality comes from the different dimensional datasets.
+  \item I will take these from Tom. After he comes back he will prepare the already existing non-monotonic examples.
+\end{itemize}
+
+\subsection{Performance against baselines}
+\begin{itemize}
+  \item Here the prediction performance for power-law etc. will be provided.
+  \item The difference between the non-monotonic and monotonic predictions will be highlighted.
+\end{itemize}
+

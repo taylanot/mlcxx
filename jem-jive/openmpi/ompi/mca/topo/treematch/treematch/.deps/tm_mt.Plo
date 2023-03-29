@@ -1,0 +1,6 @@
+treematch/tm_mt.lo: treematch/tm_mt.c /usr/include/stdc-predef.h \
+ treematch/tm_mt.h
+
+/usr/include/stdc-predef.h:
+
+treematch/tm_mt.h:

@@ -1,0 +1,13 @@
+<map id="jive::geom::ShapeTable" name="jive::geom::ShapeTable">
+<area shape="rect" id="node1" title=" " alt="" coords="146,229,319,256"/>
+<area shape="rect" id="node7" href="$classjive_1_1geom_1_1CustomShapeTable.html" title=" " alt="" coords="5,304,228,331"/>
+<area shape="rect" id="node9" href="$classjive_1_1geom_1_1StdShapeTable.html" title=" " alt="" coords="253,304,447,331"/>
+<area shape="rect" id="node2" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="71,155,215,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="95,80,192,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="79,5,207,32"/>
+<area shape="rect" id="node5" href="$classjive_1_1util_1_1EventSource.html" title=" " alt="" coords="240,155,404,181"/>
+<area shape="rect" id="node6" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="265,80,379,107"/>
+<area shape="rect" id="node8" href="$classjive_1_1fem_1_1CustomShapeTable.html" title=" " alt="" coords="11,379,223,405"/>
+<area shape="rect" id="node10" href="$classjive_1_1fem_1_1AutoShapeTable.html" title=" " alt="" coords="250,379,442,405"/>
+<area shape="rect" id="node11" href="$classjive_1_1geom_1_1SimpleShapeTable.html" title=" " alt="" coords="466,379,685,405"/>
+</map>

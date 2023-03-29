@@ -1,0 +1,387 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class ObjectCollection
+//=======================================================================
+
+/*!
+  \class ObjectCollection ObjectCollection.dox jem/util/ObjectCollection.h
+
+  \brief Represents an heterogeneous collection of objects.
+
+  The abstract class \c ObjectCollection represents an heterogeneous
+  collection of objects of type \c Object. It provides functions for
+  adding objects, for removing objects, for iterating over all
+  objects, and for memory management. It is the superclass of various
+  types of collections, including associative collections and ordered
+  collections.
+
+  As the \c ObjectCollection inherits the interface class \c
+  Enumerable, you can iterate over all objects in a collection by
+  means of an \c Enumerator object. An \c ObjectCollection may \em not
+  be structurally modified while one or more enumerators are pointing
+  to it. In particular, you may not call any non-const member
+  functions such as \c add() and \c clear(). %All classes in jem that
+  implement these functions will immediately throw an exception if you
+  try to do so.
+
+  If you need to store and manipulate a homogeneous collection of
+  objects, you are probably better off with a template class such as
+  the class \c Flex.
+
+*/
+
+class ObjectCollection : public Object,
+                         public Enumerable
+{
+ public:
+
+
+  static  Class*  makeClass ();
+  static  Class*  getType   ();
+  virtual Class*  getClass  () const;
+
+//-----------------------------------------------------------------------
+//   enumerate
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumerator over this collection.
+
+  Returns an \c Enumerator that can be used to iterate over all
+  objects in this collection. This function simply executes:
+
+  \code
+  return this->getEnumerator ();
+  \endcode
+
+  This function is not virtual so that it can be overriden by derived
+  classes with a version that returns a special enumerator object. The
+  \c Dictionary class, for instance, overrides this function with a
+  version that returns a \c DictionaryEnumerator instead of an \c
+  Enumerator.
+
+  \return An \c Enumerator over all objects in this collection.
+
+*/
+
+  Ref<Enumerator> enumerate () const;
+
+
+//-----------------------------------------------------------------------
+//   getEnumerator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumerator over this collection.
+
+  Returns an \c Enumerator that can be used to iterate over all
+  objects in this collection. This object collection may not be
+  structurally modified as long as one or more enumerators are
+  pointing to it.
+
+*/
+
+  virtual Ref<Enumerator> getEnumerator () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   add
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Adds an object to this collection.
+
+  Requests that the object \a obj is added to this collection. This
+  function returns \c true if the object has been added, and \c false
+  otherwise. An implementation of this function does not have to add
+  the object if it is already present in this collection and if all
+  objects in this collection should be unique.
+
+  This function may not be called if an enumerator points to this
+  collection.
+
+  \param obj - the object to be added.
+
+  \return \c true if the object has been added to this collection, and
+  \c false otherwise.
+
+*/
+
+  virtual bool add ( const Ref<Object>& obj ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   clear
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes all objects from this collection.
+
+  Deletes all objects from this collection.
+
+  This function may not be called if an enumerator points to this
+  collection.
+
+  \post <code>this->size() == 0</code>
+
+*/
+
+  virtual void clear () = 0;
+
+
+//-----------------------------------------------------------------------
+//   reserve
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Pre-allocates data structures for storing additional objects.
+
+  Notifies this collection that it should pre-allocate data structures
+  for storing additional objects. The input parameter \a n specifies
+  the total number of objects that will be stored in this
+  collection. This function may speed up subsequent calls to the
+  member function \c add().
+
+  This function may not be called if an enumerator points to this
+  collection.
+
+  The implementation of this function provided by the \c
+  ObjectCollection class does nothing.
+
+  \param n - the total number of objects to be stored in this
+  collection.
+
+  \pre <code>n >= 0</code>
+
+  \sa \c trimToSize(), \c capacity()
+
+*/
+
+  virtual void reserve ( int n );
+
+
+//-----------------------------------------------------------------------
+//   trimToSize
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deallocates non-used memory.
+
+  Notifies this collection that it should deallocate non-used
+  memory. Call this function after you have added all objects to this
+  collection.
+
+  For efficiency reasons, an \c ObjectCollection may allocate extra
+  memory each time that an object is added and no more free space is
+  left in its internal data structures. This means that the \c
+  ObjectCollection may use more memory than is actually needed to
+  store all objects. This member function informs the \c
+  ObjectCollection that no more new objects will be added and that it
+  should shrink its data structures as much as possible.
+
+  This function may not be called if an enumerator points to this
+  collection.
+
+  \sa \c reserve(), \c capacity()
+
+*/
+
+  virtual void trimToSize ();
+
+
+//-----------------------------------------------------------------------
+//   capacity
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the capacity of this collection.
+
+  Returns the number of objects that this collection can contain
+  without having to expand its internal data structures. This number
+  is called the \em capacity of this collection.
+
+  The implementation of this function provided by the \c
+  ObjectCollection class simply returns \c size().
+
+  \return The capacity of this collection.
+
+*/
+
+  virtual int capacity () const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of objects in this collection.
+
+  Returns the number of objects in this collection.
+
+  \return The number of objects in this collection.
+ 
+*/
+
+  virtual int size () const = 0;
+  
+
+ protected:
+
+  virtual            ~ObjectCollection ();
+
+
+//-----------------------------------------------------------------------
+//   clone_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Makes a deep copy of another collection.
+
+  Copies the contents of the collection \a rhs into this
+  collection. This function essentially executes:
+
+  \code
+
+  Ref<Enumerator>  e;
+  Ref<Object>      obj;
+
+  clear   ();
+  reserve ( rhs.size() );
+
+  for ( e = rhs.enumerate(); ! e->atEnd(); e->toNext() )
+  {
+    obj = e->get ();
+    
+    if ( obj != NIL )
+    {
+      obj = obj->clone ();
+    }
+
+    add ( obj );
+  }
+  
+  \endcode
+
+  You can use this function to implement the \c Clonable interface
+  class.
+
+  \param rhs - the object collection to be copied.
+
+*/
+
+  void clone_ ( const ObjectCollection& rhs );
+
+
+//-----------------------------------------------------------------------
+//   readFrom_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads the contents of this collection from an object input
+  stream.
+
+  Clears this collection and then fills it with the objects that are
+  read from the object input stream \a in. This function performs the
+  same operation as the function \c writeTo_, but then in reverse.
+
+  You can use this function to implement the \c io::Serializable
+  interface class.
+
+  \param in - an object input stream.
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \throws io::SerializationException - if the input stream is corrupt.
+
+*/
+
+  void readFrom_ ( io::ObjectInput& in );
+
+
+//-----------------------------------------------------------------------
+//   writeTo_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes the contents of this collection to an object output
+  stream.
+
+  Writes all objects in this collection to the object output stream \a
+  out. This function essentially executes the following code:
+
+  \code
+
+  Ref<Enumerator> e;
+
+  out << size();
+
+  for ( e = enumerate(); ! e->atEnd(); e->toNext() )
+  {
+    out.encodeObject ( e->get() );
+  }
+  
+  \endcode
+
+  You can use this function to implement the \c io::Serializable
+  interface class.
+
+  \param out - an object output stream.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+  void writeTo_  ( io::ObjectOutput& out ) const;
+
+};
+
+
+
+
+JEM_END_PACKAGE( util )

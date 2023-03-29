@@ -1,0 +1,13 @@
+<map id="jem::Collectable" name="jem::Collectable">
+<area shape="rect" id="node1" title="Provides support for automatic garbage collection." alt="" coords="5,132,133,159"/>
+<area shape="rect" id="node2" href="$classjem_1_1io_1_1Deflator.html" title=" " alt="" coords="219,5,346,32"/>
+<area shape="rect" id="node3" href="$classjem_1_1io_1_1Inflator.html" title=" " alt="" coords="222,56,343,83"/>
+<area shape="rect" id="node4" href="$classjem_1_1mt_1_1IOMutex.html" title=" " alt="" coords="215,107,350,133"/>
+<area shape="rect" id="node5" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="234,157,331,184"/>
+<area shape="rect" id="node10" href="$classjive_1_1implict_1_1SolverRunData.html" title=" " alt="" coords="181,208,384,235"/>
+<area shape="rect" id="node11" href="$classjive_1_1mp_1_1BorderXData.html" title=" " alt="" coords="199,259,366,285"/>
+<area shape="rect" id="node6" href="$classjem_1_1Boolean.html" title=" " alt="" coords="447,81,555,108"/>
+<area shape="rect" id="node7" href="$classjem_1_1Character.html" title=" " alt="" coords="442,132,561,159"/>
+<area shape="rect" id="node8" href="$classjem_1_1gl_1_1ColorMap.html" title=" " alt="" coords="433,183,569,209"/>
+<area shape="rect" id="node9" href="$classjem_1_1gl_1_1Controller.html" title=" " alt="" coords="432,233,571,260"/>
+</map>

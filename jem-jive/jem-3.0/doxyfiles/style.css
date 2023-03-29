@@ -1,0 +1,388 @@
+#@include "default-style.css"
+
+.memitem {
+    margin-left        : 0px;
+    margin-right       : 0px;
+}
+
+.memproto {
+    margin-left        : 0px;
+    margin-right       : 0px;
+    border             : 1px solid #A8B8D9;
+    padding            : 6px 0px 6px 0px;
+    color              : #253555;
+    font-weight        : bold;
+    text-shadow        : 0px 1px 1px rgba(255, 255, 255, 0.9);
+    background-image   :none;
+    background-repeat  :repeat-x;
+    background-color   : #E2E8F2;
+    /* opera specific markup */
+    box-shadow                  : none;
+    border-radius               : 0px;
+    border-top-right-radius     : 5px;
+    border-top-left-radius      : 5px;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    -moz-border-radius          : 0px;
+    -moz-border-radius-topright : 5px;
+    -moz-border-radius-topleft  : 5px;
+    /* webkit specific markup */
+    -webkit-box-shadow              : none;
+    -webkit-border-radius           : 0px;
+    -webkit-border-top-right-radius : 5px;
+    -webkit-border-top-left-radius  : 5px;
+}
+
+.memdoc {
+    border-bottom    : 1px solid #A8B8D9;
+    border-left      : 1px solid #A8B8D9;
+    border-right     : 1px solid #A8B8D9;
+    padding          : 2px 5px;
+    background-color : #FBFCFD;
+    border-top-width : 0;
+    background-image : none;
+    /* opera specific markup */
+    box-shadow                    : none;
+    border-radius                 : 0px;
+    /* firefox specific markup */
+    -moz-box-shadow               : none;
+    -moz-border-radius            : 0px;
+    /* webkit specific markup */
+    -webkit-box-shadow            : none;
+    -webkit-border-radius         : 0px;
+}
+
+div.contents {
+    margin-top    : 10px;
+    margin-left   : 20px;
+    margin-right  : 20px;
+    margin-bottom : 10px;
+}
+
+body, tbody, table, div, p, dl {
+	font-family  : Lucida Grande, Verdana, \
+	               Geneva, Arial, sans-serif;
+	font-size    : 14px;
+}
+
+body {
+    margin-bottom : 20px;
+}
+
+#titlearea {
+	border           : none;
+}
+#titlearea table {
+	font-family      : Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+        text-align       : center;
+	font-size        : 100%;
+	color            : white;
+	background-color : #9CAFD4;
+	padding          : 0px;
+	margin           : 0px;
+	width            : 100%;
+	border-top       : 1px solid #5373B4;
+}
+
+#titlearea table div {
+    line-height     : 150%;
+}
+
+.title {
+    font-size       : 150%;
+    font-weight     : bold;
+    text-align      : center;
+    margin          : 10px 2px;
+}
+
+h1, h1 a {
+    font-size        : 150%;
+    color            : black;
+}
+
+h2, h2 a {
+    font-size        : 120%;
+    background-color : #9CAFD4;
+    color            : #ffffff; 
+    padding-top      : 2px;
+    padding-left     : 5px;
+    padding-bottom   : 2px;
+    margin-right     : 0px;
+    margin-left      : 0px;
+}
+
+h3 {
+    font-size        : 100%;
+}
+
+h1 a:hover {
+    text-decoration  : none;
+}
+
+div.groupHeader {
+    background-color : #E2E8F2;
+    margin-left      : 0px;
+    margin-top       : 12px;
+    padding-top      : 4px;
+    padding-bottom   : 4px;
+    padding-left     : 4px;
+    font-weight      : bold;
+}
+
+div.groupText {
+    margin-left      : 16px;
+    font-style       : italic;
+}
+
+dt {
+    font-weight      : bold;
+}
+
+small {
+    font-size        : 80%;
+}
+
+/*
+  navigation bars
+*/
+
+#navrow1, #navrow2, #navrow3, #navrow4 {
+    background-color : #9CAFD4;
+    height           : 29px;
+}
+
+#navrow2, #navrow3, #navrow4 {
+   padding-top      : 0px;
+   padding-top      : 8px;
+   background-color : #F0F0F0;
+}
+
+#navrow1 {
+    z-index       : 100;
+    border-bottom : 1px solid #555555;
+}
+
+#navrow2 {
+    z-index       : 101;
+    border-bottom : 1px solid #555555;
+}
+
+#navrow3 {
+    z-index       : 102;
+    border-bottom : 1px solid #555555;
+}
+
+#navrow4 {
+    z-index       : 103;
+    border-bottom : 1px solid #555555;
+}
+
+.navpath ul, .tabs, .tabs2, .tabs3, .tablist li {
+    background-image   : none;
+    border             : none;
+    line-height        : 27px;
+    height             : 29px;
+}
+
+.tabs {
+    font-size          : 13px;
+}
+
+.tabs2 {
+    font-size          : 11px;
+}
+
+.tabs3 {
+    font-size          : 11px;
+}
+
+.tablist a {
+    background-image            : none;
+
+    position                    : relative;
+    top                         : 1px;
+    color                       : #555555;
+    text-shadow                 : none;
+    border                      : 1px solid #555555;
+    background-color            : #C5C5C5; 
+    margin-left                 : 2px;
+    /* opera specific markup */
+    border-radius               : 0px;
+    box-shadow                  : inset 0px -4px 4px #a5a5a5;
+    border-top-right-radius     : 12px;
+    border-top-left-radius      : 12px;
+    /* firefox specific markup */
+    -moz-box-shadow             : inset 0px -4px 4px #a5a5a5;
+    -moz-border-radius          : 0px;
+    -moz-border-radius-topright : 12px;
+    -moz-border-radius-topleft  : 12px;
+    /* webkit specific markup */
+    -webkit-box-shadow              : inset 0px -4px 4px #a5a5a5;
+    -webkit-border-radius           : 0px;
+    -webkit-border-top-right-radius : 12px;
+    -webkit-border-top-left-radius  : 12px;
+}
+
+.tabs3 .tablist a {
+    position                    : relative;
+    top                         : 1px;
+    border                      : 1px solid #555555;
+    border-bottom               : none;
+    color                       : #555555;
+    /* opera specific markup */
+    box-shadow                  : inset 0px -4px 4px #a5a5a5;
+    border-radius               : 0px;
+    border-top-right-radius     : 9px;
+    border-top-left-radius      : 8px;
+    /* firefox specific markup */
+    -moz-box-shadow             : inset 0px -4px 4px #a5a5a5;
+    -moz-border-radius          : 0px;
+    -moz-border-radius-topright : 9px;
+    -moz-border-radius-topleft  : 9px;
+    /* webkit specific markup */
+    -webkit-box-shadow              : inset 0px -4px 4px #a5a5a5;
+    -webkit-border-radius           : 0px;
+    -webkit-border-top-right-radius : 9px;
+    -webkit-border-top-left-radius  : 9px;
+}
+
+.tablist a:hover {
+    position         : relative;
+    top              : 1px;
+    border           : 1px solid #555555;
+    border-bottom    : 1px solid #F0F0F0;
+    color            : #555555;
+    background-image : none;
+    background-color : #F0F0F0;
+    text-shadow      : none;
+    /* opera specific markup */
+    box-shadow                  : none;
+    box-shadow                  : 0px -5px 5px #999999;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    -moz-box-shadow             : 0px -5px 5px #999999;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;
+    -webkit-box-shadow          : 0px -5px 5px #999999;
+}
+
+.tabs .tablist a:hover {
+    /* opera specific markup */
+    box-shadow                  : none;
+    box-shadow                  : 0px -5px 5px #777777;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    -moz-box-shadow             : 0px -5px 5px #777777;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;
+    -webkit-box-shadow          : 0px -5px 5px #777777;
+}
+
+.tablist li.current a:hover {
+    position         : relative;
+    top              : 1px;
+    border           : 1px solid #555555;
+    border-bottom    : 1px solid #F0F0F0;
+    color            : #555555;
+    background-color : #F0F0F0;
+}
+
+.tablist li.current a {
+    position         : relative;
+    top              : 1px;
+    color            : #555555;
+    border           : 1px solid #555555;
+    border-bottom    : 1px solid #F0F0F0;
+    background-image : none;
+    background-color : #F0F0F0;
+    text-shadow      : none;
+    /* opera specific markup */
+    box-shadow                  : none;
+    box-shadow                  : 0px -5px 5px #999999;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    -moz-box-shadow             : 0px -5px 5px #999999;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;
+    -webkit-box-shadow          : 0px -5px 5px #999999;
+}
+
+.tabs .tablist li.current a {
+    /* opera specific markup */
+    box-shadow                  : none;
+    box-shadow                  : 0px -5px 5px #777777;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    -moz-box-shadow             : 0px -5px 5px #777777;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;
+    -webkit-box-shadow          : 0px -5px 5px #777777;
+}
+
+.tabs .tablist li div a {
+    /* opera specific markup */
+    box-shadow                  : none;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;    
+}
+
+.tabs .tablist li div a:hover {
+    /* opera specific markup */
+    box-shadow                  : none;
+    /* firefox specific markup */
+    -moz-box-shadow             : none;
+    /* webkit specific markup */
+    -webkit-box-shadow          : none;    
+}
+
+#nav-path {
+   background-color : #F0F0F0;
+   border-bottom    : 1px solid #555555;
+}
+
+hr.footer {
+    margin-top         : 20px;
+}
+
+div.ah {
+    background-color     : #9CAFD4;
+    font-weight          : bold;
+    color                : #ffffff;
+    margin-bottom        : 3px;
+    margin-top           : 3px;
+    padding              : 0.2em;
+    border               : none;
+    border-radius        : 0px;
+    -moz-border-radius   : 0px;
+    -webkit-border-radius: 0px;
+    box-shadow           : none;
+    -moz-box-shadow      : none;
+    -webkit-box-shadow   : none;
+
+    background-image     : none;
+}
+
+div.footer {
+    margin-left        : 20px;
+    margin-right       : 20px;
+}
+
+div.header
+{
+    background-image   : none;
+    background-color   : #F0F0F0;
+    margin             : 0px;
+    border-bottom      : 1px solid #C4CFE5;
+}
+
+div.qindex
+{
+    margin          : 0px;
+    padding         : 0px;
+    margin-top      : 2px;
+    padding-top     : 2px;
+    margin-bottom   : 2px;
+    padding-bottom  : 2px;
+}

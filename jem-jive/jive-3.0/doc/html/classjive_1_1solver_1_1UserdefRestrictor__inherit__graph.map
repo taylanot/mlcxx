@@ -1,0 +1,11 @@
+<map id="jive::solver::UserdefRestrictor" name="jive::solver::UserdefRestrictor">
+<area shape="rect" id="node1" title=" " alt="" coords="172,379,387,405"/>
+<area shape="rect" id="node2" href="$classjive_1_1solver_1_1SparseRestrictor.html" title=" " alt="" coords="175,304,383,331"/>
+<area shape="rect" id="node3" href="$classjive_1_1solver_1_1Restrictor.html" title=" " alt="" coords="27,229,191,256"/>
+<area shape="rect" id="node4" href="$classjive_1_1algebra_1_1AbstractMatrix.html" title="Defines a common interface for different matrix types." alt="" coords="5,155,212,181"/>
+<area shape="rect" id="node5" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="60,80,157,107"/>
+<area shape="rect" id="node6" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="45,5,173,32"/>
+<area shape="rect" id="node7" href="$classSparseMatrixExt.html" title=" " alt="" coords="215,229,343,256"/>
+<area shape="rect" id="node8" href="$classjive_1_1solver_1_1LocalRestrictor.html" title=" " alt="" coords="368,229,567,256"/>
+<area shape="rect" id="node9" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="411,155,524,181"/>
+</map>

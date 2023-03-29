@@ -1,0 +1,13 @@
+<map id="jem::Throwable" name="jem::Throwable">
+<area shape="rect" id="node1" title="Provides a single superclass for all exceptions in Jem." alt="" coords="5,132,128,159"/>
+<area shape="rect" id="node2" href="$classjem_1_1CancelledException.html" title=" " alt="" coords="176,56,359,83"/>
+<area shape="rect" id="node5" href="$classjem_1_1Error.html" title=" " alt="" coords="224,107,311,133"/>
+<area shape="rect" id="node7" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="208,157,327,184"/>
+<area shape="rect" id="node11" href="$classjem_1_1RuntimeException.html" title="Signals a runtime exception." alt="" coords="181,208,354,235"/>
+<area shape="rect" id="node3" href="$classjem_1_1io_1_1CancelledIOException.html" title=" " alt="" coords="407,5,624,32"/>
+<area shape="rect" id="node4" href="$classjem_1_1mp_1_1AbortException.html" title=" " alt="" coords="424,56,607,83"/>
+<area shape="rect" id="node6" href="$classjem_1_1MemoryError.html" title=" " alt="" coords="446,107,585,133"/>
+<area shape="rect" id="node8" href="$classjem_1_1ArithmeticException.html" title=" " alt="" coords="422,157,609,184"/>
+<area shape="rect" id="node9" href="$classjem_1_1gl_1_1DisplayException.html" title=" " alt="" coords="421,208,609,235"/>
+<area shape="rect" id="node10" href="$classjem_1_1gl_1_1GLException.html" title=" " alt="" coords="437,259,593,285"/>
+</map>

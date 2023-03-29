@@ -1,0 +1,94 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,english]{habanera-shortmanual}
+
+\usepackage{epsfig}
+
+
+\newcommand{\Code}[1]{\texttt{#1}}
+
+
+
+\Title{Jive user manual}
+
+\Subtitle{}
+\nocontents
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\noindent
+Jive is an object oriented toolkit, written in C++, that can be used
+to solve partial differential equations. It consists of a set of
+classes and functions for transforming a partial differential equation
+into a sparse system of equations; for solving such a system of
+equations; and for computing quantities derived from the solution.
+
+Jive is built on top of the general purpose toolkit Jem. This means
+that Jive will run on all platforms supported by Jem. It also means
+that users of Jive will have to become familiar with a subset of Jem.
+
+\BlankLine
+Like Jem, Jive bundles groups of related classes and functions into
+modular units called \emph{packages}. This version of Jive contains
+the following packages:
+\begin{itemize}
+
+\item \Code{algebra} : contains a set of classes that implement common
+  matrix/vector operations. It also provides a framework for writing
+  generic algorithms involving matrices and vectors.
+
+\item \Code{fem}: exports various classes that can be used to develop
+  finite element applications. In particular, it exports classes for
+  assembling global matrices and a global vectors from sets of element
+  matrices and vectors.
+
+\item \Code{geom}: provides a set of classes that can be used to
+  compute the interpolation functions of basic shapes such as lines,
+  triangles, quadrilaterals, tetrahedra, hexahedra, wedges, and
+  multi-dimensional prisms. These classes also provide support for
+  computing the spatial derivatives of the interpolation polynomials
+  and for evaluating surface and volume integrals.
+
+\item \Code{io}: contains classes for reading and writing meshes and
+  other data structures. All data are written to and read from
+  xml-formatted text files. This means that one can directly view the
+  contents of an output file. What is more, one can easily create an
+  input file, either by hand or automatically.
+
+\item \Code{solver} : provides support for solving linear systems of
+  equations. It comprises two classes that implement an iterative
+  solution algorithm, and one class that implements a direct
+  algorithm.
+
+\item \Code{util} : exports various classes and functions for storing
+  and manipulating frequently used data structures such as
+  unstructured grids and finite element meshes. This package is used
+  by all other packages in Jive.
+
+\end{itemize}
+
+\BlankLine
+Writing a program is Jive is similar to writing a program with
+Jem. Consult the Jem user manual to find out how to use a package, how
+to compile and link a program, and how to write a portable make file.
+
+\BlankLine
+The capabilities of this version of Jive are demonstrated by three
+sample program that can be found in the directory
+\Code{\$JIVEDIR/examples}, where \Code{\$JIVEDIR} denotes the
+directory in which Jive has been installed. The first sample program
+-- located in the subdirectory \Code{poisson-fdm} -- solves a simple
+Poisson problem by means of the finite difference method. The second
+program -- located in \Code{poisson-fem} -- solves the same problem by
+means of the finite element method. The third program -- located in
+\Code{space-time} -- solves a time-dependent diffusion problem by
+means of the finite element method. The interesting thing about this
+program is that the elements are defined in the space-time domain, and
+not, as is usual, in spatial domain alone.
+
+
+\end{document}
+

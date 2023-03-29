@@ -1,0 +1,13 @@
+<map id="jem::io::Reader" name="jem::io::Reader">
+<area shape="rect" id="node1" title="Represents a text input stream." alt="" coords="364,132,484,159"/>
+<area shape="rect" id="node6" href="$classjem_1_1io_1_1BufferedReader.html" title=" " alt="" coords="545,5,719,32"/>
+<area shape="rect" id="node7" href="$classjem_1_1io_1_1FilterReader.html" title=" " alt="" coords="556,56,708,83"/>
+<area shape="rect" id="node8" href="$classjem_1_1io_1_1InputStreamReader.html" title=" " alt="" coords="532,107,732,133"/>
+<area shape="rect" id="node9" href="$classjem_1_1io_1_1LineNumberReader.html" title=" " alt="" coords="533,157,731,184"/>
+<area shape="rect" id="node10" href="$classjem_1_1io_1_1NullReader.html" title=" " alt="" coords="559,208,705,235"/>
+<area shape="rect" id="node11" href="$classjem_1_1io_1_1StdinReader.html" title=" " alt="" coords="555,259,709,285"/>
+<area shape="rect" id="node2" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="200,107,297,133"/>
+<area shape="rect" id="node3" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,107,133,133"/>
+<area shape="rect" id="node4" href="$classjem_1_1io_1_1TextInput.html" title="Provides an interface for reading text&#45;based input." alt="" coords="181,157,316,184"/>
+<area shape="rect" id="node5" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="13,157,126,184"/>
+</map>

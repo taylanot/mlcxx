@@ -1,0 +1,172 @@
+
+GENERAL FORMATTING RULES
+
+  A source/comment line should not be longer than 72 characters.
+  
+  A source file should not contain tabs but spaces.
+  
+  A source/comment line should not contain any spaces after the
+  last non-space character.
+  
+  Blank lines should be used to separate logical series of
+  statements.
+
+  Statement blocks that are delimited by a pair of braces should
+  be indented by two spaces. For instance:
+
+    int foo ( int n )
+    {
+      int i, k;
+
+      k = 0;
+
+      for ( i = 0; i < 10; i++ )
+      {
+        k += i;
+      }
+
+      return k;
+    }
+
+
+STATEMENT FORMATTING RULES
+
+  An if statement should be formatted as follows:
+
+    if ( expr1 )
+    {
+      // if block
+    }
+    else if ( expr2 )
+    {
+      // else block
+    }
+    else
+    {
+      // default block
+    }
+
+  Note that an if/else block should ALWAYS be delimited by a
+  pair of braces, even when it consists of a single statement.
+
+  A for loop should be formatted as follows:
+
+    for ( expr1; expr2; expr3 )
+    {
+       // loop body
+    }
+
+  Again, the loop body should always be delimited by a pair of
+  braces, even when it consists of a single statement.
+
+  While and do loops should be formatted as follows:
+
+    while ( expr )
+    {
+      // loop body
+    }
+
+    do
+    {
+      // loop body
+    }
+    while ( expr );
+
+
+EXPRESSION FORMATTING RULES
+
+  The operands and operators in an expression should generally
+  be separated by one or more spaces. Example:
+
+    x = 0.5 * (1.0 + exp( y )) - 7.0;
+
+  To distinguish between function calls and array/matrix subscript
+  expressions, the latter should not include a space between
+  braces/brackets and the subscript variable. For instance,
+  suppose that `foo' is a function and that `a' and `b' are
+  one and two dimensional arrays, respectively. Then you should
+  write:
+
+    a[i] = foo( 9.0 ) + b(i,j);
+
+  instead of:
+
+    a[ i ] = foo( 9.0 ) + b( i, j );
+
+
+MACRO NAMES
+
+  Macros are written in all upper case characters. Words are separated
+  by underscores. Examples: JEM_FUNC, JEM_PRECHECK.
+
+  Macros that prevent a header file from being included more that once
+  are written as follows:
+
+    `JEM_' <PACKAGE_NAME> [ `_' <SUB_PACKAGE_NAME> ] `_' <FILE_NAME>
+    `_H'.
+
+  Thus, the header file `jem/base/reflect/Field.h' is protected by the
+  macro `JEM_BASE_REFLECT_FIELD_H'.
+
+
+NAMESPACE NAMES
+
+  Namespaces are written in all lower case characters. A namespace
+  should consist of one word only. Examples: base, native, io.
+
+
+TYPE NAMES
+
+  Type names are written in upper and lower case characters. The first
+  character of a type name is an upper case character. Words are
+  separated by upper case characters. Examples: String, InputStream,
+  ThreadLocal.
+
+
+FUNCTION NAMES
+
+  Function names are written in upper and lower case characters. The
+  name of a function starts with a lower case character. Words are
+  separated by upper case characters. Examples: getName, readLine.
+
+
+VARIABLE NAMES
+
+  Variables names are written in the same way as function
+  names. Examples: bufferSize, pathName.
+
+
+CONSTANT NAMES
+
+  Constants are written in all upper case characters. Words are
+  separated by underscores.  Examples: THREAD_NULL_KEY, MAX_VALUE,
+  NIL.
+
+
+PROTECTED MEMBER NAMES
+
+  Names of protected members end with an underscore. This rule applies
+  to all protected members, including types. Examples: init_, Data_.
+
+
+PRIVATE MEMBER NAMES
+
+  The rules for protected members also apply to private members.
+
+
+FILE NAMES
+
+  Source files end with the extension `.cpp'; header files end with
+  the extension `.h'; template implementation files end with the
+  extension `.tcc'.
+
+  Each public class definition is stored in a header file named
+  `ClassName.h', where `ClassName' denotes the name of the
+  class. Likewise, the class implementation is stored in a source file
+  named `ClassName.cpp' and/or `ClassName.tcc'.
+
+  Source files and header files containing function
+  declarations/definitions and/or collections of simple classes should
+  should start with a lower case character. Examples: `intrinsics.h',
+  `utilities.h', `algorithms.h'.
+

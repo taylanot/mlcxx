@@ -1,0 +1,417 @@
+\documentclass[a4paper]{article}
+
+\usepackage{listings}
+\usepackage{palatino}
+\usepackage{parskip}
+\usepackage{color}
+\usepackage{url}
+
+\lstset{language={},backgroundcolor=\color[gray]{0.95},
+  basicstyle=\ttfamily}
+
+
+%========================================================================
+% Definitions
+%========================================================================
+
+
+\newcommand{\Code}[1]{\texttt{#1}}
+
+
+%========================================================================
+% Document
+%========================================================================
+
+
+\title {Jem/Jive 2.0\\[1ex]
+        Release Notes}
+\author{Dynaflow Research Group}
+\date  {24-10-2011}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+Version 2.0 of Jem/Jive is a new major release with many new features and
+improvements. Although this new version is largely source compatible with
+the previous version (1.5.1), it might be necessary to adapt existing
+programs before they can be compiled with version 2.0.
+
+The following list provides an overview of the new features and
+improvements. More detailed information can be found in the following
+sections.
+
+\begin{itemize}
+
+  \item Jive now provides native support for the Windows operating system
+    in addition to Linux and MacOS~X.
+
+  \item The reference manual has been set up in a completely new way. It
+    now lists all classes and functions, and not only those with
+    documentation.
+
+  \item A new type \Code{idx\_t} is used to represent indices and sizes
+    of most data structures. By default this type is equal to \Code{int}
+    but it can be configured to be a long integer.
+
+  \item The \Code{Array} class provides support for mixed-type
+    expressions and irregular slices using the subscript and
+    function-call operators.
+
+  \item The implementation of the visualization module has been largely
+    revised. It provides a better user interface and implements a much
+    better font-rendering method.
+
+  \item The \Code{geom} and \Code{fem} packages in Jive provide support
+    for so-called isogeometric elements that are based on NURBS and
+    T-splines.
+
+  \item The \Code{solver} package in Jive implements new and more
+    efficient (parallel) preconditioners and solvers. It also supports a
+    new option to re-use a preconditioner multiple times during a
+    non-linear and/or transient computation.
+
+  \item The \Code{implict} package in Jive provides a new and more
+    flexible framework for implementing implicit time integration
+    procedures.
+
+  \item The syntax of a properties file has been extended so that the
+    type of an object (such as a model) can be specified more directly. A
+    sub-properties set named \Code{params} can be used to simplify
+    the specification of user-defined functions.
+
+  \item The \Code{Properties} class is much more efficient when storing
+    simple values such as integers and floating point numbers.
+
+  \item The \Code{UserFunc} class provides support for computing the
+    derivative of a user-defined function.
+
+  \item The output operators have been implemented in a better way. The
+    type of the output stream is preserved when chaining multiple output
+    operations.
+
+  \item Various existing classes have been improved and several new
+    classes have been added to Jem and Jive. These minor improvements and
+    extensions make it bit easier to develop programs with Jem/Jive.
+
+\end{itemize}
+
+%------------------------------------------------------------------------
+
+\section{Windows support}
+
+Jive 2.0 can be used to develop native Windows programs; there is no need
+anymore for a compatibility layer like Cygwin. Two compilers are
+supported: the Windows version of the GNU compiler (MinGW) or the Visual
+C++ compiler from Microsoft, possibly in combination with Visual
+Studio. When using the GNU compiler or when using the Microsoft compiler
+without Visual Studio, it is necessary to install the so-called MSYS
+package that provides GNU Make and some other tools that are necessary to
+make use of the Makefiles provided by Jive.
+
+%------------------------------------------------------------------------
+
+\section{Reference manual}
+
+The reference manual has been restructured so that it provides a complete
+overview of all classes and functions that are available in Jem and Jive.
+A new search function can help finding the documentation of a specific
+class or function. Although the manual is far from complete, it provides
+an efficient way to find the definition of a class or the declaration of
+a (member) function; it is not necessary any more to look into header
+files. The manual also makes it clear how classes are related to each
+other. The latest version of the manual is available online at:
+\url{www.dynaflow.com/manuals/jive-reference-manual/}.
+
+%------------------------------------------------------------------------
+
+\section{The \Code{idx\_t} type}
+
+A new type \Code{idx\_t} (declared in the \Code{jem} namespace) is used
+to store indices and sizes of most container classes. By default, the
+\Code{idx\_t} type is equal to \Code{int} so that existing code is not
+affected by this change. The \Code{idx\_t} type can be configured to be
+equal to long integer on 64-bit platforms. This makes it possible to
+store very large data sets of which the size exceeds the capacity of
+32-bit integers.
+
+The types \Code{IdxVector} and \Code{IdxMatrix} (declared in the
+namespace \Code{jive}) are used to store arrays of indices. By default,
+they are equal to the types \Code{IntVector} and \Code{IntMatrix}.
+
+Current users of Jive are advised to use the new types \Code{idx\_t},
+\Code{IdxVector} and \Code{IdxMatrix} in new code. Existing code need not
+to be updated, unless 32-bit integers are not large enough.
+
+%------------------------------------------------------------------------
+
+\section{Isogeometric elements}
+
+Jive 2.0 provides support for so-called isogeometric elements that are
+based on Bezier extraction. This feature makes it possible to use element
+shape functions that are based on splines, including NURBS and T-splines.
+The new classes \Code{BezierShape} and \Code{BezierElement} are the main
+building blocks for implementing models that are based in isogeometric
+elements. These are defines in the packages \Code{geom} and \Code{fem},
+respectively.
+
+Because an isogeometric element has no nodes from a traditional finite
+element point of view (it has control points instead), many modifications
+have been made to the \Code{geom} package. Although most of these
+modifications are not visible, some may be incompatible with existing
+code. To be precise, the following member functions have been renamed:
+\begin{itemize}
+
+  \item \Code{getLocalNodeCoords} has been renamed to
+    \Code{getVertexCoords};
+
+  \item \Code{getNodeGradients} has been renamed to
+    \Code{getVertexGradients};
+
+  \item \Code{getNodeNormals} has been renamed to
+    \Code{getVertexNormals}.
+
+\end{itemize}
+In addition, the \Code{params} parameter has been removed from the
+following member functions:
+\begin{itemize}
+  \item \Code{evalShapeFunctions};
+  \item \Code{evalShapeGradients};
+  \item \Code{evalNormal}.
+\end{itemize}
+
+%------------------------------------------------------------------------
+
+\section{New preconditioners}
+
+The \Code{solver} package has been extended with a number of new
+preconditioners: \Code{ILUn}, \Code{ILUd} and \Code{Coarse}. The first
+two implement efficient and robust incomplete factorization algorithms.
+The \Code{ILUn} preconditioner is less sophisticated than \Code{ILUd} but
+will work quite well for a wide range of problems. The \Code{ILUd} can be
+much more effective, but not for all kinds of problems. The
+\Code{Coarse} preconditioner implements an algebraic coarse grid
+preconditioner that must be combined with a conventional preconditioner
+like \Code{ILUd}. The \Code{Coarse} preconditioner is especially meant to
+be used in parallel computations.
+
+The new \Code{Schur} solver is also meant to be used in parallel
+computations. It transforms the global system of equations into a smaller
+one that involves only the degrees of freedom in the interfaces of the
+sub-domains. This smaller system can be solved with any of the available
+iterative solvers. The \Code{Schur} solver can be very effective in
+combination with the \Code{Coarse} preconditioner, especially for systems
+of equations that are obtained from solid mechanics models.
+
+The iterative solvers have a new property named \Code{updatePolicy} that
+controls when a preconditioner is to be updated. Its default value is
+\Code{"Auto"} which indicates that a preconditioner should only be
+updated when the performance of the solver degrades too much. This
+procedure can significantly lower the time that is needed to update the
+preconditioner in non-linear and time-dependent computations.
+
+%------------------------------------------------------------------------
+
+\section{New time integration framework}
+
+The \Code{implict} package provides a new and flexible time integration
+framework. This framework is based on the assumption that the time
+integration procedure is implemented by a model and not by a module. That
+is, a model must combine the stiffness matrix, the damping matrix and the
+mass matrix into one matrix that is then passed to a linear or non-linear
+solver module. In this way it is straightforward to combine any time
+integration scheme with any linear or non-linear solution procedure.
+
+Three classes form the basis of the time integration framework:
+\Code{TimeStepper}, \Code{TransientMatrix} and \Code{TransientModel}. The
+\Code{TimeStepper} class is an abstract base class that represents a time
+integration method. The \Code{TransientMatrix} class represents a matrix
+that is a linear combination of the stiffness matrix, the damping matrix
+and the mass matrix. It uses the \Code{TimeStepper} class to determine
+the coefficients with which the three matrices are to be multiplied. The
+\Code{TransientModel} class couples the \Code{TimeStepper} and the
+\Code{TransientMatrix} classes and takes care of handling the actions
+that are requested by a solver module. A \Code{TransienModel} is
+typically the top-most model in the model tree when running an implicit
+time-dependent simulation.
+
+Implementing a new time integration procedure involves implementing a new
+class that is derived from the \Code{TimeStepper} class. There is no need
+to implement a new model, unless the time integration procedure has a
+form that does not fit into the interface defined by the
+\Code{TimeStepper} class.
+
+%------------------------------------------------------------------------
+
+\section{Extended properties file syntax}
+
+The syntax of a properties file has been slightly extended to simplify
+the specification of a model, module or some other object. The type of
+the object does not have to be specified as a separate property. Instead,
+it can be specified between the `\Code{=}' and `\Code{\{}' tokens. For
+instance:
+\begin{lstlisting}
+  model = "Transient"
+  {
+    // ...
+  };
+\end{lstlisting}
+This is equivalent with:
+\begin{lstlisting}
+  model =
+  {
+    type = "Transient";
+    // ...
+  };
+\end{lstlisting}
+
+Properties that are specified in a properties set named \Code{params} can
+be used in function expressions elsewhere in the properties file, without
+having to specify the \Code{params} name as a prefix. This is best
+explained with a simple example:
+\begin{lstlisting}
+  params =
+  {
+    tau = 0.1;
+  };
+
+  model = "Example"
+  {
+    load = "exp( - t / tau )";
+  };
+\end{lstlisting}
+The property \Code{model.load} is a function expression involving the
+parameter \Code{tau} that has been defined in the \Code{params}
+properties set.
+
+%------------------------------------------------------------------------
+
+\section{Other new features}
+
+The output operators (overloaded left-shift operators) have been
+succeeded by overloaded \Code{print} functions that result in more
+readable code. For instance:
+\begin{lstlisting}
+  print ( System::out(), "Hello, the value of x = ", x );
+\end{lstlisting}
+The output operators still exist but have been re-implemented in terms of
+the \Code{print} functions.
+
+A new \Code{StringBuffer} class (in the \Code{base} package of Jem) can
+be used to efficiently construct strings. Here is an example:
+\begin{lstlisting}
+  StringBuffer  buf;
+  String        str;
+
+  print ( buf, "x = ", x, ', y = ', y );
+
+  str = buf.toString ();
+\end{lstlisting}
+The \Code{StringBuffer} class can pass its allocated data directly to a
+\Code{String} object so no data needs to be copied.
+
+The \Code{Array} class now supports expressions involving different types
+of arrays. For instance, it is possible to write an expression involving
+integer and floating point arrays. It is also possible to assign an array
+to another array of a different types, as long as the array elements can
+be converted. Here is a simple example:
+\begin{lstlisting}
+  Array<int>     a ( 10 );
+  Array<double>  b ( 10 );
+  Array<float>   c ( 10 );
+
+  c = a + 3 * b;
+\end{lstlisting}
+An integer array can be used as an index to obtain a non-regular slice;
+there is no need to use the \Code{select} function. For instance:
+\begin{lstlisting}
+  Array<int>       a ( 4 );
+  Array<double,2>  b ( 10, 10 );
+
+  // Initialize a ...
+
+  b(a,3) = 1.0;
+\end{lstlisting}
+Note that the \Code{select} function is still needed when mixing integer
+arrays and slices.
+
+A new function \Code{find} can be used to obtain the indices of the array
+elements for which a given expression is true. For instance:
+\begin{lstlisting}
+  Array<double>  a ( 10 );
+  Array<int>     b;
+
+  find ( b, a > 10.0 );
+
+  a[b] = 10.0;
+\end{lstlisting}
+
+The \Code{Table} class has been extended with functions for getting
+values from a row or column. The \Code{XTable} class has been extended
+with functions for setting the values in a row or column.
+
+The \Code{DofSpace} class has been extended with overloaded versions of
+the \Code{getDofIndices} function that return the DOFs for a single DOF
+type or a single row item. There is no need any more to use an array with
+a single element.
+
+Function expressions can refer to a special variable named \Code{rand}
+that evaluates to a random uniform number between 0.0 and 1.0. This
+variable is stored in the global database \Code{globdat} with the name
+\Code{var.rand}.
+
+The \Code{Globdat} class has been extended with a number of functions for
+updating and reverting the time and time step that are stored in the
+global database \Code{globdat}.
+
+Two new macros, named \Code{JEM\_ASSERT2} and \Code{JEM\_PRECHECK2}, can
+be used to check that a given expression is true. These are similar to
+the existing macros \Code{JEM\_ASSERT} and \Code{JEM\_PRECHECK}, except
+that they have two parameters: an expression and a string that will be
+printed when the expression is not true. The latter string can clarify
+what kind of error occurred.
+
+%------------------------------------------------------------------------
+
+\section{Incompatibilities with version 1.5.1}
+
+\begin{itemize}
+
+  \item The \Code{isNull} member function has been deleted from the
+    following classes: \Code{NodeSet} \Code{ElementSet},
+    \Code{NodeGroup} and \Code{ElementGroup}. An instance of one of these
+    classes can be compared with the constant \Code{NIL} instead.
+
+  \item The \Code{ModuleFactory} class requires a module construction
+    function with an extra \Code{Properties} parameter. This parameter
+    will be set to the global database \Code{globdat}.
+
+  \item The \Code{DOF\_SPACE} member has been deleted from the class
+    \Code{ActionParams} because it was never really used.
+
+  \item The class \Code{SolverRunData} in the \Code{implict} package has
+    been modified. This should not be a problem because this class is not
+    meant to be used outside Jive.
+
+  \item The function \Code{newSolver} in the \Code{implict} package has a
+    different set of parameters. To be precise, it requires a
+    \Code{Properties} object containing the system matrix, the
+    \Code{DofSpace} and a few other optional objects. This
+    \Code{Properties} can be created with the function
+    \Code{newSolverParams}.
+
+  \item The \Code{PrintWriter} class has no member function named
+    \Code{print} anymore. The global function \Code{print} should be used
+    instead.
+
+  \item The function \Code{declareParallelSolvers} in the \Code{solver}
+    package no longer exists. Use the function \Code{declareSolvers}
+    instead.
+
+\end{itemize}
+
+\end{document}
+

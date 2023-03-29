@@ -1,0 +1,8 @@
+<map id="jive::geom::TrueMaskMatrix" name="jive::geom::TrueMaskMatrix">
+<area shape="rect" id="node1" title=" " alt="" coords="85,229,287,256"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1MaskMatrix.html" title=" " alt="" coords="5,155,180,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="44,80,141,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="29,5,157,32"/>
+<area shape="rect" id="node5" href="$classjem_1_1io_1_1Serializable.html" title=" " alt="" coords="204,155,355,181"/>
+<area shape="rect" id="node6" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="223,80,336,107"/>
+</map>

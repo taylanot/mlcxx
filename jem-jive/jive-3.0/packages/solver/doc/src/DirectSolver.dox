@@ -1,0 +1,270 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( solver )
+
+
+//=======================================================================
+//   class DirectSolver
+//=======================================================================
+
+/*!
+
+  \brief Provides an interface for classes that implement direct
+  solution algorithms.
+
+  <code>\#include<jive/solver/DirectSolver.h></code>
+
+  The abstract class \c DirectSolver encapsulates a direct algorithm,
+  such as Gaussian elimination, for solving a linear system of
+  equations. Its main purpose is to provide a single interface for the
+  classes that implement direct solution algorithms.
+
+  All classes that are derived from the \c DirectSolver class have at
+  least two properties that provide some control over the solution
+  procedure. The first property, called the <em>zero pivot
+  threshold</em>, is a floating point number below which a pivot is
+  marked as zero. To be precise, the i-th pivot \c p[i] is marked as a
+  zero pivot if
+
+  <code> abs( p[i] ) < eps * s[i] </code>
+
+  with \c the zero pivot threshold and \c s[i] the i-th scale
+  factor. This factor is of the same order of magnitude as the largest
+  element -- in absolute value -- on the i-th row of the coefficient
+  matrix of the linear system of equations to be solved. The precise
+  definition of the scale factor depends on the dynamic type of a \c
+  DirectSolver instance. That is, each class that is derived from the
+  \c DirectSolver class may implement its own strategy for computing
+  the scale factors, as long as they are of the same order magnitude
+  as the maximum row elements.
+
+  The zero pivot threshold controls the detection of singular systems
+  of equations. If the threshold is very small -- close to machine
+  accuracy -- then roundoff errors may prevent the solver from
+  detecting that the system of equations is singular. If, on the other
+  hand, the threshold is large -- close to one -- than the solver may
+  mark a non-singular system of equations as being singular.  By
+  default, the zero pivot threshold equals the constant \c
+  DEFAULT_ZERO_PIVOT_THRESHOLD.
+
+  The second property that controls the solution procedure is an
+  integer, here denoted by \c n, that specifies the maximum number of
+  allowed zero pivots. If \a n equals zero, a \c DirectSolver object
+  will throw a \c SolverException whenever it encounters a zero
+  pivot. If \a n is larger than zero, it will only throw an exception
+  if it encounters \a n or more zero pivots. The first <i>(n-1)</i>
+  zero pivots will be replaced by some non-zero value. Setting n to a
+  non-zero value is useful when you want to compute a solution of a
+  singular, or near singular, system of equations. By default, the
+  maximum number of allowed zero pivots is zero.
+
+*/
+
+class DirectSolver : public Solver
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   static data
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The default zero pivot threshold.
+
+  The default zero pivot threshold. Its value is currently set to \c
+  1.0e-8.
+
+*/
+
+  static const double DEFAULT_ZERO_PIVOT_THRESHOLD;
+
+
+// ----------------------------------------------------------------------
+//   events
+// ----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that progress is being made.
+  
+  The event \c progressEvent is emitted repeatedly when the solution
+  of the linear system of equations is being computed. The argument of
+  event is a double precision number between zero and one that
+  indicates how much work has been completed.
+  
+*/
+
+  jem::util::Event<double>  progressEvent;
+
+
+//-----------------------------------------------------------------------
+//   configure
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Configures this solver given a set of properties.
+
+  Configures this solver given the set of properties stored in the
+  object \a props. When this function returns, \a conf contains all
+  the properties that have been used.
+
+  The following table lists the properties that are recognized by the
+  \c DirectSolver class.
+
+  <table>
+    <tr>
+      <td> Name
+      <td> Description
+      <td> Type
+      <td> Valid range
+    </tr>
+
+    <tr>
+      <td> <code>zeroPivotThreshold</code>
+      <td> Sets the zero pivot threshold
+      <td> <code>double</code>
+      <td> <code>(0,inf)</code>
+    </tr>
+
+    <tr>
+      <td> <code>maxZeroPivotCount</code>
+      <td> Sets the maximum number of allowed zero pivots
+      <td> <code>int</code>
+      <td> <code>[0,inf)</code>
+    </tr>
+  </table>
+
+  Both properties are optional.
+
+  \param conf  - used properties.
+
+  \param props - input properties.
+
+*/
+
+  virtual void configure
+
+    ( const Properties&  conf,
+      const Properties&  props );
+
+
+
+//-----------------------------------------------------------------------
+//   setZeroPivotThreshold
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the threshold for detecting zero pivots.
+
+  Sets the zero pivot threshold to \a eps.
+
+  \param eps - the relative zero pivot threshold.
+
+  \pre <code>eps > 0.0</code>
+
+  \post <code>this->getZeroPivotThreshold() == eps</code>
+
+*/
+
+  virtual void setZeroPivotThreshold ( double eps ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   getZeroPivotThreshold
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the current zero pivot threshold.
+
+  Returns the current zero pivot threshold.
+
+  \return The relative zero pivot threshold.
+
+*/
+
+  virtual double getZeroPivotThreshold () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   setMaxZeroPivotCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the maximum number of allowed zero pivots.
+
+  Sets the maximum number of allowed zero pivots to \a n.
+
+  \param n - the maximum number of allowed zero pivots.
+
+  \pre <code>n >= 0</code>
+
+  \post <code>this->getMaxZeroPivotCount() == n</code>
+
+*/
+
+  virtual void setMaxZeroPivotCount ( int n ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   getMaxZeroPivotCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the maximum number of allowed zero pivots.
+
+  Returns the maximum number of allowed zero pivots.
+
+  \return The maximum number of allowed zero pivots.
+
+*/
+
+  virtual int getMaxZeroPivotCount () const  = 0;
+
+
+ protected:
+
+  virtual            ~DirectSolver ();
+};
+
+
+
+JIVE_END_PACKAGE( solver )

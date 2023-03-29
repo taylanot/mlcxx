@@ -1,0 +1,597 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( io )
+
+
+//=======================================================================
+//   class TextInput
+//=======================================================================
+
+/*!
+  \class TextInput TextInput.dox  jem/io/TextInput.h
+
+  \brief Provides an interface for reading text-based input.
+
+  The \c TextInput interface provides a set of (abstract) functions
+  for reading characters from an input stream. It is typically used to
+  implement functions that parse text input and that do not care about
+  the source of the input.
+
+  \sa \c Reader, \c TextOutput, \c DataInput.
+
+*/
+
+class TextInput : public Interface
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   read
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Extracts the next character from this input stream.
+
+  Returns the next character, cast to an \c int, from this input
+  stream. If the end of the stream has been reached, \c -1 is
+  returned.
+
+  \return The next character in the input stream, or \c -1.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+  
+  virtual int read () = 0;
+
+
+/*!
+
+  \brief Extracts multiple characters from this input stream.
+
+  Extracts up to \a n characters from this input stream and stores them
+  into the the array \a buf. The number of characters extracted may be
+  less than \a n if the end of the stream is encountered or if there
+  are no more characters available at this moment.
+
+  \param buf - a character array of which the size is at least \a n.
+
+  \param n - the maximum number of characters to be extracted from the
+  input stream.
+
+  \return The number of characters that have been extracted from the
+  input stream and that have been stored in the character array \a
+  buf. If \a n is larger than zero, this function will always return a
+  positive integer, unless the end of the input stream is encountered
+  before any character has been extracted.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the array \a buf is at least \a n characters long.
+
+  \post If \a k denotes the value returned by this function, then the
+  array elements <code>buf[0], ..., buf[k - 1]</code> have been
+  filled.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual int read ( char* buf, int n ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   pushBack
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Pushes back a previously read character.
+
+  Pushes back the character \a c, cast to an <code>unsigned
+  char</code>, into this input stream. This character must have been
+  previously extracted from the input stream by calling one of the \c
+  read() member functions. The pushed back character will be the first
+  character to be extracted from the input stream when one of the \c
+  read() member functions is called.
+
+  Characters must be pushed back in the <em>same order</em> as they
+  have been read; one is not allowed to alter the contents of the
+  input stream.
+
+  If the character \a c has a negative value, this function does
+  nothing.
+
+  Example:
+
+  \code
+  void skipNumbers ( TextInput& in )
+  {
+    int c;
+
+    for ( c = in.read(); c >= 0 && isalpha(c); c = in.read() );    
+    in.pushBack( c );
+  }
+  \endcode
+
+  \param c - the character to be pushed back.
+
+  \post If \a c is non-negative, then <code>this->read() == c</code>.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual void pushBack ( int c ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   skipWhite
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Skips over white space.
+
+  Extracts white space from this input stream. A possible
+  implementation could be:
+
+  \code
+  int c;
+
+  for ( c = read(); c >= 0 && isspace(c); c = read() );
+  pushBack( c );
+  \endcode
+
+  \post The next character returned by the \c read() member function
+  either returns \c -1 or a non-white space character.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual void skipWhite () = 0;
+
+
+//-----------------------------------------------------------------------
+//   parseByte
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads a byte from this input stream.
+
+  Reads a byte from this input stream. On success, the read byte is
+  returned; otherwise an exception is thrown. You should normally not
+  call this function directly, but use one of the overloaded input
+  operators.
+
+  \return The byte that has been read from this input stream.
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \throws IllegalInputException - if the input is out of range.
+
+  \sa <code>operator >> ( TextInput&, byte& )</code>
+
+*/
+
+  virtual byte   parseByte  () = 0;
+
+
+//-----------------------------------------------------------------------
+//   parseBool
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Reads a boolean from this input stream.
+
+  Reads a boolean from this input stream. On success, the read boolean
+  is returned; otherwise an exception is thrown. You should normally
+  not call this function directly, but use one of the overloaded input
+  operators.
+
+  \return The bool that has been read from this input stream.
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \sa <code>operator >> ( TextInput&, bool& )</code>
+
+*/
+
+  virtual bool   parseBool  () = 0;
+
+
+//-----------------------------------------------------------------------
+//   parseInt
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Reads a long integer from this input stream.
+  
+  Reads a long integer from this input stream. On success, the read
+  integer is returned; otherwise an exception is thrown. You should
+  normally not call this function directly, but use one of the
+  overloaded input operators.
+
+  \return The integer that has been read from this input stream.
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input can not be converted to a long
+  integer.
+
+  \throws IllegalInputException - if the input is out of range.  
+
+  \sa <code>operator >> ( TextInput&, long& )</code>
+
+*/
+
+
+  virtual long   parseInt   () = 0;
+
+
+//-----------------------------------------------------------------------
+//   parseFloat
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads a double from this input stream.
+
+  Reads a double precision number from this input stream. On success,
+  the read duoble is returned; otherwise an exception is thrown. You
+  should normally not call this function directly, but use one of the
+  overloaded input operators.
+
+  \return The double that has been read from this input stream.
+
+  \throws IOException - if an I/O error occurs.
+    
+  \throws ParseException - if the input can not be converted to a
+  double.
+
+  \throws IllegalInputException - if the input is out of range.
+
+  \sa <code>operator >> ( TextInput&, double& )</code>
+
+*/
+
+  virtual double parseFloat () = 0;
+  
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   text input operators
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \relates TextInput
+
+  \brief Reads a boolean from a text input stream.
+
+  Reads a boolean from the text input stream \a in and assigns it to
+  the parameter \a b. This operator simply executes:
+
+  <code>b = in.parseBool(); return in;</code>
+
+  \param in - a text input stream.
+
+  \param b - the boolean to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+*/
+
+inline TextInput& operator >> ( TextInput& in, bool& b );
+
+
+/*!
+  
+  \relates TextInput
+
+  \brief Reads a byte from a text input stream.
+
+  Reads a byte from the text input stream \a in and assigns it to the
+  parameter \a b. This operator simply executes:
+
+  <code>b = in.parseByte(); return in;</code>
+
+  \param in - a text input stream.
+
+  \param b - the byte to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \throws IllegalInputException - if the input is out of range.
+
+*/
+
+inline TextInput& operator >> ( TextInput& in, byte& b );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Reads a character from a text input stream.
+
+  Reads the next character from the text input stream \a in and
+  assigns it to the parameter \a c. Leading white space is skipped by
+  calling <code>in.skipWhite()</code>.
+
+  \param in - a text input stream.
+
+  \param c - the character to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the end of the stream has been reached.
+
+*/
+
+TextInput& operator >> ( TextInput& in, char& c );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Reads a short integer from a text input stream.
+
+  Reads a short integer from the text input stream \a in and assigns
+  it to the parameter \a i. This operator first reads a long integer
+  from the input stream and then tries to convert it to a short
+  integer.
+
+  \param in - a text input stream.
+
+  \param i - the short integer to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \throws IllegalInputException - if the input is out of range.
+
+  \sa <code>operator >> ( TextInput&, long& )</code>
+
+*/
+
+TextInput& operator >> ( TextInput& in, short& i );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Reads an integer from a text input stream.
+
+  Reads an integer from the text input stream \a in and assigns
+  it to the parameter \a i. This operator first reads a long integer
+  from the input stream and then tries to convert it to an int.
+
+  \param in - a text input stream.
+
+  \param i - the integer to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \throws IllegalInputException - if the input is out of range.
+
+  \sa <code>operator >> ( TextInput&, long& )</code>
+
+*/
+
+TextInput& operator >> ( TextInput& in, int& i );
+
+
+/*!
+  
+  \relates TextInput
+  
+  \brief Reads a long integer from a text input stream.
+  
+  Reads a long integer from the text input stream \a in and assigns it
+  to the parameter \a i. This operator simply executes:
+
+  <code>i = in.parseInt(); return in;</code>
+
+  \param in - a text input stream.
+
+  \param i - the long integer to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input can not be converted to a long
+  integer.
+
+  \throws IllegalInputException - if the input is out of range.
+
+*/
+
+TextInput& operator >> ( TextInput& in, long& i );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Reads a float from a text input stream.
+
+  Reads a floating point number from the text input stream \a in and
+  assigns it to the parameter \a f. This operator first reads a double
+  from the input stream and then tries to convert it to a float.
+
+  \param in - a text input stream.
+
+  \param f - the float to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+  \throws ParseException - if the input is not in the correct format.
+
+  \throws IllegalInputException - if the input is out of range.
+
+  \sa <code>operator >> ( TextInput&, double& )</code>
+
+*/
+
+TextInput& operator >> ( TextInput& in, float& f );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Reads a double from a text input stream.
+
+  Reads a double precision number from the text input stream \a in and
+  assigns it to the parameter \a d. This operator simply executes:
+
+  <code>i = in.parseFloat(); return in;</code>
+
+  \param in - a text input stream.
+
+  \param d - the double to be read.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+    
+  \throws ParseException - if the input can not be converted to a
+  double.
+
+  \throws IllegalInputException - if the input is out of range.
+
+*/
+
+TextInput& operator >> ( TextInput& in, double& d );
+
+
+/*!
+
+  \relates TextInput
+
+  \brief Applies a manipulator function to a text input stream.
+  
+  Applies the manipulator function \a manip to the text input stream
+  \a in. This operator is equivalent with:
+
+  <code>return manip( in );</code>
+
+  \param in - a text input stream.
+
+  \param manip - a text input stream manipulator function.
+
+  \return \a in
+  
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextInput& operator >>
+
+  ( TextInput&    in,
+    TextInput&  (*manip) ( TextInput& ) );
+
+
+//-----------------------------------------------------------------------
+//   skipWhite
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates TextInput
+  
+  \brief Extracts white space from a text input stream.
+    
+  A manipulator function that extracts white space from the text input
+  stream \a in by calling <code>in.skipWhite()</code>.
+  
+  Example:
+
+  \code
+  int readChar ( TextInput& in )
+  {
+    in >> skipWhite;
+    return in.read();
+  }
+  \endcode
+
+  \param in - a text input stream.
+
+  \return \a in
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextInput& skipWhite ( TextInput& in );
+
+
+
+JEM_END_PACKAGE( io )

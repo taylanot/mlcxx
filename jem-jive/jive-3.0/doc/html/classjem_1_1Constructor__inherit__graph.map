@@ -1,0 +1,9 @@
+<map id="jem::Constructor" name="jem::Constructor">
+<area shape="rect" id="node1" title=" " alt="" coords="149,304,279,331"/>
+<area shape="rect" id="node6" href="$classjem_1_1ConstructorTemplate.html" title=" " alt="" coords="5,379,196,420"/>
+<area shape="rect" id="node7" href="$classjem_1_1DefaultConstructor.html" title=" " alt="" coords="221,386,437,413"/>
+<area shape="rect" id="node2" href="$classjem_1_1Member.html" title=" " alt="" coords="160,229,268,256"/>
+<area shape="rect" id="node3" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="142,155,286,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="165,80,263,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="150,5,278,32"/>
+</map>

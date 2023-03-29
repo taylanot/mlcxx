@@ -1,0 +1,13 @@
+<map id="jive::geom::StdShapeTable" name="jive::geom::StdShapeTable">
+<area shape="rect" id="node1" title=" " alt="" coords="600,81,795,108"/>
+<area shape="rect" id="node7" href="$classjive_1_1fem_1_1AutoShapeTable.html" title=" " alt="" coords="856,56,1048,83"/>
+<area shape="rect" id="node11" href="$classjive_1_1geom_1_1SimpleShapeTable.html" title=" " alt="" coords="843,107,1061,133"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1ShapeTable.html" title=" " alt="" coords="379,81,552,108"/>
+<area shape="rect" id="node3" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="177,56,321,83"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="13,56,111,83"/>
+<area shape="rect" id="node5" href="$classjive_1_1util_1_1EventSource.html" title=" " alt="" coords="167,107,331,133"/>
+<area shape="rect" id="node6" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="5,107,119,133"/>
+<area shape="rect" id="node8" href="$classjive_1_1fem_1_1AutoShapeTable1D.html" title=" " alt="" coords="1109,5,1320,32"/>
+<area shape="rect" id="node9" href="$classjive_1_1fem_1_1AutoShapeTable2D.html" title=" " alt="" coords="1109,56,1320,83"/>
+<area shape="rect" id="node10" href="$classjive_1_1fem_1_1AutoShapeTable3D.html" title=" " alt="" coords="1109,107,1320,133"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="jive::fem::ShapeModule" name="jive::fem::ShapeModule">
+<area shape="rect" id="node1" title=" " alt="" coords="5,304,180,331"/>
+<area shape="rect" id="node2" href="$classjive_1_1app_1_1Module.html" title=" " alt="" coords="26,229,159,256"/>
+<area shape="rect" id="node3" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="21,155,165,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="44,80,141,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="29,5,157,32"/>
+</map>

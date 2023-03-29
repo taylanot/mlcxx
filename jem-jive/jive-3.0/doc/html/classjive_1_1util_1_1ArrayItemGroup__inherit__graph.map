@@ -1,0 +1,10 @@
+<map id="jive::util::ArrayItemGroup" name="jive::util::ArrayItemGroup">
+<area shape="rect" id="node1" title=" " alt="" coords="154,304,341,331"/>
+<area shape="rect" id="node2" href="$classjive_1_1util_1_1XItemGroup.html" title=" " alt="" coords="5,229,167,256"/>
+<area shape="rect" id="node3" href="$classjive_1_1util_1_1ItemGroup.html" title="Encapsulates a set of item indices." alt="" coords="10,155,162,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="37,80,135,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="22,5,150,32"/>
+<area shape="rect" id="node6" href="$classjem_1_1Clonable.html" title=" " alt="" coords="191,229,303,256"/>
+<area shape="rect" id="node7" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="268,155,381,181"/>
+<area shape="rect" id="node8" href="$classjem_1_1io_1_1Serializable.html" title=" " alt="" coords="328,229,479,256"/>
+</map>

@@ -1,0 +1,1114 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class Flex
+//=======================================================================
+
+/*!
+  \class Flex Flex.dox jem/util/Flex.h
+
+  \brief Implements a generic, resizable vector.
+
+  The template class \c Flex represents a vector (one-dimensional
+  array) containing elements of type \a T. The elements are numbered
+  in the usual way from zero to the total number of elements minus
+  one. They can be accessed in constant time by calling the overloaded
+  subscript operator or by dereferencing an iterator returned by a \c
+  Flex instance.
+
+  In contrast to the \c Array class, the \c Flex class provides
+  functions for adding and removing elements. Although elements can be
+  inserted at arbitrary positions, the \c Flex class is optimized for
+  appending elements to the end of a \c Flex. Likewise, removing
+  elements from the end of a \c Flex is much more efficient than
+  removing elements from the middle or the beginning of a \c Flex.
+
+  A \c Flex has a \em capacity that specifies how many elements it can
+  store without having to allocate additional memory. The capacity is
+  automatically increased whenever there is no more space to store
+  additional elements. The capacity can also be set manually when you
+  know beforehand how many elements you are going to add to a \c Flex.
+
+  The automatic capacity growth of a \c Flex can be controlled by
+  means of its <em>expansion factor</em>. Each time a \c Flex needs to
+  allocate memory for additional elements, it multiplies its current
+  capacity with its expansion factor to determine its new capacity. A
+  larger expansion factor therefore leads to a more `aggressive'
+  capacity growth.
+
+  Several members of the \c Flex class return iterators, pointers and
+  references that refer to an element in a \c Flex instance. Unless
+  stated otherwise, these iterators, pointers and references are valid
+  as long as the \c Flex instance is not structurally modified, either
+  by adding/removing elements, or by changing the capacity of the
+  flex.
+
+  A \c Flex stores its elements in a contiguous array that can be
+  accessed directly. This means that one can pass the elements in a \c
+  Flex to a function that expects a standard array.
+
+  \sa \c Array, \c ArrayBuffer.
+
+*/
+
+template <class T>
+  class Flex
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A random access iterator type.
+
+  A random access iterator type pointing to elements of type \a
+  T. This iterator fulfills the requirements of the random access
+  iterator category of the standard C++ library.
+
+*/
+
+  typedef T* Iterator;
+
+
+/*!
+
+  \brief A read-only random access iterator type.
+
+  A random access iterator type pointing to elements of type \a const
+  \a T. This iterator fulfills the requirements of the random access
+  iterator category of the standard C++ library.
+
+*/
+
+  typedef const T* ConstIterator;
+  
+
+/*!
+
+  \brief The default expansion factor.
+
+  This floating point constant specifies the default expansion factor
+  of a \c Flex. Its current value is 1.5, but a different value may be
+  used in a future version of Jem.
+
+*/
+
+  static const float EXPANSION_FACTOR;
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs an empty flex.
+
+  Constructs an empty flex.
+
+  \post <code>
+    this->size()               == 0 && <br>
+    this->capacity()           == 0 && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  Flex ();
+
+
+/*!
+
+  \brief Constructs a flex of a given size.
+
+  Constructs a flex of size \a n.
+
+  \param n - the size of this \c Flex.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the type \a T provides a default constructor.
+
+  \post <code>
+    this->size()               == n && <br>
+    this->capacity()           == n && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  explicit Flex ( int n );
+
+
+/*!
+ 
+  \brief Constructs a copy of another flex.
+
+  Constructs a flex containing copies of the elements of the \a rhs
+  flex. The elements of the newly created flex are initialized by
+  calling the copy constructor of type \a T.
+
+  \param rhs - the \c Flex to be copied.
+
+  \pre The type \a T has a copy constructor.
+
+  \post <code>
+    this->size()               == rhs.size()   && <br>
+    this->capacity()           == this->size() && <br>
+    this->getExpansionFactor() == rhs.getExpansionFactor()
+  </code>
+
+*/
+
+  inline Flex ( const Flex& rhs );
+
+
+/*!
+
+  \brief Constructs a flex given two input iterators.
+
+  Constructs a flex containing copies of the elements between the
+  input iterators \a first and \a last. The elements of the newly
+  created flex are initialized by calling the copy constructor of type
+  \a T.
+
+  \param first - an input iterator pointing to the first element.
+
+  \param last - an input iterator pointing one position past the last
+  element.
+
+  \pre
+    The expression \c *first can be converted to type \a T, <br>
+    and the type \a T has a copy constructor, <br>
+    and \a last is reachable from \a first.
+
+  \post <code>
+    this->size()     == std::distance( first, last ) && <br>
+    this->capacity() == this->size()                 && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  template <class InputIterator>
+    inline Flex ( InputIterator first,
+                  InputIterator last );
+
+
+/*!
+
+  \brief Deallocates all memory allocated by this flex.
+
+  Deallocates all memory that has been allocated by this flex. The
+  destructor invalidates all iterators, pointers and references that
+  point to an element in this flex.
+
+*/
+
+  ~Flex ();
+
+
+//-----------------------------------------------------------------------
+//   begin
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns an iterator pointing to the begin of this flex.
+  
+  Returns an iterator pointing to the first element in this flex, or
+  \c end() if this flex is empty. The iterator is valid as long as
+  this flex is not structurally modified, either by adding/removing
+  elements, or by changing the capacity of this flex.
+
+  \return An iterator pointing to the begin of this flex.
+
+*/
+
+  inline Iterator begin ();
+
+
+/*!
+  
+  \brief Returns a const iterator pointing to the begin of this flex.
+
+  Returns a const iterator pointing to the first element in this flex,
+  or \c end() if this flex is empty. The iterator is valid as long as
+  this flex is not structurally modified.
+
+  \return A const iterator pointing to the begin of this flex.
+
+*/
+
+  inline ConstIterator begin () const;
+
+
+//-----------------------------------------------------------------------
+//   end
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the end of this flex.
+
+  Returns an iterator pointing to one position past the last element
+  in this flex. The iterator is valid as long as this flex is not
+  structurally modified.
+
+  \return An iterator pointing to the end of this flex.
+
+*/
+
+  inline Iterator end ();
+
+
+/*!
+
+  \brief Returns a const iterator pointing to the end of this flex.
+
+  Returns a const iterator pointing to one position past the last
+  element in this flex. The iterator is valid as long as this flex is
+  not structurally modified.
+
+  \return A const iterator pointing to the end of this flex.
+
+*/
+
+  inline ConstIterator end () const;
+  
+
+//-----------------------------------------------------------------------
+//   front
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the first element in this flex.
+
+  Returns a reference to the first element in this flex. The reference
+  is valid as long as this flex is not structurally modified.
+
+  \pre <code>this->size() > 0</code>
+
+  \return <code>(*this)[0]</code>
+
+*/
+
+  inline T& front ();
+
+
+/*!
+
+  \brief Returns a const reference to the first element in this flex.
+
+  Returns a const reference to the first element in this flex. The
+  reference is valid as long as this flex is not structurally
+  modified.
+
+  \pre <code>this->size() > 0</code>
+
+  \return <code>(*this)[0]</code>
+
+*/
+
+  inline const T& front () const;
+
+
+//-----------------------------------------------------------------------
+//   back
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the last element in this flex.
+
+  Returns a reference to the last element in this flex. The reference
+  is valid as long as this flex is not structurally modified.
+
+  \pre <code>this->size() > 0</code>
+
+  \return <code>(*this)[ this->size() - 1 ]</code>
+
+*/
+
+  inline T& back ();
+
+
+/*!
+
+  \brief Returns a const reference to the last element in this flex.
+
+  Returns a const reference to the last element in this flex. The
+  reference is valid as long as this flex is not structurally
+  modified.
+
+  \pre <code>this->size() > 0</code>
+
+  \return <code>(*this)[ this->size() - 1 ]</code>
+
+*/
+
+  inline const T& back () const;
+  
+  
+//-----------------------------------------------------------------------
+//   assignment operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies another flex.
+
+  The assignment operator first resizes this flex so that it has the
+  same size as the \a rhs flex. Next, the values of the elements in
+  the \a rhs flex are assigned to the elements in this flex by calling
+  the assignment operator of type \a T.
+  
+  \param rhs - the \c Flex to be copied.
+
+  \pre The type \a T has an assignment operator.
+
+  \post <code>
+    this->size() == rhs.size() && <br>
+    this->getExpansionFactor() == rhs.getExpansionFactor()
+  </code>
+
+  \return \c *this
+
+*/
+
+  Flex& operator = ( const Flex& rhs );
+
+
+/*!
+
+  \brief Sets all elements in this flex to a given value.
+
+  Sets all elements in this flex to the value \a rhs by calling the
+  assignment operator of type \a T.
+
+  \param rhs - an instance of type \a T.
+
+  \pre The type \a T has an assignment operator.
+
+  \return \c *this
+
+*/
+
+  Flex& operator = ( T rhs );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Swaps the contents of this flex with another flex.
+
+  Swaps the internal state of this flex with that of the \a rhs
+  flex. Note that this function just swaps a few pointers; it does not
+  swap the individual elements.
+
+  \param rhs - a \c Flex instance.
+
+*/
+
+  void swap ( Flex& rhs );
+
+
+//-----------------------------------------------------------------------
+//   subscript operators
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns the element at a given index.
+
+  Returns a reference to the \a i-th element in this flex. The
+  reference is valid as long as this flex is not structurally
+  modified.
+
+  \param i - a valid index.
+
+  \pre <code>i >= 0 && i < this->size()</code>
+
+  \return A reference to the \a i-th element in this flex.
+
+*/
+
+  inline T& operator [] ( int i );
+
+
+/*!
+
+  \brief Returns the element at a given index.
+
+  Returns a const reference to the \a i-th element in this flex. The
+  reference is valid as long as this flex is not structurally
+  modified.
+
+  \param i - a valid index.
+
+  \pre <code>i >= 0 && i < this->size()</code>
+
+  \return A const reference to the \a i-th element in this flex.
+
+*/
+
+
+  inline const T& operator [] ( int i ) const;
+
+
+//-----------------------------------------------------------------------
+//   pushBack
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Appends an element to this flex.
+
+  Appends a copy of the object \a item to the end of this flex. The
+  copy is created by calling the copy constructor of type \a T. The
+  capacity of this flex will be increased if necessary.
+
+  The time complexity of this function is <i>O(1)</i>, provided that
+  the capacity of this flex is large enough.
+
+  \param item - the object to be appended.
+
+  \pre The type \a T has a copy constructor.
+
+  \post <code>this->back() == item</code>
+
+*/
+
+  inline void pushBack ( T item );
+
+
+/*!
+
+  \brief Appends multiple copies of an element to this flex.
+
+  Appends \a n copies of the object \a item to the end of this
+  flex. The copies are initialized by calling the copy constructor of
+  type \a T. The capacity of this flex will be increased if necessary.
+
+  The time complexity of this function is <i>O(n)</i>, provided that
+  the capacity of this flex is large enough.
+
+  \param item - the object to be copied and appended.
+
+  \param n - the number of copies to be appended.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the type \a T has a copy constructor.
+
+*/
+
+  void pushBack ( T item, int n );
+  
+
+/*!
+
+  \brief Appends the elements between two input iterators to this
+  flex.
+
+  Appends copies of the elements between the input iterators \a first
+  and \a last to the end of this flex. The copies are initialized by
+  calling the copy constructor of type \a T. The capacity of this will
+  be increased if necessary.
+
+  Provided that the capacity of this flex is large enough, the time
+  complexity of this function is <i>O(n)</i> with \a n the number
+  elements between the two input iterators.
+
+  \param first - an input iterator pointing to the first element to be
+  appended.
+
+  \param last - an input iterator pointing one position past the lest
+  element to be appended.
+
+  \pre 
+   The type \a T has a copy constructor, <br>
+   and the expression \c *first can be converted to type \a T, <br>
+   and \a last is reachable from \a first.
+
+
+  \warning The iterators \a first and \a last should \em not point to
+  elements in this flex, since this function invalidates all such
+  iterators.
+
+*/
+  
+  template <class InputIterator>
+    void pushBack ( InputIterator first,
+                    InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   popBack
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes the last element in this flex.
+
+  Deletes the last element in this flex by calling the destructor of
+  type \a T. The capacity of this flex is not modified.
+
+  The time complexity of this function is <i>O(1)</i>.
+
+  \pre <code>this->size() > 0</code>
+
+*/
+
+  inline void popBack  ();
+
+
+/*!
+
+  \brief Deletes multiple elements at the end of this flex.
+
+  Deletes the last \a n elements in this flex by calling the
+  destructor of type \a T. The capacity of this flex is not modified.
+
+  This function is equivalent with:
+
+  \code
+  int i;
+
+  for ( i = 0; i < n; i++ ) {
+    this->popBack();
+  }
+  \endcode
+
+  The time complexity of this function is <i>O(n)</i>.
+
+  \param n - the number of elements to be deleted.
+
+  \pre <code>this->size() >= n</code>
+
+*/
+
+  inline void popBack  ( int n );
+
+
+//-----------------------------------------------------------------------
+//   insert
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief Inserts an element into this flex.
+
+  Inserts a copy of the object \a item into this flex \em before the
+  iterator \a pos. The copy is initialized by calling the assignent
+  operator of type \a T. The element pointed to by \a pos, and all
+  succeeding elements, are shifted one position to the right. The
+  capacity of this flex will be increased is necessary.
+
+  If the capacity of this flex is large enough, the time complexity of
+  this function is <i>O(k)</i> with \a k equal to <code>(end() -
+  pos)</code>.
+
+  \param pos - an iterator pointing to an element in this flex, or \c
+  end().
+
+  \param item - the object to be inserted.
+
+  \pre The type \a T has both a default constructor and an assignment
+  operator.
+
+*/
+
+  void insert ( Iterator pos, T item );
+
+
+/*!
+
+  \brief Inserts multiple copies of an element into this flex.
+  
+  Inserts \a n copies of the object \a item into this flex \em before
+  the iterator \a pos. The copies are initialized by calling the
+  assignent operator of type \a T. The element pointed to by \a pos,
+  and all succeeding elements, are shifted \a n positions to the
+  right. The capacity of this flex will be increased is necessary.
+
+  If the capacity of this flex is sufficient, the time complexity of
+  this function if <i>O(n + k)</i> with \a k equal to <code>(end() -
+  pos)</code>.
+
+  \param pos - an iterator pointing to an element in this flex, or \c
+  end().
+
+  \param item - the object to be inserted.
+
+  \param n - the number of copies to be inserted.
+
+  \pre The type \a T has both a default constructor and an assignment
+  operator.
+
+*/
+
+  void insert ( Iterator pos, T item, int n );
+
+
+/*!
+
+  \brief Inserts the elements between two input iterators into this
+  flex.
+
+  Inserts copies of the elements between the input iterators \a first
+  and \a last into this flex \em before the iterator \a pos. The
+  copies are initialized by calling the assignent operator of type \a
+  T. The element pointed to by \a pos, and all succeeding elements,
+  are shifted to the right. The capacity of this flex will be
+  increased is necessary.
+
+  If the capacity of this flex is large enough, the time complexity of
+  this function if <i>O(n + k)</i> with \a n equal to
+  <code>std::distance( first, last )</code> and \a k equal to
+  <code>(end() - pos)</code>.
+
+  \param pos - an iterator pointing to an element in this flex, or \c
+  end().
+
+  \param first - an input iterator pointing to the first element to be
+  inserted.
+
+  \param last - an input iterator pointing to one position past the
+  last element to be inserted.
+
+  \pre 
+  The type \a T has both a default constructor and an assignment
+  operator, <br>
+   and the expression \c *first can be converted to type \a T, <br>
+   and \a last is reachable from \a first.
+
+*/
+
+  template <class InputIterator>
+    void insert ( Iterator      pos,
+                  InputIterator first,
+                  InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   erase
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes an element from this flex.
+
+  Deletes the element pointed to by the iterator \a pos from this flex
+  by calling the destructor of type \a T. %All succeeding elements are
+  shifted one position to the left. The capacity of this flex is not
+  modified.
+
+  The time complexity of this function is <i>O(k)</i> with \a k equal
+  to <code>(end() - pos)</code>.
+
+  \param pos - an iterator pointing to an element in this flex, or \c
+  end().
+
+*/
+
+  inline void erase ( Iterator pos );
+
+
+/*!
+
+  \brief Deletes multiple elements from this flex.
+
+  Deletes all elements between the iterators \a first and \a last from
+  this flex by calling the destructor of type \a T. %All elements
+  succeeding the last deleted element are shifted to the left. The
+  capacity of this flex is not modified.
+
+  The time complexity of this function is <i>O(n + k)</i> with \a n
+  equal to <code>(last - first)</code> and \a k equal to 
+  <code>(end() - pos)</code>.
+
+  \param first - an iterator pointing to the first element to be
+  deleted, or \c end().
+
+  \param last - an iterator pointing one position past the last
+  element to be deleted, or \c end().
+
+  \pre \a last is reachable from \a first.
+
+
+*/
+
+  inline void  erase ( Iterator first,
+                       Iterator last );
+
+
+//-----------------------------------------------------------------------
+//   clear
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes all elements from this flex.
+
+  Deletes all elements in this flex. The capacity of this flex is not
+  modified.
+
+  This function is equivalent with:
+
+  <code>erase( begin(), end() )</code>
+
+  \post <code>this->size() == 0</code>
+
+*/
+
+  inline void clear ();
+  
+
+//-----------------------------------------------------------------------
+//   resize
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Adjusts the size of this flex.
+
+  Sets the size of this flex to \a n. This function is equivalent with:
+
+  \code
+  if ( n < size() )
+  {
+    popBack ( size() - n );
+  }
+  else
+  {
+    pushBack ( T(), n - size() );
+  }
+  \endcode
+
+  \param n - the new size of this flex.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>this->size() == n</code>
+
+*/
+
+  void resize ( int n );
+
+
+//-----------------------------------------------------------------------
+//   reserve
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the capacity of this flex to a given value.
+
+  If \a cap is larger than the current capacity, then the capacity of
+  this flex is increased to \a cap. Otherwise, this function does
+  nothing.
+
+  \param cap - the new capacity of this flex.
+
+  \post <code>this->capacity() >= cap</code>
+
+*/
+
+  inline void reserve ( int cap );
+
+
+//-----------------------------------------------------------------------
+//   setExpansionFactor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the expansion factor if this flex to a given value.
+
+  Sets the expansion factor of this flex to the value \a x.
+
+  \param x - the new expansion factor of this flex.
+
+  \pre <code>x >= 1.0</code>
+
+  \post <code>this->getExpansionFactor() == x</code>
+
+*/
+
+  inline void setExpansionFactor ( float x );
+
+
+//-----------------------------------------------------------------------
+//   getExpansionFactor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the expansion factor of this flex.
+
+  Returns the expansion factor of this flex.
+
+  \return The expansion factor of this flex.
+
+*/
+
+  inline float getExpansionFactor () const;
+
+
+//-----------------------------------------------------------------------
+//   trimToSize
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the capacity to the size of this flex.
+
+  Adjusts the capacity so that it becomes equal to the size of this
+  flex.
+
+  \post <code>this->capacity() == this->size()</code>
+
+*/
+
+  inline void trimToSize ();
+
+
+//-----------------------------------------------------------------------
+//   capacity
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the capacity of this flex.
+
+  Returns the capacity of this flex.
+
+  \return The capacity of this flex.
+
+*/
+
+  inline int capacity () const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this flex.
+
+  Returns the number of elements stored in this flex.
+
+  \return The size of this flex.
+
+*/
+
+  inline int size () const;
+
+
+//-----------------------------------------------------------------------
+//   addr
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a pointer to an element in this flex.
+
+  Returns a pointer to the \a i-th element in this flex. The pointer
+  is valid as long as this flex is not structurally modified.
+
+  \param i - a valid index or \c size().
+
+  \pre <code>i >= 0 && i <= this->size()</code>
+
+*/
+
+  inline T* addr ( int i = 0 );
+
+
+/*!
+
+  \brief Returns a const pointer to an element in this flex.
+
+  Returns a const pointer to the \a i-th element in this flex. The
+  pointer is valid as long as this flex is not structurally modified.
+
+  \param i - a valid index or \c size().
+
+  \pre <code>i >= 0 && i <= this->size()</code>
+
+
+*/
+
+    inline const T* addr ( int i = 0 ) const;
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   serialization operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Flex
+
+  \brief Flex de-serialization operator
+
+  Reads the \c Flex \a f from the data input stream \a in. The current
+  contents of the flex \a f are discarded by calling
+  <code>f.clear()</code>.
+
+  \param in - a data input stream.
+
+  \param f - the flex to be read.
+
+  \return \a in
+
+  \throws io::IOException - if an IO error occurs.
+  
+  \throws io::SerializationException - if the data input stream is
+          corrupt.
+
+  \pre The type \a T provides a de-serialization operator.
+
+*/
+
+template <class T>
+  io::DataInput& operator >> ( io::DataInput&   in,
+                               Flex<T>&         f );
+
+/*!
+
+  \relates Flex
+
+  \brief Flex serialization operator.
+
+  Writes the \c Flex \a f to the data output stream \a out. The
+  de-serialization operator can be used to restore the \c Flex object.
+
+  \param out - a data output stream.
+
+  \param f - the flex to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T provides a serialization operator.
+
+*/
+
+template <class T>
+  io::DataOutput& operator << ( io::DataOutput&  out,
+                                const Flex<T>&   f );
+
+
+//-----------------------------------------------------------------------
+//   print operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Flex
+
+  \brief Flex print operator.
+
+  Prints the contents of the \c Flex \a f in a human readable format
+  to the text output stream \a out.
+
+  \param out - a text output stream.
+
+  \param f - the flex to be printed.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T provides a print operator.
+
+*/
+
+template <class T>
+  io::TextOutput& operator << ( io::TextOutput&  out,
+                                const Flex<T>&   f );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Flex
+
+  \brief Interchanges two flex instances.
+
+  Interchanges the state of two \c Flex objects. This function is
+  equivalent with:
+
+  <code>lhs.swap ( rhs )</code>
+
+  \param lhs - a flex.
+
+  \param rhs - another flex.
+
+*/
+
+template <class T>
+  inline void swap ( Flex<T>&  lhs,
+                     Flex<T>&  rhs );
+
+
+
+JEM_END_PACKAGE( util )
+

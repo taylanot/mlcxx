@@ -1,0 +1,6 @@
+<map id="jem::xml::TextLog" name="jem::xml::TextLog">
+<area shape="rect" id="node1" title=" " alt="" coords="9,229,148,256"/>
+<area shape="rect" id="node2" href="$classjem_1_1xml_1_1ParseLog.html" title=" " alt="" coords="5,155,152,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="30,80,127,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="15,5,143,32"/>
+</map>

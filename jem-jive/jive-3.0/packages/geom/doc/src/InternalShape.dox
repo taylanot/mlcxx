@@ -1,0 +1,560 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( geom )
+
+
+//=======================================================================
+//   class InternalShape
+//=======================================================================
+
+/*!
+
+  \brief Encapsulates the geometrical properties of a regular,
+  internal element.
+
+  <code>\#include <jive/geom/InternalShape.h></code>
+
+  The abstract class \c InternalShape encapsulates the geometrical
+  properties of a regular finite element. It extends the interface
+  defined by the \c Shape class with functions that compute the
+  gradients of the shape functions in various points within an
+  element.
+
+  The local coordinate system of an internal shape has the same rank
+  as the global coordinate system in which that shape `lives'. This
+  means that the member function \c localRank() and \c globalRank()
+  return the same number.
+
+  An internal shape may have multiple boundaries that are represented
+  by instances of the \c BoundaryShape class. Each boundary is
+  identified by an index that ranges from zero to the number of
+  boundaries minus one. The following code fragment shows how to
+  compute the surface area of an internal element by iterating over
+  its boundaries.
+
+  \code
+
+  // Compute the surface area of the internal shape s. The matrix c
+  // should contain the global node coordinates of the shape.
+
+  double getSurfaceArea ( const InternalShape& s,
+                          const Matrix&        c )
+  {
+    BoundaryShape*  b;
+    Matrix          x;
+    Vector          w;
+    double          a;
+    int             i, j;
+  
+    a = 0.0;
+
+    for ( i = 0; i < s.boundaryCount(); i++ )
+    {
+      b = s.getBoundaryShape ( i );
+
+      x.ref ( Matrix( b->globalRank(), b->nodeCount() ) );
+      w.ref ( Vector( b->integrationPointCount() ) );
+
+      s .getBoundaryCoords     ( x, i, c );
+      b->getIntegrationWeights ( w, x );
+      
+      a += sum ( w );
+    }
+
+    return a;
+  }
+  
+  \endcode
+
+  \sa \c BoundaryShape
+
+*/
+
+class InternalShape : public Shape
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A type representing the boundary topology of an internal
+  shape.
+
+  The \c Topology type represents the boundary topology of an internal
+  shape. It is an alias for \c jem::numeric::SparseStructure.
+
+*/
+
+  typedef jem::numeric::SparseStructure  Topology;
+
+
+/*!
+
+  \brief A type representing a one-dimensional integer array.
+
+  The \c IntVector type represents a one-dimensional integer array. It
+  is just an alias for \c jive::util::IntVector.
+
+*/
+
+  typedef util::IntVector IntVector;
+
+
+/*!
+
+  \brief A three-dimensional array type.
+
+  The \c Cubix type represents a three-dimensional array of double
+  precision numbers. It is an alias for \c jive::util::Cubix.
+
+*/
+
+  typedef util::Cubix Cubix;
+
+
+//-----------------------------------------------------------------------
+//   getType
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a pointer to a \c Class object representing this
+  class.
+
+  Returns a pointer to a \c jem::Class object that represents the \c
+  InternalShape class. This pointer remains valid during the entire
+  lifetime of the current program.
+
+  \return A pointer to a \c jem::Class object that represents this
+  class.
+
+*/
+
+  static jem::Class* getType ();
+
+
+//-----------------------------------------------------------------------
+//   globalRank
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the global rank of this shape.
+
+  Returns the rank (number of dimensions) of the global coordinate
+  system in which this internal shape `lives'. The implementation
+  provided by the \c InternalShape class simply returns
+  <code>this->localRank()</code>.
+
+  \return The global rank of this internal shape.
+
+*/
+
+  virtual int globalRank () const;
+
+
+//-----------------------------------------------------------------------
+//   boundaryCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of boundaries.
+
+  Returns the number of boundaries of this internal shape.
+
+  \return The number of boundaries of this shape.
+
+*/
+
+  virtual int boundaryCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getBoundaryShape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a boundary shape object given a boundary index.
+
+  Returns a pointer to the \c BoundaryShape instance that represents
+  the boundary with index \a ibnd of this internal shape. The pointer
+  remains valid during the lifetime of this internal shape object.
+
+  \param ibnd - a valid boundary index.
+
+  \pre <code>ibnd >= 0 && ibnd < this->boundaryCount()</code>
+
+  \return A pointer to a \c BoundaryShape that represents one of the
+  boundaries of this internal shape.
+
+*/
+
+  virtual BoundaryShape* getBoundaryShape
+
+    ( int ibnd ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getBoundaryNodes
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the indices of the nodes on one of the boundaries of
+  this shape.
+
+  Returns an array containing the indices of the nodes on the boundary
+  with index \a ibnd. If \c nodes denotes the returned array, then \c
+  nodes.size() equals the number of nodes on the boundary and \c
+  nodes[i] yields the index of the i-th node on that boundary. In
+  other words, if \c j equals \c nodes[i], then the j-th node of this
+  internal shape is the i-th node on the specified boundary.
+
+  For performance reasons, the returned array may share its data with
+  one of the private members of this shape object. One should
+  therefore not modify the contents of the array.
+
+  \param ibnd - a valid boundary index.
+
+  \pre <code>ibnd >= 0 && ibnd < this->boundaryCount()</code>
+
+  \return The indices of the nodes on a specific boundary.
+
+*/
+
+  virtual IntVector getBoundaryNodes
+    
+    ( int ibnd ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getBoundaryTopology
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the boundary topology of this internal shape.
+
+  Returns a \c jem::numeric::SparseStructure that encodes the non-zero
+  pattern of the boundary-node connectivity matrix of this internal
+  shape. This matrix is a sparse, boolean matrix that indicates which
+  boundaries are attached to which nodes. To be precise, the matrix
+  entry at location (i,j) is non-zero if the i-th boundary is attached
+  to the j-th node of this shape.
+
+  Let \c s denote the sparse structure returned by this function. Then
+  \c s.size(0) equals the number of boundaries of this shape; \c
+  s.size(1) equals the number of nodes attached to this shape; and \c
+  s.getColumnIndices(i) yields an integer array containing the indices
+  of the nodes attached to boundary \c i. This array is identical to
+  the array returned by <code>this->getBoundaryNodes(i)</code>.
+  
+  For performance reasons, the returned sparse structure may point
+  directly to the private data structures of this shape. This means
+  that one should not modify the contents of the sparse structure;
+  invoke the member \c clone ont the sparse structure if you do want
+  to modify the sparse structure.
+  
+  The default implementation of this member function provided by the
+  \c InternalShape class constructs a sparse structure on the fly by
+  repeatedly calling the member function \c getBoundaryNodes().
+
+  \return An instance of the class \c jem::numeric::SparseStructure
+  that represents boundary connectivity matrix of this shape.
+
+*/
+
+  virtual Topology getBoundaryTopology () const;
+
+
+//-----------------------------------------------------------------------
+//   getBoundaryCoords
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Collects the coordinates of the nodes on a specific boundary
+  of this shape.
+
+  Fills the matrix \a x with the (global) coordinates of the nodes on
+  the boundary \a ibnd of this shape: \c x(i,j) is set to the i-th
+  coordinate of the j-th node on that boundary. The matrix \a c should
+  contain the global node coordinates of this shape; \c c(i,j) should
+  be equal to the i-th coordinate of the j-th node.
+
+  The default implementation provided by the \c InternalShape class
+  simply uses the <code>\link ArraySelections select\endlink</code>
+  function provided by the Jem library:
+
+  \code
+  x = select ( c, slice(ALL), getBoundaryNodes(ibnd) );
+  \endcode
+
+  \param x - a matrix that will be filled with the global coordinates
+  of the nodes on the i-th boundary.
+
+  \param ibnd - a valid boundary index.
+
+  \param c - a matrix containing the global node coordinates of this
+  shape.
+
+  \pre <code>
+    x.size(0) == this->globalRank() && <br>
+    x.size(1) == this->getBoundaryNodes(ibnd).size() && <br>
+    ibnd >= 0 && ibnd < this->boundaryCount() && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void getBoundaryCoords
+
+    ( const Matrix&  x,
+      int            ibnd,
+      const Matrix&  c ) const;
+
+
+//-----------------------------------------------------------------------
+//   getShapeGradients
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the gradients of the shape functions in the
+  integration points of this shape.
+
+  Fills the three-dimensional array \a g with the spatial derivatives
+  of the shape functions in the integration points of this shape: \c
+  g(i,j,k) is set to the derivative with respect to the i-th
+  coordinate of the j-th shape function in the k-th integration
+  point. As a bonus, the vector \a w is filled with the global
+  integration weights: \c w[i] is set to the integration weight of the
+  i-th integration point. The matrix \a c should contain the global
+  node coordinates of this shape; \c c(i,j) should be equal to the
+  i-th coordinate of the j-th node.
+
+  Note that the derivatives are computed in the \em global coordinate
+  system.
+
+  The implementation of this function provided by the \c InternalShape
+  class repeatedly calls the member function \c evalShapeGradients().
+  Derived classes are encouraged to provide a more efficient
+  implementation.
+
+  \param g - a three-dimensional array that will be filled with the
+  gradients of the shape functions.
+
+  \param w - a vector that will be filled with the global integration
+  weights.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    g.size(0) == this->globalRank() && <br>
+    g.size(1) == this->nodeCount() && <br>
+    g.size(2) == this->integrationPointCount() && <br>
+    w.size()  == this->integrationPointCount() && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void getShapeGradients
+
+    ( const Cubix&   g,
+      const Vector&  w,
+      const Matrix&  c ) const;
+
+
+//-----------------------------------------------------------------------
+//   evalShapeGradients
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the gradients of the shape functions in a specific
+  point within this shape.
+  
+  Fills the matrix \a g with the spatial derivatives of the shape
+  functions in a specific point in this shape: \c g(i,j) is set to the
+  derivative with respect of the i-th coordinate of the j-th shape
+  function in that point. The vector \a u should contain the \em local
+  coordinates of that point: \c u[i] should be equal to the i-th local
+  coordinate. The matrix \a c should contain the global node
+  coordinates of this shape; \c c(i,j) should be equal to the i-th
+  coordinate of the j-th node.
+
+  Note that the derivatives are computed in the \em global coordinate
+  system.
+
+  \param g - a matrix that will be filled with the gradients of the
+  shape functions.
+
+  \param u - a local coordinate vector.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    g.size(0) == this->globalRank() && <br>
+    g.size(1) == this->nodeCount()  && <br>
+    u.size()  == this->localRank()  && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void evalShapeGradients
+
+    ( const Matrix&  g,
+      const Vector&  u,
+      const Matrix&  c ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getNodeGradients
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the gradients of the shape functions in the
+  nodes of this shape.
+
+  Fills the three-dimensional array \a g with the spatial derivatives
+  of the shape functions in the nodes: \c g(i,j,k) is set to the
+  derivative with respect to the i-th coordinate of the j-th shape
+  function in the k-th node. The matrix \a c should contain the global
+  node coordinates of this shape; \c c(i,j) should be equal to the
+  i-th coordinate of the j-th node.
+
+  Note that the derivatives are computed in the \em global coordinate
+  system.
+
+  The implementation of this function provided by the \c InternalShape
+  class repeatedly calls the member function \c evalShapeGradients().
+  Derived classes are encouraged to provide a more efficient
+  implementation.
+
+  \param g - a three-dimensional array that will be filled with the
+  gradients of the shape functions.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    g.size(0) == this->globalRank () && <br>
+    g.size(1) == this->nodeCount  () && <br>
+    g.size(2) == this->nodeCount  () && <br>
+    c.size(0) == this->globalRank () && <br>
+    c.size(1) == this->nodeCount  ()
+  </code>
+
+*/
+
+  virtual void getNodeGradients
+
+    ( const Cubix&   g,
+      const Matrix&  c ) const;
+
+
+//-----------------------------------------------------------------------
+//   getBoundaryGradients
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the gradients of the shape functions in the
+  integration points on a boundary of this shape.
+
+  Fills the three-dimensional array \a g with the spatial derivatives
+  of the shape functions in the integration points on the boundary \a
+  ibnd of this shape: \c g(i,j,k) is set to the derivative with
+  respect to the i-th coordinate of the j-th shape function in the
+  k-th integration point on the boundary \a ibnd. The matrix \a c
+  should contain the global node coordinates of this shape; \c c(i,j)
+  should be equal to the i-th coordinate of the j-th node.
+
+  Note that the derivatives are computed in the \em global coordinate
+  system.
+
+  \param g - a three-dimensional matrix that will be filled with the
+  gradients of the shape functions.
+
+  \param ibnd - a valid boundary index.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    g.size(0) == this->globalRank() && <br>
+    g.size(1) == this->nodeCount()  && <br>
+    g.size(2) ==
+      this->getBoundaryShape(ibnd)->integrationPointCount() && <br>
+    ibnd >= 0 && ibnd < this->boundaryCount() && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void getBoundaryGradients
+
+    ( const Cubix&   g,
+      int            ibnd,
+      const Matrix&  c ) const = 0;
+  
+
+//-----------------------------------------------------------------------
+//   other functions
+//-----------------------------------------------------------------------
+
+
+  virtual jem::Class*     getClass  () const;
+
+
+ protected:
+  
+  virtual                ~InternalShape ();
+};
+
+
+
+JIVE_END_PACKAGE( geom )

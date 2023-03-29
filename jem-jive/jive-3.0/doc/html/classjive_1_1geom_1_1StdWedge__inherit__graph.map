@@ -1,0 +1,6 @@
+<map id="jive::geom::StdWedge" name="jive::geom::StdWedge">
+<area shape="rect" id="node1" title=" " alt="" coords="113,80,277,107"/>
+<area shape="rect" id="node3" href="$classjive_1_1geom_1_1StdWedge18.html" title=" " alt="" coords="5,155,185,181"/>
+<area shape="rect" id="node4" href="$classjive_1_1geom_1_1StdWedge6.html" title=" " alt="" coords="209,155,381,181"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1StdShape.html" title="Encapsulates the geometrical properties of a finite element in its local coordinate system." alt="" coords="115,5,275,32"/>
+</map>

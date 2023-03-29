@@ -1,0 +1,721 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class Event
+//=======================================================================
+
+/*!
+  \class Event Event.dox jem/util/Event.h
+
+  \brief Encapsulates a list of call-back functions that are invoked
+  when a specific event occurs.
+
+  An \c Event object encapsulates a list of call-back functions, named
+  \em delegates, that are invoked when the \c emit() member function
+  is called. Events can be used, among others, to connect independent
+  software components and to implement the model-view-controller
+  pattern.
+
+  The \c emit() member function accepts up to three arguments that are
+  passed on to each delegate. The argument types are equal to the
+  three template parameters \a A, \a B and \a C of the \c Event
+  class. The number of arguments accepted by the \c emit() function is
+  equal to the number of template parameters that are not equal to the
+  type \c Nil. For instance, the \c emit() member function accepts
+  only one argument if the template parameters \a B and \a C are both
+  equal to \c Nil. Since \c Nil is the default value of each template
+  parameter, the number of arguments accepted by \c emit() is simply
+  equal to the number of template parameters that have been
+  specified. This is illustrated in the following example:
+
+  \code
+  Event<>           e0;
+  Event<int>        e1;
+  Event<int,float>  e2;
+  
+  e0.emit ();          // OK: event has no arguments.
+  e1.emit ( 0 );       // OK: event has a single int argument.
+  e2.emit ( 0, 1.0 );  // OK: event has an int and a float argument.
+  e2.emit ( 1 );       // Error: float argument is missing.
+  \endcode
+
+  For convenience, the arguments accepted by the \c emit() member
+  function are said to be the arguments of an event.
+
+  To be useful, an event should be connected to one or more delegates
+  by calling the non-member function \c connect(). A delegate can be a
+  regular function or a non-static member function -- called a method
+  -- of a collectable class (that is, a class derived from the \c
+  Collectable class). The argument types of the delegate must be
+  compatible with the arguments types of the event. Thus, one can not
+  connect an event with an argument of type \c int to a delegate with
+  an argument of type \c int*. One can, however, connect an event to a
+  delegate that has less arguments than the event. In this case, the
+  last few arguments of the event will be discarded when the delegate
+  is called. Here is an example:
+
+  \code
+  void printValue ( int value )
+  {
+    System::out() << value;
+  }
+
+  class Foo : public Collectable
+  {
+   public:
+
+    void setValue ( float value )
+    {
+      value_ = value;
+    }
+
+   private:
+   
+    float value_;
+  };
+  
+  int main ()
+  {
+    Ref<Foo>            foo = newInstance<Foo> ();
+    Event<int,int>      e1;
+    Event<const char*>  e2;
+
+    // The following call is valid: the second int argument will be
+    // discarded.
+
+    connect ( e1, & printValue );  
+
+    // The following call is also valid: the second int argument will
+    // be discarded, and the first int argument will be converted to a
+    // float.
+
+    connect ( e1, foo, & Foo::setValue );
+
+    // This will not compile: an argument of type const char* can not
+    // be converted to an argument of type int.
+
+    connect ( e2, & printValue );
+
+    return 0;
+  }
+  \endcode
+
+  An event can also be connected to a regular function that acts as a
+  method of a collectable class. Such a function is called a <em>proxy
+  method</em>. The page \ref ProxyMethods explains why proxy methods
+  are useful and how proxy methods are defined.
+
+  If an event is connected to a method or proxy method of a
+  collectable object, the event will store a \c WeakRef instead of a
+  \c Ref that points to the object. This means that the collectable
+  object will be deleted if there are no more \c Ref instances that
+  point to that object. In other words, an event will not prevent the
+  destruction of a collectable object.
+
+  Although jem currently supports only two types of delegates (or
+  three, if you view a proxy method as a distinct type of delegate),
+  you can easily implement other types of delegates. The documentation
+  of the \c AbstractDelegate and \c Delegate classes explains how to
+  do this.
+
+  Because the \c Event class is <em>reentrant</em>, an event may be
+  emitted recursively. This means that one may connect an event to a
+  delegate that emits the same event. One may even connect an event to
+  a delegate that deletes the event.
+
+  The example below illustrates the power of events. It involves two
+  independent classes that are connected to each other through an
+  event. The first class, named \c EvolutionGraph represents a graph
+  that dynamically displays the evolution of a given quantity. The
+  second class, named \c PressureSensor, represents a device that
+  measures the pressure at a given location. Each time it has taken a
+  new measurement, it calls the \c emit() member of its event named \c
+  newPressureEvent. The measured pressure is passed as an argument to
+  the \c emit() function that passes it on to the member function \c
+  addpoint() of the \c EvolutionGraph object that is connected to the
+  event.
+
+  \code
+  class EvolutionGraph : public Object
+  {
+   public:
+   
+    void addPoint ( double value );
+
+    // More stuff ...
+
+  };
+
+  class PressureSensor : public Object
+  {
+   public:
+ 
+    Event<double> newPressureEvent;
+
+    void takeMeasurement ()
+    {
+      double p;
+
+      // Read pressure p from pressure sensor ...
+
+      newPressureEvent.emit ( p );
+    }
+
+  };
+
+  int main ()
+  {
+    Ref<EvolutionGraph>  graph  = newInstance<EvolutionGraph> ();
+    Ref<PressureSensor>  sensor = newInstance<PressureSensor> ();
+    Time                 t;    
+
+    connect ( sensor->newPressureEvent,
+              graph,
+              & EvolutionGraph::addPoint );
+
+    // Initialize the graph and sensor objects ...
+
+    // Take measurements for a period of 10.0 seconds. The measured
+    // pressure will be displayed by the graph object.
+
+    t = Time::now() + 10.0;
+
+    while ( Time::now() < t )
+    {
+      sensor->takeMeasurement ();
+    }
+
+    return 0;
+  }
+  \endcode
+
+  \sa \c Delegate.
+
+*/
+
+template <class A = Nil, class B = Nil, class C = Nil>
+  class Event
+{
+ public:
+  
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A struct for bundling the arguments of an event.
+
+  The \c Arguments type is a struct that temporarily bundles the
+  arguments passed to the \c emit() member function. You only have to
+  deal with such a struct if you implement your own delegate type.
+
+  \sa \c Delegate
+
+*/
+
+  typedef EventArguments<A,B,C> Arguments;
+
+
+//-----------------------------------------------------------------------
+//   static data members
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The number of arguments of this event.
+
+  The static constant \c ARGUMENT_COUNT equals the number of arguments
+  that are passed by the \c emit() member function to the delegates
+  connected to an event.
+
+*/
+
+  static const int ARGUMENT_COUNT = Arguments::ARGUMENT_COUNT;
+
+
+//-----------------------------------------------------------------------
+//   Constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a new event.
+
+  Constructs an \c Event object that is not connected to any delegate.
+
+*/
+
+  inline Event ();
+
+
+//-----------------------------------------------------------------------
+//   destructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deallocates resources.
+
+  The destructor deallocates the list of delegates that is
+  encapsulated by this event. However, if the destructor is invoked
+  during a call of the \c emit() function, the deallocation operation
+  will be postponed until the \c emit() function has returned.
+
+*/
+
+  inline ~Event ();
+
+
+//-----------------------------------------------------------------------
+//   emit
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Invokes all delegates connected to this event.
+
+  Invokes each delegate connected to this event. No arguments are
+  passed to the delegates. The order in which the delegates are called
+  is unspecified.
+
+  Note that this function only exists if all template parameters are
+  equal to \c Nil.
+
+  \pre <code>ARGUMENT_COUNT == 0</code>
+
+*/
+
+  inline void emit () const;
+
+
+/*!
+
+  \brief Invokes all delegates with a given argument.
+
+  Invokes each delegate connected to this event with the argument \a a. 
+  The order in which the delegates are called is unspecified.
+
+  Note that this function only exists if the last two template
+  parameters are equal to \c Nil.
+
+  \param a - the argument to be passed to each delegate.
+
+  \pre
+    <code>ARGUMENT_COUNT == 1</code> <br>
+    and the type \a A has a copy constructor.
+
+*/
+
+  inline void emit ( A a ) const;
+
+
+/*!
+
+  \brief Invokes all delegates with two given arguments.
+
+  Invokes each delegate connected to this event with the arguments \a
+  a and \a b.  The order in which the delegates are called is
+  unspecified.
+
+  Note that this function only exists if the last template parameter
+  equals \c Nil.
+
+  \param a - the first argument to be passed to each delegate.
+  
+  \param b - the second argument to be passed to each delegate.
+
+  \pre
+    <code>ARGUMENT_COUNT == 2</code> <br>
+    and the types \a A and \a B have a copy constructor.
+
+*/
+
+  inline void emit ( A a, B b ) const;
+
+
+/*!
+
+  \brief Invokes all delegates with three given arguments.
+
+  Invokes each delegate connected to this event with the arguments \a
+  a, \a b and \a c.  The order in which the delegates are called is
+  unspecified.
+
+  Note that this function only exists if none of the template parameters
+  equals \c Nil.
+
+  \param a - the first argument to be passed to each delegate.
+  
+  \param b - the second argument to be passed to each delegate.
+
+  \param c - the third argument to be passed to each delegate.
+
+  \pre
+    <code>ARGUMENT_COUNT == 3</code> <br>
+    and the types \a A, \a B and \a C have a copy constructor.
+
+*/
+
+  inline void emit ( A a, B b, C c ) const;
+
+
+//-----------------------------------------------------------------------
+//   enable
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Enables or disables this event.
+
+  Enables or disables this event. If the parameter \a flag is \c true,
+  then all subsequent invocations of the \c emit() member function
+  will invoke the delegates to which this event has been connected. If
+  \a flag equals \c false, on the other hand, then all subsequent
+  invocations of \c emit() will have no effect. That is, the delegates
+  will not be called.
+
+  An event is enabled by default.
+
+  \param flag - a boolean indicating whether this event is to be
+  enabled.
+
+  \return \c true if this event was enabled before this function was
+  called, and \c false otherwise.
+
+*/
+
+  bool enable ( bool flag = true );
+
+
+//-----------------------------------------------------------------------
+//   clear
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Clears the list of delegates.
+
+  Deletes all delegates to which this event has been connected.
+
+*/
+
+  inline void clear ();
+
+
+//-----------------------------------------------------------------------
+//   isConnected
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether the list of delegates is not empty.
+
+  Returns \c true if this event is connected to one or more delegates,
+  and \c false otherwise.
+
+  \return \c true if the list of delegates is not empty, and \c false
+  otherwise.
+
+*/
+
+  inline bool isConnected () const;
+
+
+//-----------------------------------------------------------------------
+//   connectTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Adds a delegate to this event.
+
+  Connects this event to the delegate \a d. The delegate will be
+  called when the \c emit() member function is called. The delegate
+  must have been created by the operator \c new; it will be deleted
+  automatically when the destructor of this event is called or when
+  the delegate is no longer valid. A delegate can not be added to more
+  than one event.
+
+  You only need to use this function if you implement your own
+  delegate type. Otherwise, you should use the non-member function \c
+  connect().
+
+  \param d - a \c Delegate that has been created by the operator \c
+  new.
+
+  \pre The delegate \a d is not \c NULL.
+
+*/
+
+  void connectTo ( Delegate<Arguments>* d );
+
+
+//-----------------------------------------------------------------------
+//   disconnectFrom
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Removes a delegate from this event.
+
+  Removes the delegate that is equal to the argument \a d from this
+  event. That is, this function will iterate over all delegates
+  connected to this event, and will remove the \em first one that is
+  equal to \a d. Equality is tested by calling the member function
+  <code>\link AbstractDelegate::equals equals\endlink</code>.
+
+  The delegate \a d must have been created by the operator \c new; it
+  will be deleted by this function.
+
+  You only need to use this function if you implement your own
+  delegate type. Otherwise, you should use the non-member function \c
+  disconnect().
+
+  \param d - a \c Delegate that has been created by the operator \c
+  new.
+
+  \pre The delegate \a d is not \c NULL.
+
+*/
+
+  void disconnectFrom ( Delegate<Arguments>* d );
+
+
+ private:
+
+//-----------------------------------------------------------------------
+//   copy constructor & assignment operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Disabled copy constructor.
+
+  The copy constructor of the \c Event class is a private member
+  because an event can not be copied.
+
+*/
+
+  Event ( const Event& rhs );
+
+
+/*!
+
+  \brief Disabled assignment operator.
+
+  The assignment operator of the \c Event class is a private member
+  because an event can not be copied.
+
+*/
+
+  Event& operator = ( const Event& rhs );
+
+};
+
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   connect
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Event
+
+  \brief Connects an event to a function.
+
+  Connects the event \a e to the function \a func. The arguments of
+  the event and of the function must be compatible. The number of
+  function arguments, however, may be less than the number of event
+  arguments.
+
+  \param e - an \c Event object.
+
+  \param func - a pointer to a function.
+
+  \pre The function \a func is either a non-member function or a
+  static member function.
+
+*/
+
+template <class E, class F>
+  inline void connect ( E& e, F func );
+
+
+/*!
+
+  \relates Event
+
+  \brief Connects an event to a member function.
+
+  Connects the event \a e to the method (non-static member function)
+  or \ref ProxyMethods "proxy method" \a mfunc. If \a mfunc is a
+  regular method, it will be invoked on the object \a obj whenever the
+  event is emitted. The arguments of the method must be compatible
+  with the arguments of the event. The number of method arguments may
+  be less than the number of event arguments.
+  
+  If \a mfunc is a proxy method, then it will be called with the
+  object \a obj as the first arguments whenever the event is emitted.
+  The other arguments of the proxy method must be compatible with the
+  arguments of the event. The number of arguments of the proxy method
+  -- not counting the first argument -- may be less than the number of
+  event arguments.
+
+  \param e - an \c Event object.
+
+  \param obj - a pointer to a collectable object.
+
+  \param mfunc - a pointer to a regular method or to a proxy method.
+
+  \pre
+    The type \a T must be derived from the \c Collectable class.
+  
+*/
+
+template <class E, class T, class M>
+  inline void connect ( E& e, T* obj, M mfunc );
+
+
+/*!
+
+  \relates Event
+
+  \brief Connects an event to a member function.
+
+  Connects the event \a e to the method or proxy method \a mfunc.
+  This function is similar to the \c connect function described above;
+  the only difference is that it has a \c Ref object instead of a
+  plain pointer as its second argument. Calling this function has the
+  same effect as:
+  
+  \code
+  connect ( e, obj.get(), mfunc );
+  \endcode
+
+*/
+
+template <class E, class T, class M>
+  inline void connect ( E& e, const Ref<T>& obj, M mfunc );
+
+
+//-----------------------------------------------------------------------
+//   disconnect
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates Event
+
+  \brief Disconnects an event from a function.
+
+  Disconnects the event \a e from the function \a func. Note that if
+  the event \a e has been connected to the function \a func multiple
+  times, it must be disconnected as many times to completely
+  disconnect the event from the function.
+
+  \param e - an \c Event object.
+
+  \param func - a pointer to a function.
+
+  \pre The function \a func is either a non-member function or a
+  static member function.
+
+*/
+
+template <class E, class F>
+  inline void disconnect ( E& e, F func );
+
+
+/*!
+
+  \relates Event
+
+  \brief Disconnects an event from a member function.
+
+  Disconnects the event \a e from the method (non-static member
+  function) or \ref ProxyMethods "proxy method" \a mfunc. Note that if
+  the event \a e has been connected to the method \a mfunc multiple
+  times, it must be disconnected as many times to completely
+  disconnect the event from the method.
+  
+  \param e - an \c Event object.
+
+  \param obj - a pointer to a collectable object.
+
+  \param mfunc - a pointer to a regular method or to a proxy method.
+
+  \pre
+    The type \a T must be derived from the \c Collectable class.
+  
+*/
+
+template <class E, class T, class M>
+  inline void disconnect ( E& e, T* obj, M mfunc );
+
+
+/*!
+
+  \relates Event
+
+  \brief Disconnects an event from a member function.
+
+  Disconnects the event \a e from the method or proxy method \a mfunc.
+  This function is similar to the \c disconnect function described
+  above; the only difference is that it has a \c Ref object instead of
+  a plain pointer as its second argument. Calling this function has
+  the same effect as:
+  
+  \code
+  disconnect ( e, obj.get(), mfunc );
+  \endcode
+
+*/
+
+template <class E, class T, class M>
+  inline void disconnect ( E& e, const Ref<T>& obj, M mfunc );
+
+
+
+
+
+
+JEM_END_PACKAGE( util )

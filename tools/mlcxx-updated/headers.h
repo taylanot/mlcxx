@@ -6,56 +6,67 @@
  *
  */
 
+// Some easy definitions...
 #define ARMA_WARN_LEVEL 1
+#define DOCTEST_CONFIG_IMPLEMENT
+#define PRINT(...) std::cout << __VA_ARGS__ << std::endl; 
+#define PRINT_VAR(...) std::cout << #__VA_ARGS__ << " := " << std::endl << __VA_ARGS__ << std::endl; 
+#define PRINT_SEED(...) std::cout << " SEED               : " << __VA_ARGS__ << std::endl; 
+#define PRINT_TIME(...) std::cout << " ELAPSED TIME (sec) : " << __VA_ARGS__ << std::endl; 
 
 // standard
+#include <list>
+#include <cmath>
 #include <string>
 #include <cstdio>
 #include <vector>
 #include <variant>
 #include <cstdlib>
+#include <iomanip>
+#include <numeric>
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
 #include <filesystem>
-#include <iomanip>
 
 // jem/jive
-#include <jem/base/String.h>
-#include <jem/util/Timer.h>
-#include <jem/util/Properties.h>
-#include <jem/base/System.h>
 #include <jive/Array.h>
+#include <jem/util/Timer.h>
+#include <jem/base/String.h>
+#include <jem/base/System.h>
+#include <jem/util/Properties.h>
 
 
 // boost 
-#include <boost/assert.hpp>
 #include <boost/any.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/assert.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-
+#include <boost/math/special_functions/factorials.hpp>
+#include <boost/serialization/nvp.hpp>
 //mlpack
 
 #include <mlpack/core.hpp>
-#include <mlpack/methods/linear_regression.hpp>
+//#include <mlpack/methods/linear_regression.hpp>
 
 // local
-#include "utils/system.h"
-#include "utils/save.h"
-#include "utils/load.h"
-#include "utils/convert.h"
-#include "utils/datagen.h"
-#include "utils/covmat.h"
-#include "algo/kernelridge.h"
-#include "algo/semiparamkernelridge.h"
-#include "utils/functionalpca.h"
-#include "utils/functionalsmoothing.h"
-#include "src/learning_curve.h"
-#include "data/data_prep.h"
-#include "model/model.h"
-#include "model/leastsquaresregression.h"
-#include "tests/test_arma.h"
+#include "utils/utils.h"
+#include "algo/algo.h"
+#include "opt/opt.h"
+#include "src/src.h"
+#include "models/models.h"
+#include "stats/stats.h"
+#include "stats/hypothesis.h"
 
+// tests
+#include "tests/doctest.h"
+#include "tests/tests.h"
+//#include "tests/test_arma.h"
+
+// main functions
+#include "main_input.h"
+#include "main_func.h"
 
 

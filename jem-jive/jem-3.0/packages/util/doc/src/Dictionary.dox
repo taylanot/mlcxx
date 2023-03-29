@@ -1,0 +1,484 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class Dictionary
+//=======================================================================
+
+/*!
+  \class Dictionary Dictionary.dox jem/util/Dictionary.h
+
+  \brief Implements an associative, heterogeneous collection that maps
+  strings to objects.
+
+  The abstract class \c Dictionary represents an associative,
+  heterogeneous collection that maps keys of type \c String to values
+  of type \c Object. %All keys in a \c Dictionary are unique and each
+  key maps to at most one value.
+ 
+  The \c Dictionary class provides functions for inserting key/value
+  pairs; for retrieving a value associated with a specific key; and
+  for iterating over all key/value pairs by means of a \c
+  DictionaryEnumerator object. The order in which the enumerator
+  iterates over the key/value pairs is called the order of a \c
+  Dictionary.
+
+  Because the \c Dictionary class is derived from the \c
+  ObjectCollection class, one can view a dictionary as regular,
+  non-associative collection of objects that contain the key/value
+  pairs. By default, key/value pairs are stored in objects of type \c
+  ObjectPair, but a class derived from the \c Dictionary class is free
+  to store the key/value pairs in objects of another type.
+
+  A \c Dictionary may not be structurally modified as long as one or
+  more enumerators are pointing to it. In particular, you may not call
+  any non-const member functions such as \c insert() and \c erase().
+
+  \sa \c Properties
+
+*/
+
+class Dictionary : public ObjectCollection
+{
+ public:
+
+  static  Class*  makeClass ();
+  static  Class*  getType   ();
+  virtual Class*  getClass  () const;
+
+
+//-----------------------------------------------------------------------
+//   enumerate
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumerator over this dictionary.
+
+  Returns a \c DictionaryEnumerator that can be used to iterate over
+  the key/value pairs in this dictionary. This function simply
+  executes:
+
+  \code
+  return getDictEnumerator();
+  \endcode
+
+  \return A \c DictionaryEnumerator over this dictionary.
+
+*/
+  
+  Ref<DictionaryEnumerator> enumerate () const;
+
+
+//-----------------------------------------------------------------------
+//   getDictEnumerator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumerator over this dictionary.
+
+  Returns a \c DictionaryEnumerator that can be used to iterate over
+  all key/value pairs in this dictionary. The enumerator points to the
+  first key/value pair, or to the special end object if this
+  dictionary is empty.
+
+  This dictionary may not be structurally modified as long as one or
+  more enumerators are pointing to it.
+
+  \return A \c DictionaryEnumerator over this dictionary.
+
+*/
+
+  virtual Ref<DictionaryEnumerator> getDictEnumerator () const = 0;
+  
+
+//-----------------------------------------------------------------------
+//   getEnumerator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an enumerator over this dictionary.
+
+  Returns an \c Enumerator that can be used to iterate over all
+  key/value pairs in this dictionary.
+
+  The implementation of this function provided by the \c Dictionary
+  class simply executes:
+
+  \code
+  return getDictEnumerator();
+  \endcode
+
+  \return An \c Enumerator over this dictionary.
+
+*/
+
+  virtual Ref<Enumerator> getEnumerator () const;
+  
+
+//-----------------------------------------------------------------------
+//   contains
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Checks whether this dictionary contains a specific key.
+
+  Returns \c true if this dictionary contains the key \a key, and \c
+  false otherwise.
+
+  The implementation of this function provided by the \c Dictionary
+  class is equivalent with:
+
+  \code
+
+  Ref<Object> dummy;
+
+  return find ( dummy, key );
+
+  \endcode
+
+  \param key - a key string.
+
+  \return \c true if this dictionary contains the key \a key, and \c
+  false otherwise.
+
+*/
+
+  virtual bool contains ( const String& key ) const;
+
+
+//-----------------------------------------------------------------------
+//   get
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the object associated with a specific key.
+
+  Returns a reference to the object that is associated with the key \a
+  key. A \c NIL reference is returned if this dictionary does not
+  contain the specified key.
+
+  The implementation of this function provided by the \c Dictionary
+  class executes the following code:
+
+  \code
+
+  Ref<Object> value;
+
+  if ( find( value, key ) ) {
+    return value;
+  }
+  else {
+    return NIL;
+  }
+
+  \endcode
+
+  Note that if a dictionary may contain \c NIL objects, then you may
+  have to call the function \c contains() if you want to be sure that
+  the dictionary contains the specified key. In this case you are
+  advised to use the function \c find() instead of \c get().
+
+  \param key - a key string.
+
+  \return A reference to the object associated with the specified key,
+  or \c NIL if there is no such object.
+
+*/
+
+  virtual Ref<Object> get ( const String& key ) const;
+
+
+//-----------------------------------------------------------------------
+//   find
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for an object associated with a specific key.
+
+  Searches for the object that is associated with the key \a key. If
+  the object is found, then its address is stored in the output
+  parameter \a value and \c true is returned. Otherwise, \c false is
+  returned and the output parameter \a value is not modified.
+
+  This function may not be called if an enumerator points to this
+  dictionary.
+
+  \param value - a reference in which the address of the object to be
+  found is stored.
+
+  \param key - the key associated with the object to be found.
+
+  \return \c true if this dictionary contains the key \a key, and \c
+  false otherwise.
+
+*/
+
+  virtual bool find   ( Ref<Object>&   value,
+                        const String&  key ) const = 0;
+  
+//-----------------------------------------------------------------------
+//   insert
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Inserts a key/value pair into this dictionary.
+
+  Inserts a key/value pair in this dictionary. If this dictionary
+  already contains the key \a key, then its associated value is
+  replaced by the parameter \a value.
+
+  This function may not be called if an enumerator points to this
+  dictionary.
+
+  \param key - a key string.
+
+  \param value - the object associated with the key \a key.
+
+*/
+
+  virtual void insert ( const String&       key,
+                        const Ref<Object>&  value ) = 0;
+  
+
+//-----------------------------------------------------------------------
+//   erase
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes a key/value pair from this dictionary.
+
+  Deletes the key \a key and its associated value from this
+  dictionary. If this dictionary does not contain the specified key,
+  then this function has no effect.
+
+  This function may not be called if an enumerator points to this
+  dictionary.
+
+  \param key - the key to be deleted.
+
+*/
+
+  virtual void erase ( const String& key ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   add
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Adds a key/value pair to this dictionary.
+
+  Adds the key/value pair encapsulated by the object \a obj to this
+  dictionary. The dynamic type of the object \a obj is not
+  specified. The only requirement is that it should have the same type
+  as the key/value objects returned by an enumerator over this
+  dictionary. Thus, if \c lhs and \c rhs are two distinct
+  dictionaries of the same type, then the following code should be
+  legal.
+
+  \code
+
+  Ref<Enumerator> e;
+
+  for ( e = rhs.enumerate(); ! e->atEnd(); e->toNext() ) {
+    lhs.add ( e->get() );
+  }
+
+  \endcode
+
+  The implementation of this function provided by the \c Dictionary
+  class expects an object of type \c ObjectPair. The implementation is
+  as follows:
+
+  \code
+
+  if ( obj != NIL ) {
+    
+    Ref<ObjectPair> p = checkedCast<ObjectPair>( obj );
+    
+    insert ( toValue<String>( p->getFirst() ), p->getSecond() );
+    
+    return true;
+  }
+  else {
+    return false;
+  }
+
+  \endcode
+
+  This function may not be called if an enumerator points to this
+  dictionary.
+
+  \param obj - the key/value pair to be added to this dictionary.
+
+  \return \c true if the key/value pair has been added, and \c false
+  otherwise.
+
+*/
+
+  virtual bool add ( const Ref<Object>& obj );
+  
+  
+ protected:
+   
+  virtual  ~Dictionary ();
+
+
+//-----------------------------------------------------------------------
+//   readFrom_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads the contents of this dictionary from an object input
+  stream.
+
+  Clears this dictionary and then fills it with the key/value pairs
+  that are read from the object input stream \a in. This function
+  performs the same operation as the function \c writeTo_, but then in
+  reverse.
+
+  You can use this function to implement the \c io::Serializable
+  interface class.
+
+  \param in - an object input stream.
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \throws io::SerializationException - if the input stream is corrupt.
+
+*/
+
+  void readFrom_ ( io::ObjectInput& in );
+
+
+//-----------------------------------------------------------------------
+//   writeTo_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes the contents of this dictionary to an object output
+  stream.
+
+  Writes all objects in this dictionary to the object output stream \a
+  out. This function essentially executes the following code:
+
+  \code
+
+  Ref<DictionaryEnumerator> e;
+
+  out << size();
+
+  for ( e = enumerate(); ! e->atEnd(); e->toNext() ) {
+    out << e->getKey ();
+    out.encodeObject ( e->getValue() );
+  }
+  
+  \endcode
+
+  You can use this function to implement the \c io::Serializable
+  interface class.
+
+  \param out - an object output stream.
+
+  \throws io::IOException - if an I/O error occurs.
+
+*/
+
+  void writeTo_ ( io::ObjectOutput& out ) const;
+ 
+
+//-----------------------------------------------------------------------
+//   clone_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Makes a deep copy of another dictionary.
+
+  Copies the contents of the collection \a rhs into this
+  collection. This function essentially executes:
+
+  \code
+
+  Ref<DictionaryEnumerator>  e;
+  String                     key;
+  Ref<Object>                value;
+
+  clear   ();
+  reserve ( rhs.size() );
+
+  for ( e = rhs.enumerate(); ! e->atEnd(); e->toNext() )
+  {
+    key   = e->getKey   ();
+    value = e->getValue ();
+    
+    if ( value != NIL )
+    {
+      value = value->clone ();
+    }
+    
+    insert ( key, value );
+  }
+  
+  \endcode
+
+  You can use this function to implement the \c Clonable interface
+  class.
+
+  \param rhs - the dictionary to be copied.
+
+*/
+
+  void clone_  ( const Dictionary& rhs );
+
+};
+
+
+
+
+
+JEM_END_PACKAGE( util )
+

@@ -1,0 +1,603 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class ItemSet
+//=======================================================================
+
+/*!
+
+  \brief Stores a (large) homogeneous set of objects.
+
+  <code>\#include <jive/util/ItemSet.h></code>
+
+  An \c ItemSet encapsulates a homogeneous set of small objects that
+  are referred to as \em items. Such an item can be viewed as a blob
+  of data that has both an index and an ID associated with it. The
+  index ranges from zero to the total number of items minus one, and
+  the ID is an arbitrary integer that is unique for each item. The
+  actual data stored in an item is determined by the type of the item
+  set in which it is stored. For instance, an item in a \c PointSet
+  (that is derived from \c ItemSet) encapsulates a double precision
+  coordinate vector.
+
+  In addition to a set of items, an \c ItemSet has a name and a
+  reference to a \c ItemMap object. The former is used mainly to
+  create context strings for errors associated with the \c ItemSet,
+  while the latter can be used to map item IDs to indices and the
+  other way around.
+
+  \sa \c ItemMap
+
+*/
+
+
+class ItemSet : public jem::Object
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Represents a string type.
+
+  Represents a string type.
+
+*/
+
+  typedef jem::String  String;
+
+
+/*!
+
+  \brief Represents a formatted output stream.
+
+  Represents a formatted text output stream.
+
+*/
+
+  typedef jem::io::PrintWriter  Printer;
+
+
+/*!
+
+  \brief Represents a dictionary.
+
+  Represents a dictionary that maps strings to objects.
+
+*/
+
+  typedef jem::util::Dictionary  Dict;
+
+
+/*!
+
+  \brief Represents a properties set.
+
+  Represents a properties set.
+
+*/
+
+  typedef jem::util::Properties  Properties;
+  
+
+//-----------------------------------------------------------------------
+//   events
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that the size of this item set has changed.
+
+  Signals that the size of this item set (that is, the number of
+  items) has changed. The first event argument is the new size of this
+  item set. The second event argument is a reference to this item set.
+
+*/
+
+  jem::util::Event < int, Self& >  newSizeEvent;
+
+
+/*!
+
+  \brief Signals that the items have been re-ordered.
+
+  Signals that the items in this set have been re-ordered. The first
+  event argument specifies how the items have been re-ordered. If this
+  argument is denoted by \c iperm, then <code>iperm[i]</code> is the
+  \em new index of the <i>i</i>-th item. If <code>iperm[i]</code> is a
+  negative number, then the <i>i</i>-th item has been deleted. The
+  second event argument is a reference to this item set.
+
+  Note that the item IDs do not change when the items are re-ordered.
+
+*/
+
+  jem::util::Event
+    < const IntVector&, Self& >  newOrderEvent;
+
+
+//-----------------------------------------------------------------------
+//   toString
+//-----------------------------------------------------------------------
+
+
+  virtual String  toString () const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this item set.
+
+  Returns the number of items in this set.
+
+  \return The number of items in this item set.
+
+*/
+
+  virtual int  size () const;
+
+
+//-----------------------------------------------------------------------
+//   getName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the (descriptive) name of this item set.
+
+  Returns the descriptive name of this item set.
+
+  \return The name of this item set.
+
+*/
+
+  String  getName () const;
+
+
+//-----------------------------------------------------------------------
+//   getTagName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an XML tag name for this item set.
+
+  Returns a string that can be used as the name of an XML tag
+  containing items of the same type as are stored in this item
+  set. The implementation provided by the \c ItemSet class simply
+  executes:
+
+  <code>return jem::xml::makeTag ( getItemsName() );</code>
+
+  \return An XML tag for this item set.
+
+*/
+
+  virtual String  getTagName   () const;
+
+
+//-----------------------------------------------------------------------
+//   getItemName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the type name of an item.
+
+  Returns a string that can be used as the type name of an item in
+  this set. For instance, if this item sets contains points, it could
+  return the string <code>"point"</code>.
+
+  The string returned by this function is mostly used to generate
+  various types of output messagesm, including error messages.
+
+  \return A string denoting the type of items in this set.
+
+*/
+
+  virtual String  getItemName  () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getItemsName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the plural of an item type name.
+
+  Returns a string that can be used to describe multiple items in this
+  set. In other words, it should return the plural of the name
+  returned by the function \c getItemName().
+
+  The implementation of this function provided by the \c ItemSet class
+  applies a few simple rules to construct a string that is the plural
+  of the string returned by the \c getItemName() function.
+
+  \return A string that describes multiple items in this set.
+  
+*/
+  
+  virtual String  getItemsName () const;
+
+
+//-----------------------------------------------------------------------
+//   getContext
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a context string.
+
+  Returns a context string that can be used for displaying errors and
+  other types of messages that are related to this item set.  The
+  returned string is typically passed as a context string to the
+  constructor of an exception class.
+
+  \return A context string.
+
+*/
+
+  String  getContext () const;
+
+
+//-----------------------------------------------------------------------
+//   getItemMap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the item map associated with this item set.
+
+  Returns a pointer to the \c ItemMap object that is associated with
+  this item set. The pointer is guaranteed to be non-null and to be
+  valid throughout the lifetime of this item set.
+
+  \return A pointer to the \c ItemMap of this item set.
+
+*/
+
+  virtual ItemMap*  getItemMap () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getItemPath
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an identification string for an item.
+
+  Returns an identification string for the item with ID \a
+  itemID. This string can be used to display messages related to that
+  particular item.
+
+  The current implementation of this function simply returns:
+
+  <code>String::format ( "%S[%d]", & myName_, itemID )</code>
+
+  \param itemID - an item ID.
+
+  \return An identification string for the item with ID \a itemID.
+
+*/
+
+  String  getItemPath ( int itemID ) const;
+
+
+//-----------------------------------------------------------------------
+//   findItem
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the index of an item with a given ID.
+
+  Returns the index of the item with ID \a itemID, or a negative
+  integer if there is no item in this set with that ID. The function
+  simply executes:
+
+  <code>return getItemMap()->findItem ( itemID )</code>
+
+  Note that you can better use the \c ItemMap associated with this
+  item set directly if you have to find many items. In this way you
+  will reduce the number of virtual function calls and speed up your
+  code.
+
+  \param itemID - an item ID.
+
+  \return The index of the item with ID \a itemID, or a negative
+  number.
+
+*/
+
+  int  findItem ( int itemID ) const;
+
+
+//-----------------------------------------------------------------------
+//   getItemID
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the ID of the item with a given index.
+
+  Returns the ID of the item with index \a iitem. This function simple
+  executes:
+
+  <code>return getItemMap()->getItemID ( iitem )</code>
+
+  Note that you can better use the \c ItemMap associated with this
+  item set directly if you have to get the IDs of many items. In this
+  way you will reduce the number of virtual function calls and speed
+  up your code.
+
+  \param iitem - a valid item index
+
+  \pre <code>iitem >= 0 && iitem < size()</code>
+
+  \return The ID of the item with index iitem.
+
+*/
+
+  int  getItemID ( int iitem ) const;
+
+
+//-----------------------------------------------------------------------
+//   printTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints the contents of this item set.
+
+  Writes the contents of this item set to the formatted output stream
+  \a out. This function should \em not print the delimiting XML tags.
+
+  The implementation of this function provided by the \c ItemSet class
+  prints the string returned by the function \c toString().
+
+  \param out - a formatted text output stream.
+
+  \throws jem::io::IOException - if an I/O error occurs.
+
+*/
+    
+  virtual void  printTo ( Printer& out ) const;
+
+ 
+//-----------------------------------------------------------------------
+//   store
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Stores this item set in a (global) data set.
+
+  Stores this item set as a property named \a name in the global data
+  set \a globdat. This function also stores a reference to this item
+  set in a special dictionary (stored in \a globdat) that can be
+  accessed with the member function \c getAll().
+
+  Note that the \a name parameter is required because an item set is
+  normally stored as a property with a shorter name than the full name
+  of this item set that is returned by the member function \c
+  getName().
+
+  \param name - the name of this item set in \a globdat.
+
+  \param globdat - a (global) data set.
+
+  \sa \c Globdat
+
+*/
+
+  void  store ( const String&      name,
+                const Properties&  globdat ) const;
+
+
+//-----------------------------------------------------------------------
+//   find
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a named item set in a (global) data set.
+
+  Searches for an item set named \a name in the global data set \a
+  globdat. If found, a reference to the item set is returned, else \c
+  nullptr is returned.
+
+  \param name - the name of the item set to be found.
+
+  \param globdat - a (global) data set.
+
+  \return The item set named \a name in \a globdat, or \c nullptr
+  if there is no such item set.
+
+  \sa \c store(), \c Globdat
+
+*/
+
+  static jem::Ref<ItemSet>  find
+
+    ( const String&           name,
+      const Properties&       globdat );
+
+
+//-----------------------------------------------------------------------
+//   get
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a named item set stored in a (global) data set.
+
+  Returns a reference to the item set named \a name in the global data
+  set \a globdat. An exception is thrown if there is no such item
+  set. The parameter \a context will be used as the context string for
+  the exception.
+
+  \param name - the name of the item set to be retrieved.
+
+  \param globdat - a (global) data set.
+
+  \param context - an error context string.
+
+  \return The item set named \a name in \a globdat.
+
+  \throws jem::IllegalInputException - if there is no item set named
+  \a name in the data set \a globdat.
+
+  \sa \c find(), \c Globdat
+
+*/
+
+  static jem::Ref<ItemSet>  get
+
+    ( const String&           name,
+      const Properties&       globdat,
+      const String&           context );
+
+
+//-----------------------------------------------------------------------
+//   getAll
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a dictionary containing all item sets in a (global)
+  data set.
+
+  Returns a dictionary containing all item sets in the global data set
+  \a globdat. To be precise, the dictionary conains all item sets that
+  have been stored in \a globdat by a call to the \c store() member
+  function.
+
+  \param globdat - a global data set.
+
+  \return A dictionary containing all item sets in \a globdat.
+
+*/
+
+  static jem::Ref<Dict>  getAll ( const Properties&  globdat );
+
+
+//-----------------------------------------------------------------------
+//   listAll
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the names of all item sets stored in a (global) data
+  set.
+
+  Returns an array containing all the names of the item sets stored in
+  the global data set \a globdat. Note that the array contains the
+  names passed to the \c store() member function, and \em not the
+  names returned by the \c getName() member function.
+
+*/
+
+  static StringVector  listAll ( const Properties&  globdat );
+
+
+ protected:
+
+
+//-----------------------------------------------------------------------
+//   constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs an item set with a given name.
+
+  Constructs an item set with name \a name.
+
+  \param name - the name of this item set.
+
+  \post <code>this->getName() == name</code>
+
+*/
+
+  ItemSet ( const String& name = "" );
+
+
+//-----------------------------------------------------------------------
+//   destructor
+//-----------------------------------------------------------------------
+
+
+  virtual  ~ItemSet ();
+
+
+ protected:
+
+
+//-----------------------------------------------------------------------
+//   myName_
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The descriptive name of this item set.
+  
+  The string \c myName_ stores the descriptive name of this item
+  set. It is initialized by the string passed to the constructor of
+  the \c ItemSet class.
+
+*/
+
+
+  String  myName_;
+
+};
+
+
+
+JIVE_END_PACKAGE( util )
+

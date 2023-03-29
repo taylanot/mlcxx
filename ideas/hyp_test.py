@@ -24,10 +24,8 @@ def sample(a=100, phi=np.pi, N=50, noise=True, sort=True, width=5,test=False):
     if sort:
         x = np.sort(x,axis=0)
         if noise:
-            #y = np.multiply((a*x)**2, np.sin(12*x+phi)) + np.random.normal(0,1.,(N,1))
             y = np.multiply(a, np.sin(x+phi)) + np.random.normal(0,.1,(N,1))
         else:
-            #y = np.multiply((a*x)**2, np.sin(12*x+phi)) 
             y = np.multiply(a, np.sin(x+phi)) 
     return x, y 
 
@@ -108,7 +106,7 @@ class SemiParamKernelRidgePast():
         self.Y = Y
         self.X = X
 
-    def fit_them_all(self, X, Y, grid=1):
+    def fit_them_all(self, X, Y, grid=50):
         ls = np.linspace(0.001,1,grid)
         lmbdas = np.linspace(0., 10, grid)
         Xtrn, Xtst, Ytrn, Ytst = train_test_split(X,Y, test_size=0.5, random_state=2)
@@ -172,7 +170,7 @@ class SemiParamKernelRidge():
         self.Y = Y
         self.X = X
 
-    def fit_them_all(self, X, Y, grid=100):
+    def fit_them_all(self, X, Y, grid=50):
         ls = np.linspace(0.001,1,grid)
         lmbdas = np.linspace(0., 10, grid)
         Xtrn, Xtst, Ytrn, Ytst = train_test_split(X,Y, test_size=0.5, random_state=2)
@@ -229,8 +227,8 @@ class func_gen():
         return np.sin
 
     def __call__(self, x):
-        return np.hstack(([np.multiply(self.a, np.sin(x+self.phi))]))
-        #return np.hstack(([np.multiply(self.a, np.sin(self.phi))]))
+        #return np.hstack(([np.multiply(self.a, np.sin(x+self.phi))]))
+        return np.hstack(([np.multiply(self.a, (x+self.phi))]))
 
 ### Block-2 ####
 
@@ -285,7 +283,7 @@ lmbda = 0.
 l = 0.01 
 N = 30
 Ntst = 1000
-repeat = 10
+repeat = 300
 M = 10
 
 kernel = rbf(l=l)
@@ -294,6 +292,7 @@ funcs = func_gen(num=M)
 phi =  np.random.normal(0,1)
 
 noise = True
+print("noise:{}".format(noise))
 #noise = False
 
 err0 = []
@@ -327,9 +326,9 @@ H2 = np.array(err2)
 print("W/0-1:",wilcoxon(H0,H1))
 print("W/0-2:",wilcoxon(H0,H2))
 print("W/1-2:",wilcoxon(H1,H2))
-print("f/0-1:",f_oneway(H0,H1))
-print("f/0-2:",f_oneway(H0,H2))
-print("f/1-2:",f_oneway(H1,H2))
+#print("f/0-1:",f_oneway(H0,H1))
+#print("f/0-2:",f_oneway(H0,H2))
+#print("f/1-2:",f_oneway(H1,H2))
 #print("t/0-1:",ttest_ind(H0,H1))
 #print("t/0-2:",ttest_ind(H0,H2))
 

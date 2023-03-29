@@ -1,0 +1,1 @@
+../../../../../ompi/mpi/fortran/mpif-h/scatter_f.c

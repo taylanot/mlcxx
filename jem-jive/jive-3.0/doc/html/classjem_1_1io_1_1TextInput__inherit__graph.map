@@ -1,0 +1,13 @@
+<map id="jem::io::TextInput" name="jem::io::TextInput">
+<area shape="rect" id="node1" title="Provides an interface for reading text&#45;based input." alt="" coords="167,183,301,209"/>
+<area shape="rect" id="node3" href="$classjem_1_1io_1_1Reader.html" title="Represents a text input stream." alt="" coords="349,183,469,209"/>
+<area shape="rect" id="node2" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="5,183,119,209"/>
+<area shape="rect" id="node4" href="$classjem_1_1io_1_1BufferedReader.html" title=" " alt="" coords="530,5,705,32"/>
+<area shape="rect" id="node5" href="$classjem_1_1io_1_1FilterReader.html" title=" " alt="" coords="541,56,693,83"/>
+<area shape="rect" id="node6" href="$classjem_1_1io_1_1InputStreamReader.html" title=" " alt="" coords="517,107,717,133"/>
+<area shape="rect" id="node7" href="$classjem_1_1io_1_1LineNumberReader.html" title=" " alt="" coords="518,157,717,184"/>
+<area shape="rect" id="node8" href="$classjem_1_1io_1_1NullReader.html" title=" " alt="" coords="544,208,691,235"/>
+<area shape="rect" id="node9" href="$classjem_1_1io_1_1StdinReader.html" title=" " alt="" coords="541,259,694,285"/>
+<area shape="rect" id="node10" href="$classjem_1_1io_1_1StringReader.html" title=" " alt="" coords="538,309,697,336"/>
+<area shape="rect" id="node11" href="$classjem_1_1mt_1_1ThreadSafeReader.html" title=" " alt="" coords="517,360,717,387"/>
+</map>

@@ -1,0 +1,561 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( geom )
+
+
+//=======================================================================
+//   class StdShape
+//=======================================================================
+
+/*!
+
+  \brief Encapsulates the geometrical properties of a finite element
+  in its local coordinate system.
+
+  <code>\#include <jive/geom/StdShape.h></code>
+
+  The abstract base class \c StdShape encapsulates the properties of a
+  finite element in its local coordinate system. It can be used to get
+  the local node coordinates of an element; to evaluate the shape
+  functions of an element; and to evaluate the gradients of the shape
+  functions in the local coordinate system.
+
+  In addition to a set of nodes and shape functions, a \c StdShape
+  object has a name and a rank. The former is a string that may have
+  any value as long as it is unique for each \c StdShape object. The
+  latter is an integer number that equals the number of dimensions of
+  the local coordinate system.
+
+  The \c StdShape class implements the Singleton pattern. This means
+  that there exists only one \c StdShape object for each type of
+  element. For instance, there is one \c StdShape object that captures
+  the local geometrical properties of a triangle element with linear
+  shape functions. This particular object can be obtained by calling
+  the static member function \c getShape of the class \c
+  StdLinearTriangle. The shape object representing other element types
+  can be obtained in a similar way. You can use the helper class \c
+  StdShapeInstance to create a single instance of a class derived from
+  the \c StdShape class in a thread-safe way.
+
+  Since the number of \c StdShape objects in a program is limited to
+  the number of element types that are used, there is no need to
+  destroy and deallocate \c StdShape objects when they are no longer
+  needed. In fact, they can not be destroyed because the destructor of
+  the \c StdShape class is a protected member. This design eliminates
+  the possibility that a program accidentaly accesses an invalid
+  pointer to a \c StdShape object.
+
+  The \c StdShape class encapsulates a static table containing
+  pointers to the \c StdShape objects that are used in a
+  program. Access to this table is provided by the static member
+  functions \c findShape() and \c registerShape(). The the first
+  function returns a pointer to a shape object given its name, while
+  the second function registers a standard shape object by inserting
+  it into the table. You can use the helper class \c
+  StdShapeRegisterAgent to automate the registration of shape objects.
+
+  The static shape table is used -- among others -- by the
+  serialization functions \c encodeShape() and \c decodeShape(). The
+  first writes the name of a \c StdShape object to a data output
+  stream. The second reads the name of a \c StdShape object from a
+  data input stream and then calls the function \c findShape() to
+  obtain a pointer to that shape object.
+
+  \sa \c StdShapeInstance, \c StdShapeRegisterAgent, \c Shape
+
+*/
+
+class StdShape
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A string type.
+
+  The \c String type encapsulates the name of a \c StdShape object. It
+  is just a convenient alias for \c jem::String.
+
+*/
+
+  typedef jem::String String;
+
+
+/*!
+
+  \brief A vector type.
+
+  The \c Vector type represents a one-dimensional array of doubles. It
+  is just a convenient alias for \c jive::util::Vector.
+
+*/
+
+  typedef util::Vector Vector;
+
+
+/*!
+
+  \brief A matrix type.
+
+  The \c Matrix type represents a two-dimensional array of double. It
+  is just an alias for \c jive::util::Matrix.
+
+*/
+
+  typedef util::Matrix Matrix;
+
+
+/*!
+
+  \brief A three-dimensional array of doubles.
+
+  The \c Cubix type is a three-dimensional array of doubles. It is
+  simply an alias for \c jive::util::Cubix.
+
+*/
+
+  typedef util::Cubix Cubix;
+
+
+//-----------------------------------------------------------------------
+//   name
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the name of this shape.
+
+  Returns the name of this \c StdShape object. The name can be any
+  string as long as it is unique for each \c StdShape object. To avoid
+  name conflicts, it is strongly recommended that the name of a \c
+  StdShape is similar to the name of the element type represented by
+  that shape object. For instance, if this shape object represents a
+  triangle element with linear shape functions, then this function
+  should return the string \c "LinearTriangle", or something similar.
+
+  \return The name of this shape.
+
+*/
+
+  virtual String name () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   rank
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the rank of this shape.
+
+  Returns the rank (number of dimensions) of the local coordinate
+  system of this shape.
+
+  \return The rank of this shape.
+
+*/
+
+  virtual int rank () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   nodeCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of nodes attached to this shape.
+
+  Returns the number of nodes attached to this shape.
+
+  \return The number of nodes.
+
+*/
+
+  virtual int nodeCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getNodeCoords
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the local node coordinates.
+
+  Returns a matrix containing the local coordinates of the nodes
+  attached to this shape. If \c c denotes the returned matrix, then \c
+  c(i,j) equals the i-th coordinate of the j-th node.
+
+  \return The local node coordinates.
+
+*/
+
+  virtual Matrix getNodeCoords () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   containsPoint
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether a point is located within this shape.
+
+  Returns \c true if the point specified by the local coordinate vector \a
+  u lies within this shape, and \c false otherwise.
+  
+  \param u - a local coordinate vector.
+
+  \pre <code>u.size() == this->rank()</code>
+
+  \return \c true if the specified point lies within this shape, and
+  \c false otherwise.
+
+*/
+
+  virtual bool containsPoint ( const Vector& u ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   evalShapeFunctions
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the shape functions in a given point.
+
+  Fills the vector \a h with the values of the shape functions in a
+  specific point within this shape: \c h[i] is set to the i-th shape
+  function in that point. The vector \a u should contain the local
+  coordinates of the point: \c u[i] should be equal to the i-th local
+  coordinate.
+
+  \param h - a vector that will be filled with the values of the shape
+  functions in a specific point within this shape.
+
+  \param u - a vector containing the local coordinates of the
+  specified point.
+
+  \pre <code>
+    h.size() == this->nodeCount() && <br>
+    u.size() == this->rank() &&
+    this->containsPoint ( u )
+  </code>
+
+*/
+
+  virtual void evalShapeFunctions ( const Vector&  h,
+                                    const Vector&  u ) const = 0;
+
+/*!
+
+  \brief Computes the shape functions in multiple points within this
+  shape.
+
+  Fills the matrix \c h with the values of the shape functions in a
+  set of points within this shape: \c h(i,j) is set to the i-th shape
+  function in the j-th point. The matrix \a u should contain the local
+  coordinates of the points: \c u(i,j) should be equal to the i-th local
+  coordinate of the j-th point.
+
+  The implementation of this function provided by the \c StdShape
+  class simply executes:
+
+  \code
+
+  int j;
+
+  for ( j = 0; j < u.size(1); j++ ) {
+    evalShapeFunctions ( h( slice(ALL), j ), u( slice(ALL), j ) );
+  }
+
+  \endcode
+
+  \param h - a matrix that will be filled with the values of the shape
+  functions in a specific set of points within this shape.
+
+  \param u - a matrix containing the local coordinates of the
+  specified points.
+
+  \pre <code>
+    h.size(0) == this->nodeCount() && <br>
+    u.size(0) == this->rank()      && <br>
+    h.size(1) == u.size(1)
+  </code>
+
+*/
+
+  virtual void evalShapeFunctions ( const Matrix&  h,
+                                    const Matrix&  u ) const;
+
+
+//-----------------------------------------------------------------------
+//   evalShapeGradients
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the gradients of the shape functions in a specific
+  point within this shape.
+  
+  Fills the matrix \a g with the spatial derivatives of the shape
+  functions in a specific point in this shape: \c g(i,j) is set to the
+  i-th derivative of the j-th shape function in that point. The vector
+  \a u should contain the local coordinates of that point: \c u[i]
+  should be equal to the i-th local coordinate.
+
+  Note that the derivatives are computed in the local coordinate
+  system.
+
+  \param g - a matrix that will be filled with the gradients of the
+  shape functions.
+
+  \param u - a local coordinate vector.
+
+  \pre <code>
+    g.size(0) == this->rank()       && <br>
+    g.size(1) == this->nodeCount()  && <br>
+    u.size()  == this->rank()
+  </code>
+
+*/
+
+  virtual void evalShapeGradients ( const Matrix&  g,
+                                    const Vector&  u ) const = 0;
+
+/*!
+
+  \brief Computes the gradients of the shape functions in multiple
+  points within this shape.
+  
+  Fills the three-dimensional array \a g with the spatial derivatives
+  of the shape functions in a specified set of points in this shape:
+  \c g(i,j,k) is set to the i-th derivative of the j-th shape function
+  in the k-th point. The matrix \a u should contain the local
+  coordinates of the points: \c u(i,k) should be equal to the i-th
+  local coordinate of the k-th point.
+
+  Note that the derivatives are computed in the local coordinate
+  system.
+
+  The implementation of this function provided by the \c StdShape
+  class basically executes the following code:
+
+  \code
+
+  int k;
+
+  for ( k = 0; k < u.size(1); k++ ) {
+    evalShapeGradients ( g( slice(ALL), slice(ALL), k ),
+                         u( slice(ALL), k ) );
+  }
+
+  \endcode
+
+  \param g - a three-dimensional array that will be filled with the
+  gradients of the shape functions in a specific set of points.
+
+  \param u - a matrix containing the local coordinates of the
+  specified points.
+
+  \pre <code>
+    g.size(0) == this->rank()       && <br>
+    g.size(1) == this->nodeCount()  && <br>
+    u.size(0) == this->rank()       && <br>
+    u.size(1) == g.size(2)
+  </code>
+
+*/
+
+  virtual void  evalShapeGradients ( const Cubix&   g,
+                                     const Matrix&  u ) const;
+
+//-----------------------------------------------------------------------
+//   registerShape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Registers a standard shape.
+
+  Registers the standard shape \a shape by inserting it into the
+  static shape table that is encapsulated by the \c StdShape class. If
+  the table already contains a shape with the same name as \a shape,
+  then \a shape replaces the current object in the table.  You can use
+  the helper class \c StdShapeRegisterAgent to automate the
+  registration of standard shapes.
+
+  This function is thread safe.
+
+  \param shape - a pointer to a \c StdShape object.
+
+  \pre <code>shape != nullptr</code>
+
+  \post <code>findShape( shape->name() ) == shape</code>
+
+*/
+
+  static void registerShape ( StdShape* shape );
+
+
+//-----------------------------------------------------------------------
+//   findShape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a standard shape with a given name.
+
+  Returns a pointer to the shape object with name \a name. If no shape
+  with that name has been registered -- with the \c registerShape()
+  function -- then \c nullptr is returned.
+
+  This function is thread safe.
+
+  \param name - the name of a standard shape.
+
+  \return A pointer to \c StdShape object with name \a name, or \c
+  nullptr if there is no shape with that name.
+
+*/
+
+  static StdShape* findShape ( const String& name  );
+
+
+//-----------------------------------------------------------------------
+//   encodeShape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes a standard shape to a data output stream.
+
+  Writes the name of the \c StdShape object \a shape to the data
+  output stream \a out. The member function \a decodeShape() can be
+  used to reverse this procedure.
+
+  \param out - a data output stream.
+
+  \param shape - a pointer to a \c StdShape object.
+
+  \pre <code>shape != nullptr</code>
+
+  \throws jem::io::IOException - if an I/O error occurs.
+
+*/
+
+  static void encodeShape ( jem::io::DataOutput&  out,
+                            StdShape*             shape );
+
+
+//-----------------------------------------------------------------------
+//   decodeShape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Reads a standard shape from a data input stream.
+
+  Reads the name of a standard shape from the input stream \a in, and
+  returns a pointer to the \c StdShape object with that name.
+
+  \param in - a data input stream.
+
+  \throws jem::io::SerializationException - if there is no \c StdShape
+  object with the extracted name.
+
+*/
+
+  static StdShape* decodeShape ( jem::io::DataInput& in );
+
+
+ protected:
+
+
+//-----------------------------------------------------------------------
+//   constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs an empty shape object.
+
+  The default constructor does nothing; it simply creates an empty \a
+  StdShape object.
+
+*/
+
+  StdShape ();
+
+
+//-----------------------------------------------------------------------
+//   destructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Protected destructor to invalidate delete expressions.
+
+  The destructor of the \c StdShape class is a protected member to
+  ensure that a \c StdShape object can not be created on the stack and
+  that a \c StdShape object can not be deleted. All classes derived
+  from the \c StdShape class should also declare their destructor
+  protected.
+
+  The destructor of the \c StdShape class does nothing.
+
+*/
+
+  virtual  ~StdShape ();
+
+
+ private:
+
+                          StdShape   ( const StdShape& );
+  StdShape&               operator = ( const StdShape& );
+
+};
+
+
+
+
+
+JIVE_END_PACKAGE( geom )

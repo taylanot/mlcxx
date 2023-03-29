@@ -1,0 +1,12 @@
+<map id="jive::geom::StdLine" name="jive::geom::StdLine">
+<area shape="rect" id="node1" title=" " alt="" coords="213,183,360,209"/>
+<area shape="rect" id="node3" href="$classjive_1_1geom_1_1StdLine2.html" title=" " alt="" coords="417,5,571,32"/>
+<area shape="rect" id="node4" href="$classjive_1_1geom_1_1StdLine2C1.html" title=" " alt="" coords="408,56,580,83"/>
+<area shape="rect" id="node5" href="$classjive_1_1geom_1_1StdLine3.html" title=" " alt="" coords="417,107,571,133"/>
+<area shape="rect" id="node6" href="$classjive_1_1geom_1_1StdLine3B.html" title=" " alt="" coords="412,157,576,184"/>
+<area shape="rect" id="node7" href="$classjive_1_1geom_1_1StdLine4.html" title=" " alt="" coords="417,208,571,235"/>
+<area shape="rect" id="node8" href="$classjive_1_1geom_1_1StdLine4B.html" title=" " alt="" coords="412,259,576,285"/>
+<area shape="rect" id="node9" href="$classjive_1_1geom_1_1StdLine5B.html" title=" " alt="" coords="412,309,576,336"/>
+<area shape="rect" id="node10" href="$classjive_1_1geom_1_1StdLine6B.html" title=" " alt="" coords="412,360,576,387"/>
+<area shape="rect" id="node2" href="$classjive_1_1geom_1_1StdShape.html" title="Encapsulates the geometrical properties of a finite element in its local coordinate system." alt="" coords="5,183,165,209"/>
+</map>

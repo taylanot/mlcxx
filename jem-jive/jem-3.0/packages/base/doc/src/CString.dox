@@ -1,0 +1,230 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class CString
+//=======================================================================
+
+/*!
+  \class CString CString.dox jem/base/CString.h
+
+  \brief Converts a %String object to a null-terminated character
+  array.
+
+  The \c CString class helps you convert \c String objects to
+  null-terminated character arrays that can be passed to standard
+  C/C++ functions. \c CString objects are normally created by calling
+  the non-member function \c makeCString(). Here is a typical example:
+
+  \code
+  String s ( "Hello World" );
+
+  ::fputs ( ::stdout, makeCString(s) );
+  \endcode
+
+  A \c CString object is basically a simple wrapper around a
+  dynamically allocated null-terminated character array. Although
+  multiple \c CString objects may point to the same array, only one of
+  these objects is the \em owner of the array. When the owner is
+  destroyed it will deallocate the character array. %All other \c
+  CString objects pointing to the same character array then become
+  invalid and should no longer be used.
+
+  \sa \c String, \c makeCString()
+
+*/
+
+class CString
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+ 
+/*!
+
+  \brief Creates an empty \c CString object.
+
+  Creates an empty \c CString object that points to the empty
+  character array \c "". This object is not the owner of its character
+  array.
+
+  \post <code>this->addr()[0] == '\\0'</code>
+
+*/
+  
+  CString ();
+
+
+/*!
+
+  \brief Creates a \c CString from a \c String object.
+
+  Creates a \c CString object that points to a null-terminated
+  character array containing the same characters as the \c String
+  object \a str. This \c CString object is the owner of its character
+  array.
+
+  \param str - a \c String object.
+
+  \post <code>str == this->addr()</code>
+
+*/
+
+  explicit CString ( const String& str );
+
+
+/*!
+
+  \brief Copy constructor.
+
+  Creates a \em shallow copy of the \c CString \a rhs. The newly
+  created object points to the same character array as the \a rhs
+  object. Ownership of the character array is passed from the \a rhs
+  object to the newly created object.
+
+  \param rhs - a \c CString object.
+
+  \post <code>this->addr() == rhs.addr()</code>
+
+*/
+
+  CString ( const CString& rhs );
+
+
+/*!
+
+  \brief Deallocates resources.
+
+  If this object is the owner of its character array, it will delete
+  the character array. %All other \c CString objects pointing to the
+  same character array then become invalid.
+
+*/
+
+  ~CString ();
+  
+
+//-----------------------------------------------------------------------
+//   assignment operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies another \c CString object.
+
+  Copies the character array pointed to by the \a rhs object to this
+  object. Ownership of the character array is passed from the \a rhs
+  object to this object.
+
+  If this object is the owner of its current character array, it will
+  delete that array.
+
+  \param rhs - the \c CString object to be copied.
+
+  \return <code>*this</code>
+
+  \post <code>this->addr() == rhs.addr()</code>
+
+*/
+
+  CString& operator = ( const CString& rhs );
+    
+
+//-----------------------------------------------------------------------
+//   conversion operator
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Conversion operator.
+
+  This conversion operator returns a pointer to the null-terminated
+  character array encapsulated by this \c CString object. The pointer
+  is valid as long as the character array is not deallocated.
+
+  \return <code>this->addr()</code>
+
+*/
+  
+  inline operator const char* () const;
+  
+
+//-----------------------------------------------------------------------
+//   addr
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns the character array encapsulated by this object.
+
+  Returns a pointer to the null-terminated character array
+  encapsulated by this \c CString object. The pointer is valid as long
+  as the array is not deallocated.
+
+  \return A pointer to the character array encapsulated by this
+  object.
+
+*/
+
+  inline const char* addr() const;
+
+};
+
+
+//=======================================================================
+//   Related functions
+//=======================================================================
+
+/*!
+
+  \relates CString
+
+  \brief Converts a \c String object to a \c CString object.
+
+  Converts a the \c String object \a str to a \c CString object.
+
+  \param str - the \c String to be converted.
+
+  \return <code>CString( str )</code>
+
+*/
+
+inline CString  makeCString ( const String& str );
+
+
+
+JEM_END_PACKAGE_BASE

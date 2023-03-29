@@ -1,0 +1,119 @@
+
+<Include source="points.dat"/>
+
+<!--
+<Points>
+
+  1 0.0;
+  2 2.0;
+  3 3.0;
+  4 4.0;
+  5 5.0;
+  6 6.0;
+  7 7.0;
+  8 8.0;
+  9 9.0;
+
+</Points>
+-->
+
+
+<Segments>
+
+ 1 [1:4];
+ 2 3 4 5 [6:10;2];
+ 3 4 7 2;
+ 4 2 4 6 8;
+ 5 10 12 14;
+
+</Segments>
+
+
+<PointGroup name = "first">
+
+  { [1:50;2] }
+
+</PointGroup>
+
+
+<PointGroup name = "second">
+
+  ( ( {3} | {4} ) | {1} | {2} & first ) \ ( ! {} \ first ) 
+
+</PointGroup>
+
+
+<PointGroup name = "first">
+
+  { 1 3 19 22 }
+
+</PointGroup>
+
+
+<SegmentGroup name = "first">
+
+  { 1 2 3 }
+
+</SegmentGroup>
+
+
+<SegmentGroup name = "second">
+
+  { 1 2 }
+
+</SegmentGroup>
+
+
+<SegmentGroup name = "third">
+
+  { 4 5 }
+
+</SegmentGroup>
+
+
+
+<PointTable name = "initialVelocity" type = "Sparse">
+
+  <Section columns="x | z | y">
+    
+    [0:3] 0.0 1.0 2.0
+
+  </Section>
+
+  <Section columns="y">
+    
+    [3:8] -30.0
+
+  </Section>
+
+</PointTable>
+
+
+<PointDatabase name = "point data">
+
+  <Column name = "idat" type = "int">
+
+    "first"  1 2 3 4 5;
+    "second" 4 5 6;
+
+  </Column>
+
+  <Column name = "fdat" type = "float">
+
+    [1:10] 0.01 3;
+
+  </Column>
+
+
+</PointDatabase>
+
+<SegmentTable name = "Particles" type = "Dense">
+
+  <Section columns="a | b | c">
+    
+    "second"   0.0  1.0  2.0
+    "third"   10.0 20.0 30.0
+
+  </Section>
+
+</SegmentTable>

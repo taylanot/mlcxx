@@ -1,0 +1,997 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class ArrayBuffer
+//=======================================================================
+
+/*!
+
+  \class ArrayBuffer ArrayBuffer.dox jem/util/ArrayBuffer.h
+
+  \brief Provides support for creating one-dimensional %Array
+  objects.
+
+  The template class \c ArrayBuffer represents a one-dimensional array
+  that can grow and shrink. It is meant to be a helper class for
+  creating array objects of type \c Array<T,1> of which the size is
+  not known beforehand. Here is an example:
+
+  \code
+  Array<int> readArray ( io::TextInput& in )
+  {
+    ArrayBuffer<int>  buf;
+    int               c;
+    int               i;
+
+    // Read integers until the end of the text input stream.
+
+    for ( c = in.read(); c >= 0; c = in.read() )
+    {
+      in.pushBack ( c );
+      in >> i;
+      buf.pushBack ( i );
+    }
+
+    return buf.toArray ();
+  }
+  \endcode
+
+  An \c ArrayBuffer encapsulates a one-dimensional \c Array object
+  that is said to be the <em>buffer array</em> of the \c ArrayBuffer
+  object. This buffer array contains the elements in the \c
+  ArrayBuffer. It is automatically re-allocated whenever new elements
+  are added to the \c ArrayBuffer and there is no more space in the
+  buffer array. The buffer array is also re-allocated when the \c
+  ArrayBuffer is given a size -- by calling the \c resize() function
+  -- that exceeds the size of the buffer array.
+
+  The size of an \c ArrayBuffer -- that is, the number of elements --
+  does not have to equal to the size of its buffer array. The latter
+  is generally larger than the former so that it is not necessary to
+  re-allocate memory for each element that is added to an \c
+  ArrayBuffer. The size of the buffer array is called the \em capacity
+  of an \c ArrayBuffer. The ratio between the capacity and the size of
+  an \c ArrayBuffer is controlled by its <em>expansion
+  factor</em>. Each time an \c ArrayBuffer needs to re-allocate memory
+  for additional elements, it multiplies its current capacity with its
+  expansion factor to determine its new capacity. A larger expansion
+  factor therefore leads to a more `aggressive' capacity growth.
+
+  Several member functions of the \c ArrayBuffer class return
+  iterators, pointers and references that refer to an array
+  element. Unless stated otherwise, these iterators, pointers and
+  references are valid as long as the \c ArrayBuffer is not
+  structurally modified, either by adding/removing elements, or by
+  changing the capacity of the \c ArrayBuffer.
+  
+  The facilities provided by the \c ArrayBuffer class is similar to
+  those provided by the \c Flex class. They differ on two
+  points. First, an \c ArrayBuffer can be converted to an \c Array
+  with almost zero overhead; there is no need to allocate memory and
+  copy the elements into a new object. Second, An \c ArrayBuffer calls
+  the default constructor of all elements in its buffer array, even of
+  the elements that are not actually in use. Likewise, an \c
+  ArrayBuffer does not call the destructor of the elements that are
+  removed until the buffer array is re-allocated. This means that the
+  \c ArrayBuffer class is best used for types \a T that do not have a
+  constructor or destructor, such as the primitive types \c int and \c
+  double.
+
+  \note Some member functions of the \c ArrayBuffer class return
+  non-const references even though these functions are declared as a
+  const members. The reason is that multiple \c ArrayBuffer objects
+  and \c Array objects may point to the same data. Consequently, one
+  can easily modify the elements in an \c ArrayBuffer object, even if
+  that object is declared const.
+
+  \sa \c Flex.
+
+*/
+
+
+template <class T>
+  class ArrayBuffer
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A random access iterator type.
+
+  A random access iterator type pointing to elements of type \a
+  T. This iterator fulfills the requirements of the random access
+  iterator category of the standard C++ library.
+
+*/
+
+  typedef typename Array<T>::Iterator Iterator;
+
+
+/*!
+
+  \brief Read-only iterator type.
+
+  This is an alias for the \c Iterator type. Like the \c Array class,
+  the \c ArrayBuffer class does not provide a separate read-only
+  iterator type since multiple \c ArrayBuffer \c and Array objects may
+  refer to the same data. Thus, one can easily modify the elements in
+  an \c ArrayBuffer object even if that object is declared constant.
+
+*/
+
+  typedef Iterator ConstIterator;
+
+
+//-----------------------------------------------------------------------
+//   static data members
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The default expansion factor.
+
+  This floating point constant specifies the default expansion factor
+  of an \c ArrayBuffer. Its current value is 1.5, but a different
+  value may be used in a future version of Jem.
+
+*/
+  
+  static const float EXPANSION_FACTOR;
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs an empty \c ArrayBuffer.
+
+  Constructs an empty \c ArrayBuffer. This constructor has the same
+  effect as:
+
+  \code
+  ArrayBuffer ( Array<T>() );
+  \endcode
+
+  \post <code>
+    this->size()               == 0 && <br>
+    this->capacity()           == 0 && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+  
+*/
+
+  ArrayBuffer ();
+
+
+/*!
+
+  \brief Constructs an \c ArrayBuffer with a given size.
+
+  Constructs an \c ArrayBuffer with size \a n. This constructor has
+  the same effect as:
+
+  \code
+  ArrayBuffer ( Array<T>( n ) );
+  \endcode
+
+  \param n - the size of this \c ArrayBuffer.
+
+  \pre <code>n >= 0</code>
+
+  \post <code>
+    this->size()               == n && <br>
+    this->capacity()           == n && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  explicit ArrayBuffer ( int n );
+
+
+/*!
+
+  \brief Constructs an \c ArrayBuffer with a given buffer array.
+
+  Constructs an \c ArrayBuffer that uses the array \a buf as its
+  initial buffer array. The elements in this array become the initial
+  elements in the newly created \c ArrayBuffer. This constructor has
+  the same effect as:
+
+  \code
+  ArrayBuffer ( buf, buf.size() );
+  \endcode
+
+  \param buf - the initial buffer array of the newly created \c
+  ArrayBuffer.
+
+  \post <code>
+    this->size()               == buf.size() && <br>
+    this->capacity()           == buf.size() && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  explicit ArrayBuffer ( const Array<T>& buf );
+
+
+/*!
+
+  \brief Constructs an \c ArrayBuffer with a given buffer array and
+  size.
+
+  Constructs an \c ArrayBuffer that uses the array \a buf as its
+  initial buffer array. The first \a n elements in this array become
+  the initial elements in the newly created \c ArrayBuffer. The buffer
+  array is copied by reference. This means that if you modify the
+  contents of the buffer array, you will also modify the contents of
+  the \c ArrayBuffer.
+
+  Note that the array \a buf is the \em initial buffer array. A new
+  array will be allocated when additional elements are added to the \c
+  ArrayBuffer and the buffer array is not large enough.
+
+  \param buf - the initial buffer array.
+
+  \param n - the initial size of the \c ArrayBuffer.
+
+  \pre <code>n >= 0 && n <= buf.size()</code>
+
+  \post <code>
+    this->size()               == n          && <br>
+    this->capacity()           == buf.size() && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  ArrayBuffer ( const Array<T>& buf, int n );
+  
+
+/*!
+
+  \brief Creates a deep copy of another \c ArrayBuffer.
+
+  Creates a \em deep copy of the \a rhs \c ArrayBuffer. That is, the
+  newly created \c ArrayBuffer and the \a rhs \c ArrayBuffer point to
+  distinct memory areas.
+
+  \param rhs - the \c ArrayBuffer to be copied.
+
+  \post <code>
+    this->size()               == rhs.size() && <br>
+    this->capacity()           == rhs.size() && <br>
+    this->getExpansionFactor() == rhs.getExpansionFactor()
+  </code>
+
+*/
+
+  ArrayBuffer ( const ArrayBuffer& rhs );
+
+
+/*!
+
+  \brief Constructs an \c ArrayBuffer given two input iterators.
+
+  Constructs an \c ArrayBuffer containing copies of the elements
+  between the input iterators \a first and \a last. This constructor
+  has the same effect as:
+  
+  \code
+  ArrayBuffer ( Array<T>( first, last ) );
+  \endcode
+
+  \param first - an input iterator pointing to the first element.
+
+  \param last - an input iterator pointing one position past the last
+  element.
+
+  \pre
+    The expression \c *first can be converted to type \a T, <br>
+    and the type \a T has a copy constructor, <br>
+    and \a last is reachable from \a first.
+
+  \post <code>
+    this->size()     == std::distance( first, last ) && <br>
+    this->capacity() == this->size()                 && <br>
+    this->getExpansionFactor() == EXPANSION_FACTOR
+  </code>
+
+*/
+
+  template <class InputIterator>
+    ArrayBuffer ( InputIterator first,
+                  InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   begin & end
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the begin of this \c
+  ArrayBuffer.
+  
+  Returns an iterator pointing to the first element in this \c
+  ArrayBuffer, or \c end() if this \c ArrayBuffer is empty. The
+  iterator is valid as long as this \c ArrayBuffer is not structurally
+  modified, either by adding/removing elements, or by changing the
+  capacity of this \c ArrayBuffer.
+
+  \return <code>toArray().begin()</code>
+
+*/
+
+  inline Iterator begin () const;
+
+
+/*!
+
+  \brief Returns an iterator pointing to the end of this \c
+  ArrayBuffer.
+
+  Returns an iterator pointing to one position past the last element
+  in this \c ArrayBuffer. The iterator is valid as long as this \c
+  ArrayBuffer is not structurally modified.
+
+  \return <code>toArray().end()</code>
+
+*/
+
+  inline Iterator end () const;
+  
+
+//-----------------------------------------------------------------------
+//   front & back
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the first element in this \c
+  ArrayBuffer.
+
+  Returns a reference to the first element in this \c ArrayBuffer. The
+  reference is valid as long as this \c ArrayBuffer is not
+  structurally modified.
+
+  \pre <code>size() > 0</code>
+
+  \return <code>toArray().front()</code>
+
+*/
+  
+  inline T& front () const;
+
+
+/*!
+
+  \brief Returns a reference to the last element in this \c
+  ArrayBuffer.
+
+  Returns a reference to the last element in this \c ArrayBuffer. The
+  reference is valid as long as this \c ArrayBuffer is not
+  structurally modified.
+
+  \pre <code>size() > 0</code>
+
+  \return <code>toArray().back()</code>
+
+*/
+
+  inline T& back () const;
+
+  
+//-----------------------------------------------------------------------
+//   assignment operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies another \c ArrayBuffer.
+
+  Makes a deep copy of the \a rhs \c ArrayBuffer. This operator is
+  equivalent with:
+
+  \code
+  if ( size() != rhs.size() )
+  {
+    resize ( rhs.size() );
+  }
+  
+  toArray() = rhs.toArray();
+
+  return *this;
+  \endcode
+  
+  \param rhs - the \c ArrayBuffer to be copied.
+
+  \post <code>
+    this->size() == rhs.size() && <br>
+    this->getExpansionFactor() == rhs.getExpansionFactor()
+  </code>
+
+  \return \c *this
+
+*/
+
+  ArrayBuffer& operator = ( const ArrayBuffer& rhs );
+
+
+/*!
+
+  \brief Sets all elements in this \c ArrayBuffer to a given value.
+
+  Sets all elements in this \c ArrayBuffer to the value \a rhs. This
+  operator is equivalent with:
+
+  \code
+  toArray() = rhs;
+
+  return *this;
+  \endcode
+
+  \param rhs - an instance of type \a T.
+
+  \return \c *this
+
+*/
+
+  inline const ArrayBuffer& operator = ( T rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Swaps the contents of this \c ArrayBuffer with another one.
+
+  Swaps the internal state of this \c ArrayBuffer with that of the \a
+  rhs \c ArrayBuffer. Note that this function just swaps a few
+  pointers; it does not swap the individual elements.
+
+  \param rhs - an \c ArrayBuffer instance.
+
+*/
+
+  void swap ( ArrayBuffer& rhs );
+
+
+//-----------------------------------------------------------------------
+//   subscript operators
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Returns the element at a given index.
+
+  Returns a reference to the \a i-th element in this \c
+  ArrayBuffer. The reference is valid as long as this \c ArrayBuffer
+  is not structurally modified.
+
+  \param i - a valid index.
+
+  \pre <code>i >= 0 && i < size()</code>
+
+  \return <code>toArray()[i]</code>
+
+*/
+
+  inline T& operator [] ( int i ) const;
+
+
+/*!
+
+  \brief Returns a slice of this \c ArrayBuffer.
+
+  Returns a one-dimensional \c Array object that refers to a section
+  of this \c ArrayBuffer.
+
+  \param s - a \c Slice instance or an instance of a class derived
+  from \c Slice.
+
+  \return <code>toArray()[s]</code>
+
+*/
+
+  template <class S>
+    inline Array<T> operator [] ( const S& s ) const;
+  
+
+//-----------------------------------------------------------------------
+//   pushBack
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Appends an element to this \c ArrayBuffer.
+
+  Appends a copy of the object \a item to the end of this \c
+  ArrayBuffer. The copy is created by calling the assignment operator
+  of type \a T. If necessary, the capacity of this \c ArrayBuffer will
+  be expanded by re-allocating the buffer array.
+
+  The time complexity of this function is <i>O(1)</i>, provided that
+  the capacity of this \c ArrayBuffer is large enough.
+
+  \param item - the object to be appended.
+
+  \pre The type \a T has an assignment operator.
+
+  \post <code>back() == item</code>
+
+*/
+
+  inline void pushBack ( T item );
+
+
+/*!
+
+  \brief Appends multiple copies of an element to this \c ArrayBuffer.
+
+  Appends \a n copies of the object \a item to the end of this \c
+  ArrayBuffer. The copies are initialized by calling the assignment
+  operator of type \a T. If necessary, the capacity of this \c
+  ArrayBuffer will be expanded by re-allocating the buffer array.
+
+  The time complexity of this function is <i>O(n)</i>, provided that
+  the capacity of this \c ArrayBuffer is large enough.
+
+  \param item - the object to be copied and appended.
+
+  \param n - the number of copies to be appended.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the type \a T has an assignment operator.
+
+*/
+
+  void pushBack ( T item, int n );
+  
+
+/*!
+
+  \brief Appends the elements between two input iterators to this
+  \c ArrayBuffer.
+
+  Appends copies of the elements between the input iterators \a first
+  and \a last to the end of this \c ArrayBuffer. The copies are
+  initialized by calling the assignment operator of type \a T. If
+  necessary, the capacity of this \c ArrayBuffer will be expanded by
+  re-allocating the buffer array.
+
+  Provided that the capacity of this \c ArrayBuffer is large enough,
+  the time complexity of this function is <i>O(n)</i> with \a n the
+  number elements between the two input iterators.
+
+  \param first - an input iterator pointing to the first element to be
+  appended.
+
+  \param last - an input iterator pointing one position past the lest
+  element to be appended.
+
+  \pre 
+   The type \a T has an assignment operator, <br>
+   and the expression \c *first can be converted to type \a T, <br>
+   and \a last is reachable from \a first.
+
+  \warning The iterators \a first and \a last should \em not point to
+  elements in this \c ArrayBuffer, since this function invalidates all
+  such iterators.
+
+*/
+
+  template <class InputIterator>
+    void pushBack ( InputIterator first,
+                    InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   popBack
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Deletes the last element in this \c ArrayBuffer.
+
+  Removes the last element from this \c ArrayBuffer. The destructor of
+  the element is \em not called. The capacity of this \c ArrayBuffer
+  is not modified.
+
+  The time complexity of this function is <i>O(1)</i>.
+
+  \pre <code>size() > 0</code>
+
+*/
+
+  inline void popBack ();
+
+
+/*!
+
+  \brief Deletes multiple elements at the end of this \c ArrayBuffer.
+
+  Removes the last \a n elements from this \c ArrayBuffer. The
+  destructors of the elements are \em not called. The capacity of this
+  \c ArrayBuffer is not modified.
+
+  This function is equivalent with:
+
+  \code
+  int i;
+
+  for ( i = 0; i < n; i++ )
+  {
+    popBack();
+  }
+  \endcode
+
+  The time complexity of this function is <i>O(n)</i>.
+
+  \param n - the number of elements to be deleted.
+
+  \pre <code>size() >= n</code>
+
+*/
+
+  inline void popBack ( int n );
+
+
+/*!
+
+  \brief Deletes all elements from this \c ArrayBuffer.
+
+  Deletes all elements in this \c ArrayBuffer. The destructors of the
+  elements are \em not called. The capacity of this \c ArrayBuffer is not
+  modified.
+
+  \post <code>size() == 0</code>
+
+*/
+
+  inline void clear ();
+
+
+//-----------------------------------------------------------------------
+//   resize
+//-----------------------------------------------------------------------
+/*!
+
+  \brief Adjusts the size of this \c ArrayBuffer.
+
+  Sets the size of this \c ArrayBuffer to \a n. This function is
+  equivalent with:
+
+  \code
+  if ( n < size() )
+  {
+    popBack ( size() - n );
+  }
+  else
+  {
+    pushBack ( T(), n - size() );
+  }
+  \endcode
+
+  \param n - the new size of this flex.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>size() == n</code>
+
+*/
+      
+  inline void resize ( int n );
+
+
+//-----------------------------------------------------------------------
+//   reserve
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the capacity of this \c ArrayBuffer to a given value.
+
+  If \a cap is larger than the current capacity, then the capacity of
+  this \c ArrayBuffer is increased to \a cap by re-allocating the
+  buffer array. Otherwise, this function does nothing.
+
+  \param cap - the new capacity of this flex.
+
+  \post <code>capacity() >= cap</code>
+
+*/
+
+  inline void reserve ( int cap );
+
+//-----------------------------------------------------------------------
+//   setExpansionFactor & getExpansionFactor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the expansion factor if this \c ArrayBuffer to a given
+  value.
+
+  Sets the expansion factor of this \c ArrayBuffer to the value \a x.
+
+  \param x - the new expansion factor of this \c ArrayBuffer.
+
+  \pre <code>x >= 1.0</code>
+
+  \post <code>getExpansionFactor() == x</code>
+
+*/
+
+  inline void setExpansionFactor ( float x );
+
+
+/*!
+
+  \brief Returns the expansion factor of this \c ArrayBuffer.
+
+  Returns the expansion factor of this \c ArrayBuffer.
+
+  \return The expansion factor of this \c ArrayBuffer.
+
+*/
+
+  inline float getExpansionFactor () const;
+
+
+//-----------------------------------------------------------------------
+//   trimToSize
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the capacity to the size of this \c ArrayBuffer.
+
+  Re-allocates the buffer array so that its size is equal to the size
+  of this \c ArrayBuffer.
+
+  \post <code>capacity() == size()</code>
+
+*/
+
+  inline void trimToSize ();
+
+
+//-----------------------------------------------------------------------
+//   capacity
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the capacity of this \c ArrayBuffer.
+
+  Returns the capacity of this \c ArrayBuffer.
+
+  \return <code>getBuffer().size()</code>.
+
+*/
+
+  inline int capacity () const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this \c ArrayBuffer.
+
+  Returns the number of elements stored in this \c ArrayBuffer.
+
+  \return The size of this \c ArrayBuffer.
+
+*/
+
+  inline int size () const;
+  
+
+//-----------------------------------------------------------------------
+//   toArray
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the contents of this \c ArrayBuffer as an array.
+
+  Returns an array containing the elements in this \c ArrayBuffer. The
+  returned array points to the \em same data as this \c
+  ArrayBuffer. This means that if you modify the elements in the
+  returned array, you also modify the elements in this \c ArrayBuffer.
+
+  \return <code>getBuffer()[ slice(BEGIN,size()) ]</code>
+
+*/
+
+  inline Array<T> toArray () const;
+
+/*!
+
+  \brief Returns a reference to the buffer array.
+
+  Returns a const-reference to the buffer array encapsulated by this
+  \c ArrayBuffer. The reference remains valid until this \c
+  ArrayBuffer is structurally modified.
+
+*/
+
+  inline const Array<T>& getBuffer () const;
+
+};
+  
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   serialization operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates ArrayBuffer
+
+  \brief \c ArrayBuffer de-serialization operator
+
+  Reads the \c ArrayBuffer \a buf from the data input stream \a
+  in. The current contents of the \c ArrayBuffer are discarded by
+  calling <code>buf.clear()</code>.
+
+  \param in - a data input stream.
+
+  \param buf - the \c ArrayBuffer to be read.
+
+  \return \a in
+
+  \throws io::IOException - if an IO error occurs.
+  
+  \throws io::SerializationException - if the data input stream is
+          corrupt.
+
+  \pre The type \a T defines a de-serialization operator.
+
+*/
+
+template <class T>
+  io::DataInput&  operator >> ( io::DataInput&  in,
+                                ArrayBuffer<T>& buf );
+
+
+/*!
+
+  \relates ArrayBuffer
+
+  \brief \c ArrayBuffer serialization operator.
+
+  Writes the \c ArrayBuffer \a buf to the data output stream \a
+  out. The de-serialization operator can be used to restore the \c
+  ArrayBuffer object.
+
+  \param out - a data output stream.
+
+  \param buf - the \c ArrayBuffer to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T defines a serialization operator.
+
+*/
+
+template <class T>
+  io::DataOutput& operator << ( io::DataOutput&       out,
+                                const ArrayBuffer<T>& buf );
+
+
+//-----------------------------------------------------------------------
+//   print operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates ArrayBuffer
+
+  \brief \c ArrayBuffer print operator.
+
+  Prints the contents of the \c ArrayBuffer \a buf in a human readable
+  format to the text output stream \a out.
+
+  \param out - a text output stream.
+
+  \param buf - the \c ArrayBuffer to be printed.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T defines a print operator.
+
+*/
+
+template <class T>
+  io::TextOutput& operator << ( io::TextOutput&       out,
+                                const ArrayBuffer<T>& buf );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates ArrayBuffer
+
+  \brief Interchanges two \c ArrayBuffer instances.
+
+  Interchanges the state of two \c ArrayBuffer objects. This function is
+  equivalent with:
+
+  <code>lhs.swap ( rhs )</code>
+
+  \param lhs - an \c ArrayBuffer.
+
+  \param rhs - another \c ArrayBuffer.
+
+*/
+
+template <class T>
+  inline void swap ( ArrayBuffer<T>& lhs,
+                     ArrayBuffer<T>& rhs );
+
+
+
+
+
+JEM_END_PACKAGE( util )

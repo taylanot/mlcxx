@@ -1,0 +1,4 @@
+var searchData=
+[
+  ['qmult_4252',['qmult',['../classjem_1_1numeric_1_1Quaternion.html#a8d122c8bfd4bad886063de86ef27b4bf',1,'jem::numeric::Quaternion::qmult(Vec4 &amp;r, const Vec4 &amp;a, const Vec4 &amp;b) noexcept'],['../classjem_1_1numeric_1_1Quaternion.html#a29496a32c50e53d89c3505d574b52870',1,'jem::numeric::Quaternion::qmult(const Vector &amp;r, const Vector &amp;a, const Vector &amp;b)'],['../classjem_1_1numeric_1_1Quaternion.html#a8e4a02092716171288e261fe6662f763',1,'jem::numeric::Quaternion::qmult(const Matrix &amp;r, const Vec4 &amp;a, const Matrix &amp;b)'],['../classjem_1_1numeric_1_1Quaternion.html#addc9976ccf75994786f5aac2fbffd609',1,'jem::numeric::Quaternion::qmult(const Matrix &amp;r, const Vector &amp;a, const Matrix &amp;b)'],['../classjem_1_1numeric_1_1Quaternion.html#a9f131f630d8c358a0a6dbe61e5fa4a31',1,'jem::numeric::Quaternion::qmult(const Matrix &amp;r, const Matrix &amp;a, const Matrix &amp;b)']]]
+];

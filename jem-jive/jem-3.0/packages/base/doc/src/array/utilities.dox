@@ -1,0 +1,708 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+/*!
+  
+  \defgroup ArrayUtilities Array utility functions
+  
+  \brief A collection of functions operating on arrays.
+
+  <code>\#include <jem/base/array/utilities.h></code>
+
+  This header file exports a collection of functions that perform
+  various operations on \c Array objects and array
+  expressions. Supported operations are:
+
+  \li reduce an array to a scalar;
+  \li shift the elements in an array;
+  \li test whether two arrays are equal;
+  \li sort an array and find a specific element.
+
+  Note that these functions are also available through the general
+  header file <code><jem/base/Array.h></code>.
+
+*/
+
+
+//@{
+
+
+//-----------------------------------------------------------------------
+//   min
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Computes the minimum value of an array expression.
+
+  Computes the minimum value of the array expression or \c Array
+  object \a e.
+
+  \param e - an array expression or an \c Array object.
+
+  \return The smallest element in the array. The return value is
+  undefined if the array is empty.
+
+  \pre The type \a T supports the \c < operator.
+
+*/
+
+template <class T, int N>
+  T min ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   max
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the maximum value of an array expression.
+
+  Computes the minimum value of the array expression or \c Array
+  object \a e.
+
+  \param e - an array expression or an \c Array object.
+
+  \return The largest element in the array. The return value is
+  undefined if the array is empty.
+
+  \pre The type \a T supports the \c < operator.
+
+*/
+
+template <class T, int N>
+  T max ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   sum
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the sum of all elements in an array expression.
+
+  Computes the sum of all elements in the array expression or \c Array
+  object \a e.
+
+  \param e - an array expression or an \c Array object.
+
+  \return The sum of all elements in the array. The return value is
+  undefined if the array is empty.
+
+  \pre The type \a T supports the \c + operator.
+
+*/
+
+template <class T, int N>
+  T sum ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   product
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of all elements in an array expression.
+
+  Computes the product of all elements in the array expression or \c
+  Array object \a e.
+
+  \param e - an array expression or an \c Array object.
+
+  \return The product of all elements in the array. The return value is
+  undefined if the array is empty.
+
+  \pre The type \a T supports the \c * operator.
+
+*/
+
+template <class T, int N>
+  T product ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   testall
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether all elements in an array expression are true.
+
+  Tests whether all elements in the array expression or \c
+  Array object \a e are true.
+
+  \param e - an array expression or an \c Array object.
+
+  \return \c true if all elements in the array evaluate to \c true,
+  and \c false otherwise. The return value is undefined if the array
+  is empty.
+
+  \pre The type \a T can be converted to a boolean.
+
+*/
+
+template <class T, int N>
+  bool testall ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   testany
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether at least one element in an array expression is
+  true.
+
+  Tests whether at least one element in the array expression or \c
+  Array object \a e is true.
+
+  \param e - an array expression or an \c Array object.
+
+  \return \c true if at least one elements in the array evaluates to
+  \c true, and \c false otherwise. The return value is undefined if
+  the array is empty.
+
+  \pre The type \a T can be converted to a boolean.
+
+*/
+
+template <class T, int N>
+  bool testany ( const ArrayExpr<T,N>& e );
+
+
+//-----------------------------------------------------------------------
+//   shift & cshift
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Shifts all elements in a one-dimensional array expresion.
+
+  Shifts all elements in the one-dimensional array expression \a e \a
+  k places to the right. Thus, element \c e[i] becomes element
+  <code>e[i + k]</code>. If \a k is negative, the elements are shifted
+  to the left. The last \a k elements (or the first \a k elements if
+  \a k is negative) are discarded, while the first \a k (or last \a k)
+  elements are unchanged.
+
+  If \a k is larger than or equal to the size of the array expression
+  \a e, then this functin does nothing.
+
+  \param e - a one-dimensional, lvalue array expression.
+
+  \param k - an integer specifying how many places the elements in \a
+  a should be shifted to the right.
+
+  \pre The type \a T provides an assignment operator <br>
+       and \a e is an lvalue expression.
+
+*/
+
+template <class T>
+  void shift ( const ArrayExpr<T,1>& e, int k );
+
+
+
+/*!
+  
+  \brief Shifts all elements in a one-dimensional array expression in
+  a circular way.
+  
+  Like the function \c shift(), this function shifts all elements in
+  the one-dimensional array expression \a e \a k places to the
+  right. Thus, element \c e[i] becomes element <code>e[i +
+  k]</code>. If \a k is negative, the elements are shifted to the
+  left. Unlike \c shift(), however, the last \a k elements (or the
+  first \a k elements if \a k is negative) are `wrapped around' and
+  become the first (or last) \a k elements.
+  
+  If \a k is larger than the size of the array \a a, then \a k is
+  replaced by <code>(k % a.size())</code>.
+  
+  \param e - a one-dimensional, lvalue array expression.
+  
+  \param k - an integer specifying the number of places that the
+  elements in \a a should be shifted to the right.
+  
+  \pre the type \a T provides an assignment operator <br>
+       and \a e is an lvalue expression.
+
+*/
+
+template <class T>
+  void cshift ( const ArrayExpr<T,1>& e, int k );
+
+
+//-----------------------------------------------------------------------
+//   reverse
+//-----------------------------------------------------------------------
+
+
+/*!
+  
+  \brief Reverses the elements in a one-dimensional array expression.
+  
+  Reverses the order in which the elements are stored in the
+  one-dimensional array expression \a e. That is, the first element
+  becomes the last element; the second element becomes the second last
+  element; and so on.
+
+  \param e - a one-dimensional, lvalue array expression.
+
+  \pre the type \a T provides an assignment operator <br>
+       and \a e is an lvalue expression.
+
+*/
+
+template <class T>
+  void reverse ( const ArrayExpr<T,1>& e );
+
+
+//-----------------------------------------------------------------------
+//   reshape
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Converts a one-dimensional array to a multi-dimcnsional
+  array.
+
+  Converts the one-dimensional array \a a to an <i>N</i>-dimensional
+  array with shape \a sh. The returned array points to the same data
+  block as the argument array \a a. Any modifications to the returned
+  array are therefore visible in \a a, and the other way around.
+  
+  Let \a r denote the array returned by this function. The mapping of
+  the elements in \a r and the argument array \a a is defined as
+  follows:
+
+  \li if \a N equals two:<br>
+  <code>r(i,j) == a[ i + j * sh[0] ]</code>;
+    
+  \li if \a N equals three:<br>
+  <code>r(i,j,k) == a[ i + j * sh[0] + k * sh[0] * sh[1] ]</code>;
+  
+  \li if \a N equals four:<br>
+  <code>r(i,j,k,p) == a [ i + j * sh[0] + k * sh[0] * sh[1] + p *
+  sh[0] * sh[1] * sh[2] ]</code>.
+  
+  A different mapping can be obtained by invoking the member function
+  \c Array::transpose() on the returned array.
+
+  \param a - a one-dimensional \c Array.
+
+  \param sh - the shape of the converted array.
+
+  \return An <i>N</i>-dimensional array pointing to the same data
+  block as the argument array \a a.
+
+  \pre <code>product(sh) == a.size()</code>
+
+*/
+
+template <class T, int N>
+  inline Array<T,N> reshape ( const Array<T,1>&   a,
+                              const Tuple<int,N>& sh );
+
+
+//-----------------------------------------------------------------------
+//   equal
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether two array expressions are equal.
+
+  Tests whether the shapes and the elements of the array expressions
+  \a lhs and \a rhs are equal.
+
+  \param lhs - an array expression or an \c Array object.
+
+  \param rhs - another array expression or an \c Array object.
+
+  \return <code>
+    equal( lhs.shape(), rhs.shape() ) && <br>
+    testall( lhs == rhs )
+  </code>
+
+*/
+
+template <class T, int N>
+  bool equal ( const ArrayExpr<T,N>& lhs,
+               const ArrayExpr<T,N>& rhs );
+
+
+//-----------------------------------------------------------------------
+//   iarray
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief Returns an enumeration of integers as an array expression.
+
+  Returns a one-dimensional array expression of length \a n that
+  represents the integer array
+
+  <code>[0, 1, 2, ..., n - 1]</code>.
+
+  \param n - the length of the returned array expression.
+
+  \pre <code>n >= 0</code>
+
+  \return A one-dimensional array expression enumerating all
+  non-negative integers that are smaller than \a n.
+
+*/
+
+inline ArrayExpr<int,1> iarray ( int n );
+
+
+/*!
+
+  \brief Returns an enumeration of integers as an array expression.
+
+  Returns a one-dimensional array expression that represents the
+  integer array
+
+  <code>[0, 1, 2, ..., s.last() - 1]</code>.
+
+  \param s - a slice specifying the length of the returned array
+  expression.
+
+  \return A one-dimensional array expression enumerating all
+  integers selected by the slice object \a s.
+
+*/
+
+inline ArrayExpr<int,1> iarray ( const SliceTo& s );
+
+
+/*!
+
+  \brief Returns an enumeration of integers as an array expression.
+
+  Returns a one-dimensional array expression that represents the
+  integer array
+
+  <code>[i, i + k, i + 2 * k, ..., i + n * k]</code>
+
+  with <code>i = s.first()</code> and <code>k = s.stride()</code>, and
+  with \c n the largest integer such that
+
+  <code>i + n * k < s.last()</code>.
+
+  \param s - a slice specifying the integers in the returned array
+  expression.
+
+  \return A one-dimensional array expression enumerating all
+  integers selected by the slice object \a s.
+
+*/
+
+inline ArrayExpr<int,1> iarray ( const Slice& s );
+
+
+/*!
+
+  \brief Returns an enumeration of integers as an array expression.
+
+  Returns a one-dimensional array expression that represents the
+  integer array
+
+  <code>[i, i + 1, i + 2, ..., j - 1]</code>
+
+  with <code>i = s.first()</code> and <code>j = s.last()</code>.
+
+  \param s - a slice specifying the integers in the returned array
+  expression.
+
+  \return A one-dimensional array expression enumerating all
+  integers selected by the slice object \a s.
+
+*/
+
+inline ArrayExpr<int,1> iarray ( const SliceFromTo&  s );
+
+
+
+
+
+//-----------------------------------------------------------------------
+//   makeContiguous
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Converts an array to a contiguous array.
+
+  Returns an array that has the same shape as the array \a a; that has
+  the same elements as \a a; and that is stored contiguously in
+  memory. If the array \a a is already contiguous, then this function
+  simply returns \a a.
+
+  \param a - an \c Array object.
+
+  \return A contiguous array containing the same elements as \a a.
+  
+  \sa \c Array::isContiguous().
+
+*/
+
+template <class T, int N>
+  inline Array<T,N> makeContiguous ( const Array<T,N>& a );
+
+
+
+//-----------------------------------------------------------------------
+//   sort
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sorts a one-dimensional array in ascending order.
+
+  Sorts the elements stored in the one-dimensional array \a a in such
+  a way that
+
+  <code>a[i + 1] >= a[i]</code>
+
+  for all valid indices \c i.
+
+  The worst-case time compexity of this function is <i>O(n*log(n))</i>
+  with <i>n</i> the length of the array \a a.
+
+  \param a - a one-dimensional \c Array that is to be sorted.
+
+  \pre
+    The type \a T supports the assignment operator;
+    and the type \a T supports the \c < operator.
+
+  \note The current implementation is based on heap sort.
+
+*/
+
+template <class T>
+  void sort ( const Array<T>& a );
+
+
+/*!
+
+  \brief Sorts an array in ascending order through an index array.
+  
+  Sorts the elements in the index array \a perm in such a way that
+
+  <code>a[ perm[i + 1] ] >= a[ perm[i] ]</code>
+
+  for all valid indices \c i.
+
+  The worst-case time compexity of this function is <i>O(n*log(n))</i>
+  with <i>n</i> the length of the array \a perm.
+    
+  \param perm - an \c Array of which the elements are valid indices into
+  the array \a a.
+
+  \param a - an \c Array object.
+    
+  \pre The type \a T provides a \c < operator.
+
+  \note The current implementation is based on heap sort.
+
+*/
+
+template <class T>
+  void sort ( const Array<int>& perm, const Array<T>& a );
+
+
+//-----------------------------------------------------------------------
+//   binarySearch
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches a sorted array for an element with a specific value.
+
+  Returns the index of the element with value \a value in the sorted
+  array \a a. If there is no such element, a negative integer is
+  returned. If there are multiple elements with the value \a value,
+  the index of any one of those elements is returned.
+
+  The worst-case time complexity of this function is <i>O(log(n))</i>
+  with <i>n</i> the length of the array \a a.
+
+  \param value - the value of the element to be found.
+
+  \param a - an \c Array that has been sorted in ascending order.
+
+  \return The index of the element with value \a value, or a negative
+  integer if there is no element with that value.
+
+  \pre
+    The array \a a has been sorted in ascending order; <br>
+    and the type \a T provides the \c < operator.
+
+  \sa \c sort().
+
+*/
+
+template <class T>
+  int binarySearch ( const T& value, const Array<T>& a );
+
+
+//-----------------------------------------------------------------------
+//   lowerBound
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Searches a sorted array for the first element with a specific
+  value.
+  
+  Returns the index of the first element with value \a value in the
+  sorted array \a a. If there is no such element, the returned index
+  refers to the first element with a value larger than \a value. If \a
+  value is larger than the largest element in the array, the size of
+  the array is returned.
+
+  The worst-case time complexity of this function is <i>O(log(n))</i>
+  with <i>n</i> the length of the array \a a.
+
+  \param value - the value of the element to be found.
+
+  \param a - an \c Array that has been sorted in ascending order.
+
+  \return the index of the first element with value \a value, or the
+  index of the first element that is larger than \a value, or the size
+  of the array.
+
+  \pre
+    The array \a a has been sorted in ascending order; <br>
+    and the type \a T provides the \c < operator.
+
+*/
+
+template <class T>
+  int lowerBound ( const T& value, const Array<T>& a );
+
+
+//-----------------------------------------------------------------------
+//   upperBound
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Searches a sorted array for the first element that is larger
+  than a specific value.
+  
+  Returns the index of the first element with a value that is larger
+  than \a value in the sorted array \a a. If there is no such element,
+  the size of the array \a a is returned.
+
+  The worst-case time complexity of this function is <i>O(log(n))</i>
+  with <i>n</i> the length of the array \a a.
+
+  \param value - the value of the element to be found.
+
+  \param a - an \c Array that has been sorted in ascending order.
+
+  \return the index of the first element that is larger than \a value,
+  or the size of the array \a a.
+
+  \pre
+    The array \a a has been sorted in ascending order; <br>
+    and the type \a T provides the \c < operator.
+
+  \sa \c sort().
+
+*/
+
+template <class T>
+  int upperBound ( const T& value, const Array<T>& a );
+
+
+//-----------------------------------------------------------------------
+//   equalRange
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief Searches a sorted array for a set of elements that all have a
+  specific value.
+  
+  Returns a \c SliceFromTo object representing the indices of the
+  elements that all have the value \a value in the sorted array \a a.
+  If \a s denotes the returned slice object, then
+
+  <code>a[i] == value</code>
+
+  for all indices \a i that meet the condition
+    
+  <code>i >= s.first() && i < s.last()</code>
+    
+  If there are no elements with the value \a value, then the returned
+  slice object represents an empty range of indices.
+  
+  The worst-case time complexity of this function is <i>O(log(n))</i>
+  with <i>n</i> the length of the array \a a.
+
+  \param value - the value of the elements to be found.
+
+  \param a - an \c Array that has been sorted in ascending order.
+
+  \return A \c SliceFromTo representing the indices of the
+  elements with value \a value.
+
+  \pre
+    The array \a a has been sorted in ascending order; <br>
+    and the type \a T provides the \c < operator.
+
+  \sa \c sort().
+
+*/
+
+template <class T>
+  SliceFromTo equalRange ( const T& value, const Array<T>& a );
+
+
+
+//@}
+
+
+
+JEM_END_PACKAGE_BASE

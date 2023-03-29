@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# Try to find a sane shell on this system.
+
+bindirs="/bin /usr/bin /usr/local/bin"
+
+for dir in $bindirs; do
+
+  for sh in dash bash ksh ash zsh; do
+
+    if [ -x "$dir/$sh" ]; then
+      SH="$dir/$sh"
+      SH_NAME="$sh"
+      break
+    fi
+
+  done
+
+  if [ -n "$SH" ]; then
+    break
+  fi
+
+done
+
+if [ -z "$SH" ]; then
+
+  for dir in $bindirs; do
+
+    if [ -x "$dir/sh" ]; then
+      SH="$dir/sh"
+      SH_NAME="sh"
+      break
+    fi
+
+  done
+
+  if [ -z "$SH" ]; then
+    echo "$0: unable to locate a usable shell -- bummer!" 1>&2
+    exit 1
+  fi
+
+fi
+
+export SH
+export SH_NAME
+
+exec $SH conf/configure.sh "$@"

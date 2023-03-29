@@ -1,0 +1,11 @@
+<map id="jive::util::ItemGroup" name="jive::util::ItemGroup">
+<area shape="rect" id="node1" title="Encapsulates a set of item indices." alt="" coords="327,107,479,133"/>
+<area shape="rect" id="node4" href="$classjive_1_1fem_1_1AutoBndGroup.html" title=" " alt="" coords="537,5,719,32"/>
+<area shape="rect" id="node5" href="$classjive_1_1util_1_1AllItemGroup.html" title=" " alt="" coords="543,56,713,83"/>
+<area shape="rect" id="node6" href="$classjive_1_1util_1_1ColoredItemGroup.html" title=" " alt="" coords="527,107,729,133"/>
+<area shape="rect" id="node7" href="$classjive_1_1util_1_1EmptyItemGroup.html" title=" " alt="" coords="531,157,725,184"/>
+<area shape="rect" id="node8" href="$classjive_1_1util_1_1XItemGroup.html" title=" " alt="" coords="547,208,709,235"/>
+<area shape="rect" id="node2" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,107,279,133"/>
+<area shape="rect" id="node3" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,107,133,133"/>
+<area shape="rect" id="node9" href="$classjive_1_1util_1_1ArrayItemGroup.html" title=" " alt="" coords="777,208,964,235"/>
+</map>

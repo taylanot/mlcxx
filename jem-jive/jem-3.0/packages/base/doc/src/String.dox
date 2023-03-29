@@ -1,0 +1,1714 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class BasicString
+//=======================================================================
+
+/*!
+  \class BasicString String.dox jem/base/String.h
+
+  \brief Helps the %String class converting various types of
+  strings.
+
+  The \c BasicString class is used by the \c String class to convert
+  null-terminated character arrays and \c String objects to a common
+  representation. It is a light-weight class that contains just a
+  pointer to a character array and an integer specifying the length of
+  that array. The instantiation of a \c BasicString object is
+  therefore a cheap operation.
+
+  This class is normally instantiated implicitly by the compiler using
+  one of the conversion constructors.
+
+*/
+
+class BasicString
+{
+ public:
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Character array conversion constructor.
+
+  Creates a \c BasicString from a null-terminated character array
+
+  \param str - a null-terminated character array or \c NULL.
+
+*/
+
+  inline BasicString ( const char* str );
+
+
+/*!
+
+  \brief String conversion constructor.
+
+  Creates a \c BasicString from the first \a n elements in the
+  character array \a str.
+
+  \param str - a null-terminated character array of length \a n. If \a
+  n is zero, \a str may be \c NULL.
+
+  \param n - the length of the character array \a str.
+
+  \pre <code>n >= 0</code>
+
+  \post <code>this->size() == n</code>
+
+*/
+
+  inline BasicString ( const char* str, int n );
+
+
+/*!
+
+  \brief String conversion constructor.
+
+  Creates a \c BasicString from the \c String \a str.
+
+  \param str - a \c String object.
+
+  \post <code>this->size() == str.size()</code>
+
+*/
+
+  inline BasicString ( const String& str );
+
+
+//-----------------------------------------------------------------------
+//   operator []
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief BasicString subscript operator.
+
+  Returns the \a i-th character of this BasicString.
+
+  \param i - the character index.
+
+  \return The \a i-th character of this \c BasicString.
+
+  \pre <code>i >= 0 && i < this->size()</code>
+
+*/
+
+  inline char operator [] ( int i ) const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this \c BasicString.
+
+  \return The number of characters in this \c BasicString.
+
+*/
+
+  inline int size () const;
+
+};
+
+
+//=======================================================================
+//   class String
+//=======================================================================
+
+/*!
+  \class String String.dox jem/base/String.h
+
+  \brief Encapsulates a character string.
+  
+  The \c String class represents character arrays. It provides a set
+  of functions for accessing individual characters, for comparing
+  strings, for finding substrings, for stripping white space from a
+  string, and for translating all characters to uppercase or
+  lowercase. The \c String class also overloads the + operator so that
+  one can easily concatenate two strings.
+
+  Strings are \em immutable. This means that the individual characters
+  in a string can not be modified. The only way to change the contents
+  of a string is to call one of the assignment operators. Use an \c
+  Array, or a similar type of object, if you need to modify the
+
+  Strings may share their contents through a thread-safe reference
+  counting scheme. Very small strings, however, are stored directly in
+  a \c String object itself. This implementation avoids the overhead
+  associated with reference counting when the strings are small. Note
+  that users of the \c String class do not need to be aware that
+  strings may share their contents; they can safely assume that each
+  \c String stores its own copy of its contents. In particular, there
+  is no danger that modifications to one \c String will be visible in
+  another \c String.
+  
+  \note Because \c String instances are used by the exception classes,
+  the class \c String will never throw an exception itself.
+
+  \warning The character array stored in a \c String object is \b not
+  null-terminated. Use the \c CString class and the \c makeCString
+  function to convert a \c String object to a null-terminated
+  character array.
+
+  \sa \c CString.
+
+*/
+
+class String
+{
+ public:
+
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief A random access iterator type.
+
+  A random access iterator type pointing to elements of type
+  <code>const char</code>. This iterator fulfills the requirements of
+  the random access iterator category of the standard C++
+  library. Since a \c String is immutable, the Iterator type only
+  provides read-only access to a String.
+
+*/
+
+  typedef const char* Iterator;
+
+
+/*!
+  
+  \brief A random access iterator type.
+
+  A random access iterator type pointing to elements of type
+  <code>const char</code>. This is an alias for the \c Iterator type.
+
+*/
+
+  const char* ConstIterator;
+
+
+//-----------------------------------------------------------------------
+//   default constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates an empty String.
+  
+  Creates an empty String.
+
+  \post <code> this->size() == 0 </code>
+
+*/
+
+  String ();
+
+
+//-----------------------------------------------------------------------
+//   primitive type conversion constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the boolean \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the boolean \a value.
+
+  \param value - a boolean value.
+
+  \sa \c Boolean::print().
+
+*/
+
+  explicit String ( bool value );
+
+
+/*!
+
+  \brief Initializes this string to the character \a value.
+  
+  Initilizes this \c String object to the character \a value.
+
+  \param value - a character.
+
+  \post <code>
+    this->size()  == 1 && <br>
+    this->front() == value
+  </code>
+
+*/
+
+  explicit String ( char value );
+
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the byte \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the byte \a value.
+
+  \param value - a byte.
+
+  \sa \c Integer::print().
+
+*/
+
+  explicit String ( byte value );
+
+
+/*!
+ 
+  \brief Initializes this string to the string representation of 
+  the short \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the short \a value.
+
+  \param value - a short integer.
+
+  \sa \c Integer::print().
+
+*/
+
+  explicit String ( short value );
+
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the int \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the int \a value.
+
+  \param value - an integer.
+
+  \sa \c Integer::print().
+
+*/
+
+  explicit String ( int value );
+
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the long int \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the long int \a value.
+
+  \param value - a long integer.
+
+  \sa \c Integer::print().
+
+*/
+
+  explicit String ( long value );
+
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the float \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the float \a value.
+
+  \param value - a float.
+
+  \sa \c Float::print().
+
+*/
+
+  explicit String ( float value );
+
+
+/*!
+
+  \brief Initializes this string to the string representation of 
+  the double \a value.
+  
+  Initilizes this \c String object to the string representation 
+  of the double \a value.
+
+  \param value - a double.
+
+  \sa \c Float::print().
+
+*/
+
+  explicit String ( double value );
+
+
+//-----------------------------------------------------------------------
+//   character array conversion constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Initializes this string to a null-terminated character
+  array.
+
+  Initializes this \c String to the null-terminated character array \a
+  str. If \a str is \c NULL, this \c String is initialized to an empty
+  \c String. Note that this contructor makes a copy of the array \a str.
+
+  \param str - a null-terminated character array, or \c NULL.
+
+  \post <code> this->equals( rhs ) == true </code>
+
+  \warning The character array stored in this \c String is \b not 
+  null-terminated.
+
+*/
+
+  String ( const char* str );
+
+
+//-----------------------------------------------------------------------
+//   input iterator constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Constructs a string given two input iterators.
+
+  Constructs a string containing the characters between
+  the input iterators \a first and \a last.
+
+  \param first - an input iterator pointing to the first character.
+
+  \param last - an input iterator pointing to one position past the
+  last character.
+
+  \pre
+    The input iterator \a last is reachable from \a first, <br>
+    and the expression \c *first can be converted to type \c char.
+
+  \post <code> this->size() == std::distance( first, last ) </code>
+
+*/
+
+  String ( InputIterator first, InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   string concatenation constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a string that is the catenation of two
+  \c BasicString objects.
+
+  Creates a \c String that is the catenation of the \c BasicString
+  \a lhs and the \c BasicString \a rhs. That is, the first
+  <code>lhs.size()</code> characters of this \c String are equal to
+  the characters in \a lhs, while the next <code>rhs.size()</code>
+  characters are equal to the characters in \a rhs.
+
+  \param lhs - the first \c BasicString to be catenated.
+  \param rhs - the second \c BasicString to be catenated.
+
+  \post <code>
+    (*this)[ slice(BEGIN,lhs.size()) ] == lhs && <br>
+    (*this)[ slice(lhs.size(),END) ]   == rhs
+  </code>
+
+*/
+
+  String ( const BasicString& lhs, const BasicString& rhs );
+
+
+//-----------------------------------------------------------------------
+//   copy constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a copy of another string.
+
+  Creates a copy of the \c String \a rhs.
+
+  \param rhs - the \c String to be copied.
+
+  \post <code> this->equals( rhs ) == true </code>
+
+*/
+
+  String ( const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   destructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Frees resources if necessary.
+   
+  Frees resources if necessary.
+
+*/
+
+  ~String ();
+
+
+//-----------------------------------------------------------------------
+//   assignment operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies another string into this string.
+  
+  Copies the \c String \a rhs into this \c String.
+
+  \param rhs - the \c String to be copied.
+
+  \post <code> this->equals( rhs ) == true </code>
+
+*/
+
+  String& operator = ( const String& rhs );
+
+
+/*!
+
+  \brief Copies a character array into this string.
+
+  Copies the null-terminated character array \a rhs into this \c
+  String.
+
+  \param str a null-terminated character array, or \c NULL.
+
+  \post <code> this->equals( rhs ) == true </code>
+
+*/
+
+  String& operator = ( const char* str );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Swaps the contents of this string with another string.
+  
+  Equivalent with:
+  
+  \code
+  
+  String tmp( rhs );
+  
+  lhs = rhs;
+  rhs = tmp;
+  
+  \endcode
+
+  \param rhs - the \c String with which this \c String should be
+  interchanged.
+
+*/
+
+  void swap ( String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   begin & end
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the begin of this string.
+
+  Returns an \c Iterator pointing to the first character of this
+  string, or \c end() if this string is empty. The \c Iterator is
+  valid until one of the assignment operators of this \c String is
+  called, or until the destructor of this \c String is invoked.
+
+  \return An \c Iterator pointing to the first character of this \c
+  String.
+
+*/
+
+  inline Iterator begin () const;
+
+
+/*!
+
+  \brief Returns an iterator pointing to the end of this string.
+
+  Returns an \c Iterator pointing to one position past the last
+  character of this string. The \c Iterator is valid until one of
+  the assignment operators of this \c String is called, or until the
+  destructor of this \c String is called.
+
+  \return An \c Iterator pointing one position past the last character
+  of this \c String.
+
+*/
+
+  inline Iterator end() const;
+
+
+//-----------------------------------------------------------------------
+//   front & back
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the first character in this string.
+
+  Returns the first character in this \c String.
+
+  \return The first character in this \c String.
+
+  \pre <code> this->size() > 0 </code>
+
+*/
+
+  inline char front() const;
+
+
+/*!
+
+  \brief Returns the last character in this string.
+
+  Return the last character in this \c String.
+
+  \return The last character in this \c String.
+
+  \pre <code> this->size() > 0 </code>
+
+*/
+
+  inline char back () const;
+
+
+//-----------------------------------------------------------------------
+//   subscript operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief String subscript operator.
+
+  Returns the \a i-th character in this \c String.
+
+  \param i - character index.
+
+  \return The \a i-th character in this \c String.
+
+  \pre <code>i >= 0 && i < this->size()</code>
+
+*/
+
+  inline char operator [] ( int i ) const;
+
+
+//-----------------------------------------------------------------------
+//   slice operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Slice operator that creates a slice of this string.
+   
+   Returns a \c String representing a slice of this \c String.
+
+   \return A slice of this \c String.
+
+   \sa \c Slice, \c slice().
+*/
+
+  String operator [] ( const Slice& s ) const;
+
+
+/*!
+
+  \brief Overloaded slice operator.
+
+  Returns a \c String representing a contiguous slice of this \c
+  String.
+
+  \return A contiguous slice of this \c String.
+
+  \pre <code> s.last() <= this->size() </code>
+
+  \sa \c SliceFromTo, \c slice().
+
+*/
+
+  String operator [] ( const SliceFromTo& s ) const;
+
+
+/*!
+
+  \brief Overloaded slice operator.
+
+  Returns a \c String representing a slice that starts at the first
+  character of this \c String.
+
+  \return A slice of this \c String.
+
+  \pre <code> s.last() <= this->size() </code>
+
+  \sa \c SliceTo, \c slice().
+
+*/
+
+  String operator [] ( const SliceTo& s ) const;
+
+
+/*!
+
+  \brief Overloaded slice operator.
+
+  Returns a \c String representing a slice that extends to the last
+  character of this \c String.
+
+  \return A slice of this \c String.
+
+  \sa \c SliceFrom, \c slice().
+
+*/
+
+  String operator [] ( const SliceFrom& s ) const;
+
+
+/*!
+
+  \brief Overloaded slice operator.
+
+  Returns this \c String.
+
+  \return <code> *this </code>
+
+  \sa \c SliceAll, \c slice().
+
+*/
+
+  inline String operator [] ( const SliceAll& ) const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*! 
+
+  \brief Returns the size of this string.
+
+  Returns the size of this \c String.
+
+  \return The number of characters stored in this \c String.
+
+*/
+
+  inline int size () const;
+
+
+//-----------------------------------------------------------------------
+//   addr
+//-----------------------------------------------------------------------
+
+/*! 
+
+  \brief Returns a pointer to the i-th character in this string.
+
+  Returns a pointer to the \a i-th character in this \c String. The
+  pointer is valid until one of the assignment operators of this \c
+  String is called, or until the destructor of this \c String is
+  invoked.
+  
+  \param i - a character index.
+
+  \return The address of the i-th character in this \c String.
+
+  \pre <code>i >= 0 && i <= this->size()</code>
+
+*/
+
+  inline const char* addr ( int i = 0) const;
+
+
+//-----------------------------------------------------------------------
+//   hashValue
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a hash value for this string.
+   
+   Computes a hash value for this \c String.
+
+  \return A hash value for this \c String.
+
+*/
+
+  long hashValue () const;
+
+
+//-----------------------------------------------------------------------
+//   toUpper
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns this string with all characters translated to
+  upper case.
+  
+  Translates all characters in this \c String to upper case.
+
+  \return A copy of this \c String with all characters translated to
+  upper case.
+
+*/
+
+  String toUpper () const;
+
+
+//-----------------------------------------------------------------------
+//   toLower
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns this string with all characters translated to lower
+  case.
+  
+  Translates all characters in this \c String to lower case.
+
+  \return A copy of this \c String with all characters translated to
+  lower case.
+
+*/
+
+  String toLower () const;
+
+
+//-----------------------------------------------------------------------
+//   stripWhite
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns this string stripped of white space.
+  
+  Strips this \c String of white space.
+
+  \return A copy of this \c String that has been stripped of leading
+  and trailing white space.
+
+*/
+
+  String stripWhite () const;
+
+
+//-----------------------------------------------------------------------
+//   equals
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Comparison of two strings.
+   
+  Compares this \c String to the string \a rhs. The result is \c true
+  if and only if both strings represent the same character sequence.
+
+  \param rhs - a \c String to which this \c String is compared.
+
+  \return \c true if both strings are equal, \c false otherwise.
+
+  \note For performance reasons, the argument \a rhs has type \c
+  String instead of type \c BasicString.
+
+*/
+
+  bool equals ( const String& rhs ) const;
+
+
+/*!
+
+  \brief Comparison of two strings.
+   
+  Compares this \c String to the character array \a rhs. The result is
+  \c true if and only if both strings represent the same character
+  sequence. If the character array \a rhs equals \c NULL, it is viewed
+  as a string with zero length.
+
+  \param rhs - a null-terminated character array to which this \c
+  String is compared.
+
+  \return \c true if both strings are equal, \c false otherwise.
+
+  \note For performance reasons, the argument \a rhs has type
+  <code>const char*</code> instead of type \c BasicString.
+
+*/
+
+  bool equals ( const char* rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   equalsIgnoreCase
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Case insensitive comparison of two strings.
+   
+  Compares this \c String to the argument string \a rhs, ignoring case
+  considerations. The result is \c true if and only if both strings
+  have the same size and the corresponding characters in both strings
+  are equal ignoring case.
+
+  \param rhs - a \c BasicString to which this \c String is compared.
+
+  \return \c true if both strings are equal ignoring case, \c false
+  otherwise.
+
+*/
+
+  bool equalsIgnoreCase ( const BasicString& rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   compareTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Lexicographical comparison of two Strings.
+   
+  Compares this \c String lexicographically to the argument string \a
+  rhs. This function is similar to the standard C function \c strcmp().
+   
+  \param rhs - a \c BasicString to which this \c String is compared.
+
+  \return \li zero if this \c String equals the argument string;
+          \li a positive integer if this \c String lexicographically
+              precedes the argument string;
+          \li a negative integer if the argument string
+              lexicographically precedes this String.
+
+*/
+
+  int compareTo ( const BasicString& rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   compareToIgnoreCase
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Case insensitive lexicographical comparison of two Strings.
+   
+  This function is similar to the function \c compareTo(), except that
+  case considerations are ignored.
+
+  \param rhs - a \c BasicString to which this \c String is compared.
+
+  \return An integer indicating whether this \c String is larger than,
+  equal to, or smaller than the argument string.
+
+*/
+
+  int compareToIgnoreCase ( const BasicString& rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   find (a substring)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds the first occurrence of a specified substring.
+  
+  Determines the smallest integer <i>k</i> such that
+
+  <code> k >= fromIndex && <br>
+  (*this)[ slice(k,k+needle.size()) ].equals( needle ) == true
+  </code>
+
+  \param needle - the substring to be found.
+
+  \param fromIndex - the character index from which the search is
+  started. \a fromIndex may have any value.
+
+  \return <i>k</i>, if such an integer can be found. Otherwise a
+  negative number is returned.
+
+*/
+
+  int find ( const BasicString& needle, int fromIndex ) const;
+
+
+//-----------------------------------------------------------------------
+//   find (a character)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds the first occurrence of a specified character.
+  
+  Determines the smallest integer <i>k</i> such that
+
+  <code> k >= fromIndex && k < this->size() && <br>
+  (*this)[k] == needle
+  </code>
+
+  \param needle - the character to be found.
+
+  \param fromIndex - the character index from which the search is
+  started. \a fromIndex may have any value.
+
+  \return <i>k</i>, if such an integer can be found. Otherwise a
+  negative number is returned.
+
+*/
+
+  int find ( char needle, int fromIndex ) const;
+
+
+//-----------------------------------------------------------------------
+//   rfind (from the end of the string)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds the last occurrence of a specified substring.
+
+  Finds the last occurrence of a specified substring.
+
+  \param needle - the substring to be found.
+
+  \return <code> this->rfind( needle, this->size() ) </code>
+
+*/
+
+  int rfind ( const BasicString& needle ) const;
+
+
+/*!
+
+  \brief Finds the last occurrence of a specified character.
+
+  Finds the last occurrence of a specified character.
+
+  \param needle - the character to be found.
+
+  \return <code> this->rfind( needle, this->size() ) </code>
+
+*/
+
+  int rfind ( char needle ) const;
+
+
+//-----------------------------------------------------------------------
+//   rfind (from a given index)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds the last occurrence of a specified substring,
+  starting at a specified index.
+
+  Determines the largest integer <i>k</i> such that
+
+  <code> k < fromIndex && <br>
+  (*this)[ slice(k,k+needle.size()) ].equals( needle )
+  </code>
+
+  \param needle - the substring to be found.
+
+  \param fromIndex - the character index from which the backward
+  search is started. \a fromIndex may have any value.
+
+  \return <i>k</i>, if such a number can be found. Otherwise a
+  negative number is returned.
+
+*/
+
+  int rfind ( const BasicString& needle, int fromIndex ) const;
+
+
+/*!
+
+  \brief Finds the last occurrence of a specified character,
+  starting at a specified index.
+
+  Determines the largest integer <i>k</i> such that
+
+  <code> k >= 0 && k < fromIndex &&
+  (*this)[k] == needle
+  </code>
+
+  \param needle - the character to be found.
+
+  \param fromIndex - the character index from which the backward
+  search is started. \a fromIndex may have any value.
+
+  \return <i>k</i>, if such a number can be found. Otherwise a
+  negative number is returned.
+
+*/
+
+  int rfind ( char needle, int fromIndex ) const;
+
+
+//-----------------------------------------------------------------------
+//   format
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a string according to a printf-style format
+  string.
+  
+  Creates a \c String according to the format string \a fmt. This
+  function is similar to the standard C function \c printf, except
+  that it recognises only the following conversion specifiers: \%\%,
+  \%d, \%i \%o, \%u, \%x, \%X, \%f, \%g, \%e, \%G, \%E, \%c, \%s and
+  \%p (see the manual pages for printf for their meaning). Any special
+  formatting flags, such as the field width, are not supported.
+
+  This format string \a fmt may also contain the special format
+  specifier \%S. The argument for this specifier must be a pointer to
+  a \c String object.
+
+  \param fmt - a null-terminated format string.
+
+  \return A \c String formatted according to the format string \a fmt.
+
+  \note If the format string contains an illegal conversion specifier
+  the program will be aborted.
+
+*/
+
+  String format ( const char* fmt, ... );
+
+};
+
+
+//=======================================================================
+//   Related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   operator + 
+//-----------------------------------------------------------------------
+
+/*!
+  \name String catenation operators.
+
+  Catenation of strings and characters.
+*/
+
+//@{
+
+/*! 
+  \relates String
+
+  Returns the catenation of two strings.
+
+  \param lhs - a \c String.
+  \param rhs - another \c String.
+
+  \return <code>String( lhs, rhs )</code>
+
+*/
+
+inline String operator + ( const String& lhs, const String& rhs );
+
+
+/*! 
+  \relates String 
+  
+  Returns the catenation of two strings.
+
+  \param lhs - a \c String.
+  \param rhs - a null-terminated character array, or \c NULL.
+
+  \return <code>String( lhs, rhs )</code>
+
+*/
+
+inline String operator + ( const String& lhs, const char* rhs );
+
+
+/*! 
+  \relates String 
+
+  Returns the catenation of two strings.
+
+  \param lhs - a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>String( lhs, rhs )</code>
+
+*/
+
+inline String operator + ( const char* lhs, const String& rhs );
+
+
+/*! 
+  \relates String 
+
+  Returns the catenation of a string and a character.
+
+  \param lhs - a \c String.
+  \param rhs - a character.
+
+  \return <code>String( lhs, BasicString( &rhs, 1 ) )</code>
+
+*/
+
+inline String operator + ( const String& lhs, char rhs );
+
+
+/*! 
+  \relates String 
+
+  Returns the catenation of a string and a character.
+
+  \param lhs - a character.
+  \param rhs - a \c String.
+
+  \return <code>String( BasicString( &rhs, 1 ), rhs )</code>
+
+*/
+
+inline String operator + ( char lhs, const String& rhs );
+
+//@}
+
+
+//-----------------------------------------------------------------------
+//   operator == 
+//-----------------------------------------------------------------------
+
+
+/*!
+  \name String comparison operators.
+
+  Lexicographical comparison of strings.
+*/
+
+//@{
+
+/*!
+  \relates String
+
+  Tests whether two strings are equal.
+  
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>lhs.equals( rhs )</code>
+
+  \sa \c equals.
+*/
+
+inline bool operator == ( const String& lhs, const String& rhs );
+
+
+/*!
+  \relates String
+
+  Tests whether two strings are equal.
+  
+  \param lhs - a \c String.
+  \param rhs - a null-terminated character array, or \c NULL.
+
+  \return <code>lhs.equals( rhs )</code>
+
+  \sa \c equals.
+*/
+
+inline bool operator == ( const String& lhs, const char* rhs );
+
+
+/*!
+  \relates String
+
+  Tests whether two strings are equal.
+  
+  \param lhs - a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>lhs.equals( rhs )</code>
+
+  \sa \c equals.
+*/
+
+inline bool operator == ( const char* lhs, const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   operator !=
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  Tests whether two strings are unequal.
+  
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>! lhs.equals( rhs )</code>
+
+  \sa \c equals.
+*/
+
+inline bool operator != ( const String& lhs, const String& rhs );
+
+
+/*!
+  \relates String
+
+  Tests whether two strings are unequal.
+  
+  \param lhs - a \c String.
+  \param rhs - a null-terminated character array, or \c NULL.
+
+  \return <code>! lhs.equals( rhs )</code>
+
+  \sa \c equals.
+*/
+
+inline bool operator != ( const String& lhs, const char* rhs );
+
+
+/*!
+  \relates String
+
+  Tests whether two strings are unequal.
+  
+  \param lhs - a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>! lhs.equals( rhs )</code>
+  
+  \sa \c equals.
+*/
+
+inline bool operator != ( const char* lhs, const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   operator < 
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  Tests whether one string is lexicographically smaller than another
+  string.
+
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) < 0</code>
+  
+  \sa \c compareTo.
+*/
+
+inline bool operator < ( const String& lhs, const String& rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically smaller than another
+  string.
+
+  \param lhs - a \c String.
+  \param rhs - a null-terminated character array, or \c NULL.
+
+  \return <code>lhs.compareTo( rhs ) < 0</code>
+   
+  \sa \c compareTo.
+*/
+
+inline bool operator < ( const String& lhs, const char* rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically smaller than another
+  string.
+
+  \param lhs - a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) < 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator < ( const char* lhs, const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   operator <=
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  Tests whether one string is lexicographically smaller than or equal
+  to another string.
+
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) <= 0</code>
+  
+  \sa \c compareTo.
+*/
+
+inline bool operator <= ( const String& lhs, const String& rhs );
+
+
+/*! 
+  \relates String
+  
+  Tests whether one string is lexicographically smaller than or equal
+  to another string.
+
+  \param lhs - a \c String.
+  \param rhs - a a null-terminated character array, or \c NULL.
+
+  \return <code>lhs.compareTo( rhs ) <= 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator <= ( const String& lhs, const char* rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically smaller than or equal
+  to another string.
+
+  \param lhs - a a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) <= 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator <= ( const char* lhs, const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   operator >
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  Tests whether one string is lexicographically larger than another
+  string.
+
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) > 0</code>
+  
+  \sa \c compareTo.
+*/
+
+inline bool operator > ( const String& lhs, const String& rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically larger than another
+  string.
+
+  \param lhs - a \c String.
+  \param rhs - a null-terminated character array, or \c NULL.
+
+  \return <code>lhs.compareTo( rhs ) > 0</code>
+   
+  \sa \c compareTo.
+*/
+
+inline bool operator > ( const String& lhs, const char* rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically larger than another
+  string.
+
+  \param lhs - a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) > 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator > ( const char* lhs, const String& rhs );
+
+
+//-----------------------------------------------------------------------
+//   operator >=
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  Tests whether one string is lexicographically larger than or equal
+  to another string.
+
+  \param lhs - a \c String.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) >= 0</code>
+  
+  \sa \c compareTo.
+*/
+
+inline bool operator >= ( const String& lhs, const String& rhs );
+
+
+/*! 
+  \relates String
+  
+  Tests whether one string is lexicographically larger than or equal
+  to another string.
+
+  \param lhs - a \c String.
+  \param rhs - a a null-terminated character array, or \c NULL.
+
+  \return <code>lhs.compareTo( rhs ) >= 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator >= ( const String& lhs, const char* rhs );
+
+
+/*! 
+  \relates String
+
+  Tests whether one string is lexicographically larger than or equal
+  to another string.
+
+  \param lhs - a a null-terminated character array, or \c NULL.
+  \param rhs - a \c String.
+
+  \return <code>lhs.compareTo( rhs ) >= 0</code>
+
+  \sa \c compareTo.
+*/
+
+inline bool operator >= ( const char* lhs, const String& rhs );
+
+
+//@}
+
+
+//-----------------------------------------------------------------------
+//   input & output operators
+//-----------------------------------------------------------------------
+
+/*!
+  \name Input and output operators
+*/
+
+//@{
+
+
+/*!
+  \relates String
+  
+  \brief String de-serialization operator.
+
+  Reads a \c String from the data input stream \a in and assigns it to
+  \a s.
+
+  \param in - the \c DataInputStream from which the string is to be
+         read.
+
+  \param s - the \c String to be read.
+
+  \return \a in
+  
+  \throws io::IOException - if an IO error occurs.
+  
+  \throws io::SerializationException - if the data input stream is
+          corrupt.
+
+*/
+
+io::DataInput& operator >> ( io::DataInput& in, String& s );
+
+
+/*!
+  \relates String
+
+  \brief String serialization operator.
+
+  Writes the \c String \a s to the data output stream \a out. The
+  de-serialization operator can be used to restore the \c String
+  object.
+
+  \param out - the data output stream to which the string is to be
+         written.
+  
+  \param s - the \c String to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an IO error occurs.
+
+*/
+
+io::DataOutput& operator << ( io::DataOutput& out, const String& s );
+
+
+/*!
+  \relates String
+
+  \brief Reads a string from a text input stream.
+  
+  Skips white space and then reads a \c String from the text input
+  stream \a in. This function is equivalent with:
+
+  \code
+  s = String();
+  in.skipWhite();
+  for ( int c = in.read(); c >= 0 && ! isspace(c); c = in.read() ) {
+    s += (char) c;
+  }
+  in.pushBack( c );
+
+  return in;
+  \endcode
+  
+  \param in - the text input stream from which the string is te be
+  read.
+
+  \param s - the string to be read.
+
+  \return \a in
+
+  \throws io::IOException - if an IO error occurs.
+
+*/
+
+io::TextInput& operator >> ( io::TextInput& in, String& s );
+
+
+/*!
+  \relates String
+
+  \brief Writes a string to a text output stream.
+  
+  Writes the contents of the \c String \a s to the text output stream
+  \a out. This function is equivalent with:
+
+  <code>out.write( s.addr(), s.size() )</code>.
+
+  \param out - the text output stream to which the string is to be
+  written.
+
+  \param s - the string to be writtem.
+
+  \return \a out
+
+  \throws io::IOException - if an IO error occurs.
+
+*/
+
+io::TextOutput& operator << ( io::TextOutput& out, const String& s );
+
+
+//@}
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+  \relates String
+
+  \brief Swaps two strings.
+
+  Swaps two strings. Equivalent with: <code>lhs.swap( rhs )</code>.
+
+  \param lhs - a \c String.
+  \param rhs - another \c String.
+
+*/
+  
+inline void swap( String& lhs, String& rhs );
+
+
+
+JEM_END_PACKAGE_BASE

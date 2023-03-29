@@ -1,0 +1,37 @@
+#!/bin/sh
+
+if [ -z "$JEMDIR" ]; then
+
+  cat<<EOF 1>&2
+
+*** Error:
+
+    Please set the JEMDIR environment variable to the location
+    where the Jem library has been installed; then run this
+    script again.
+
+EOF
+
+  exit 1
+
+fi
+
+if [ ! -x "$JEMDIR/bin/shpp" ]; then
+
+  cat<<EOF 1>&2
+
+*** Error:
+
+    It seems that the Jem library has not yet been configured
+    and installed. Please do that before running this script.
+
+EOF
+
+  exit 1
+
+fi
+
+"$JEMDIR/bin/shpp" -x scripts/conf/configure.sh \
+                      scripts/conf/configure || exit 1
+
+exec scripts/conf/configure

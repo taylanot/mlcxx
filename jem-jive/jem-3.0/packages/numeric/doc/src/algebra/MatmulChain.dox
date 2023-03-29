@@ -1,0 +1,890 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( numeric )
+
+
+//=======================================================================
+//   class SparseMatrix
+//=======================================================================
+
+/*!
+  \class MatmulChain MatmulChain.dox jem/numeric/algebra/MatmulChain.h
+
+  \brief Multiplies a series of matrices and vectors.
+
+  The template class \c MatmulChain can be used to compute the product
+  of \a N matrices containing elements of type \a T. It can also be
+  used to compute the product of \a N matrices and a vector, and the
+  product of a vector, \a N matrices and a vector. Since a \c
+  MatmulChain object stores any temporary matrices and vectors in
+  private data members, it does not have to allocate and deallocate
+  those temporary matrices and vectors for each product that it
+  computes. As a consequence, a \c MatmuChain can be considerably
+  faster than an equivalent series of nested \c numeric::matmul()
+  calls, especially when the product of \a N matrices is computed
+  repeatedly within a loop. This is illustrated in the example below:
+
+  \code
+  MatmulChain<double,3>  mc;
+  
+  Array<double,2>        a ( 10,  8 );
+  Array<double,2>        b (  8,  9 );
+  Array<double,2>        c (  9, 13 );
+  Array<double,2>        r ( 10, 13 );
+  
+  int                    i;
+
+
+  for ( i = 0; i < 1000; i++ )
+  {
+    // Fill a, b, and c ...
+
+    r = mc.matmul ( a, b, c );
+
+    // Do something with r ...
+  }
+  \endcode
+
+  When using the \c matmul() function, the above loop could be coded
+  as follows:
+
+  \code
+  for ( i = 0; i < 1000; i++ )
+  {
+    r = numeric::matmul ( a, numeric::matmul( b, c ) );
+  }
+  \endcode
+
+  In this case, however, two temporary matrices will be allocated and
+  destroyed in each iteration of the loop.
+
+  The first template argument, \a T, specifies the type of the matrix
+  and vector elements. The second template argument, \a N, specifies
+  the length of a \c MatmulChain; that is, the number of matrices that
+  are to be multiplied.
+
+  \note The \c MatmulChain class is not thread safe.
+
+  \pre <code>N >= 0 && N <= 4</code>
+
+  \sa \c numeric::matmul()
+  
+*/
+
+
+template <class T, int N>
+  class MatmulChain
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   constants
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The length of the chain.
+
+  A constant integer representing the length of this chain. It is
+  equal to the second template parameter.
+
+*/
+
+  static const int LENGTH = N;
+
+
+//-----------------------------------------------------------------------
+//   constructor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates a new matmul chain.
+
+  Creates a new \c MatmulChain object that is ready for use.
+
+*/
+
+  inline MatmulChain ();
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the matrix product of two vectors.
+
+  Returns a reference to a matrix containing the product of the
+  vectors \a v and \a v. From a logical point of view, this function
+  has the same effect as:
+
+  <code>return numeric::matmul( v, w )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  zero.
+
+  \param v - a (column) vector.
+  
+  \param w - a (row) vector.
+
+  \pre <code>LENGTH == 0</code>
+
+  \return A reference to a matrix containing the product of \a v and
+  \a w.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T>&  v,
+                             const Array<T>&  w );
+  
+
+
+//-----------------------------------------------------------------------
+//   matmul (matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a matrix and a vector.
+
+  Returns a reference to a vector containing the product of the matrix
+  \a a and the vector \a v. From a logical point of view, this
+  function has the same effect as:
+
+  <code>return numeric::matmul( a, v )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length one.
+
+  \param a - a matrix.
+  
+  \param v - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 1 && <br>
+    a.size(1) == v.size()
+  </code>
+
+  \return A reference to a vector containing the product of \a a and
+  \a v.
+
+*/
+
+  const Array<T>& matmul ( const Array<T,2>&  a,
+                           const Array<T>&    v );
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a vector and a matrix.
+
+  Returns a reference to a (row) vector containing the product of the
+  vector \a v and the matrix \a a. From a logical point of view, this
+  function has the same effect as:
+
+  <code>return numeric::matmul( v, a )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length one.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+
+  \pre <code>
+    LENGTH   == 1 && <br>
+    v.size() == a.size(0)
+  </code>
+
+  \return A reference to a vector containing the product of \a v and
+  \a a.
+
+*/
+
+  const Array<T>& matmul ( const Array<T>&    v,
+                           const Array<T,2>&  a );
+                           
+  
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of two vectors and a matrix.
+
+  Returns a reference to a matrix containing the product of the vector
+  \a v, the matrix \a a and the vector \a w. From a logical point of
+  view, this function has the same effect as:
+
+  <code>return numeric::matmul( v, numeric::matmul( a, w )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length one.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+
+  \param w - a (column) vector.
+
+  \pre <code>
+    LENGTH   == 1         && <br>
+    v.size() == a.size(0) && <br>
+    w.size() == a.size(1)
+  </code>
+
+  \return A reference to a matrix containing the product of \a v, 
+  \a a and \a w.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T>&    v,
+                             const Array<T,2>&  a,
+                             const Array<T>&    w );
+
+
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of two matrices.
+
+  Returns a reference to a matrix containing the product of the
+  matrices \a a and \a b. From a logical point of view, this function
+  has the same effect as:
+
+  <code>return numeric::matmul( a, b )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length two.
+
+  \param a - a matrix.
+  
+  \param b - another matrix.
+
+  \pre <code>
+    LENGTH    == 2 && <br>
+    a.size(1) == b.size(0)
+  </code>
+
+  \return A reference to a matrix containing the product of \a a and
+  \a b.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T,2>&  a,
+                             const Array<T,2>&  b );
+
+
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of two matrices and a vector.
+
+  Returns a reference to a vector containing the product of the matrices
+  \a a and \a b, and the vector \a v. From a logical point of view, this
+  function has the same effect as:
+
+  <code>return numeric::matmul( a, numeric::matmul( b, v ) )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length two.
+
+  \param a - a matrix.
+  
+  \param b - another matrix.
+
+  \param v - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 2         && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == v.size()
+  </code>
+
+  \return A reference to a vector containing the product of \a a, \a b
+  and \a v.
+
+*/
+
+  const Array<T>& matmul ( const Array<T,2>&  a,
+                           const Array<T,2>&  b,
+                           const Array<T>&    v );
+
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a vector and two matrices.
+
+  Returns a reference to a (row) vector containing the product of the
+  vector \a v, and the matrices \a a and \a b. From a logical point of
+  view, this function has the same effect as:
+
+  <code>return numeric::matmul( numeric::matmul( v, a ), b )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length two.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - another matrix.
+
+  \pre <code>
+    LENGTH    == 2         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0)
+  </code>
+
+  \return A reference to a vector containing the product of \a v, \a a
+  and \a b.
+
+*/
+
+  const Array<T>& matmul ( const Array<T>&    v,
+                           const Array<T,2>&  a,
+                           const Array<T,2>&  b );
+                           
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the matrix product of two vectors and two matrices.
+
+  Returns a reference to a matrix containing the product of the vector
+  \a v, the matrices \a a and \a b, and the vector \a w. From a
+  logical point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    numeric::matmul ( v, a ),
+    numeric::matmul ( b, w )
+  )
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length two.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - another matrix.
+
+  \param w - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 2         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == w.size()
+  </code>
+
+  \return A reference to a matrix containing the product of \a v, \a a,
+  \a b and \a w.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T>&    v,
+                             const Array<T,2>&  a,
+                             const Array<T,2>&  b,
+                             const Array<T>&    w );
+
+
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of three matrices.
+
+  Returns a reference to a matrix containing the product of the
+  matrices \a a, \a b and \a c. From a logical point of view, this
+  function has the same effect as:
+
+  <code> return numeric::matmul( a, numeric::matmul( b, c ) )</code>
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  three.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix.
+
+  \param c - a third matrix.
+
+  \pre <code>
+    LENGTH    == 3         && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0)
+  </code>
+
+  \return A reference to a matrix containing the product of \a a, \a b
+  and \a c.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T,2>&  a,
+                             const Array<T,2>&  b,
+                             const Array<T,2>&  c );
+
+  
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of three matrices and a vector.
+
+  Returns a reference to a vector containing the product of the
+  matrices \a a, \a b and \a c, and the vector \a v. From a logical
+  point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    a, numeric::matmul ( b, numeric::matmul( c, v ) )
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  three.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \param v - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 3         && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == v.size()
+  </code>
+
+  \return A reference to a vector containing the product of \a a, \a
+  b, \a c and \a v.
+
+*/
+
+  const Array<T>& matmul ( const Array<T,2>&  a,
+                           const Array<T,2>&  b,
+                           const Array<T,2>&  c,
+                           const Array<T>&    v );
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a vector and three matrices.
+
+  Returns a reference to a (row) vector containing the product of the
+  vector \a v, and the matrices \a a, \a b and \a c. From a logical
+  point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    numeric::matmul ( numeric::matmul( v, a ), b ),
+    c
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  three.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \pre <code>
+    LENGTH    == 3         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0)
+  </code>
+
+  \return A reference to a vector containing the product of \a v, \a
+  a, \a b and \a c.
+
+*/
+
+  const Array<T>& matmul ( const Array<T>&    v,
+                           const Array<T,2>&  a,
+                           const Array<T,2>&  b,
+                           const Array<T,2>&  c );
+  
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the matrix product of two vectors and three
+  matrices.
+
+  Returns a reference to a matrix containing the product of the vector
+  \a v, the matrices \a a, \a b and \a c, and the vector \a w. From a
+  logical point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    numeric::matmul ( numeric::matmul( v, a ), b ),
+    numeric::matmul ( c, w )
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  three.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \param w - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 3         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == w.size()
+  </code>
+
+  \return A reference to a matrix containing the product of \a v, \a
+  a, \a b, \a c and \a w.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T>&    v,
+                             const Array<T,2>&  a,
+                             const Array<T,2>&  b,
+                             const Array<T,2>&  c,
+                             const Array<T>&    w );
+
+
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix * matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of four matrices.
+
+  Returns a reference to a matrix containing the product of the
+  matrices \a a, \a b, \a c and \a d. From a logical point of view,
+  this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    a, numeric::matmul( b, numeric::matmul( c, d ) )
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  four.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix.
+
+  \param c - a third matrix.
+
+  \param d - a fourth matrix.
+
+  \pre <code>
+    LENGTH    == 4         && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == d.size(0)
+  </code>
+
+  \return A reference to a matrix containing the product of \a a, \a
+  b, \a c and \a d.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T,2>&  a,
+                             const Array<T,2>&  b,
+                             const Array<T,2>&  c,
+                             const Array<T,2>&  d );
+
+  
+//-----------------------------------------------------------------------
+//   matmul (matrix * matrix * matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of four matrices and a vector.
+
+  Returns a reference to a vector containing the product of the
+  matrices \a a, \a b, \a c and \a d, and the vector \a v. From a
+  logical point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    a, numeric::matmul (
+      b, numeric::matmul( c, numeric::matmul( d, v ) )
+    )
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  four.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \param d - a fourth matrix.
+
+  \param v - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 4         && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == d.size(0) && <br>
+    d.size(1) == v.size()
+  </code>
+
+  \return A reference to a vector containing the product of \a a, \a
+  b, \a c, \a d and \a v.
+
+*/
+
+  const Array<T>& matmul ( const Array<T,2>&  a,
+                           const Array<T,2>&  b,
+                           const Array<T,2>&  c,
+                           const Array<T,2>&  d,
+                           const Array<T>&    v );
+
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix * matrix * matrix)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a vector and four matrices.
+
+  Returns a reference to a (row) vector containing the product of the
+  vector \a v and the matrices \a a, \a b, \a c and \a d. From a
+  logical point of view, this function has the same effect as:
+
+  \code
+  return numeric::matmul (
+    numeric::matmul (
+      numeric::matmul ( numeric::matmul( v, a ), b ), c
+    ),
+    d
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  four.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \param d - a fourth matrix.
+
+  \pre <code>
+    LENGTH    == 4         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == d.size(0)
+  </code>
+
+  \return A reference to a vector containing the product of \a v, \a
+  a, \a b, \a c and \a d.
+
+*/
+
+  const Array<T>& matmul ( const Array<T>&    v,
+                           const Array<T,2>&  a,
+                           const Array<T,2>&  b,
+                           const Array<T,2>&  c,
+                           const Array<T,2>&  d );
+  
+
+//-----------------------------------------------------------------------
+//   matmul (vector * matrix * matrix * matrix * matrix * vector)
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the matrix product of two vectors and four matrices.
+
+  Returns a reference to a matrix containing the product of the vector
+  \a v, the matrices \a a, \a b, \a c and \a d, and the vector \a
+  w. From a logical point of view, this function has the same effect
+  as:
+
+  \code
+  return numeric::matmul (
+    numeric::matmul ( numeric::matmul( v, a ), b ),
+    numeric::matmul ( c, numeric::matmul( d, w ) )
+  );
+  \endcode
+
+  The returned reference is valid until this function is called again
+  or until this \c MatmulChain object is destroyed.
+
+  This function is only available if this matmul chain has length
+  four.
+
+  \param v - a (row) vector.
+
+  \param a - a matrix.
+  
+  \param b - a second matrix
+
+  \param c - a third matrix.
+
+  \param d - a fourth matrix.
+
+  \param w - a (column) vector.
+
+  \pre <code>
+    LENGTH    == 4         && <br>
+    v.size()  == a.size(0) && <br>
+    a.size(1) == b.size(0) && <br>
+    b.size(1) == c.size(0) && <br>
+    c.size(1) == d.size(0) && <br>
+    d.size(1) == w.size()
+  </code>
+
+  \return A reference to a matrix containing the product of \a v, \a
+  a, \a b, \a c, \a d and \a w.
+
+*/
+
+  const Array<T,2>& matmul ( const Array<T>&    v,
+                             const Array<T,2>&  a,
+                             const Array<T,2>&  b,
+                             const Array<T,2>&  c,
+                             const Array<T,2>&  d,
+                             const Array<T>&    w );
+
+};
+
+
+
+
+JEM_END_PACKAGE( numeric )

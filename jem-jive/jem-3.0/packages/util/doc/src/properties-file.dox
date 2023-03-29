@@ -1,0 +1,452 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+/*!
+
+  \page PropertiesFile Properties file format
+
+  A properties file is made up of a series of comments, include
+  statements, and property definition statements. Whitespace -- a
+  series of spaces, tabs and newlines -- is not significant.
+
+
+  \section PropertiesFileComments Comments
+
+  Comments come in two flavors: single-line comments and comment
+  blocks. A single-line comment starts with two slashes and ends at
+  the first newline character. A comment block starts with a
+  slash-star and ends with a star-slash. Comment blocks may contain
+  nested comment blocks. The file fragment below demonstrates the use
+  of different types of comments.
+
+  \verbatim
+
+  // This is a single line comment. Two slashes, //, or a
+  // slash-star, /*, have no special meaning in a single-line
+  // comment. 
+
+  /* This is a comment block. Two slashes, //, have no special
+     meaning inside a comment block. A slash-star starts a nested
+     comment block: /* this nested block must be properly terminated
+     by a star-slash */. The main comment block ends here. */
+
+  \endverbatim
+
+
+  \section PropertyIncludeStatements Include statements
+
+  A properties file may include another file by means an <em>include
+  statement</em>. Such a statements has the following format:
+
+  <code>include</code> <i>file</i> <code>;</code>
+
+  where <i>file</i> is a quoted string specifying the name of the file
+  to be included. The contents of that file are inserted into the
+  current properties file, right after the include statement. If
+  <i>file</i> is a relative file name, then the search for the file
+  starts from the directory containing the current properties file.
+
+  If the string <i>file</i> contains substitution directives, these
+  are expanded before the file is opened (provided that string
+  expansion is enabled). See the section \ref PropertyStringExpansion
+  for more information.
+
+  Note that support for include statements is controlled by the
+  constant <code>\link jem::util::Properties::PARSE_INCLUDE
+  Properties::PARSE_INCLUDE\endlink</code>.
+  
+
+  \section PropertyDefinitions Property definitions
+
+  A property definition has the following format:
+  
+  <i>name</i> <code>=</code> <i>value</i> <code>;</code>
+
+  The name of a property is either a simple name or a compound name. A
+  simple name starts with an alphabetic character or an underscore,
+  followed by an arbitrary number of alphanumeric characters and/or
+  underscores. A compound name consists of one or more simple names
+  separated by dots. Such a compound name refers to a property in a
+  nested properties set. If a compound name starts with a single dot,
+  it refers to a property in the root properties set; see the section
+  \ref NestedProperties for the details.
+
+  The value of a property can be a boolean, an integer, a floating
+  point number, a string, or a one-dimensional array containing
+  elements of these types. The value of a property can also be a
+  nested set of properties or a reference to another property.
+
+  The file fragment below shows a some property definitions. The
+  details are discussed in the following sections.
+
+  \verbatim
+
+  company   = "ACME Corp";
+  countries = [ "USA", "Mexico", "Cuba" ];
+  
+  finances  = {
+    revenues = 1.2e9;
+    costs    = 0.8e9;
+    taxes    = 0.2e9;
+  };
+  
+  people.management  = 125;
+  people.engineering = 814;
+  people.marketing   = 245;
+  people.sales       = people.marketing;
+
+  \endverbatim
+
+  
+  \section BooleanProperties Boolean properties
+
+  The value of a boolean property is specified by the words \c true
+  and \c false. Example:
+  
+  \verbatim
+  
+  displaySplashScreen = true;
+  enableExpertMenus   = false;
+  
+  \endverbatim
+ 
+  Note that case matters; words such as \c False and \c TRUE do
+  \em not specify a boolean value.
+
+  A boolean property has type \c bool in a C++ program.
+
+  
+  \section IntegerProperties Integer properties
+
+  The value of an integer property can be specified as a
+  decimal or hexadecimal number. The former consists of an
+  optional plus or minus sign, followed by one or more decimal digits.
+  The latter consists of the prefix \c 0x or \c 0X, followed by
+  one or more hexadecimal digits. Here is an example:
+  
+  \verbatim
+  
+  i =     123;
+  j =    -123;
+  k =  0xff11;
+  m =  0XFF11;
+  
+  \endverbatim
+  
+  An integer property has type \c int in a C++ program.
+
+  
+  \section FloatProperties Floating point properties
+
+  The value of a floating point property starts with an
+  optional plus or minus sign, followed by one or more decimal
+  digits, followed by a decimal point, followed by one or more
+  decimal digits. Optionally, it ends with an exponent: the
+  character \c e or \c E, followed by an optional plus or minus
+  sign, followed by one or more decimal digits. Here is an
+  example:
+  
+  \verbatim
+  
+  x =      1.0;
+  y =    -2.33;
+  z = +3.44e-8;
+
+  \endverbatim
+  
+  A floating point property has type \c double in a C++ program.
+  
+
+  \section StringProperties String properties
+
+  The value of a string property consists of a series of
+  characters and/or whitespace between two single quotes
+  <code>'</code> or two double quotes <code>"</code>.
+  A single-quoted string may contain double quotes, and the
+  other way around. Two strings separated by whitespace are
+  joined into a single string.
+  
+  Special characters can be entered by using an escape
+  escape sequence: a backslash followed by some other
+  character. The table below lists the available escape
+  sequences.
+  
+  <table>
+    <tr><td>Escape sequence<td>Resulting character
+    <tr><td><code>\\\\</code><td>backslash
+    <tr><td><code>\\n</code><td>newline
+    <tr><td><code>\\t</code><td>horizontal tab
+    <tr><td><code>\\v</code><td>vertical tab
+    <tr><td><code>\\b</code><td>backspace
+    <tr><td><code>\\f</code><td>form feed
+    <tr><td><code>\\r</code><td>carriage return
+    <tr><td><code>\\'</code><td>single quote
+    <tr><td><code>\\"</code><td>double quote
+  </table>
+  
+  In addition, a backslash followed by a space results in
+  space.
+  
+  A string may contain multiple newline characters. All 
+  whitespace after a newline character is discarded, except
+  when the newline character is preceded by a backslash.
+  In this case, the backslash-newline sequence is discarded
+  but all following whitespace is included in the string.
+  
+  Below is an example properties file containing some
+  string properties.
+  
+  \verbatim
+  
+  str1 = 'a single-quoted string';
+  str2 = "a double-quoted string";
+  str3 = "a string " "split in two";
+  str4 = "a string with a \t tab and a \n newline";
+  str5 = "a string spanning 
+          two lines";
+
+  \endverbatim
+
+  String properties may contain embedded substitution directives that
+  are expanded before the string is stored in a properties set. See
+  the section \ref PropertyStringExpansion for more information.
+  
+  A string property has type \c jem::String in a C++ program.
+  
+
+  \section ArrayProperties Array properties
+
+  The value of an array property is made up of a comma-separated list
+  of elements between an left bracket <code>[</code> and a right
+  bracket <code>]</code>. An array element can be a boolean values,
+  an integer number, a floating point number and a string. All array
+  elements must have the same type. An empty array -- that is, an
+  array without elements -- consists of only a left bracket followed
+  by a right bracket. Here is an example involving some array
+  properties:
+
+  \verbatim
+
+  a = [];                    // An empty array
+  b = [ true, false ];       // A boolean array
+  c = [ 1, -1,  3 ];         // An integer array
+  d = [ "hello", "world" ];  // A string array
+  e = [ 1.0, false, 2.0 ];   // Error: elements have mixed type
+
+  \endverbatim
+
+  Substitution directives embedded in the elements of a string array
+  are expanded in the same way as they are expanded in string
+  properties.
+
+  Array properties have type \c jem::Array<T> in a C++ program. The
+  template parameter \c T equals the type of the array elements. An
+  empty array is represented by an object reference that has value \c
+  NIL.
+
+
+  \section NestedProperties Nested properties
+
+  A nested set of properties is composed of a left brace
+  (<code>{</code>), followed by zero or more property definitions,
+  followed by a right brace (<code>}</code>). Here is an example:
+
+  \verbatim
+
+  displayOptions =
+  {
+    fontType     = "Times";
+    lineWidth    = 4;
+    antiAliasing = true;
+  };
+
+  \endverbatim
+
+  This file fragment defines a nested properties set named \c
+  displayOptions that contains the properties \c fontType, \c
+  lineWidth, and \c antiAliasing. 
+
+  Properties sets may be nested to any depth. The top-most set of
+  properties is called the <em>root set</em>.
+
+  Nested properties sets have type \c jem::util::Properties in a C++
+  program.
+
+
+  \section PropertyReferences Property references
+
+  If the value of a property is a property name, then the value of the
+  named property is assigned to the target property. This is best
+  explained with a simple example:
+
+  \verbatim
+
+  a = 10;
+  b = a;
+
+  \endverbatim
+
+  After reading this properties file, both properties \c a and \c b
+  will have the integer value \c 10.
+
+  The right-hand side property is looked up in the current set of
+  properties. If it can not be found, it is recursively looked up in
+  the enclosing properties set, until the root set is reached. If the
+  property can not be found in the root set, an error is generated.
+  In the case that the name of the right-hand side property starts
+  with a dot, the search for the property is limited to the root set.
+  Here is an example involving nested properties sets:
+
+  \verbatim
+
+  a =
+  {
+    a = 1;
+    b =
+    {
+      a = 2;
+    };
+    c =
+    {
+      d = 3;
+      e = d;
+      f = a;
+      g = b.a;
+      h = .a.b.a;
+    };
+  };
+
+  \endverbatim
+
+  These property definitions specify that the property
+  <code>a.c.e</code> should be assigned the value \c 3; that the
+  property <code>a.c.f</code> should be assigned the value \c 1; that
+  the property <code>a.c.g</code> should be assigned the value \c 2;
+  and that the property <code>a.c.h</code> should also be assigned the
+  value \c 2.
+
+  Note that poperties are assigned by value. This means that the
+  left-hand property and the right-hand property refer to different
+  objects. A consequence of this is that the left-hand property is not
+  affected by any later modifications to the right-hand property, and
+  the other way around. This is illustrated by the following example:
+
+  \verbatim
+
+  a =
+  {
+    x = 1.0;
+    y = 2.0;
+  };
+
+  b   = a;
+  b.x = 1.5;
+
+  \endverbatim
+
+  After reading this properties file, the property <code>a.x</code>
+  will be equal to \c 1.0, and the property <code>b.x</code> will be
+  equal to \c 1.5.
+
+
+  \section PropertyStringExpansion String expansions
+
+  A string may contain <em>substitution directives</em> that have the
+  following format:
+
+  <code>$(</code><i>name</i><code>)</code>
+
+  where <i>name</i> is either the name of an existing property, or the
+  name of a built-in command. Such a substitution directive is
+  replaced by the value of the referenced property or the output
+  produced by the built-in command. This is illustrated in the
+  following example:
+
+  \verbatim
+
+  strings =
+  {
+    hello = "Hello";
+  };
+
+  dialog  =
+  {
+    text  = "$(strings.hello) $(_USER_)!";
+  };
+
+  \endverbatim
+
+  Once this file has been parsed, the property
+  <code>dialog.text</code> will have the value <code>"Hello
+  mike!"</code> if the current user is named \c mike.
+
+  The following table lists the available built-in commands.
+
+  <table>
+
+    <tr><td>Name<td>Resulting string
+
+    <tr><td><code>_PATH_</code>
+        <td>the full path name of the current file
+
+    <tr><td><code>_FILE_</code>
+        <td>the name of the current file
+
+    <tr><td><code>_DIR_</code>
+        <td>the name of the directory containing the current file
+
+    <tr><td><code>_USER_</code>
+        <td>the name of the current user
+
+    <tr><td><code>_HOME_</code>
+        <td>the home directory of the current user
+
+    <tr><td><code>_HOST_</code>
+        <td>the name of the current computer
+
+    <tr><td><code>_TIME_</code>
+        <td>the current time
+
+    <tr><td><code>_DATE_</code>
+        <td>the current date
+  </table>
+
+  Because each \c $ character in a string is assumed to be the
+  beginning of a substitution directive, two consecutive \c $
+  characters must be used to obtain a single \c $ character in an
+  expanded string. Thus, the string <code>"\$\$(_DATE_)"</code> will
+  be expanded to the string <code>"\$(_DATE_)"</code>.
+
+  Note that string expansion must be enabled with the constant
+  <code>\link jem::util::Properties::PARSE_STRINGS
+  Properties::PARSE_STRINGS\endlink</code>.
+
+*/
+
+

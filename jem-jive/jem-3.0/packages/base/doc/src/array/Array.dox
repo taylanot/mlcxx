@@ -1,0 +1,1841 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE_BASE
+
+
+//=======================================================================
+//   class Array
+//=======================================================================
+
+/*!
+
+  \class Array Array.dox jem/base/array/Array.h
+
+  \brief Implements a multi-dimensional array that supports slicing
+  and array expressions.
+
+  The \c Array class represents a multi-dimensional array of
+  objects. It is a template class with two template parameters. The
+  first parameter, \a T, specifies the type of the objects stored in
+  the array. This type should define a default constructor and a copy
+  constructor. The second parameter, \a N, specifies the \em rank --
+  i.e. the number of dimensions -- of the array. At this time, arrays
+  up to rank four are supported. If the rank parameter is omitted, a
+  default value of one is assumed.
+
+  Each array has a \em shape : an integer \c Tuple of length equal to
+  the rank of the array. The elements of this \c Tuple specify the
+  sizes of the array in each dimension. For instance, a
+  three-dimensional array with shape <i>(10,3,5)</i> has size 10 in
+  the first dimension, size 3 in the second dimension and size 5 in
+  the third dimension.
+
+  The elements in an array are identified in the usual way by a set of
+  integer indices ranging from zero to the corresponding array size
+  minus one. Thus, the index pair <i>(1,0)</i> identifies the second
+  element in the first column of a two-dimensional array.
+
+  An array stores its elements in a data block that may be shared with
+  one or more other arrays. As a consequence, multiple arrays may
+  provide different views to parts of the same data. For instance, a
+  one-dimensional array may provide access to one column of a
+  two-dimensional array. Another consequence of the shared storage
+  scheme is that the elements of an array may be modified by modifying
+  the elements of another array. In most cases this is the behavior
+  one would expect, but in some cases it may lead to unexpected
+  results. One should therefore always be aware that multiple arrays
+  may share the same data.
+
+  The \c Array class provides a set of overloaded subscript and
+  function-call operators that can be used to access the elements of
+  an array. The \c Array class also provides a set of member functions
+  that provide direct access to the data block pointed to by an
+  array. Although one is advised to avoid these functions, they can be
+  useful in the case that you need to pass the contents of an array to
+  a function that expects a standard C/C++ array. They can also be
+  useful to write optimized code sections that avoid redundant index
+  calculations.
+
+  More information on using the \c Array class is provided in the
+  following sections:
+
+  \li \ref ArraySlices - how to select regular sections of an
+  array.
+
+  \li \ref ArraySelections - how to select non-regular sections of an
+  array.
+
+  \li \ref ArrayExpressions - how to perform complex operations
+  using simple array expressions.
+
+  \li \ref ArrayAssignmentOperators - additional assignment operators
+  that are not member functions of the \c Array class.
+
+  \li \ref ArrayUtilities - a collection of handy functions that
+  operate on arrays.
+
+  \li \ref ArrayHeaders - which header files should be included
+  into your source files.
+
+  \note The \c Array class uses a non-thread safe reference countaing
+  scheme for sharing data blocks. This means that you should be very
+  careful when using concurrent threads that manipulate the same array
+  data block. The best way to avoid disastrous race conditions is not
+  to share arrays between threads.
+
+  \note The \c Array class actually has three template arguments. The
+  third argument -- which by default equals the class \c Nil -- is
+  used to implement \ref ArrayExpressions "array expressions" and is
+  normally not visible to users of the \c Array class.
+
+  \note %All the subscript operators of the \c Array class return
+  non-const references even though the operators are declared as a
+  const member functions. The reason is that multiple arrays may point
+  to the same data block. Consequently, one could easily modify the
+  elements of a const \c Array through a non-const \c Array that
+  points to the same data block.
+
+  \sa \c ArrayExpr.
+
+*/
+
+template <class T, int N>
+  class Array
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A type representing the shape of an array.
+
+  The \c Shape type represents the shape of an array. It is an alias
+  for \c Tuple<int,N>.
+
+*/
+
+  typedef Tuple<int,N> Shape;
+
+
+/*!
+
+  \brief Array iterator type.
+
+  An iterator type pointing to elements of type \a T. This iterator
+  type fulfills the requirements of the bi-directional iterator
+  category of the standard C++ library. If the array rank \a N equals
+  one, the iterator type fulfills the requirements of the
+  random access iterator category of the standard C++ library.
+
+  An iterator of a multi-dimensional array traverses that array in
+  column-major order. That is, the array index in the first dimension
+  varies fastest while the array index in the last dimension varies
+  slowest.
+
+*/
+
+  typedef ArrayIterator<T,N> Iterator;
+
+
+/*!
+
+  \brief Read-only iterator type.
+
+  This is an alias for the \c Iterator type. The \c Array class does
+  not provide a separate read-only iterator type since multiple arrays
+  may share the same data. Thus, one can easily modify the elements of
+  an array even if that array is declared constant.
+
+*/
+
+  typedef Iterator ConstIterator;
+
+
+//-----------------------------------------------------------------------
+//   static data members
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The rank of the \c Array class.
+
+  \c RANK specifies the rank of the \c Array class. It is an integer
+  constant equal to the second template parameter \a N.
+
+*/
+
+  static const int RANK = N;
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Creates an empty array.
+
+  Creates an empty array.
+
+  \post <code>sum( abs( shape() ) ) == 0</code>
+
+*/
+
+  Array ();
+
+
+/*!
+
+  \brief Creates a one-dimensional array of a given length.
+
+  Creates a one-dimensional array with length \a n. The elements of
+  the array are initialized by the default constructor of type \a T.
+
+  \param n - an integer specifying the length of the array.
+
+  \pre
+    <code>
+      RANK == 1 && <br>
+      n >= 0
+    </code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    this->size() == n && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  explicit Array ( int n );
+
+
+/*!
+
+  \brief Creates a two-dimensional array with a given shape.
+
+  Creates a two-dimensional array with shape <i>(m,n)</i>. The
+  elements of the array are initialized by the default constructor
+  of type \a T.
+
+  \param m - an integer specifying the size of the array in the first
+  dimension.
+
+  \param n - an integer specifying the size of the array in the second
+  dimension.
+
+  \pre
+    <code>
+      RANK == 2 && <br>
+      m >= 0 && <br>
+      n >= 0
+    </code> <br>
+    and the type \a T has a default constructor.
+  
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  Array ( int n, int m );
+
+
+/*!
+
+  \brief Creates a three-dimensional array with a given shape.
+
+  Creates a three-dimensional array with shape <i>(m,n,p)</i>. The
+  elements of the array are initialized by the default constructor
+  of type \a T.
+
+  \param m - an integer specifying the size of the array in the first
+  dimension.
+
+  \param n - an integer specifying the size of the array in the second
+  dimension.
+  
+  \param p - an integer specifying the size of the array in the third
+  dimension.
+
+  \pre
+    <code>
+      RANK == 3 && <br>
+      m >= 0 && <br>
+      n >= 0 && <br>
+      p >= 0
+    </code> <br>
+    and the type \a T has a default constructor.
+  
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  Array ( int n, int m, int p );
+
+
+/*!
+
+  \brief Creates a four-dimensional array with a given shape.
+
+  Creates a four-dimensional array with shape <i>(m,n,p,q)</i>. The
+  elements of the array are initialized by the default constructor of
+  type \a T.
+
+  \param m - an integer specifying the size of the array in the first
+  dimension.
+
+  \param n - an integer specifying the size of the array in the second
+  dimension.
+  
+  \param p - an integer specifying the size of the array in the third
+  dimension.
+
+  \param q - an integer specifying the size of the array in the fourth
+  dimension.
+
+  \pre
+    <code>
+      RANK == 4 && <br>
+      m >= 0 && <br>
+      n >= 0 && <br>
+      p >= 0 && <br>
+      q >= 0
+    </code> <br>
+    and the type \a T has a default constructor.
+  
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p && <br>
+    this->size(3) == q && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  Array ( int n, int m, int p, int q );
+
+
+/*!
+
+  \brief Creates an array with a given shape.
+
+  Creates an \a N-dimensional array with shape \a sh. The elements of
+  the array are initialized by the default constructor of type \a T.
+
+  \param sh - the shape of the array.
+
+  \pre
+    <code>min(sh) >= 0</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    equal( this->shape(), sh ) && </code> <br>
+    <code>this->isContiguous()
+  </code>
+
+  \sa \c jem::shape().
+
+*/
+
+  explicit Array ( const Shape& sh );
+
+
+/*!
+
+  \brief Creates a shallow copy of another array.
+
+  The copy constructor of the \c Array class creates a \em shallow
+  copy of the \a rhs array. This means that the newly created array
+  points to the same data block as the original array. Any
+  modifications in the new array will therefore be visible in the
+  original array, and the other way around.
+
+  Because of the shallow copy semantics, returning an array from a
+  function is a relatively cheap operation.
+
+  \param rhs - an \c Array object.
+
+*/
+
+  Array ( const Array& rhs );
+
+
+/*!
+
+  \brief Creates a new array given an array expression.
+
+  Constructs an array from the array expression \a rhs. In contrast to
+  the copy constructor, this constructor has deep copy semantics. This
+  means that the new array does not share its data with the array
+  expression.
+
+  The newly created array has the same shape as the \a rhs array
+  expression.
+
+  \param rhs - an \ref ArrayExpressions "array expression".
+
+  \post <code>
+    equal( this->shape(), rhs.shape() ) && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  Array ( const ArrayExpr<T,N>& rhs );
+
+
+/*!
+  \brief Creates an array given two input iterators.
+
+  Constructs a one-dimensional array containing copies of the elements
+  between the input iterators \a first and \a last. The elements are
+  copied by calling the copy constructor of type \a T.
+
+  \param first - an input iterator pointing to the first element to be
+  copied into the new array.
+
+  \param last - an input iterator pointing one position past the last
+  element to be copied into this array.
+
+  \pre
+    <code>RANK == 1</code> <br>
+    and the type \a T has a copy constructor, <br>
+    and the input iterator \a last is reachable from \a first.
+
+  \post <code>
+    this->size() == std::distance( first, last ) && <br>
+    this->isContiguous()
+  </code>
+
+*/
+
+  template <class InputIterator>
+    Array ( InputIterator first,
+            InputIterator last );
+
+
+//-----------------------------------------------------------------------
+//   destructor
+//-----------------------------------------------------------------------
+
+/*!
+  \fn Array::~Array ()
+
+  \brief Deallocates memory if necessary.
+
+  The destructor of the \c Array class will deallocate the data block
+  this array is pointing to if no other arrays are pointing to the
+  same data block.
+
+*/
+
+  ~Array ();
+
+//-----------------------------------------------------------------------
+//   assignment operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Copies the contents of another array.
+  
+  Copies the elements of the \a rhs array into this array. To be
+  precise, the elements of the \a rhs array are copied into the data
+  block this array is pointing to. The memory areas pointed to by the
+  \a rhs array and this array should not overlap.
+
+  The elements are copied by calling the assignment operator of type
+  \a T.
+
+  \param rhs - the array to be copied.
+
+  \return <code>*this</code>
+
+  \pre
+    <code>equals( this->shape(), rhs.shape() )</code> <br>
+    and the type \a T has an assignment operator.
+
+  \note In contrast to the copy constructor, the assignment operator
+  of the \c Array class has deep copy semantics.
+
+  \sa \ref ArrayAssignmentOperators.
+
+*/
+                  
+  const Array& operator = ( const Array& rhs ) const;
+
+
+/*!
+
+  \brief Sets all elements of this array to the same value.
+
+  Assigns all elements of this array the value \a rhs by calling the
+  assignment operator of type \a T.
+
+  \param rhs - the value to be copied.
+
+  \return <code>*this</code>
+
+  \pre The type \a T has an assignment operator.
+
+  \sa \ref ArrayAssignmentOperators.
+
+*/
+
+  const Array& operator = ( T rhs ) const;
+
+
+/*!
+
+  \brief Assigns an array expression to this array.
+
+  Copies the elements of the array expression \a rhs into this
+  array. To be precise, the elements of the \a rhs array expression
+  are copied into the data block this array is pointing to.
+
+  The elements are copied by calling the assignment operator of type \a T.
+
+  \param rhs - an \ref ArrayExpressions "array expression".
+
+  \return <code>*this</code>
+
+  \pre
+    <code>equal( this->shape(), rhs.shape() )</code> <br>
+    and the type \a T has an assignment operator.
+
+  \sa \ref ArrayAssignmentOperators.
+
+*/
+
+  const Array& operator = ( const ArrayExpr<T,N>& rhs ) const;
+
+
+//-----------------------------------------------------------------------
+//   begin
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the begin of this array.
+
+  Returns an iterator pointing to the first element in this array, or
+  \c end() if this array is empty. The iterator is valid as long as
+  the data block pointed to by this array is not deallocated.
+
+  \return An iterator pointing to the first element in this array, or
+  <code>end()</code> if the array is empty.
+
+*/
+
+  Iterator begin () const;
+
+
+//-----------------------------------------------------------------------
+//   end
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an iterator pointing to the end of this array.
+
+  Returns an iterator pointing one position past the last element in
+  this array. The iterator is valid as long as the data block pointed
+  to by this array is not deallocated.
+  
+  \return An iterator pointing one position past the last element in
+  this array.
+
+*/
+
+  Iterator end () const;
+  
+
+//-----------------------------------------------------------------------
+//   front
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the first element in an array.
+
+  Returns a reference to the first element in a one-dimensional
+  array. This reference is valid as long as the data block pointed to
+  by this array is not deallocated.
+
+  \return A reference to the first element in this array:
+  <code>(*this)[0]</code>.
+
+  \pre <code>
+    RANK == 1 && <br>
+    this->size() > 0
+  </code>
+  
+*/
+  
+  T& front () const;
+
+
+//-----------------------------------------------------------------------
+//   back
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the last element in an array.
+
+  Returns a reference to the last element in a one-dimensional
+  array. This reference is valid as long as the data block pointed to
+  by this array is not deallocated.
+
+  \return A reference to the last element in this array:
+  <code>(*this)[ size() - 1 ]</code>.
+  
+  \pre <code>
+    RANK == 1 && <br>
+    this->size() > 0
+  </code>
+
+*/
+
+  T& back () const;
+
+
+//-----------------------------------------------------------------------
+//   clone
+//-----------------------------------------------------------------------      
+
+/*!
+
+  \brief Creates a deep copy of this array.
+
+  Returns a deep copy of this array. That is, the returned array
+  contains copies of the elements in this array. The returned array is
+  guaranteed to be contiguous. In other words:
+
+  <code>clone().isContiguous() == true</code>.
+
+  \return A deep copy of this array.
+
+  \sa \c isContiguous().
+
+*/
+
+  Array clone () const;
+
+
+//-----------------------------------------------------------------------
+//   ref
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Shallow assignment of another array.
+
+  After calling the \c ref member function, this array will point to
+  the same data block as the \a rhs array. Consequently, any
+  modifications to this array will be visible in the \a rhs array, and
+  the other way around.
+
+  \param rhs - an array of the same rank as this array.
+
+  \post <code>
+    equals( this->shape(), rhs.shape() ) && <br>
+    this->addr() == rhs.addr()
+  </code>
+
+*/
+
+  void ref ( const Array& rhs );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+ 
+/*!
+
+  \brief Swaps the data blocks of two arrays.
+
+  Swaps the data blocks and shapes of this array and the \a rhs
+  array. Thus, after calling the member \c swap, this array has the
+  shape of the \a rhs array and points to the data block of that
+  array. Conversely, the \a rhs array has the shape of this array and
+  points to the data block of this array.
+
+  \param rhs - an array of the same rank as this array.
+
+*/
+
+  void swap ( Array& rhs );
+
+
+//-----------------------------------------------------------------------
+//   subscript operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the element located at a given index.
+
+  Returns a reference to the \a i-th element of a one-dimensional
+  array. This reference is valid as long as the data block pointed to
+  by this array is not deallocated.
+
+  \param i - a valid array index.
+
+  \return <code>addr()[ i * stride() ]</code>
+
+  \pre <code>
+    RANK == 1 && <br>
+    i >= 0 && i < this->size()
+  </code>
+
+*/
+  
+  inline T& operator [] ( int i ) const;
+
+
+/*!
+
+  \brief Returns a one-dimensional slice of this array.
+
+  Returns a one-dimensional \c Array object that refers to a section
+  of this array. This operator is only supported by one-dimensional
+  arrays.
+
+  \param s - a \c Slice instance or an instance of a class derived
+  from \c Slice.
+
+  \return A slice of this array.
+
+  \pre <code>RANK == 1</code>
+
+  \sa \ref ArraySlices.
+
+*/
+
+  template <class S>
+    Array operator [] ( const S& s ) const;
+
+
+/*!
+
+  \brief Returns the element located at a given index pair.
+
+  Returns a reference to the element <i>(i,j)</i> of a two-dimensional
+  array. The reference is valid as long as the data block pointed to
+  by this array is not deallocated.
+
+  \param i - a valid array index in the first dimension.
+
+  \param j - a valid array index in the second dimension.
+
+  \return <code>addr()[ i * stride(0) + j * stride(1) ]</code>
+
+  \pre <code>
+    RANK == 2 && <br>
+    i >= 0 && i < this->size(0) && <br>
+    j >= 0 && j < this->size(1)
+  </code>
+
+*/
+
+  inline T& operator () ( int i, int j ) const;
+
+
+/*!
+
+  \brief Returns the element located at a given index tuple.
+
+  Returns a reference to the element <i>(i,j,k)</i> of a
+  three-dimensional array. This reference is valid as long as the data
+  block pointed to by this array is not deallocated.
+
+  \param i - a valid array index in the first dimension.
+
+  \param j - a valid array index in the second dimension.
+
+  \param k - a valid array index in the third dimension.
+
+  \return <code>addr()[ i * stride(0) + j * stride(1) + k * stride(2)
+  ]</code>
+
+  \pre <code>
+    RANK == 3 && <br>
+    i >= 0 && i < this->size(0) && <br>
+    j >= 0 && j < this->size(1) && <br>
+    k >= 0 && k < this->size(2)
+  </code>
+
+*/
+
+  inline T& operator () ( int i, int j, int k ) const;
+
+
+/*!
+
+  \brief Returns the element located at a given index tuple.
+
+  Returns a reference to the element <i>(i,j,k,p)</i> of a
+  four-dimensional array. This reference is valid as long as the data
+  block pointed to by this array is not deallocated.
+
+  \param i - a valid array index in the first dimension.
+
+  \param j - a valid array index in the second dimension.
+
+  \param k - a valid array index in the third dimension.
+
+  \param p - a valid array index in the fourth dimension.
+
+  \return <code>addr()[ i * stride(0) + j * stride(1) +
+                        k * stride(2) + p * stride(3) ]</code>
+
+  \pre <code>
+    RANK == 4 && <br>
+    i >= 0 && i < this->size(0) && <br>
+    j >= 0 && j < this->size(1) && <br>
+    k >= 0 && k < this->size(2) && <br>
+    p >= 0 && p < this->size(3)
+  </code>
+
+*/
+
+  inline T& operator () ( int i, int j, int k, int p  ) const;
+
+
+/*!
+
+  \brief Returns a slice of a two-dimensional array.
+
+  Returns a one-dimensional or two-dimensional \c Array object that
+  refers to a rectangular section of this two-dimensional array. The
+  returned array points to the same data block as this array.
+
+  Note that the return type \c ArraySlice is a dummy type; depending
+  on the types of the template parameters \a S1 and \a S2, \c
+  ArraySlice is either equal to \c Array<T,1> or \c Array<T,2>.
+
+  \param I - a \c Slice or a valid integer index in the first
+  dimension
+
+  \param J - a \c Slice or a valid integer index in the second
+  dimension.
+
+  \return A rectangular slice of this two-dimensional array.
+
+  \pre
+    <code>RANK == 2</code> <br>
+    and if \a I is an integer:
+    <code>I >= 0 && I < this->size(0)</code>; <br>
+    and if \a J is an integer:
+    <code>J >= 0 && J < this->size(1)</code>.
+
+  \sa \ref ArraySlices.
+
+*/
+
+  template <class S1, class S2>
+    inline ArraySlice
+    operator () ( const S1& I, const S2& J ) const;
+
+
+/*!
+
+  \brief Returns a slice of a three-dimensional array.
+
+  Returns a one-dimensional, two-dimensional or three-dimensional \c
+  Array object that refers to a rectangular section of this
+  three-dimensional array. The returned array points to the same data
+  block as this array.
+
+  Note that the return type \c ArraySlice is a dummy type; depending
+  on the types of the template parameters \a S1 and \a S2, \c
+  ArraySlice is either equal to \c Array<T,1>, \c Array<T,2>, or \c
+  Array<T,3>.
+
+  \param I - a \c Slice or a valid integer index in the first
+  dimension.
+
+  \param J - a \c Slice or a valid integer index in the second
+  dimension.
+
+  \param K - a \c Slice or a valid integer index in the third
+  dimension.
+
+  \return A rectangular slice of this three-dimensional array.
+
+  \pre
+    <code>RANK == 3</code> <br>
+    and if \a I is an integer:
+    <code>I >= 0 && I < this->size(0)</code>; <br>
+    and if \a J is an integer:
+    <code>J >= 0 && J < this->size(1)</code>; <br>
+    and if \a K is an integer:
+    <code>K >= 0 && K < this->size(2)</code>.
+
+
+  \sa \ref ArraySlices.
+
+*/
+
+  template <class S1, class S2, class S3>
+    inline ArraySlice
+    operator () ( const S1& I, const S2& J, const S3& K ) const;
+
+
+/*!
+
+  \brief Returns a slice of a four-dimensional array.
+
+  Returns a one-dimensional, two-dimensional, three-dimensional, or
+  four-dimensional \c Array object that refers to a rectangular
+  section of this four-dimensional array. The returned array points
+  to the same data block as this array.
+
+  Note that the return type \c ArraySlice is a dummy type; depending
+  on the types of the template parameters \a S1 and \a S2, \c
+  ArraySlice is either equal to \c Array<T,1>, \c Array<T,2>, \c
+  Array<T,3>, \c Array<T,4>.
+
+  \param I - a \c Slice or a valid integer index in the first
+  dimension.
+
+  \param J - a \c Slice or a valid integer index in the second
+  dimension.
+
+  \param K - a \c Slice or a valid integer index in the third
+  dimension.
+
+  \param L - a \c Slice or a valid integer index in the fourth
+  dimension.
+
+  \return A rectangular slice of this four-dimensional array.
+
+  \pre
+    <code>RANK == 4</code> <br>
+    and if \a I is an integer:
+    <code>I >= 0 && I < this->size(0)</code>; <br>
+    and if \a J is an integer:
+    <code>J >= 0 && J < this->size(1)</code>; <br>
+    and if \a K is an integer:
+    <code>K >= 0 && K < this->size(2)</code>; <br>
+    and if \a L is an integer:
+    <code>L >= 0 && L < this->size(3)</code>.<br>
+
+
+  \sa \ref ArraySlices.
+
+*/
+
+  template <class S1, class S2, class S3, class S4>
+    inline ArraySlice
+    operator () ( const S1& I, const S2& J,
+                  const S3& K, const S4& L ) const;
+
+
+//-----------------------------------------------------------------------
+//   transpose
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief Returns the transpose of this array.
+
+  Returns a view of this array with reversed dimensions. That is, the
+  first dimension of the returned array corresponds with the last
+  dimension of this array; the second dimension of the returned array
+  correponds with the second to last dimension of this array; etc.
+  The returned array points to the same data block as this array; any
+  modifications to the returned array are therefore also visible in
+  this array.
+
+  Here is an example:
+
+  \code
+
+  Array<int,3> a ( 3, 4, 5 );
+  Array<int,3> b ( a.transpose() );
+
+  b        = 0;
+  b(0,1,2) = 1;
+  b(1,2,3) = 1;
+
+  \endcode
+
+  After executing these statements, all elements of \c a are zero,
+  except for the elements \c a(2,1,0) and \c a(3,2,1).
+
+  This function is equivalent with:
+
+  \code
+
+  Tuple<int,N> perm;
+  int          i;
+
+  for ( i = 0; i < N; i++ )
+  {
+    perm[i] = N - i - 1;
+  }
+
+  return this->transpose ( perm );
+
+  \endcode
+  
+  \return The transpose of this array.
+
+*/
+
+  inline Array transpose () const;
+
+
+/*!
+
+  \brief Returns a generalized transpose of this array.
+
+  Returns the generalized transpose of this array. The transposed
+  array contains the same elements as this array, but its dimensions
+  have been permuted according to the \c Tuple \a perm. To be precise,
+  dimension 0 of the transposed array corresponds with dimension
+  <code>perm[0]</code> of this array; dimension 1 of the transposed
+  array corresponds with dimension <code>perm[1]</code> of this array;
+  etc.
+
+  Example:
+
+  \code
+  Array<int,3> a ( 2, 2, 2   );
+  Array<int,3> b ( a.shape() );
+  Array<int,3> c ( a.shape() );
+
+  b = a.transpose ( makeTuple( 1, 0, 2 ) );
+  c = a.transpose ( makeTuple( 2, 1, 0 ) );
+  \endcode
+
+  After executing this code fragment, the following expressions will
+  be true for all valid index tuples <i>(i j,k)</i>:
+
+  \code
+  b(j,i,k) == a(i,j,k);
+  c(k,j,i) == a(i,j,k);
+  \endcode
+
+  Note that the transposed array points to the same data block as this
+  array; all modifications to the transposed array will therefore be
+  visible in this array.
+  
+  \param perm - a permutation \c Tuple specifying how the dimensions
+  of the transposed array are related to the dimensions of this array.
+
+  \return The generalized transpose of this array.
+
+  \pre <code>RANK > 1</code>
+
+*/
+
+  inline Array transpose ( const Tuple<int,N>& perm ) const;
+
+
+//-----------------------------------------------------------------------
+//   getFast
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Direct data access.
+
+  Returns a reference to the \a i-th element stored in the part of the
+  data block that this array is pointing to. The reference is valid as
+  long as the data block pointed to by this array is not deallocated.
+
+  \param i - a valid index.
+
+  \return <code>addr()[i]</code>
+
+*/
+
+  inline T& getFast ( int i ) const;
+
+
+//-----------------------------------------------------------------------
+//   isContiguous
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether this array is contiguous.
+
+  Tests whether the elements of this array are stored contiguously in
+  memory. A one-dimensional array is contiguous if its stride equals
+  one.  A multi-dimensional array is contiguous if the following two
+  conditions are fulfilled:
+
+  -# <code>stride(0) == 1</code>;
+  -# <code>stride(i) == size(i - 1) * stride(i - 1)</code>.
+
+  for all <i>0 < i < N</i>.
+
+  Note that a two-dimensional array is contiguous if its elements are
+  stored contiguously in \em column-major order. Also note that the
+  elements of a contiguous array are stored in the same way as the
+  elements of a Fortran-77 array.
+
+  \return \c true if the elements of this array are stored
+  contiguously in memory, and \c false otherwise.
+
+*/
+
+  inline bool isContiguous () const;
+
+
+//-----------------------------------------------------------------------
+//   resize
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Modifies the size of a one-dimensional array.
+
+  Sets the size of this one-dimensional array to \a m. Calling this
+  function has the same effect as:
+  
+  <code>this->resize ( shape(m) )</code>
+
+  \param m -- the new size of this array.
+
+  \pre <code>
+    RANK == 1 && <br>
+    m >= 0
+  </code>
+
+  \post <code>this->size() == m</code>
+
+  \sa <code>resize ( const Shape& )</code>
+
+*/
+
+  void resize ( int m );
+  
+
+/*!
+
+  \brief Modifies the shape of a two-dimensional array.
+
+  Sets the shape of this two-dimensional array to
+  <i>(m,n)</i>. Calling this function has the same effect as:
+  
+  <code>this->resize ( shape( m, n ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+
+  \pre <code>
+    RANK == 2 && <br>
+    m    >= 0 && n >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n
+  </code>
+
+  \sa <code>resize ( const Shape& )</code>
+
+*/
+
+  void resize ( int m, int n );
+
+
+/*!
+
+  \brief Modifies the shape of a three-dimensional array.
+
+  Sets the shape of this three-dimensional array to
+  <i>(m,n,p)</i>. Calling this function has the same effect as:
+  
+  <code>this->resize ( shape( m, n, p ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+  \param p - the new array size in the third dimension.
+
+  \pre <code>
+    RANK == 3 && <br>
+    m    >= 0 && n >= 0 && p >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p
+  </code>
+
+  \sa <code>resize ( const Shape& )</code>
+
+*/
+
+  inline void resize ( int m, int n, int p );
+
+
+/*!
+
+  \brief Modifies the shape of a four-dimensional array.
+
+  Sets the shape of this four-dimensional array to
+  <i>(m,n,p,q)</i>. Calling this function has the same effect as:
+  
+  <code>this->resize ( shape( m, n, p, q ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+  \param p - the new array size in the third dimension.
+  \param q - the new array size in the fourth dimension.
+
+  \pre <code>
+    RANK == 4 && <br>
+    m    >= 0 && n >= 0 && p >= 0 && q >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p && <br>
+    this->size(3) == q
+  </code>
+
+  \sa <code>resize ( const Shape& )</code>
+
+*/
+
+  inline void resize ( int m, int n, int p, int q );
+
+
+/*!
+
+  \brief Modifies the shape of an array.
+
+  Sets the shape of this array to \a sh. From a logical point of view,
+  calling this function has the same effect as executing the following
+  statement:
+
+  <code>this->ref ( Array<T,N>( sh ) )</code>
+
+  However, there are two subtle differences between the \c resize
+  function and the above statement. First, the \c resize function will
+  re-use the data block this array is pointing to, provided that the
+  block is large enough and that the block is not shared with another
+  array. Consequently, the \c resize function can be significantly
+  faster than the above statement. The second difference is that the
+  \c resize function may not immediately call the destructor of the
+  array elements that are no longer used (the destructor will be
+  called eventually when the data block of the array is
+  deallocated). This means that you should be careful when calling the
+  resize function for an array containing elements with a non-trivial
+  destructor.
+
+  The \c resize function does \em not preserve the contents of an
+  array. That is, after calling the \c resize function you should not
+  make any assumptions about the values of the array elements. Use the
+  member function \c reshape if you want to modify the shape of an
+  array and also preserve its contents.
+
+  An array is guaranteed to be contiguous after calling its \c resize
+  member function.
+  
+  \param sh - the new shape of this array.
+
+  \pre <code>min( sh ) >= 0</code>
+
+  \post <code>
+    equal( this->shape(), sh ) && <br>
+    this->isContiguous()
+  </code>
+
+  \sa <code>reshape( const Shape& )</code>
+
+*/
+
+  void resize ( const Shape& sh );
+
+
+//-----------------------------------------------------------------------
+//   reshape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Shrinks or expands a one-dimensional array.
+
+  Shrinks or expands this one-dimensional array so that its size
+  becomes \a m. Calling this function has the same effect as:
+  
+  <code>this->reshape ( shape(m) )</code>
+
+  \param m -- the new size of this array.
+
+  \pre <code>
+    RANK == 1 && <br>
+    m >= 0
+  </code>
+
+  \post <code>this->size() == m</code>
+
+  \sa <code>reshape ( const Shape& )</code>
+
+*/
+
+  void reshape ( int m );
+  
+
+/*!
+
+  \brief Shrinks or expands a two-dimensional array.
+
+  Shrinks or expands this two-dimensional array so that its shape
+  becomes <i>(m,n)</i>. Calling this function has the same effect as:
+  
+  <code>this->reshape ( shape( m, n ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+
+  \pre <code>
+    RANK == 2 && <br>
+    m    >= 0 && n >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n
+  </code>
+
+  \sa <code>reshape ( const Shape& )</code>
+
+*/
+
+  void reshape ( int m, int n );
+
+
+/*!
+
+  \brief Shrinks or expands a three-dimensional array.
+
+  Shrinks or expands this three-dimensional array so that its shape
+  becomes <i>(m,n,p)</i>. Calling this function has the same effect
+  as:
+  
+  <code>this->reshape ( shape( m, n, p ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+  \param p - the new array size in the third dimension.
+
+  \pre <code>
+    RANK == 3 && <br>
+    m    >= 0 && n >= 0 && p >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p
+  </code>
+
+  \sa <code>reshape ( const Shape& )</code>
+
+*/
+
+  inline void reshape ( int m, int n, int p );
+
+
+/*!
+
+  \brief Shrinks or expands a four-dimensional array.
+
+  Shrinks or expands this four-dimensional array so that its shape
+  becomes <i>(m,n,p,q)</i>. Calling this function has the same effect
+  as:
+  
+  <code>this->reshape ( shape( m, n, p, q ) )</code>
+
+  \param m - the new array size in the first dimension.
+  \param n - the new array size in the second dimension.
+  \param p - the new array size in the third dimension.
+  \param q - the new array size in the fourth dimension.
+
+  \pre <code>
+    RANK == 4 && <br>
+    m    >= 0 && n >= 0 && p >= 0 && q >= 0
+  </code>
+
+  \post <code>
+    this->size(0) == m && <br>
+    this->size(1) == n && <br>
+    this->size(2) == p && <br>
+    this->size(3) == q
+  </code>
+
+  \sa <code>reshape ( const Shape& )</code>
+
+*/
+
+  inline void reshape ( int m, int n, int p, int q );
+
+
+/*!
+
+  \brief Shrinks or expands an array.
+
+  Shrinks or expands this array so that its shape becomes \a sh. All
+  elements of this array that are located within the shape \a sh are
+  preserved. Any additional elements are initialized by calling the
+  default constructor of type \c T. All elements within this array
+  that are not located within the shape \a sh are destroyed by calling
+  the destructor of type \c T.
+
+  If this array does not share its data with another array, the \c
+  reshape function will try to expand or shrink its current data
+  block. If that is not possible, or if the data block is shared with
+  another array, the \c reshape function will allocate a new data
+  block and copy the current array elements to that new block. To be
+  precise, it only copies the elements that are located within the
+  shape \a sh to the new block.
+
+  An array is guaranteed to be contiguous after calling its \c reshape
+  member function.
+  
+  \param sh - the new shape of this array.
+
+  \pre <code>min( sh ) >= 0</code>
+
+  \post <code>
+    equal( this->shape(), sh ) && <br>
+    this->isContiguous()
+  </code>
+
+  \sa <code>resize( const Shape& )</code>
+
+*/
+
+  void reshape ( const Shape& sh );
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of a one-dimensional array.
+
+  Returns the number of elements stored in this one-dimensional array.
+
+  \return The length of this array.
+
+  \pre <code>RANK == 1</code>
+
+*/
+
+  inline int size () const;
+
+
+/*!
+
+  \brief Returns one of the sizes of an array.
+
+  Returns the size of this array in the dimension \a dim. For
+  instance, if \c a is a two-dimensional array, then
+  <code>a.size(0)</code> equals the number of rows, while
+  <code>a.size(1)</code> equals the number of columns.
+
+  \param dim - a dimension index.
+
+  \return <code>this->shape()[dim]</code>
+
+  \pre <code>
+    dim >= 0 && dim < N
+  </code>
+
+*/
+
+  inline int size ( int dim ) const;
+
+
+//-----------------------------------------------------------------------
+//   stride
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the stride of a one-dimensional array.
+
+  Returns the stride of this one-dimensional array. The stride
+  specifies how far apart the elements of this array are stored in
+  memory. If the stride equals one, then all elements are stored
+  contiguously in memory. In this case, the array is said to be contiguous.
+
+  You will probably need this function if you want to access the
+  elements of a one-dimensional array directly.
+
+  \return The stride of this array.
+
+  \pre <code>RANK == 1</code>
+
+  \sa \c isContigous().
+
+*/
+
+  inline int stride () const;
+
+
+/*!
+  
+  \brief Returns one of the strides of an array.
+
+  Returns the stride of this array in the dimension \a dim. This
+  stride specifies the distance (in terms of memory addresses) between
+  two consecutive elements in the dimension \a dim.
+
+  You will probably need this function if you want to access the
+  elements of an array directly.
+
+  \param dim - the dimension index.
+
+  \return The stride of this array in the dimension \a dim.
+
+  \pre <code>
+    dim >= 0 && dim < N
+  </code>
+
+  \sa \c isContigous().
+
+*/
+
+  inline int stride ( int dim ) const;
+
+
+//-----------------------------------------------------------------------
+//   shape
+//-----------------------------------------------------------------------
+ 
+/*!
+
+  \brief Returns the shape of this array.
+
+  Returns a tuple of length \a N containing the sizes of this array in
+  all its dimensions. For instance, if this is a two-dimensional array
+  with five rows and seven columns, then the function \c shape returns
+  a tuple containing the values <i>(5,7)</i>.
+
+  \return The shape of this array.
+
+*/
+
+  inline Shape shape  () const;
+
+
+//-----------------------------------------------------------------------
+//   addr
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief Returns a pointer to the data stored in this array.
+
+  Returns the memory address of the first element stored in this
+  array. This pointer remains valid as long as the data block is not
+  deallocated.
+
+  \return A pointer to the elements stored in this array.
+
+*/
+
+  inline T* addr () const;
+
+
+/*!
+
+  \brief Returns a pointer to a specified element stored in this array.
+
+  Returns the memory address of the \a i-th element stored in this
+  one-dimensional array.  The pointer remains valid as long as the
+  data block is not deallocated.
+
+  \return <code>addr() + ( stride() * i )</code>
+
+  \pre <code>RANK == 1</code>
+
+*/
+
+  inline T* addr ( int i ) const;
+
+};
+
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   shape construction functions
+//-----------------------------------------------------------------------
+
+/*!
+  \name Shape construction functions
+*/
+
+//@{
+
+/*!
+
+  \relates Array
+
+  \brief Constructs a one-dimensional shape object.
+
+  Returns a \c Tuple of length one that can be used to construct a
+  one-dimensional \c Array with shape <i>(n)</i>.
+
+  \param n - the element of the returned tuple.
+
+  \return <code>Tuple<int,1> ( n )</code>
+
+  \pre <code>n >= 0</code>
+
+*/
+
+inline Tuple<int,1> shape ( int n );
+
+
+/*!
+
+  \relates Array
+
+  \brief Constructs a two-dimensional shape object.
+
+  Returns a \c Tuple of length two that can be used to construct a
+  two-dimensional \c Array with shape <i>(m,n)</i>.
+
+  \param m - the first element of the returned tuple.
+
+  \param n - the second element of the returned tuple.
+
+  \return <code>Tuple<int,2> ( m, n )</code>
+
+  \pre <code>
+    m >= 0 && <br>
+    n >= 0
+  </code>
+
+*/
+
+inline Tuple<int,2> shape ( int m, int n );
+
+
+/*!
+
+  \relates Array
+
+  \brief Constructs a three-dimensional shape object.
+
+  Returns a \c Tuple of length three that can be used to construct a
+  three-dimensional \c Array with shape <i>(m,n,p)</i>.
+
+  \param m - the first element of the returned tuple.
+
+  \param n - the second element of the returned tuple.
+
+  \param p - the third element of the returned tuple.
+
+  \return <code>Tuple<int,3> ( m, n, p )</code>
+
+  \pre <code>
+    m >= 0 && <br>
+    n >= 0 && <br>
+    p >= 0
+  </code>
+
+*/
+
+inline Tuple<int,3> shape ( int m, int n, int p );
+
+
+/*!
+
+  \relates Array
+
+  \brief Constructs a four-dimensional shape object.
+
+  Returns a \c Tuple of length four that can be used to construct a
+  four-dimensional \c Array with shape <i>(m,n,p,q)</i>.
+
+  \param m - the first element of the returned tuple.
+
+  \param n - the second element of the returned tuple.
+
+  \param p - the third element of the returned tuple.
+
+  \param q - the fourth element of the returned tuple.
+
+  \return <code>Tuple<int,4> ( m, n, p, q )</code>
+
+  \pre <code>
+    m >= 0 && <br>
+    n >= 0 && <br>
+    p >= 0 && <br>
+    q >= 0
+  </code>
+
+*/
+
+inline Tuple<int,4> shape ( int m, int n, int p, int q );
+
+//@}
+
+
+//-----------------------------------------------------------------------
+//   input & output operators
+//-----------------------------------------------------------------------
+
+/*!
+  \name Input and output operators
+*/
+
+//@{
+
+
+/*!
+  \relates Array
+  
+  \brief Array de-serialization operator.
+  
+  Reads an \c Array from the data input stream \a in and assigns it to
+  \a a.
+
+  \param in - the \c DataInputStream from which the array is to be
+  read.
+
+  \param a - the \c Array to be read.
+
+  \return \a in
+    
+  \throws io::IOException - if an IO error occurs.
+  
+  \throws io::SerializationException - if the data input stream is
+  corrupt.
+
+  \pre The following operator has been defined:<br>
+  <code>io::DataInput& operator >> ( io::DataInput&, T& )</code>
+
+*/
+
+template <class T, int N>
+  io::DataInput& operator >> ( io::DataInput& in,
+                               Array<T,N>&    a );
+
+
+/*!
+  \relates Array
+  
+  \brief Array serialization operator.
+
+  Writes the \c Array \a a to the data output stream \a out. The
+  de-serialization operator can be used to restore the \c Array
+  object.
+
+  \param out - the data output stream to which the array is to be
+  written.
+  
+  \param a - the \c Array to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an IO error occurs.
+    
+  \pre The following operator has been defined:<br>
+  <code>io::DataOutput& operator << ( io::DataOutput&, const T& )</code>
+
+*/
+
+template <class T, int N>
+  io::DataOutput& operator << ( io::DataOutput&   out,
+                                const Array<T,N>& a );
+
+
+/*!
+  \relates Array
+
+  \brief Array print operator.
+  
+  Prints the contents of the \c Array \a a to the text output stream
+  \a out.
+
+  \param out - the text output stream to which the array is to be
+  written.
+
+  \param a - the array to be printed.
+
+  \return \a out
+
+  \throws io::IOException - if an IO error occurs.
+
+  \pre The following operator has been defined:<br>
+  <code>io::TextOutput& operator << ( io::TextOutput&, cont T& )</code>
+
+*/
+
+template <class T, int N>
+  io::TextOutput& operator << ( io::TextOutput&   out,
+                                const Array<T,N>& a );
+
+
+//@}
+
+
+
+
+JEM_END_PACKAGE_BASE

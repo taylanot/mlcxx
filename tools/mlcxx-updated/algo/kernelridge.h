@@ -10,7 +10,7 @@
 #ifndef KERNELRIDGE_H
 #define KERNELRIDGE_H
 
-#include <mlpack/prereqs.hpp>
+//#include <mlpack/prereqs.hpp>
 
 namespace algo { 
 namespace regression {
@@ -27,36 +27,34 @@ class KernelRidge
   /**
    * @param inputs X
    * @param labels y
-   * @param weights 
    * @param lambda regularization hyper-parameter
-   * @param bias term
    * @param args for the kernel
    */
   template<typename... Ts>
-  KernelRidge<T>(const arma::mat& inputs,
-                 const arma::rowvec& labels,
-                 const double lambda ,
-                 const Ts&... args);
+  KernelRidge<T> ( const arma::mat& inputs,
+                   const arma::rowvec& labels,
+                   const double lambda,
+                   const Ts&... args );
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  KernelRidge<T>(const Ts&... args) : cov_(args...), lambda_(0.0) { }
+  KernelRidge<T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { }
 
   /**
    * @param inputs X
    * @param labels y
-   * @param lambda regularization hyper-parameter
-   * @param args for the kernel
    */
-  void Train(const arma::mat& inputs,
-             const arma::rowvec& labels);
+  void Train ( const arma::mat& inputs,
+               const arma::rowvec& labels );
+
     /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict(const arma::mat& inputs,
-               arma::rowvec& labels) const;
+  void Predict ( const arma::mat& inputs,
+                 arma::rowvec& labels ) const;
+
   /**
    * Calculate the L2 squared error on the given predictors and responses using
    * this linear regression model. This calculation returns
@@ -64,22 +62,22 @@ class KernelRidge
    * @param inputs 
    * @param labels 
    */
-  double ComputeError(const arma::mat& points,
-                      const arma::rowvec& responses) const;
+  double ComputeError ( const arma::mat& points,
+                        const arma::rowvec& responses ) const;
 
-  const arma::vec& Parameters() const { return parameters_; }
+  const arma::vec& Parameters ( ) const { return parameters_; }
 
-  arma::vec& Parameters() { return parameters_; }
+  arma::vec& Parameters ( ) { return parameters_; }
 
-  double Lambda() const { return lambda_; }
+  double Lambda ( ) const { return lambda_; }
 
-  double& Lambda() { return lambda_; }
+  double& Lambda ( ) { return lambda_; }
 
   /**
    * Serialize the model.
    */
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int /* version */)
+  void serialize ( Archive& ar, const unsigned int /* version */ )
   {
     ar & BOOST_SERIALIZATION_NVP(parameters_);
     ar & BOOST_SERIALIZATION_NVP(lambda_);
@@ -112,28 +110,31 @@ class Kernel
    * @param args for the kernel
    */
   template<typename... Ts>
-  Kernel<T>(const arma::mat& inputs,
-                 const arma::rowvec& labels,
-                 const Ts&... args);
+  Kernel<T> ( const arma::mat& inputs,
+              const arma::rowvec& labels,
+              const Ts&... args );
+
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  Kernel<T>(const Ts&... args) : cov_(args...){ }
+  Kernel<T> ( const Ts&... args ) : cov_(args...){ }
 
   /**
    * @param inputs X
    * @param labels y
    * @param args for the kernel
    */
-  void Train(const arma::mat& inputs,
-             const arma::rowvec& labels);
-    /**
+  void Train ( const arma::mat& inputs,
+               const arma::rowvec& labels );
+
+  /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict(const arma::mat& inputs,
-               arma::rowvec& labels) const;
+  void Predict ( const arma::mat& inputs,
+                 arma::rowvec& labels ) const;
+
   /**
    * Calculate the L2 squared error on the given predictors and responses using
    * this linear regression model. This calculation returns
@@ -141,19 +142,19 @@ class Kernel
    * @param inputs 
    * @param labels 
    */
-  double ComputeError(const arma::mat& points,
-                      const arma::rowvec& responses) const;
+  double ComputeError ( const arma::mat& points,
+                        const arma::rowvec& responses) const;
 
-  const arma::mat& Parameters() const { return parameters_; }
+  const arma::mat& Parameters ( ) const { return parameters_; }
 
-  arma::mat& Parameters() { return parameters_; }
+  arma::mat& Parameters ( ) { return parameters_; }
 
 
   /**
    * Serialize the model.
    */
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int /* version */)
+  void serialize ( Archive& ar, const unsigned int /* version */ )
   {
     ar & BOOST_SERIALIZATION_NVP(parameters_);
     ar & BOOST_SERIALIZATION_NVP(train_inp_);
@@ -166,8 +167,9 @@ class Kernel
   arma::vec parameters_;
   utils::covmat<T> cov_;
 };
+
 } // namespace regression
-} // namespace mlpack
+} // namespace algo
 
 #include "kernelridge_impl.h"
 

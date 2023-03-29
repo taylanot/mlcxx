@@ -1,0 +1,85 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jem/base/assert.h>
+#include <jem/numeric/sparse/matmul.h>
+#include <jem/numeric/sparse/Reorder.h>
+#include <jive/util/XDofSpace.h>
+#include <jive/fem/ElementSet.h>
+#include <jive/fem/utilities.h>
+
+
+JIVE_BEGIN_PACKAGE( fem )
+
+
+//-----------------------------------------------------------------------
+//   reorderDofs
+//-----------------------------------------------------------------------
+
+
+void                  reorderDofs
+
+  ( XDofSpace&          dofs,
+    const ElementSet&   elems )
+
+{
+  using jem::numeric::matmul;
+  using jem::numeric::Reorder;
+  using jive::util::makeDofOrdering;
+
+  JEM_PRECHECK ( elems &&
+                 dofs.getItems() == elems.getNodes().getData() );
+
+  SparseStruct  con       = elems.toMatrix ();
+
+  const idx_t   nodeCount = con.size(1);
+
+  IdxVector     iperm ( nodeCount );
+  IdxVector     jperm ( nodeCount );
+
+
+  con = matmul ( con.transpose(), con );
+
+  Reorder::rcm ( iperm, con );
+
+  con = SparseStruct ();
+
+  for ( idx_t i = 0; i < nodeCount; i++ )
+  {
+    jperm[iperm[i]] = i;
+  }
+
+  dofs.reorderDofs ( makeDofOrdering( dofs, jperm ) );
+}
+
+
+JIVE_END_PACKAGE( fem )

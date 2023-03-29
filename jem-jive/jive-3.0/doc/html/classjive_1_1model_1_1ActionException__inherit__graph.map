@@ -1,0 +1,5 @@
+<map id="jive::model::ActionException" name="jive::model::ActionException">
+<area shape="rect" id="node1" title=" " alt="" coords="5,155,213,181"/>
+<area shape="rect" id="node2" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="50,80,169,107"/>
+<area shape="rect" id="node3" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="48,5,171,32"/>
+</map>

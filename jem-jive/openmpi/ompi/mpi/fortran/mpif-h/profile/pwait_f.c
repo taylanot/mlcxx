@@ -1,0 +1,1 @@
+../../../../../ompi/mpi/fortran/mpif-h/wait_f.c

@@ -1,0 +1,754 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( numeric )
+
+
+//=======================================================================
+//   class SparseMatrix
+//=======================================================================
+
+/*!
+  \class SparseMatrix SparseMatrix.dox jem/numeric/sparse/SparseMatrix.h
+
+  \brief Represents a sparse matrix.
+
+  The template class \c SparseMatrix can be used to store and
+  manipulate sparse matrices containing elements of type \a T. An
+  instance of the \c SparseMatrix class encapsulates three arrays that
+  contain the locations and the values of the non-zero matrix
+  elements. The first array, called the <i>column index array</i>,
+  stores the column indices of the non-zero elements. The second
+  array, called the <i>row offset array</i>, stores the starting
+  position of each row in the column index array. The third array,
+  called the <i>value array</i>, stores the values of the non-zero
+  matrix elements. This array is ordered in the same way as the column
+  index array.
+
+  The column index array and the offset array are encapsulated by a \c
+  SparseStructure object that is a member of a \c SparseMatrix
+  object. The documentation of the \c SparseStructure class explains
+  in more detail how the locations of the non-zero matrix elements are
+  encoded by the column index and offset arrays.
+
+  Consider the following <i>(5x5)</i> sparse matrix:
+
+  \code
+  [ 0, 1, 0, 0, 4 ]
+  [ 2, 0, 3, 0, 0 ]
+  [ 0, 0, 0, 0, 0 ]
+  [ 0, 0, 1, 2, 3 ]
+  [ 7, 3, 0, 0, 0 ]
+  \endcode
+
+  The corresponding column index array, value array and row offset
+  array are given by:
+  
+  \code
+  indices = [ 1, 4, 0, 2, 2, 3, 4, 0, 1 ]
+  values  = [ 1, 4, 2, 3, 1, 2, 3, 7, 3 ]
+  offsets = [ 0, 2, 4, 4, 7, 9 ]
+  \endcode
+
+  Note that the column indices do not have to be stored in ascending
+  order. Thus, the index and value arrays in the example above can
+  also be stored as:
+
+  \code
+  indices = [ 4, 1, 0, 2, 4, 2, 3, 1, 0 ]
+  values  = [ 4, 1, 2, 3, 3, 1, 2, 3, 7 ]
+  \endcode
+
+  The next code fragment demonstrates how to access the contents of a
+  \c SparseMatrix.
+
+  \code
+  // This function computes a sparse matrix-vector product
+
+  Array<double>                  multiply
+
+    ( const SparseMatrix<double>&  lhs,
+      const Array<double>&         rhs )
+
+  {
+    const int             rowCount = lhs.size(0);
+
+    const Array<int>&     offsets ( lhs.getRowOffsets()    );
+    const Array<int>&     indices ( lhs.getColumnIndices() );
+    const Array<double>&  values  ( lhs.getValue()         );
+
+    Array<double>         result  ( rowCount );
+
+    double x;
+    int    i, j, n;
+
+    for ( i = 0; i < rowCount; i++ )
+    {
+      x = 0.0;
+      j = offsets[i];
+      n = offsets[i + 1];
+
+      for ( ; j < n; j++ )
+      {
+        x += values[j] * rhs[ indices[j] ];
+      }
+      
+      result[i] = x;
+    }
+
+    return result;
+  }
+  \endcode
+    
+  In addition to the \c SparseMatrix member functions, the package
+  jem.numeric provides many other non-member functions that operate on
+  \c SparseMatrix objects. More information is available in the
+  following sections:
+
+  \li \ref SparseMatrixExpressions - a collection of overloaded
+  operators that implement sparse matrix addition, substraction, and a
+  other operations.
+
+  \li \ref SparseMatrixAssignmentOperators - a collection of additional
+  assignment operators.
+
+  \li \ref SparseMatmul - a set of functions that implement sparse
+  matrix-matrix and sparse matrix-vector multiplications.
+        
+  \li \ref SparseMatrixUtilities - a collection of handy functions that
+  operate on sparse matrices and sparse structures [NOT YET
+  DOCUMENTED].
+  
+  \sa \c SparseStructure, \c SparseLU
+  
+*/
+
+
+template <class T>
+  class SparseMatrix
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \brief The structure of a sparse matrix.
+
+  A type representing the structure of a sparse matrix. It is an alias
+  for \c SparseStructure.
+
+*/
+
+  typedef SparseStructure Structure;
+
+
+/*!
+
+  \brief The shape of a sparse matrix.
+
+  A type representing the shape of a sparse matrix. It is an alias for
+  \c Tuple<int,2>. The first element in the tuple equals the number of
+  rows, and the second element equals the number of columns.
+
+*/
+
+  typedef Structure::Shape Shape;
+
+
+//-----------------------------------------------------------------------
+//   constructors
+//-----------------------------------------------------------------------
+    
+/*!
+
+  \brief Constructs an empty sparse matrix.
+
+  Constructs an empty sparse matrix.
+
+  \post <code> this->size(0) == 0 && this->size(1) == 0</code>
+
+*/
+
+  SparseMatrix ();
+
+
+/*!
+
+  \brief Constructs a sparse matrix with a given structure.
+
+  Constructs a sparse matrix with structure \a s. This constructor is
+  equivalent with:
+
+  <code>SparseMatrix ( s, Array<T>( s.nonZeroCount() ) )</code>
+
+  \pre The type \a T has a default constructor.
+
+  \sa \c SparseMatrix( const Structure&, const Array<T>& )
+
+*/
+
+
+  explicit SparseMatrix ( const Structure& s );
+
+
+/*!
+
+  \brief Constructs a sparse matrix with a given structure and value
+  array.
+
+  Constructs a sparse matrix given the structure \a s and the value
+  array \a values. Since both \a s and \a values are copied by
+  reference, this sparse matrix object points to the same data as
+  \a s and \a values. Any modifications to these two objects will
+  therefore be visible in this sparse matrix, and the other way
+  around.
+
+  \param s - a \c SparseStructure representing the non-zero pattern of
+  this sparse matrix.
+
+  \param values - an \c Array containing the values of the non-zero
+  elements in this sparse matrix.
+
+  \pre
+    <code>s.nonZeroCount() == values.size()</code> <br>
+    and the type \a T has a default constructor.
+
+  \post <code>
+    equal( this->shape(),            s.shape()            ) && <br>
+    equal( this->getRowOffsets(),    s.getRowOffsets()    ) && <br>
+    equal( this->getColumnIndices(), s.getColumnIndices() ) && <br>
+    equal( this->getValues(),        values               )
+  </code>
+
+*/
+
+  SparseMatrix ( const Structure&  s,
+                 const Array<T>&   values );
+
+
+/*!
+
+  \brief Constructs a sparse matrix given an offset and an index
+  array.
+
+  Constructs a sparse matrix with shape \a sh, row offset array \a
+  offsets and column index array \a indices. This constructor is
+  equivalent with:
+
+  <code>SparseMatrix ( Structure( sh, offsets, indices ) )</code>
+
+  \pre The type \a T has a default constructor.
+
+  \sa \c SparseMatrix( const Structure& )
+
+*/
+
+  SparseMatrix ( const Shape&       sh,
+                 const Array<int>&  offsets,
+                 const Array<int>&  indices );
+
+
+/*!
+
+  \brief Constructs a sparse matrix given an offset, an index
+  and a value array.
+
+  Constructs a sparse matrix with shape \a sh, row offset array \a
+  offsets, column index array \a indices and values \a values. This
+  constructor is equivalent with:
+
+  <code>
+  SparseMatrix ( Structure( sh, offsets, indices ), values )
+  </code>
+
+  \pre The type \a T has a default constructor.
+
+  \sa \c SparseMatrix( const Structure&, const Array<T>& )
+
+*/
+
+  SparseMatrix ( const Shape&       sh,
+                 const Array<int>&  offsets,
+                 const Array<int>&  indices,
+                 const Array<T>&    values );
+
+
+/*!
+
+  \brief Creates a shallow copy of another sparse matrix.
+
+  Creates a shallow copy of the \a rhs sparse matrix. Consequently,
+  this sparse matrix points to the same data as the \a rhs sparse
+  matrix. Any modifications to this sparse structure will therefore be
+  visible in the \a rhs sparse structure, and the other way around.
+  
+  The data shared between two or more sparse matrix objects is
+  deallocated when the last sparse matrix pointing to that data is
+  destroyed.
+
+  Because of the shallow copy semantics, returning a sparse matrix
+  from a function is a relatively cheap operation.
+
+  \param rhs - the \c SparseMatrix to be copied.
+
+  \post <code>
+    equal( this->shape(),            rhs.shape()            ) && <br>
+    equal( this->getRowOffsets(),    rhs.getRowOffsets()    ) && <br>
+    equal( this->getColumnIndices(), rhs.getColumnIndices() ) && <br>
+    equal( this->getValues(),        rhs.getValues()        )
+  </code>
+
+*/
+
+  SparseMatrix ( const SparseMatrix&  rhs );
+
+
+//-----------------------------------------------------------------------
+//   assignment operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Makes a shallow copy of another sparse matrix.
+
+  Like the copy constructor, the assignment operator has shallow copy
+  semantics. This means that after invoking the assignment operator,
+  this sparse matrix points to the same data as the \a rhs spare
+  matrix. The current contents of this sparse structure are deleted if
+  no other sparse structures point to the same data.
+
+  \param rhs - the \c SparseMatrix to be copied.
+
+  \post <code>
+    equal( this->shape(),            rhs.shape()            ) && <br>
+    equal( this->getRowOffsets(),    rhs.getRowOffsets()    ) && <br>
+    equal( this->getColumnIndices(), rhs.getColumnIndices() ) && <br>
+    equal( this->getValues(),        rhs.getValues()        )
+  </code>
+
+*/
+
+  SparseMatrix& operator = ( const SparseMatrix& rhs );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Interchanges the contents of two sparse matrices
+
+  Swaps the internal state of this sparse matrix with that of the
+  \a rhs sparse matrix.
+
+  \param rhs - a \c SparseMatrix object.
+
+*/
+
+  void swap ( SparseMatrix& rhs );
+
+
+//-----------------------------------------------------------------------
+//   clone
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a deep copy of this sparse matrix.
+
+  Returns a deep copy of this sparse matrix.
+
+  \return <code>
+    SparseMatrix (                         <br>
+      &nbsp; this->getStructure().clone(), <br>
+      &nbsp; this->getValues().clone()     <br>
+    )
+  </code>
+
+*/
+
+  SparseMatrix clone () const;
+
+
+//-----------------------------------------------------------------------
+//   transpose
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the transpose of this sparse matrix.
+
+  Returns the transpose of this sparse matrix. The returned sparse
+  matrix object does not share its data with this sparse matrix.
+
+  \return The transpose of this sparse matrix.
+
+*/
+
+  SparseMatrix transpose () const;
+
+
+//-----------------------------------------------------------------------
+//   isValid
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether the structure of this matrix is valid.
+  
+  Tests whether the structure of this sparse matrix is valid. This
+  function has the same effect as:
+
+  <code>return getStructure().isValid()</code>
+
+  \return \c true if the structure of this matrix is valid, and \c
+  false otherwise.
+
+*/
+
+//-----------------------------------------------------------------------
+//   getStructure
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the structure of this sparse matrix.
+
+  Returns a \c SparseStructure representing the non-zero pattern of
+  this sparse matrix.
+
+  \return A \c SparseStructure representing the structure of this
+  sparse matrix.
+
+*/
+
+  inline Structure getStructure () const;
+
+
+//-----------------------------------------------------------------------
+//   nonZeroCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of non-zero elements in this sparse
+  matrix.
+
+  Returns the number of non-zero elements in this sparse matrix.
+
+  \return <code>this->getValues().size()</code>
+
+*/
+  
+  inline int nonZeroCount () const;
+
+
+//-----------------------------------------------------------------------
+//   shape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the shape of this sparse matrix.
+
+  Returns a \c Tuple<int,2> that represents the shape of this
+  matrix. The first element in this tuple equals the number of rows,
+  while the second element equals the number of columns.
+
+  \return The shape of this sparse matrix.
+
+*/
+
+  inline Shape shape () const;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this sparse matrix in a given dimension.
+
+  Returns the size of this sparse matrix in the dimension \a
+  dim. Thus, <code>size(0)</code> returns the number of rows, while
+  <code>size(1)</code> returns the number of columns.
+
+  \param dim - the dimension index.
+
+  \pre <code>dim >= 0 && dim < 2</code>
+
+  \return <code>this->shape()[dim]</code>
+
+*/
+
+  inline int size ( int dim ) const;
+
+
+//-----------------------------------------------------------------------
+//   getRowOffsets
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the row offset array.
+
+  Returns a const reference to the row offset array of this sparse
+  matrix. The reference is valid until the destructor of this sparse
+  matrix is invoked.
+
+  \return <code>this->getStructure().getRowOffsets()</code>
+
+*/
+  
+  inline const Array<int>& getRowOffsets () const;
+
+
+//-----------------------------------------------------------------------
+//   getColumnIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the column index array.
+
+  Returns a const reference to the column index array of this sparse
+  matrix. The reference is valid until the destructor of this sparse
+  matrix is invoked.
+
+  \return <code>this->getStructure().getColumnIndices()</code>
+
+*/
+
+  inline const Array<int>& getColumnIndices () const;
+
+
+/*!
+
+  \brief Returns the column indices of the non-zero elements on a
+  particular row.
+
+  Returns an integer array containing the column indices of the
+  non-zero matrix elements on row \a i. The returned array shares its
+  data with the column index array of this sparse matrix.
+
+  \param i - a valid row index.
+
+  \pre <code>i >= 0 && i < this->size(0)</code>
+
+  \return <code>this->getStructure().getColumnIndices(i)</code>
+
+*/
+
+  inline Array<int> getColumnIndices ( int i ) const;
+
+
+//-----------------------------------------------------------------------
+//   getValues
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a reference to the value array.
+
+  Returns a const reference to the value array of this sparse
+  matrix. The reference is valid until the destructor of this sparse
+  matrix is invoked.
+
+  \return The value array of this sparse matrix.
+
+*/
+
+  inline const Array<T>& getValues () const;
+
+
+/*!
+
+  \brief Returns the values of the non-zero elements on a particular
+  row.
+
+  Returns an array containing the values of the non-zero elements on
+  row \a i. The returned array shares its data with the value array of
+  this sparse matrix.
+
+  This function is equivalent with:
+
+  \code
+  const int first = getRowOffsets()[i];
+  const int last  = getRowOffsets()[i + 1];
+
+  return getValues()[ slice(first,last) ];
+  \endcode
+
+  \param i - a valid row index.
+
+  \pre <code>i >= 0 && i < this->size(0)</code>
+
+  \return The values of the non-zero elements on row \a i.
+
+*/
+
+  inline Array<T> getValues ( int i ) const;
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   serialization operators
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates SparseMatrix
+
+  \brief Sparse matrix de-serialization operator.
+
+  Reads the sparse matrix \a a from the data input stream \a in. The
+  current contents of this sparse structure are deleted if no other
+  sparse structures point to the same data.
+
+  \param in - a data input stream.
+  
+  \param a - the \c SparseMatrix to be read.
+
+  \return \a in
+
+  \throws io::IOException - if an I/O error occurs.
+  
+  \throws io::SerializationException - if the input data are
+  inconsistent.
+
+  \pre The type \a T provides a de-serialization operator.
+
+*/
+
+template <class T>
+  inline io::DataInput& operator >> ( io::DataInput&   in,
+                                      SparseMatrix<T>& a );
+
+
+/*!
+
+  \relates SparseMatrix
+
+  \brief Sparse matrix serialization operator.
+
+  Writes the sparse matrix \a a to the data output stream \a
+  out. The de-serialization operator can be used to restore the \c
+  SparseMatrix object at a later time.
+
+  \param out - a data output stream.
+
+  \param a - the \c SparseMatrix to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T provides a serialization operator.
+
+*/
+
+template <class T>
+  inline io::DataOutput& operator << ( io::DataOutput&         out,
+                                       const SparseMatrix<T>&  a );
+
+//-----------------------------------------------------------------------
+//   print operator
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates SparseMatrix
+
+  \brief Sparse matrix print operator.
+
+  Writes the sparse matrix \a a in a human-readable format to the
+  text output stream \a out.
+
+  \param out - a text output stream.
+
+  \param a - the \c SparseMatrix to be written.
+
+  \return \a out
+
+  \throws io::IOException - if an I/O error occurs.
+
+  \pre The type \a T provides a print operator.
+
+*/
+
+
+template <class T>
+  io::TextOutput& operator << ( io::TextOutput&         out,
+                                const SparseMatrix<T>&  a );
+
+
+//-----------------------------------------------------------------------
+//   swap
+//-----------------------------------------------------------------------
+
+/*!
+
+  \relates SparseMatrix
+
+  \brief Interchanges the internal states of two sparse matrices.
+
+  Interchanges the internal states of two \c SparseMatrix
+  objects. This function is equivalent with:
+
+  \code
+  lhs.swap( rhs )
+  \endcode
+
+  \param lhs - a \c SparseMatrix object.
+  
+  \param rhs - another \c SparseMatrix object.
+
+*/
+
+template <class T>
+  inline void swap ( SparseMatrix<T>&  lhs,
+                     SparseMatrix<T>&  rhs );
+
+
+
+
+JEM_END_PACKAGE( numeric )

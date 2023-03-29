@@ -1,0 +1,14 @@
+
+// Generated automatically on Mon Jan  3 10:00:54 CET 2005.
+
+#ifndef JEM_CONFIG_H
+#define JEM_CONFIG_H
+
+#define JEM_OS_LINUX
+#define JEM_ARCH_IA32
+
+#define JEM_OS_POSIX
+#define JEM_OS_UNIX98
+
+#endif
+

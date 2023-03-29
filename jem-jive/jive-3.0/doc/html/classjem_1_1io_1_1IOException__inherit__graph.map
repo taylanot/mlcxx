@@ -1,0 +1,11 @@
+<map id="jem::io::IOException" name="jem::io::IOException">
+<area shape="rect" id="node1" title="Signals an I/O error." alt="" coords="343,132,496,159"/>
+<area shape="rect" id="node4" href="$classjem_1_1io_1_1EOFException.html" title=" " alt="" coords="572,5,736,32"/>
+<area shape="rect" id="node5" href="$classjem_1_1io_1_1FileOpenException.html" title=" " alt="" coords="557,56,751,83"/>
+<area shape="rect" id="node6" href="$classjem_1_1io_1_1IOverflowException.html" title=" " alt="" coords="553,107,755,133"/>
+<area shape="rect" id="node7" href="$classjem_1_1io_1_1SerializationException.html" title=" " alt="" coords="544,157,764,184"/>
+<area shape="rect" id="node8" href="$classjem_1_1io_1_1SyncFailedException.html" title=" " alt="" coords="550,208,758,235"/>
+<area shape="rect" id="node9" href="$classjem_1_1io_1_1ZipException.html" title=" " alt="" coords="574,259,734,285"/>
+<area shape="rect" id="node2" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="176,132,295,159"/>
+<area shape="rect" id="node3" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="5,132,128,159"/>
+</map>

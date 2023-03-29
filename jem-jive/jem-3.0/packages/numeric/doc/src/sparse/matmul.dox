@@ -1,0 +1,228 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( numeric )
+
+/*!
+
+  \defgroup SparseMatmul Sparse matrix-matrix and matrix-vector multiplication
+
+  \brief A collection of functions for computing sparse 
+  matrix-matrix and matrix-vector products.
+
+  <code>\#include <jem/numeric/sparse/matmul.h></code>
+
+  This header file exports a set of template functions -- all named \c
+  matmul -- that compute the following types of matrix-vector
+  products: the product of a matrix and a column vector; the product
+  of a row vector and a matrix; and the product of two matrices.
+
+  Both column and row vectors are represented by one-dimensional \c
+  Array objects. Matrices are represented by \c SparseMatrix
+  objects.
+
+  The \c matmul functions come in two flavors: one with a return
+  type and one that have a void return type. The \c matmul functions 
+  that have void return type store their results in their first 
+  argument. The other \c matmul functions, on the other hand, return a new
+  \c Array or \c SparseMatrix object containing the computed results. 
+  The versions of \c matmul that store their result in their first 
+  argument are faster because they do not have to allocate memory. 
+
+
+*/
+
+
+//@{
+
+
+//-----------------------------------------------------------------------
+//   matrix-vector product
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a matrix and a column vector.
+
+  Computes the product of the matrix \a a and the column vector \a
+  b. The result is stored in the column vector \a r.
+
+
+  \param r - a column vector that is set to the matrix-vector
+   product of \a a and \a b.
+
+  \param a - a sparse matrix.
+
+  \param b - a column vector.
+
+*/
+
+template <class T>
+
+  void                          matmul
+
+  ( const Array<T>&               r,
+    const SparseMatrix<T>&        a,
+    const Array<T>&               b );
+
+/*!
+
+  \brief Returns the product of a matrix and a column vector.
+
+  Returns a column vector containing the product of the matrix \a a
+  and the column vector \a b.
+
+  \param a - a sparse matrix.
+
+  \param b - a column vector.
+
+  \return The product of \a a and \a b.
+
+*/
+
+template <class T>
+
+  Array<T>                      matmul
+
+  ( const SparseMatrix<T>&        a,
+    const Array<T>&               b );
+
+
+
+//-----------------------------------------------------------------------
+//   vector-matrix product
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the product of a row vector and a matrix.
+
+  Computes the product of the row vector \a a and the matrix \a
+  b. The result is stored in the row vector \a r.
+
+  \param r - a row vector that is set to the vector-matrix product
+  of \a a and \a b.
+
+  \param a - a row vector.
+
+  \param b - a sparse matrix.
+  
+*/
+
+template <class T>
+
+  void                          matmul
+
+  ( const Array<T>&               r,
+    const Array<T>&               a,
+    const SparseMatrix<T>&        b );
+
+/*!
+
+  \brief Returns the product of a row vector and a matrix.
+
+  Returns a row vector containing the product of the row vector \a a
+  and the matrix \a b.
+
+  \param a - a row vector.
+
+  \param b - a matrix.
+
+  \return The product of \a a and \a b.
+
+*/
+
+template <class T>
+
+  Array<T>                      matmul
+
+  ( const Array<T>&               a,
+    const SparseMatrix<T>&        b );
+
+
+//-----------------------------------------------------------------------
+//   matrix-matrix product
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the product of two sparse matrices.
+
+  Returns a sparse matrix containing the product of the matrices \a a
+  and \a b.
+
+  \param a - a sparse matrix.
+
+  \param b - another sparse matrix.
+
+  \return The product of \a a and \a b.
+
+*/
+
+template <class T>
+
+  inline SparseMatrix<T>        matmul
+
+  ( const SparseMatrix<T>&        a,
+    const SparseMatrix<T>&        b );
+
+
+/*!
+
+  \brief Returns the filtered product of two sparse matrices.
+
+  Returns a sparse matrix containing the product of the matrices \a a
+  and \a b, however, with elements filtered out using the filter object.
+
+  \param a - a sparse matrix.
+
+  \param b - another sparse matrix.
+
+  \param filter - a sparse filter object
+
+  \return The product of \a a and \a b.
+
+*/
+
+template <class T, class F>
+
+  inline SparseMatrix<T>        matmul
+
+  ( const SparseMatrix<T>&        a,
+    const SparseMatrix<T>&        b,
+    const SparseFilter<T,F>&      filter );
+
+
+//@}
+
+
+JEM_END_PACKAGE( numeric )

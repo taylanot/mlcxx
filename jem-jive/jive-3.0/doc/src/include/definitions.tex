@@ -1,0 +1,129 @@
+%------------------------------------------------------------------------
+%   Simple commands
+%------------------------------------------------------------------------
+
+
+\renewcommand{\chapterautorefname}{Chapter}
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Subsection}
+
+\newcommand{\Code}[1]{\texttt{#1}}
+\newcommand{\Symbol}[1]{\textsl{#1}}
+\newcommand{\Makexp}[1]{\texttt{\$(#1)}}
+\newcommand{\JiveWebsite}{\url{www.dynaflow.com/software/jive-sdk}}
+
+
+%------------------------------------------------------------------------
+%   Listings commands and environments
+%------------------------------------------------------------------------
+
+
+\lstdefinestyle{default}
+{
+  basicstyle=\ttfamily, numbers=none, numberstyle=\tiny,%
+  showstringspaces=false,
+}
+
+\lstdefinestyle{C++}
+{
+  style=default, language=C++
+}
+
+\lstdefinestyle{make}
+{
+  style=default, language=[gnu]make, showtabs=true
+}
+
+\lstdefinestyle{sh}
+{
+  style=default, language=sh
+}
+
+\lstdefinestyle{csh}
+{
+  style=default, language=csh
+}
+
+\lstnewenvironment{Verbatim}[1][]
+{
+  \lstset{style=default, xleftmargin=5mm, gobble=2, #1}
+}
+{}
+
+\lstnewenvironment{Source}[2][]
+{
+  \lstset{style=#2, xleftmargin=5mm, gobble=2, #1}
+}
+{}
+
+\newcommand{\IncludeSource}[3][]
+{
+  \lstinputlisting[style=#2, frame=lines,%
+    aboveskip=\baselineskip,basicstyle=\small\ttfamily, #1]{#3}
+}
+
+
+%------------------------------------------------------------------------
+%   Description environment
+%------------------------------------------------------------------------
+
+
+\newlength{\DescrLength}
+\newcounter{DescrCounter}
+
+\newcommand{\DescrFormat}[1]{#1}
+
+\newcommand{\DescrLabel}[1]
+{%
+  \settowidth{\DescrLength}{\DescrFormat{#1}}%
+  \ifthenelse{\lengthtest{\DescrLength > \labelwidth}}%
+  {%
+    \parbox[b]{\labelwidth}%
+    {%
+      \makebox[0pt][l]{\DescrFormat{#1}}\\\mbox{}%
+    }%
+  }{%
+    {\DescrFormat{#1}}%
+  }%
+  \hfil\relax
+  \refstepcounter{DescrCounter}
+}
+
+
+\newenvironment{Description}[1][\textnormal]
+{
+  \begin{list}{h}
+  {
+    \renewcommand{\DescrFormat}{#1}
+    \renewcommand{\makelabel}{\DescrLabel}
+    \setlength{\labelwidth}{30pt}
+    \setlength{\itemindent}{0pt}
+    \setlength{\leftmargin}{\labelwidth + \labelsep + \labelsep}
+    \setlength{\rightmargin}{0pt}
+  }
+}
+{ \end{list} }
+
+
+%------------------------------------------------------------------------
+%   MakevarTable environment
+%------------------------------------------------------------------------
+
+
+\newenvironment{MakevarTable}[1]
+{
+  \begin{longtable}[c]{|>{\ttfamily}lp{9.2cm}|}
+
+    \caption*{#1}\\
+    \hline
+    \endhead
+
+    \hline
+    \endfoot
+
+    JEM\_CXX\_OPT\_FLAGS1 & Rubbish \kill
+}
+{
+  \end{longtable}
+}
+

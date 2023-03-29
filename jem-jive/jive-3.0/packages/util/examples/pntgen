@@ -1,0 +1,11 @@
+
+echo "<Points>"
+
+i=0
+
+while [ $i -lt 10000 ]; do
+  echo "  $i 0.0 0.0 0.0;"
+  i=$(( $i + 1 ))
+done
+
+echo "</Points>"

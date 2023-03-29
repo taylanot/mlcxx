@@ -1,0 +1,266 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( algebra )
+
+
+//=======================================================================
+//   class VectorSpace
+//=======================================================================
+
+/*!
+
+  \brief Computes the scalar product of two vectors.
+
+  <code>\#include <jive/algebra/VectorSpace.h></code>
+
+  The abstract class \c VectorSpace provides a set of functions that
+  compute the scalar product -- or dot product -- of two or more
+  vectors. This class can be used to implement algorithms that need to
+  ececute a series of scalar products and that do not care how the
+  scalar products are actually computed.
+
+  The member functions of the \c VectorSpace class only accept vectors
+  of a particular size. This size is called the size of a vector
+  space.
+
+  \sa \c AbstractMatrix
+
+*/
+
+class VectorSpace : public jem::Object
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A vector type.
+
+  The \c Vector type is just an alias for \c jive::util::Vector (which
+  is an alias for \c jem::Array<double>).
+
+*/
+
+  typedef util::Vector Vector;
+
+
+/*!
+
+  \brief A matrix type.
+
+  The \c Matrix type is just an alias for \c jive::util::Matrix.
+
+*/
+
+  typedef util::Matrix Matrix;
+  
+
+
+//-----------------------------------------------------------------------
+//   events
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that the size of this vector space has changed.
+
+  The \c resizeEvent is emitted whenever the size of this vector space
+  has been changed. The argument of the event is the \em new size of
+  this vector space.
+
+*/
+
+  jem::util::Event<int> resizeEvent;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this vector space.
+
+  Returns the size of this vector space.
+
+  \return The size of this vector space.
+
+*/
+
+  virtual int size () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   print
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes the constents of a vector to the standard output.
+
+  Writes the contents of the vector \a x to the standard output. The
+  output format is unspecified. Use this function for debugging
+  purposes.
+
+  \param x - the vector to be printed.
+
+  \pre <code>x.size() == this->size()</code>
+
+*/
+
+  virtual void print ( const Vector&  x ) const = 0;
+  
+  
+//-----------------------------------------------------------------------
+//   product
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the scalar product of two vectors.
+  
+  Returns the scalar product (dot product) of the vectors \a x and \a
+  y.
+
+  \param x - a vector.
+
+  \param y - another vector.
+
+  \pre <code>
+    x.size() == this->size() && <br>
+    y.size() == this->size()
+  </code>
+
+  \return The scalar product of \a x and \a y.
+
+*/
+
+  virtual double product ( const Vector&  x,
+                           const Vector&  y ) const = 0;
+
+//-----------------------------------------------------------------------
+//   products
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the scalar products of multiple vectors.
+
+  Computes the scalar products of the columns of the matrices \a x and
+  \a y. The products are stored in the vector \a a. To be precise, \c
+  a[i] is set to the scalar product of the i-th columns of the
+  matrices \a x and \a y.
+
+  The implementation of this function provoded by the \c VectorSpace
+  class repeatedly calls the member function \c product(). Derived
+  classes are encouraged to provide a more efficient implementation.
+
+  \param a - a vector that will be filled with the scalar products.
+
+  \param x - the first input matrix.
+
+  \param y - the second input matrix.
+
+  \pre <code>
+    a.size()  == x.size(1)    && <br>
+    x.size(0) == this->size() && <br>
+    y.size(0) == this->size() && <br>
+    y.size(1) == x.size(1)
+  </code>
+
+*/
+
+  virtual void products ( const Vector&  a,
+                          const Matrix&  x,
+                          const Matrix&  y ) const;
+
+//-----------------------------------------------------------------------
+//   project
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the scalar product of a vector with several other
+  vectors.
+
+  Fills the vector \a a with the scalar products of the vector \a x
+  with the columns of the matrix \a y. That is, \c a[i] is set to the
+  scalar product of \a x with the i-th column of \a y.  If the size of
+  the vector \a a is larger than \c n, with \c n the number of columns
+  in the matrix \a y, then \c a[n] is set to the scalar product of the
+  vector \a x with itself. This behavior is particularly handy when
+  implementing algorithms that involve an orthogonalization
+  procedure.
+
+  The implementation of this function provoded by the \c VectorSpace
+  class repeatedly calls the member function \c product(). Derived
+  classes are encouraged to provide a more efficient implementation.
+
+  \param a - a vector that will be filled with the scalar products.
+
+  \param x - an input vector.
+
+  \param y - an input matrix.
+
+  \pre <code>
+    a.size()  == y.size(1)    && <br>
+    x.size()  == this->size() && <br>
+    y.size(0) == this->size()
+  </code>
+
+*/
+
+  virtual void project ( const Vector&  a,
+                         const Vector&  x,
+                         const Matrix&  y ) const;
+
+
+//-----------------------------------------------------------------------
+//   other member functions
+//-----------------------------------------------------------------------
+
+
+ protected:
+
+  virtual                ~VectorSpace ();
+};
+
+
+
+JIVE_END_PACKAGE( algebra )

@@ -1,0 +1,1 @@
+../../../../../ompi/mpi/fortran/mpif-h/query_thread_f.c

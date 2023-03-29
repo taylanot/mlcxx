@@ -9,14 +9,14 @@
 #ifndef KERNELRIDGE_IMPL_H
 #define KERNELRIDGE_IMPL_H
 
-// mlpack
-#include <mlpack/core.hpp>
-// local
-#include "kernelridge.h"
-#include "utils/covmat.h"
+//// mlpack
+//#include <mlpack/core.hpp>
+//// local
+//#include "kernelridge.h"
+//#include "utils/covmat.h"
 
-using namespace mlpack;
-using namespace algo::regression;
+namespace algo {
+namespace regression {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Kernel Ridge Regression
@@ -24,10 +24,10 @@ using namespace algo::regression;
 
 template<class T>
 template<class... Ts>
-KernelRidge<T>::KernelRidge(const arma::mat& inputs,
-                            const arma::rowvec& labels,
-                            const double lambda,
-                            const Ts&... args) :
+KernelRidge<T>::KernelRidge ( const arma::mat& inputs,
+                              const arma::rowvec& labels,
+                              const double lambda,
+                              const Ts&... args ) :
     cov_(args...), lambda_(lambda)
 {
   Train(inputs, labels);
@@ -35,8 +35,8 @@ KernelRidge<T>::KernelRidge(const arma::mat& inputs,
 
 
 template<class T>
-void KernelRidge<T>::Train(const arma::mat& inputs,
-                           const arma::rowvec& labels)
+void KernelRidge<T>::Train ( const arma::mat& inputs,
+                             const arma::rowvec& labels )
 {
   train_inp_ = inputs.t();
   
@@ -49,16 +49,16 @@ void KernelRidge<T>::Train(const arma::mat& inputs,
 }
 
 template<class T>
-void KernelRidge<T>::Predict(const arma::mat& inputs,
-                             arma::rowvec& labels) const
+void KernelRidge<T>::Predict ( const arma::mat& inputs,
+                               arma::rowvec& labels ) const
 {
   arma::mat k_xpx = cov_.GetMatrix(inputs.t(),train_inp_);
   labels = (k_xpx * parameters_).t();
 }
 
 template<class T>
-double KernelRidge<T>::ComputeError(const arma::mat& inputs,
-                                    const arma::rowvec& labels) const
+double KernelRidge<T>::ComputeError ( const arma::mat& inputs,
+                                      const arma::rowvec& labels ) const
 {
   arma::rowvec temp;
   Predict(inputs, temp);
@@ -76,26 +76,25 @@ double KernelRidge<T>::ComputeError(const arma::mat& inputs,
 ///////////////////////////////////////////////////////////////////////////////
 template<class T>
 template<class... Ts>
-Kernel<T>::Kernel(const arma::mat& inputs,
-                  const arma::rowvec& labels,
-                  const Ts&... args) :
-    cov_(args...)
+Kernel<T>::Kernel ( const arma::mat& inputs,
+                    const arma::rowvec& labels,
+                    const Ts&... args ) : cov_(args...)
 {
   Train(inputs, labels);
 }
 
 
 template<class T>
-void Kernel<T>::Train(const arma::mat& inputs,
-                      const arma::rowvec& labels)
+void Kernel<T>::Train ( const arma::mat& inputs,
+                        const arma::rowvec& labels )
 {
-  this -> train_inp_ = inputs.t();
-  this -> train_lab_ = labels;
+  train_inp_ = inputs.t();
+  train_lab_ = labels;
 }
 
 template<class T>
-void Kernel<T>::Predict(const arma::mat& inputs,
-                        arma::rowvec& labels) const
+void Kernel<T>::Predict ( const arma::mat& inputs,
+                          arma::rowvec& labels ) const
 {
   arma::mat sim = cov_.GetMatrix(train_inp_, inputs.t());
   const size_t N = sim.n_rows;
@@ -107,8 +106,8 @@ void Kernel<T>::Predict(const arma::mat& inputs,
 }
 
 template<class T>
-double Kernel<T>::ComputeError(const arma::mat& inputs,
-                               const arma::rowvec& labels) const
+double Kernel<T>::ComputeError ( const arma::mat& inputs,
+                                 const arma::rowvec& labels ) const
 {
   arma::rowvec temp;
   Predict(inputs, temp);
@@ -120,4 +119,6 @@ double Kernel<T>::ComputeError(const arma::mat& inputs,
 
   return cost;
 }
+} // namespace regression
+} // namespace algo
 #endif 

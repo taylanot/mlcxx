@@ -1,0 +1,1562 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[text={16cm,24cm},centering]{geometry}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage{palatino}
+\usepackage{listings}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{underscore}
+
+\lstloadlanguages{C++,make,sh,csh}
+\graphicspath{{images/}}
+\hypersetup{colorlinks,raiselinks}
+
+\include{include/definitions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{titlepage}
+
+  \begin{center}
+
+    \vspace*{2cm}
+
+    {\Huge \textsc{Jem user manual}}
+
+    \vspace{1cm}
+
+    {\large \textsc{version 2.0}}
+
+    \vspace{2cm}
+
+    {\large \textsc{Dynaflow Research Group}}
+
+  \end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================
+
+\section{Introduction}
+
+Jem is an object oriented programming toolkit written in C++. It combines
+the efficiency and versatility of C++ with several powerful concepts
+provided by Fortran~90, Java and C\# that facilitate the development of
+robust, modular software. These concepts include:
+\begin{Description}[\textit]
+
+\item[Automatic memory management] allocate objects that are
+  automatically deleted when they are no longer being referenced.
+
+\item[Multi-dimensional array syntax] write expressions that operate
+  on multi-dimensional arrays.
+
+\item[Events] build completely independent software components and
+  connect them with events.
+
+\item[Object serialization] read/write graphs of objects from/to a
+  file in a machine-independent format.
+
+\item[Parallel programming] write concurrent programs that run
+  efficiently on multi-processor machines.
+
+\item[Reflection] discover the capabilities of objects at run-time.
+
+\end{Description}
+
+In addition to these general concepts, Jem provides a collection of
+classes and functions that hide system-dependent programming interfaces.
+Consequently, an application built on top of Jem can easily be ported
+from one operating system to another.
+
+This manual briefly explains how to get started with Jem. It does not
+provide a thorough description of the classes and functions available in
+Jem. For that, you should consult the online reference manual, located in
+the directory \Code{doc} of your Jem distribution.
+
+The remainder of this manual is organized as follows. First,
+\autoref{section:packages} explains how Jem is divided into packages and
+how these packages can be used. Next, \autoref{section:namespaces}
+explains briefly how to deal with namespaces. After that,
+\autoref{section:compiling-and-linking} explains how to compile and link
+programs based on Jem, and \autoref{section:portable-makefiles} then
+shows how you can simplify the compilation and linking process by writing
+portable makefiles. \autoref{section:sample-program} then presents a
+simple Jem program and makefile.
+
+The last three sections provide some additional information that is not
+immediately required to get started with Jem.
+\autoref{section:package-overview} provides an overview of the packages
+in Jem. \autoref{section:environment-variables} lists the environment
+variables with which the runtime behavior of a Jem program can be tuned.
+\autoref{section:make-variables} provides information that may be useful
+when building advanced makefiles.
+
+%========================================================================
+
+\section{Working with packages \label{section:packages}}
+
+Like the Java runtime library, Jem bundles groups of related classes and
+functions into modular units called \emph{packages}. Except for the three
+core packages \Code{base}, \Code{io} and \Code{util}, most packages can
+be installed and removed on an individual basis. This means that you can
+easily adapt Jem to your specific needs.
+
+To avoid naming conflicts, all members of a package are declared in the
+namespace \Code{jem::}\Symbol{package-name}. All members of the package
+\Code{base}, however, are declared in the namespace \Code{jem}. The full
+name of the class \Code{String} in the package \Code{base} is therefore
+\Code{jem::\-String}, while the full name of the class
+\Code{Input\-Stream} in the package \Code{io} is
+\Code{jem::\-io::\-Input\-Stream}.
+
+To use a class from a package you have to include the header file
+containing the class definition. By convention, all header files
+provided by a package are located in the directory
+\Code{jem/}\-\Symbol{package-name} (assuming that the header file
+search path of the compiler has been set up correctly; see the
+\autoref{section:compiling-and-linking} for more information). The
+name of the header file defining a particular class can generally be
+obtained by appending the suffix `\Code{.h}' to the name of the class.
+Thus, the full pathname of the header file defining the class
+\Code{Input\-Stream} in the package \Code{io} is
+\Code{jem/\-io/\-Input\-Stream.h}. Note that this rule is not
+applicable to all classes; consult the reference manual to be sure.
+
+A package comprises two directories that are located in the directories
+\Code{\$JEMDIR/\-include/\-jem} and \Code{\$JEMDIR/\-packages}, where
+\Code{\$JEMDIR} denotes the name of the Jem installation directory. The
+package \Code{io}, for instance, comprises the directories
+\Code{\$JEMDIR/\-include/\-jem/\-io} and \Code{\$JEMDIR/\-packages/\-io}.
+The first one contains the header files and the second one contains the
+source code, the documentation and example programs. Although the layout
+and location of a package is not really relevant when writing code, it
+can be useful to know where to look if you would like to check out an
+header file or an example program.
+
+%========================================================================
+
+\section{Dealing with namespaces \label{section:namespaces}}
+
+To use a class, function, or variable that has been declared in a
+namespace, you will have to tell the compiler in which namespace to
+search. Although this is not a Jem-specific issue, experience has shown
+that not all new users of Jem are familiar with namespaces. If that
+applies to you, you may benefit from the remainder of this section.
+
+There are three ways to tell the compiler which namespace to search:
+write fully qualified names; write one or more \emph{using declarations};
+and write one or more \emph{using directives}. The code fragment below
+shows an example in which all three methods are used.
+
+\IncludeSource{C++}{examples/namespaces.cpp}
+
+Writing fully qualified names is the safest method because changes in one
+part of your code can not lead to unexpected name collisions in another
+part of your code. However, writing fully qualified names becomes tedious
+pretty soon and also leads to code that is harder to read.
+
+Using directives are at the other end of the spectrum: they minimize the
+required typing effort, but they can also easily lead to name collisions
+when you make small changes to your code. What is worse, changes in
+external code, such as Jem, can also lead to name collisions in your own
+code. Using directives should therefore only be used in small programs
+with a limited lifespan.
+
+Using declarations allow you to strike a balance between convenience
+(less typing) and robustness (less chances for name collisions). They are
+best used within functions, but for convenience you can also put them at
+the top of your source files. You can also put them in header files, but
+this increases the chances of name collisions. A better approach is to
+create one header file -- named \Code{import.h}, for instance -- that
+contains forward declarations and using declarations for names that you
+use frequently throughout your program; see the example below.
+
+\IncludeSource[title=\Code{import.h}]{C++}{examples/import.h}
+
+Note that the header file \Code{import.h} uses forward class declarations
+instead of including the header files containing the full class
+definitions. This setup minimizes the compilation time for the source
+files that include \Code{import.h} and use only some of those
+classes.
+
+%========================================================================
+
+\section{Compiling and linking a Jem program
+  \label{section:compiling-and-linking}}
+
+To compile and link a program based on Jem you have to:
+\begin{enumerate}
+
+\item set the environment variable \Code{JEMDIR} to the directory where
+  Jem has been installed;
+
+\item append the directory \Code{\$JEMDIR/include} to the header file
+  search path of your compiler;
+
+\item append the directory \Code{\$JEMDIR/lib} to the library search path
+  of your compiler;
+
+\item link the program with the appropriate package-specific libraries;
+
+\item link the program with the core Jem library;
+
+\item link the program with all system libraries that are used by Jem;
+
+\item link the program with the standard math library.
+
+\end{enumerate}
+
+Each package provides its own library -- typically named
+\Code{jem}\-\Symbol{package-name} -- containing all object files related
+to that package. When your program uses a class or function from a
+package, you must link the program with the package-specific library. For
+instance, if your program uses the packages \Code{xml} and
+\Code{numeric}, you must link the program with the libraries
+\Code{jem\-xml} and \Code{jem\-numeric}, both of which are located in the
+directory \Code{\$JEMDIR/lib}.
+
+The core Jem library, named \Code{jem}, contains all object files from
+the core packages \Code{base}, \Code{io} and \Code{util}. There are no
+package-specific libraries for these three packages.
+
+There are two ways to determine which system libraries are required. The
+first one is to keep adding libraries until all symbols have been
+resolved. Of course, you need to be fairly familiar with the system
+libraries on your operating system for this scheme to work. Another, and
+much more elegant way is to create a portable makefile as is explained in
+the \hyperref[section:portable-makefiles]{next} section.
+
+Note that the order in which the libraries are linked with the program
+is significant with most linkers. In general, you should first list
+all package-specific libraries, then the core Jem library, then all
+system libraries used by Jem, and finally the standard math library.
+
+Here is a typical command that compiles and links a Jem program named
+\Code{parser} on a Linux system:
+\begin{Source}{sh}
+  g++ -I$JEMDIR/include -L$JEMDIR/lib parser.cpp \
+      -o parser -ljemxml -ljem -lpthread -lm
+\end{Source}
+The option \Code{-lpthread} specifies that the program should be
+linked with the POSIX thread library. This is one of the system
+libraries used by Jem.
+
+Experience has shown that one often wants to compile a program with extra
+checks during the development stage, but that those checks should be
+disabled when the program is going to be deployed. Jem therefore provides
+two sets of libraries: one that has been compiled with many checks turned
+on, and one that has been compiled with most critical checks turned off
+and with aggressive compiler optimization switches turned on. The first
+set of libraries is located in the directory \Code{\$JEMDIR/\-lib}, while
+the second one is located in \Code{\$JEMDIR/\-lib-opt}. Thus, by simply
+changing the library search path for the compiler, one can easily switch
+from development to deployment mode.
+
+%========================================================================
+
+\section{Creating portable makefiles
+  \label{section:portable-makefiles}}
+
+To reduce the complexity of the compilation and linking process, each
+package in Jem provides a special makefile that specifies which Jem
+libraries and which system libraries are required by that package. They
+also specify which directories must be appended to the header file search
+path and the library search path of the compiler. By convention, a
+package-specific makefile is named \Symbol{package-name}\Code{.mk} and is
+located in the directory \Code{\$JEMDIR/\-makefiles/\-packages}. The
+package-specific makefiles rely on several features that are specific to
+GNU make. If GNU make is not yet installed on your system, you can
+download a free copy from the GNU website \url{www.gnu.org}.
+
+You can use the package-specific makefiles by including them into your
+own makefile. For instance, if your program uses the packages
+\Code{mp} and \Code{xml}, you should put the following into your
+makefile:
+\begin{Source}{make}
+  include $(JEMDIR)/makefiles/packages/mp.mk
+  include $(JEMDIR)/makefiles/packages/xml.mk
+\end{Source}
+Note that the order of the include statements is not important. The
+package-specific makefiles automatically resolve inter-package
+dependencies, so you do not have to know that the package \Symbol{foo}
+internally makes use of \Symbol{bar}. Since all packages depend on
+the core package \Code{base}, \Code{io} and \Code{util}, their
+package-specific makefiles do not have to be included explicitly when you
+include any other package-specific makefile. In the case that you are
+lazy and do not want to keep track of which packages your program
+actually uses, you can simply put this into your makefile:
+\begin{Source}{make}
+  include $(JEMDIR)/makefiles/packages/*.mk
+\end{Source}
+But laziness has its price, and this construction may result in a
+bunch of warnings from your compiler that some libraries are not used
+to resolve any symbols.
+
+Before including a package-specific makefile, make sure you have set the
+environment variable \Code{JEMDIR} to the name of the Jem directory. You
+can do this on Windows by using the control panel, and on Linux and MacOS
+X by using a terminal. If, for instance, Jem is located in the
+directory \Code{/usr/local/lib/DRG/jem}, then execute
+\begin{Source}{sh}
+  export JEMDIR=/usr/local/lib/DRG/jem
+\end{Source}
+when using a \Code{bash}-like shell, or execute
+\begin{Source}{csh}
+  setenv JEMDIR /usr/local/lib/DRG/jem
+\end{Source}
+when using a \Code{csh}-like shell. Of course, you can also put the
+appropriate command into your shell start-up script (typically
+\Code{.bashrc} or \Code{.cshrc} in your home directory).
+
+The package-specific makefiles define a number of variables that you can
+use in your own makefile. The ones that you are most likely to need are
+briefly described below.
+\begin{Description}[\Code]
+
+\item[LIBS] the libraries and object files that need to be linked with
+  your program. This list is sorted according to the dependencies between
+  the libraries.
+
+\item[LIBDIRS] the directories to be searched for the libraries.
+
+\item[LIBDIRS_OPT] the directories to be searched for optimized
+  libraries.
+
+\item[LIBDIRS_DBG] the directories to be searched for libraries with
+  debugging information.
+
+\item[INCDIRS] the directories to be searched for the header files.
+
+\item[CXX] the name of the C++ compiler that has been used to compile the
+  Jem libraries.
+
+\item[CXX_FLAGS] the compiler options for producing normal object
+  files.
+
+\item[CXX_FLAGS_OPT] the compiler options for producing optimized object
+  files. These options also disable some runtime checks.
+
+\item[CXX_FLAGS_DBG] the compiler options for producing object files that
+  contain debugging information.
+
+\item[Compile] a sequence of commands for creating an executable program
+  (the current target, \Code{\$@}) from a single C++ source file (the
+  current prerequisite, \Code{\$<}).
+
+\item[CompileExe] a sequence of commands for creating an executable
+  program (the current target, \Code{\$@}) from a single C++ source file
+  and a set of object files (the current prerequisites, \Code{\$\^}).
+
+\item[LinkExe] a sequence of commands for linking a set of object files
+  (the current prerequisites, \Code{\$\^}) into an executable program
+  (the current target, \Code{\$@}).
+
+\item[LinkDLL] a sequence of commands for linking a set of object files
+  (the current prerequisites, \Code{\$\^}) into a dynamically shared
+  library (the current target, \Code{\$@}).
+
+\end{Description}
+See \autoref{section:make-variables} for a complete list of make
+variables.
+
+It is possible that your program requires a library that is not located
+in one of the directories listed by \Makexp{LIBDIRS}. You could, of
+course, add the required directory to the \Code{LIBDIRS} variable, but
+this may break some of the make rules that you have defined previously.
+A better solution is to assign your list of additional directories to the
+``customization'' variable \Code{MY\_LIBDIRS}. Since this variable is part
+of the definition of the variable \Code{LIBDIRS}, your list of
+directories will automatically be pre-pended to the existing list of
+directories. The same method can be uses to customize the variables
+\Code{LIBDIRS\_OPT}, \Code{LIBDIRS\_DBG} and \Code{INCDIRS}. The compiler
+options can also be customized, but in a slightly different way. See
+\autoref{section:make-variables} for the details.
+
+When you include one or more package-specific makefiles into your
+makefile, you still need some rules to actually build an executable (or
+multiple executables) from your source files. Jem can help you out here,
+provided that you only need to build a single executable. In this case
+you only have to define the name of the executable; include all required
+package-specific makefiles; and then include the makefile
+\Code{\$JEMDIR/\-makefiles/\-prog.mk}. The last makefile defines the
+following rules:
+\begin{Description}[\Code]
+
+\item[\$(program)] builds an executable named \Makexp{program} by
+  compiling and linking all C++ source files in the current directory.
+  The variable \Code{program} must have been defined before the makefile
+  \Code{\$JEMDIR/\-makefiles/\-prog.mk} is included. This is the default
+  make rule.
+
+\item[opt] builds an optimized executable named
+  \Makexp{program}\Code{-opt}. This executable will run faster than the
+  standard one because it will perform less runtime checks.
+
+\item[debug] builds an executable names \Makexp{program}\Code{-dbg} that
+  contains debugging information.
+
+\item[clean] deletes all object files and core dumps in the current
+  directory. It also deletes any temporary files that may have been
+  generated by the compiler.
+
+\item[clean-all] invokes the \Code{clean} rule, and then deletes all
+  executable programs.
+
+\end{Description}
+The next section shows an example makefile that includes the makefile
+\Code{prog.mk}.
+
+Your makefile may define a variable \Code{subdirs} that lists all
+sub-directories containing source files that are part of your program.
+You must define this variable before including the makefile
+\Code{prog.mk} from Jem. Note that the names of your source files must
+be unique; you can not have two source files with the same names that are
+located in different sub-directories.
+
+If you want to write your own rules to compile and/or link a program, you
+are advised to use the variables \Code{Compile}, \Code{CompileExe} and
+\Code{LinkExe}. You can also use the \Code{CXX} to invoke the compiler
+directly, but this can lead to problems with library and header file
+search paths. A better solution is to use the compiler wrapper script
+\Code{\$JEMDIR/\-bin/\-CC} that accepts the same set of command-line
+options on all systems.
+
+%========================================================================
+
+\section{A sample Jem program and makefile
+  \label{section:sample-program}}
+
+The example program \Code{unzip.cpp} below shows how to use various Jem
+classes to ``unzip'' a series of compressed gzip-files (see also
+\Code{www.\-gzip.\-org}). The source code starts with a few
+\Code{\#include} directives that import all required class
+definitions. It then continues with two using directives that tell the
+compiler to search the namespaces \Code{jem} and \Code{jem::io} during
+name resolution. These directives save some typing and makes the source
+code easier to read. The real action starts in the function \Code{unzip}
+that executes a loop over all files that have been specified on the
+command line. Each file that has the extension \Code{.gz} is opened with
+a \Code{Gzip\-File\-Reader} object that handles the decompression of the
+data stored in the file. The decompressed data are then written to
+another file that has the same name as the original one minus the
+\Code{.gz} suffix.
+
+\IncludeSource[title=\Code{unzip.cpp}]{C++}{examples/unzip.cpp}
+
+The entry point of the program, the function \Code{main}, simply calls
+the static member function \Code{exec} of the \Code{System} class,
+specifying the address of the \Code{unzip} function as one of the
+parameters. This may seem a bit overly complicated, especially if you
+know that the \Code{exec} function does not much more than calling the
+\Code{unzip} function. However, the \Code{exec} function also catches and
+prints any exception that is thrown by the \Code{unzip} function and the
+functions that it calls. It therefore saves you from writing the same
+exception handling code over and over again.
+
+Creating a makefile for the example program is really straightforward.
+In fact, you only need to define the name of the program, include the
+makefiles from the packages \Code{base} and \Code{io}, and include the
+makefile \Code{prog.mk}. To make things a bit more interesting, let us
+assume that the program is to be linked statically so that the
+executable can be run on a system with incompatible system libraries.
+This can be achieved by setting the customization make variable
+\Code{MY\_CXX\_LNK\_FLAGS} so that the option
+\Code{-static}\footnote{this works for the GNU linker; other linkers
+  may require a different flag.} is appended to the list of linker
+options. The complete makefile is shown below.
+
+\IncludeSource[title=\Code{Makefile}]{make}{examples/Makefile}
+
+\appendix
+
+%========================================================================
+
+\section{Package overview \label{section:package-overview}}
+
+The current version of Jem comprises the following packages:
+\begin{Description}[\Code]
+
+\item[base]  exports fundamental Jem classes.
+
+\item[io]    exports classes dealing with I/O.
+
+\item[util]  exports container classes and utility functions.
+
+\item[xutil] exports special-purpose container classes.
+
+\item[gl]    exports classes for data visualization.
+
+\item[mp]    exports classes for building parallel programs.
+
+\item[mt]    exports classes for writing multi-threaded programs.
+
+\item[numeric]
+             exports classes for developing numerical programs.
+
+\item[xml]   exports classes for parsing XML-formatted text files.
+
+\end{Description}
+These packages are described briefly in the following sub-sections. For a
+detailed description of the classes and functions in a package you should
+consult the reference manual for that package.
+
+Jem defines three integral types -- named \Code{byte}, \Code{lint} and
+\Code{idx\_t} -- that are not part of any package. They are declared in
+the namespace \Code{jem} and are available through any Jem header file.
+The \Code{byte} type is just an alias for the \Code{unsigned char} type.
+The \Code{lint} type is a large, signed integer type. It is guaranteed to
+be a 64-bit integer type on 64-bit systems. The \Code{idx\_t} type is a
+signed integer type that is used for representing sizes of container
+classes and for accessing items in a container by index. This type is
+equal to the \Code{int} type, but it can be set equal to the \Code{lint}
+type when configuring Jem.
+
+\subsection{The \Code{base} package}
+
+The package \Code{base} contains the fundamental classes and functions on
+top of which the rest of Jem has been built. The most important of these
+classes are listed below.
+\begin{Description}[\Code]
+
+\item[String] represents a character array. It provides functions for
+  searching, slicing, and concatenation, among others. It also provides
+  all the usual string comparison functions.
+
+\item[Array] represents a multi-dimensional array. It provides functions
+  for creating multi-dimensional array slices, and supports efficient
+  Fortran~90-style array expressions. It also provides support for
+  writing array expressions using a kind of tensor notation.
+
+\item[Collectable] implements an automatic memory management scheme. All
+  objects derived from \Code{Collectable} are automatically deleted when
+  they are no longer used.
+
+\item[Object] is the super class of many other classes in Jem. It can
+  therefore be used to implement heterogeneous data structures and
+  generic algorithms.
+
+\item[System] provides access to various system-level facilities. It can
+  be used, among others, to get and set the standard input and output
+  streams; to get the contents of environment variables; and to catch and
+  print exceptions thrown by the main function of a program.
+
+\item[Thread] represents a thread of execution. It provides functions for
+  starting and joining threads, and for accessing thread-local data. In
+  addition to the \Code{Thread} class, the \Code{base} package also
+  provides various synchronization data types.
+
+\item[Throwable] provides a common base for all exception classes in Jem.
+  A \Code{Throwable} object encapsulates a context string, describing the
+  place where the exception was thrown, an error string that indicates
+  why the exception was thrown, and possibly a stack trace that describes
+  the function-call path at the time that the exception was thrown.
+
+\end{Description}
+The \Code{base} package also exports a reflection framework that can
+be used to query objects for their fields (data members) and methods
+(member functions).
+
+
+\subsection{The \Code{io} package}
+
+The \Code{io} package exports classes for reading and writing both text
+and binary files. The main classes are:
+\begin{Description}[\Code]
+
+\item[Reader] \label{class:Reader} represents a text input stream and
+  provides methods for reading character data. The \Code{Reader} class
+  does not specify where the characters come from; that must be specified
+  by a derived class.
+
+\item[Writer] \label{class:Writer} represents a text output stream and
+  provides functions for writing character data and for printing
+  fundamental data types (integers, floating point numbers, etc.). Again,
+  the \Code{Writer} class itself does not specify where the characters go
+  to.
+
+\item[InputStream] represents a binary input stream and provides
+  functions for reading arrays of bytes. Where the bytes come from must
+  be specified by a derived class.
+
+\item[OutputStream] represents a binary output stream that can be used to
+  write arrays of bytes. The \Code{Output\-Stream} class itself does not
+  specify where the bytes go to.
+
+\end{Description}
+Note that the classes listed above are not thread safe. The \Code{mt}
+package provides additional classes that make it possible to share input
+and output streams between multiple threads.
+
+The \Code{io} package also contains classes for getting and setting file
+properties; for formatting numbers; for dissecting file names; for
+reading and writing compressed files; and for many other I/O-related
+operations.
+
+
+\subsection{The \Code{util} package}
+
+The \Code{util} package exports various container classes, an event
+framework, and a set of general utility functions. Here is an overview of
+the main classes in this package.
+\begin{Description}[\Code]
+
+\item[ArrayBuffer] represents a 1-D array that can grow and shrink. It is
+  meant to be a helper class for creating \Code{Array} objects of which
+  the size is not known beforehand.
+
+\item[SparseArray] implements a multi-dimensional sparse array. It
+  behaves more or less like a conventional array, except that it only
+  stores those array elements that have actually been set.
+
+\item[HashMap] represents an associative array based on a hash table.
+  That is, instead of using integers as indices, it enables you to use
+  any type as an index.
+
+\item[Dictionary] \label{class:Dictionary} represents a heterogeneous
+  associative container that maps strings to objects.
+
+\item[Properties] \label{class:Properties} implements an hierarchical
+  database containing a set of name-value pairs called properties. It is
+  typically used as a repository for configuration data. It can also be
+  used to pass a dynamically varying set of parameters to a function.
+
+\item[Event] \label{class:Event} encapsulates a list of call-back
+  functions that are invoked when a particular method is called. Events
+  can be used, among others, to connect independent software components
+  and to implement the model-view-controller pattern.
+
+\end{Description}
+
+\subsection{The \Code{xutil} package}
+
+The \Code{xutil} package exports special-purpose container classes,
+including:
+\begin{Description}[\Code]
+
+\item[SnoopDictionary] implements a
+  \hyperref[class:Dictionary]{\Code{Dictionary}} that records which
+  objects have been accessed.
+
+\item[IListArray] implements an array of integer arrays with dynamic
+  sizes. A special storage scheme is used to lower the memory management
+  overhead.
+
+\end{Description}
+
+\subsection{The \Code{gl} package}
+
+The \Code{gl} package implements a extensible framework for building and
+managing 2-D and 3-D scene graphs that are rendered with OpenGL. It also
+implements classes for managing windows, for creating screen shots, for
+drawing text, for mappping data values to colors and the other way
+around, and for a number of other useful things. Below is a overview of
+the available classes.
+\begin{Description}[\Code]
+
+\item[Color] represents an RGBA color. It can be used, among others, for
+  passing colors around, for setting and getting the current color, and
+  for translating a string to a \Code{Color} object and the other way
+  around.
+
+\item[Transform] encapsulates a $4 \times 4$ transformation matrix. It
+  provides support for creating transformation matrices from rotations
+  and translations, for concatenating transformations, for inverting a
+  transformation, and for reading a transformation from a
+  \hyperref[class:Properties]{\Code{Properties}} object.
+
+\item[VertexSet] contains a set of points. It is meant to be a building
+  block for complex geometric objects -- like line sets and triangle sets
+  -- that may share the same set of points.
+
+\item[GfxNode] represents a node in a scene graph. It declares a number
+  of virtual methods, called action handlers, that are responsible for
+  handling events such as redraw requests, resize requests, mouse clicks
+  and key presses. A node typically handles only the events it is
+  interested in, and passes all other events to its children, if it has
+  any. This design makes it very easy to define new nodes and event types
+  without having to modify the existing nodes.
+
+\item[EventNode] passes scene graph events to objects that are not part
+  of the scene graph. An \Code{Event\-Node} has a number of
+  \hyperref[class:Event]{\Code{Event}} objects that are emitted whenever
+  an actions handler of that \Code{Event\-Node} is invoked. An
+  \Code{Event\-Node} can therefore be viewed as a kind of probe that
+  enables you to intercept scene graph events without having to implement
+  a new class that is derived from \Code{Gfx\-Node}.
+
+\item[TriangleSet] implements a scene graph node that renders a set of
+  triangles. It also implements a method for finding the triangle that is
+  nearest to a given point in space. The \Code{Triangle\-Set} class
+  supports three color modes: a single color for all triangles; a
+  different color per triangle; and a color per vertex. It can generate
+  the triangle normals automatically, but it also allows you to specify a
+  normal per triangle or a normal per vertex.
+
+\item[XYPlot] implements a scene graph node that displays one or more
+  data sets in a 2-D graph. It has member functions for adding and
+  deleting data sets; for changing the way in which each data set is
+  displayed; for setting the x-range and y-range; and for setting the
+  labels along the axes. Although the graph is displayed on a rectangular
+  plane, this plane can be part of a 3-D model. Thus, it would be
+  possible to attach six \Code{XYPlot} objects to the sides of a 3-D
+  cube.
+
+\item[FrameGrabber] saves a snapshot of a scene graph to an output
+  stream. It is an abstract class that defines a common interface for
+  different types of frame grabbers. The \Code{gl} package contains two
+  derived classes: one that saves a snapshot in the PPM format, and one
+  that saves a snapshot in the PNG format.
+
+\item[Controller] enables a user to interact with a scene graph. When a
+  \Code{Controller} is created, it inserts an \Code{Event\-Node} into a
+  given scene graph. By intercepting input events, it then enables the
+  user to select an object; to center that object; to rotate and
+  translate that object; to zoom in and out; to save a snapshot; and
+  more.
+
+\item[Viewer] encapsulates a window showing a scene graph. A
+  \Code{Viewer} manages an OpenGL context and translates window-level
+  events -- like key presses, mouse clicks, resize events -- into scene
+  graph events. These events are then passed to the appropriate action
+  handler of the top-most node in the scene graph.
+
+\item[Display] implements functions for creating and deleting
+  \Code{Viewer} objects in a portable way; it can be viewed as a uniform
+  interface to different window systems. The \Code{Display} class
+  provides the option to spawn a separate thread that handles all
+  window-level events and executes all OpenGL calls. In this way you can
+  run a computation and display the results at the same time without
+  having to check for user events at regular intervals.
+
+\end{Description}
+
+\subsection{The \Code{mp} package}
+
+The \Code{mp} package contains classes for building parallel programs
+that are based on the message passing programming model. These classes
+can be used to start a set of parallel processes; to exchange data
+between processes; and to open files that are read from or written to by
+multiple processes. The fundamental classes in this package are:
+\begin{Description}[\Code]
+
+\item[Context] represents a communication context. That is, a
+  \Code{Context} object acts like a virtual network over which processes
+  can communicate.
+
+\item[Request] represents an data transfer. A \Code{Request} object can
+  be used to start a transfer; check whether a transfer has been
+  completed; and wait until a transfer has been completed.
+
+\item[RequestList] encapsulates an array of \Code{Request} objects. It
+  provides functions for starting and ending multiple data transfers.
+
+\item[BcastStream] is an \Code{InputStream} that multiplexes an input
+  stream opened by one process to all other processes. It can be used to
+  open an input file that is read by multiple processes concurrently.
+
+\item[GatherStream] gathers output generated on different processes and
+  writes it to an output stream that has been opened on one particular
+  process. It is primarily used to write data produced by multiple
+  processes to a single output file.
+
+\end{Description}
+The \Code{Context} class is an abstract class that declares various
+member functions for exchanging data, but it does not provide an
+implementation for these functions. These implementations are provided by
+a number of derived classes that use different mechanisms for
+transferring data. The \Code{MTContext} class, for instance, is based in
+threads and transfers data directly through shared memory, while the
+\Code{MPIContext} class uses the MPI library to transfer data. In this
+way an application can choose at run time which data transport mechanism
+is to be used; see also the description of the environment variable
+\hyperref[envar:JEM-MP-DRIVER]{\Code{JEM\_MP\_DRIVER}} in
+\autoref{section:environment-variables}.
+
+\subsection{The \Code{mt} package}
+
+The \Code{mt} package provides special-purpose classes for writing
+parallel programs that are based in the multi-threading programming
+model. These classes include:
+\begin{Description}[\Code]
+
+\item[Barrier] synchronizes the execution of a group of threads. That is,
+  a thread will wait on a \Code{Barrier} object until the last thread in
+  the group has called the member function \Code{wait} for that object.
+
+\item[IOMutex] implements a recursive mutex that can be shared between
+  multiple input and output streams. It can be used to provide exclusive
+  access to an input or output stream.
+
+\item[ThreadSafeReader] implements a text input stream that can be used
+  by multiple threads concurrently. It is essentially a wrapper around a
+  \Code{IOMutex} and a \hyperref[class:Reader]{\Code{Reader}} object.
+
+\item[ThreadSafeWriter] implements a text output stream that can be used
+  by multiple threads concurrently. It is essentially a wrapper around a
+  \Code{IOMutex} and a \hyperref[class:Writer]{\Code{Writer}} object.
+
+\end{Description}
+
+\subsection{The \Code{numeric} package}
+
+The \Code{numeric} package exports classes and functions that can be used
+to implement numerical algorithms. In particular, these classes and
+functions can be used to execute matrix/vector multiplications; to
+determine the inverse of a matrix; to compute the eigenvalues of a
+matrix; and to perform various sparse matrix operations. Some of of these
+classes and functions are described below.
+\begin{Description}[\Code]
+
+\item[matmul] computes the product of two matrices, a matrix and a
+  vector, a vector and a matrix, or two vectors. Note that \Code{matmul}
+  is a non-member function, and not a class, of which multiple overloaded
+  versions exist.
+
+\item[MatmulChain] computes the product of up to four matrices and/or
+  vectors. The \Code{Matmul\-Chain} class has been designed to minimize
+  the number of allocations that are required to store intermediate
+  matrices or vectors. It is therefore ideal for multiplying series of
+  matrices within a loop.
+
+\item[LUSolver] provides (static) functions for decomposing a matrix into
+  a strictly lower triangular matrix and an upper triangular matrix. It
+  also provides functions for performing a pair of forward and backward
+  substitutions; for inverting a matrix; and for computing the
+  determinant of a matrix.
+
+\item[SparseMatrix] stores a sparse matrix using the compressed row
+  storage scheme. It also provides a set of overloaded non-member
+  functions and operators for executing common operations involving
+  sparse matrices and vectors.
+
+\item[SparseLU] computes the $LU$-decomposition of a sparse matrix. It
+  does partial pivoting for stability, and it can use a row/column
+  permutation to minimize the number of fill-ins. The \Code{Sparse\-LU}
+  class is also able to compute the incomplete $LU$-decomposition of a
+  sparse matrix by discarding fill-ins that are smaller than a specified
+  threshold.
+
+\end{Description}
+The \Code{numeric} uses the \Code{Array} class from the package
+\Code{base} to represent dense matrices and vectors; it does not provide
+its own matrix and vector classes.
+
+\subsection{The \Code{xml} package}
+
+The \Code{xml} package exports a framework for parsing (simple)
+XML-formatted files. This framework is based on the concept of a stack
+containing parser objects. The idea is that you associate a parser object
+with one or more XML elements. Whenever such an element is encountered in
+a file, the corresponding parser object is pushed onto the stack. When
+the parser has finished parsing the contents of the element, it is popped
+from the stack and control is returned to the previously active
+parser.
+
+The main classes making up the parser framework are listed below.
+\begin{Description}[\Code]
+
+\item[Tokenizer] converts a XML input file into a set of tokens. A token
+  is usually an XML tag, but one can also configure a \Code{Tokenizer} in
+  such a way that it marks strings, symbols and numbers as separate
+  tokens. This is particularly handy if you need to parse the contents of
+  an XML element and store the data directly in some type of object,
+  instead of storing the data as a string first.
+
+\item[Parser] provides a common base class for all parser objects. It
+  declares a virtual method called \Code{parse} that is invoked each time
+  the parser should process an XML element. It also provides some utility
+  methods for initializing a parser stack (see below) and for reporting
+  parse errors.
+
+\item[ParserStack] implements a stack of \Code{Parser} objects. Each time
+  a new parser needs to become active, it is pushed onto the stack.
+
+\item[ParserState] groups various objects, including a \Code{Tokenizer}
+  and a \Code{Par\-ser\-Stack}, that are required when parsing an XML
+  file. There is typically one \Code{Par\-ser\-State} object that is
+  passed as an argument to the \Code{parse} method of the \Code{Parser}
+  class.
+
+\end{Description}
+In addition to these classes, the \Code{xml} package also exports a
+collection of utility classes that can be used, among others, to parse
+XML attributes; to map XML tags to \Code{Parser} objects; to log parse
+events; and to write data to an XML-formatted output file. It also
+contains classes for processing XML files according to the Document
+Object Model.
+
+%========================================================================
+
+\section{Environment variables
+  \label{section:environment-variables}}
+
+The runtime behavior of a Jem program can be tuned with a number of
+environment variables. These are described below.
+\begin{Description}[\Code]
+
+\item[JEM_ABORT_ON_EXCEPTION] indicates that a program should be aborted
+  whenever a runtime exception is thrown. If this variable is set, then
+  all constructors of the class \Code{Runtime\-Exception} will terminate
+  the current program by calling \Code{abort}. On Linux and MacOS X this
+  can produce a core dump file that can be analyzed with a debugger. Note
+  that you may have to explicitly enable core dumps in your shell by
+  executing
+  \begin{Source}[gobble=4]{sh}
+    ulimit -c unlimited
+  \end{Source}
+  when using a \Code{bash}-like shell, or
+  \begin{Source}[gobble=4]{csh}
+    limit coredumpsize unlimited
+  \end{Source}
+  when using a \Code{csh}-like shell.
+
+\item[JEM_CACHE_SIZE] sets the size (in bytes) of the thread-local memory
+  pool. To limit the synchronization overhead, each thread created by Jem
+  has a small memory pool from which it allocates small objects. The
+  default size of this pool is 128KB. You may have to decrease the size
+  if your program creates a lot of threads on a low-memory machine.
+
+\item[JEM_MP_DRIVER] \label{envar:JEM-MP-DRIVER} specifies the message
+  passing driver to be used by the \Code{mp} package. If this variable is
+  empty or not set, the default driver is used. Otherwise, it should have
+  one of the following values:
+  \begin{Description}[\Code]
+
+  \item[default] use the default driver. This is \Code{mpi} when the
+    Message Passing Interface is available, and \Code{mt} otherwise.
+
+  \item[mpi] use the MPI-based driver. MPI will be used to create
+    parallel processes and to exchange messages between these
+    processes.
+
+  \item[mt]  use the multi-threaded driver. Threads will be used to
+    simulate parallel processes; messages are copied directly between
+    threads.
+
+  \item[uni] use the single-threaded driver. This is essentially a dummy
+    driver that does not create any parallel processes.
+
+  \end{Description}
+  Note that the driver specified on the command line (with the \Code{-md}
+  or \Code{--mp-driver} option) overrides the driver specified by
+  \Code{JEM\_MP\_DRIVER}.
+
+\item[JEM_SPIN_COUNT] sets the number of cycles that a thread waits
+  before giving up the processor it is running on. When a thread has to
+  wait on a locked synchronization object like a mutex, it can retry
+  locking that object a number of times before making a system call and
+  give up the processor. The environment variable \Code{JEM\_SPIN\_COUNT}
+  specifies how many times a thread should retry to lock an object. The
+  default value is zero. By setting it to a non-zero value you can
+  decrease the synchronization overhead in multi-threaded programs,
+  provided that the number of running threads does not exceed the number
+  of physical processors in the system.
+
+\end{Description}
+
+%========================================================================
+
+\section{Make variables
+  \label{section:make-variables}}
+
+This section describes the variables that are defined in the
+package-specific makefiles. It starts with a summary that you can use to
+quickly identify the variables of interest. After that, it provides an
+alphabetically sorted list with more information about each variable.
+
+\subsection{Make variable summary}
+
+\begin{MakevarTable}{Customization variables}
+
+  \hyperref[makevar:MY-LIBS]{MY_LIBS} &
+  Extra libraries to be linked. \\
+
+  \hyperref[makevar:MY-LIBDIRS]{MY_LIBDIRS} &
+  Extra directories to be searched for libraries. \\
+
+  \hyperref[makevar:MY-LIBDIRS-OPT]{MY_LIBDIRS_OPT} &
+  Extra directories to be searched for optimized libraries. \\
+
+  \hyperref[makevar:MY-LIBDIRS-DBG]{MY_LIBDIRS_DBG} &
+  Extra directories to be searched for libraries with debug
+  information. \\
+
+  \hyperref[makevar:MY-INCDIRS]{MY_INCDIRS} &
+  Extra directories to be searched for header files. \\
+
+  \hyperref[makevar:MY-CXX-STD-FLAGS]{MY_CXX_STD_FLAGS} &
+  Extra compiler options. \\
+
+  \hyperref[makevar:MY-CXX-LNK-FLAGS]{MY_CXX_LNK_FLAGS} &
+  Extra linking options. \\
+
+  \hyperref[makevar:MY-CXX-DLL-FLAGS]{MY_CXX_DLL_FLAGS} &
+  Extra shared library options. \\
+
+  \hyperref[makevar:MY-CXX-DBG-FLAGS]{MY_CXX_DBG_FLAGS} &
+  Extra debugging options. \\
+
+  \hyperref[makevar:MY-CXX-OPT-FLAGS]{MY_CXX_OPT_FLAGS} &
+  Extra optimization options. \\
+
+  \hyperref[makevar:MY-CXX-OPT-FLAGS1]{MY_CXX_OPT_FLAGS1} &
+  Extra level-1 optimization options. \\
+
+  \hyperref[makevar:MY-CXX-OPT-FLAGS2]{MY_CXX_OPT_FLAGS2} &
+  Extra level-2 optimization options. \\
+
+  \hyperref[makevar:MY-CXX-OPT-FLAGS3]{MY_CXX_OPT_FLAGS3} &
+  Extra level-3 optimization options. \\
+
+\end{MakevarTable}
+
+\begin{MakevarTable}{Compiler-related variables}
+
+  \hyperref[makevar:LIBS]{LIBS} &
+  All libraries to be linked. \\
+
+  \hyperref[makevar:LIBDIRS]{LIBDIRS} &
+  All directories to be searched for libraries. \\
+
+  \hyperref[makevar:LIBDIRS-OPT]{LIBDIRS_OPT} &
+  All directories to be searched for optimized libraries. \\
+
+  \hyperref[makevar:LIBDIRS-DBG]{LIBDIRS_DBG} &
+  All directories to be searched for libraries with debug
+  information. \\
+
+  \hyperref[makevar:INCDIRS]{INCDIRS} &
+  All directories to be searched for header files. \\
+
+  \hyperref[makevar:CXX]{CXX} &
+  The name of the C++ compiler executable. \\
+
+  \hyperref[makevar:CXX-NAME]{CXX_NAME} &
+  The (symbolic) name of the C++ compiler. \\
+
+  \hyperref[makevar:CXX-VERSION]{CXX_VERSION} &
+  The C++ compiler version. \\
+
+  \hyperref[makevar:CXX-FLAGS]{CXX_FLAGS} &
+  The compiler options for producing normal object files. \\
+
+  \hyperref[makevar:CXX-FLAGS-DBG]{CXX_FLAGS_DBG} &
+  The compiler options for producing object files with debug
+  information. \\
+
+  \hyperref[makevar:CXX-FLAGS-OPT]{CXX_FLAGS_OPT} &
+  The compiler options for producing optimized object files. \\
+
+  \hyperref[makevar:CXX-STD-FLAGS]{CXX_STD_FLAGS} &
+  The standard compiler options. \\
+
+  \hyperref[makevar:CXX-LNK-FLAGS]{CXX_LNK_FLAGS} &
+  The compiler options for linking. \\
+
+  \hyperref[makevar:CXX-DLL-FLAGS]{CXX_DLL_FLAGS} &
+  The compiler options for creating code that can be used in
+  shared libraries. \\
+
+  \hyperref[makevar:CXX-DBG-FLAGS]{CXX_DBG_FLAGS} &
+  The debugging options. \\
+
+  \hyperref[makevar:CXX-OPT-FLAGS1]{CXX_OPT_FLAGS1} &
+  The level-1 optimization options. \\
+
+  \hyperref[makevar:CXX-OPT-FLAGS2]{CXX_OPT_FLAGS2} &
+  The level-2 optimization options. \\
+
+  \hyperref[makevar:CXX-OPT-FLAGS3]{CXX_OPT_FLAGS3} &
+  The level-3 optimization options. \\
+
+  \hyperref[makevar:OPT-LEVEL]{OPT_LEVEL} &
+  The compiler optimization level. \\
+
+  \hyperref[makevar:CMODE]{CMODE} &
+  The compilation mode. \\
+
+  \hyperref[makevar:Compile]{Compile} &
+  Commands for compiling a source file. \\
+
+  \hyperref[makevar:CompileExe]{CompileExe} &
+  Commands for compiling an executable program. \\
+
+  \hyperref[makevar:LinkDLL]{LinkDLL} &
+  Commands for linking a shared library. \\
+
+  \hyperref[makevar:LinkExe]{LinkExe} &
+  Commands for linking an executable program. \\
+
+\end{MakevarTable}
+
+\begin{MakevarTable}{System-related variables}
+
+  \hyperref[makevar:SYS-NAME]{SYS_NAME} &
+  The name of the current system. \\
+
+  \hyperref[makevar:SYS-ARCH]{SYS_ARCH} &
+  The system's hardware architecture. \\
+
+  \hyperref[makevar:SYS-LIBS]{SYS_LIBS} &
+  The system libraries to be linked. \\
+
+  \hyperref[makevar:SYS-LIBDIRS]{SYS_LIBDIRS} &
+  The directories to be searched for system libraries. \\
+
+  \hyperref[makevar:SYS-INCDIRS]{SYS_INCDIRS} &
+  The directories to be searched for system header files. \\
+
+  \hyperref[makevar:OBJ-SUFFIX]{OBJ_SUFFIX} &
+  The suffix of an object file name. \\
+
+  \hyperref[makevar:EXE-SUFFIX]{EXE_SUFFIX} &
+  The suffix of an executable name. \\
+
+\end{MakevarTable}
+
+\begin{MakevarTable}{Jem-related variables}
+
+  \hyperref[makevar:JEM-LIBS]{JEM_LIBS} &
+  The Jem libraries to be linked. \\
+
+  \hyperref[makevar:JEM-LIBDIRS]{JEM_LIBDIRS} &
+  The directories to be searched for the Jem libraries. \\
+
+  \hyperref[makevar:JEM-LIBDIRS-OPT]{JEM_LIBDIRS_OPT} &
+  The directories to be searched for the optimized Jem libraries. \\
+
+  \hyperref[makevar:JEM-LIBDIRS-DBG]{JEM_LIBDIRS_DBG} &
+  The directories to be searched for the Jem libraries with debug
+  information. \\
+
+  \hyperref[makevar:JEM-PACKAGES]{JEM_PACKAGES} &
+  The names of all used Jem packages. \\
+
+  \hyperref[makevar:JEM-CXX-STD-FLAGS]{JEM_CXX_STD_FLAGS} &
+  The standard compiler options. \\
+
+  \hyperref[makevar:JEM-CXX-LNK-FLAGS]{JEM_CXX_LNK_FLAGS} &
+  The compiler options for linking. \\
+
+  \hyperref[makevar:JEM-CXX-DLL-FLAGS]{JEM_CXX_DLL_FLAGS} &
+  The shared library options. \\
+
+  \hyperref[makevar:JEM-CXX-DBG-FLAGS]{JEM_CXX_DBG_FLAGS} &
+  The debugging options. \\
+
+  \hyperref[makevar:JEM-CXX-OPT-FLAGS1]{JEM_CXX_OPT_FLAGS1} &
+  The level-1 optimization options. \\
+
+  \hyperref[makevar:JEM-CXX-OPT-FLAGS2]{JEM_CXX_OPT_FLAGS2} &
+  The level-2 optimization options. \\
+
+  \hyperref[makevar:JEM-CXX-OPT-FLAGS3]{JEM_CXX_OPT_FLAGS3} &
+  The level-3 optimization options. \\
+
+\end{MakevarTable}
+
+\subsection{Make variable details}
+
+\begin{Description}[\Code]
+
+\item[CMODE] \label{makevar:CMODE} the compilation mode: normal,
+  optimized or with debugging information. This variable should be
+  either empty, or equal to \Makexp{CMODE_OPT} or \Makexp{CMODE_DBG}.
+  In the first case, only the standard compiler options will be used
+  when compiling a source file. In the second case, the standard
+  options will be extended with the optimization options corresponding
+  with the current optimization level. In the third case, the standard
+  options will be extended with the debug options. Note that
+  \begin{Source}[gobble=4]{make}
+    CMODE_OPT = _OPT
+    CMODE_DBG = _DBG
+  \end{Source}
+  See also \hyperref[makevar:Compile]{\Code{Compile}} and
+  \hyperref[makevar:OPT-LEVEL]{\Code{OPT\_LEVEL}}.
+
+\item[CXX_DBG_FLAGS] \label{makevar:CXX-DBG-FLAGS} the compiler
+  options for adding debugging information to object files. This
+  variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_DBG_FLAGS = $(MY_CXX_DBG_FLAGS) \
+                    $(JEM_CXX_DBG_FLAGS)
+  \end{Source}
+
+\item[CXX_DLL_FLAGS] \label{makevar:CXX-DLL-FLAGS} the compiler
+  options for creating position-independent object files that can be
+  used in shared libraries. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_DLL_FLAGS = $(MY_CXX_DLL_FLAGS) \
+                    $(JEM_CXX_DLL_FLAGS)
+  \end{Source}
+
+\item[CXX_FLAGS] \label{makevar:CXX-FLAGS} the compiler options for
+  producing normal object files. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_FLAGS = $(CXX_STD_FLAGS)
+  \end{Source} %$
+  It exists so that the variable \Code{CMODE} can be used to select
+  the compiler options. That is, the options to be passed to the
+  compiler are given by the expression:
+  \begin{Source}[gobble=4]{make}
+    $(CXX_FLAGS$(CMODE))
+  \end{Source}
+  See also \hyperref[makevar:Compile]{\Code{Compile}}.
+
+\item[CXX_FLAGS_DBG] \label{makevar:CXX-FLAGS-DBG} the compiler
+  options for producing object files with debugging information. This
+  variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_FLAGS_DBG = $(CXX_FLAGS) $(CXX_DBG_FLAGS)
+  \end{Source}
+  See also \hyperref[makevar:CXX-FLAGS]{\Code{CXX\_FLAGS}} and
+  \hyperref[makevar:Compile]{\Code{Compile}}.
+
+\item[CXX_FLAGS_OPT] \label{makevar:CXX-FLAGS-OPT} the compiler
+  options for producing optimized object files. This variable is
+  defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_FLAGS_OPT = $(CXX_FLAGS) \
+                    $(CXX_OPT_FLAGS$(OPT_LEVEL))
+  \end{Source} %$
+  See also \hyperref[makevar:CXX-FLAGS]{\Code{CXX\_FLAGS}},
+  \hyperref[makevar:OPT-LEVEL]{\Code{OPT\_LEVEL}} and
+  \hyperref[makevar:Compile]{\Code{Compile}}.
+
+\item[CXX_LNK_FLAGS] \label{makevar:CXX-LNK-FLAGS} the compiler
+  options for linking a set of object files into an executable
+  program. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_LNK_FLAGS = $(MY_CXX_LNK_FLAGS) \
+                    $(JEM_CXX_LNK_FLAGS)
+  \end{Source}
+
+\item[CXX_NAME] \label{makevar:CXX-NAME} the symbolic name of the C++
+  compiler. It has one of the following values:
+  \begin{Description}[\Code]
+
+  \item[gcc] the GNU C/C++ compiler.
+
+  \item[icc] the Intel C++ compiler.
+
+  \item[msc] the Microsoft Visual C++ compiler.
+
+  \end{Description}
+  You can use this variable to define compiler-specific options, as in
+  the following example:
+  \begin{Source}[gobble=4]{make}
+    ifeq ($(CXX_NAME),icc)
+      MY_CXX_STD_FLAGS = -ip
+    endif
+  \end{Source} %$
+
+\item[CXX_OPT_FLAGS1] \label{makevar:CXX-OPT-FLAGS1} the level-one
+  optimization options for the compiler. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_OPT_FLAGS1 = $(MY_CXX_OPT_FLAGS1) \
+                     $(JEM_CXX_OPT_FLAGS1)
+  \end{Source}
+  See also \hyperref[makevar:OPT-LEVEL]{\Code{OPT\_LEVEL}}.
+
+\item[CXX_OPT_FLAGS2] \label{makevar:CXX-OPT-FLAGS2} the level-two
+  optimization options for the compiler. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_OPT_FLAGS2 = $(MY_CXX_OPT_FLAGS2) \
+                     $(JEM_CXX_OPT_FLAGS2)
+  \end{Source}
+  See also \hyperref[makevar:OPT-LEVEL]{\Code{OPT\_LEVEL}}.
+
+\item[CXX_OPT_FLAGS3] \label{makevar:CXX-OPT-FLAGS3} the level-three
+  optimization options for the compiler. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_OPT_FLAGS3 = $(MY_CXX_OPT_FLAGS3) \
+                     $(JEM_CXX_OPT_FLAGS3)
+  \end{Source}
+  See also \hyperref[makevar:OPT-LEVEL]{\Code{OPT\_LEVEL}}.
+
+\item[CXX_STD_FLAGS] \label{makevar:CXX-STD-FLAGS} the standard
+  compiler flags that are always passed to the compiler. This variable
+  is defined as:
+  \begin{Source}[gobble=4]{make}
+    CXX_STD_FLAGS = $(MY_CXX_STD_FLAGS) \
+                    $(JEM_CXX_STD_FLAGS)
+  \end{Source}
+
+\item[CXX_VERSION] \label{makevar:CXX-VERSION} the compiler version as
+  an integer.
+
+\item[CXX] \label{makevar:CXX} the name of the compiler executable.
+  This is usually not the same as \Makexp{CXX\_NAME}.
+
+\item[CompileExe] \label{makevar:CompileExe} a sequence of commands
+  for creating an executable program (the current target, \Code{\$@})
+  from a single C++ source file and a set of object files (the current
+  prerequisites, \Code{\$\^}). The compiler/linker is invoked with the
+  following flags:
+  \begin{Source}[gobble=4]{make}
+    $(CXX_FLAGS$(CMODE)) $(CXX_LNK_FLAGS) $(INCDIRS) \
+    $(LIBDIRS$(CMODE)) $(LIBS)
+  \end{Source} %$
+  See also \hyperref[makevar:Compile]{\Code{Compile}} and
+  \hyperref[makevar:LinkExe]{\Code{LinkExe}}.
+
+\item[Compile] \label{makevar:Compile} a sequence of commands for
+  creating an executable program (the current target, \Code{\$@}) from
+  a single C++ source file (the current prerequisite, \Code{\$<}). The
+  compiler is invoked with the folllowing flags:
+  \begin{Source}[gobble=4]{make}
+    $(CXX_FLAGS$(CMODE)) $(INCDIRS)
+  \end{Source} %$
+  The compiler wrapper script \Code{\$JEMDIR/\-bin/\-CC} is used to
+  invoke the compiler; the make variable \Code{CXX} is ignored.
+
+\item[EXE_SUFFIX] \label{makevar:EXE-SUFFIX} the suffix of an
+  executable program. On Unix-like systems, this variable is empty; on
+  Windows systems this variable expands to \Code{.exe}.
+
+\item[INCDIRS] \label{makevar:INCDIRS} the list of directories to be
+  searched for header files. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    INCDIRS = $(MY_INCDIRS) $(SYS_INCDIRS) $(JEM_INCDIRS)
+  \end{Source} %$
+  The value of \Code{INCDIRS} is \emph{not} passed directly to the
+  compiler. It is first expanded by the shell, and then an appropriate
+  compiler flag is prepended to each word in the resulting list,
+  unless the word starts with the string \Code{-NODIR:}.
+
+\item[JEM_CXX_DBG_FLAGS] \label{makevar:JEM-CXX-DBG-FLAGS} the
+  debugging compiler options. This variable exists so that you can
+  re-define \hyperref[makevar:CXX-DBG-FLAGS]{\Code{CXX\_DBG\_FLAGS}}.
+
+\item[JEM_CXX_DLL_FLAGS] \label{makevar:JEM-CXX-DLL-FLAGS} the
+  compiler options for creating position-independent object files.
+  This variable exists so that you can re-define
+  \hyperref[makevar:CXX-DLL-FLAGS]{\Code{CXX\_DLL\_FLAGS}}.
+
+\item[JEM_CXX_LNK_FLAGS] \label{makevar:JEM-CXX-LNK-FLAGS} the
+  compiler options for linking a set of object files into an
+  executable program. This variable exists so that you can re-define
+  \hyperref[makevar:CXX-LNK-FLAGS]{\Code{CXX\_LNK\_FLAGS}}.
+
+\item[JEM_CXX_OPT_FLAGS1] \label{makevar:JEM-CXX-OPT-FLAGS1} the
+  level-one optimization options for the compiler. This variable
+  exists so that you can re-define
+  \hyperref[makevar:CXX-OPT-FLAGS1]{\Code{CXX\_OPT\_FLAGS1}}.
+
+\item[JEM_CXX_OPT_FLAGS2] \label{makevar:JEM-CXX-OPT-FLAGS2} the
+  level-two optimization options for the compiler. This variable
+  exists so that you can re-define
+  \hyperref[makevar:CXX-OPT-FLAGS2]{\Code{CXX\_OPT\_FLAGS2}}.
+
+\item[JEM_CXX_OPT_FLAGS3] \label{makevar:JEM-CXX-OPT-FLAGS3} the
+  level-three optimization options for the compiler. This variable
+  exists so that you can re-define
+  \hyperref[makevar:CXX-OPT-FLAGS3]{\Code{CXX\_OPT\_FLAGS3}}.
+
+\item[JEM_CXX_STD_FLAGS] \label{makevar:JEM-CXX-STD-FLAGS} the
+  standard compiler flags that are always passed to the compiler. This
+  variable exists so that you can re-define
+  \hyperref[makevar:CXX-STD-FLAGS]{\Code{CXX\_STD\_FLAGS}}.
+
+\item[JEM_LIBDIRS_DBG] \label{makevar:JEM-LIBDIRS-DBG} the directories
+  containing the Jem libraries with debugging information.
+
+\item[JEM_LIBDIRS_OPT] \label{makevar:JEM-LIBDIRS-OPT} the directories
+  containing the optimized Jem libraries.
+
+\item[JEM_LIBDIRS] \label{makevar:JEM-LIBDIRS} the directories
+  containing the standard Jem libraries.
+
+\item[JEM_LIBS] \label{makevar:JEM-LIBS} a list of all required Jem
+  libraries.
+
+\item[JEM_PACKAGES] \label{makevar:JEM-PACKAGES} the names of all used
+  Jem packages.
+
+\item[LIBDIRS_DBG] \label{makevar:LIBDIRS-DBG} the list of directories
+  to be searched for libraries with debugging information. This
+  variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    LIBDIRS_DBG = $(MY_LIBDIRS_DBG) $(SYS_LIBDIRS) \
+                  $(JEM_LIBDIRS_DBG)
+  \end{Source} %$
+  See also \hyperref[makevar:LIBDIRS]{\Code{LIBDIRS}}.
+
+\item[LIBDIRS_OPT] \label{makevar:LIBDIRS-OPT} the list of directories
+  to be searched for optimized libraries. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    LIBDIRS_OPT = $(MY_LIBDIRS_OPT) $(SYS_LIBDIRS) \
+                  $(JEM_LIBDIRS_OPT)
+  \end{Source} %$
+  See also \hyperref[makevar:LIBDIRS]{\Code{LIBDIRS}}.
+
+\item[LIBDIRS] \label{makevar:LIBDIRS} the list of directories to be
+  searched for libraries. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    LIBDIRS = $(MY_LIBDIRS) $(SYS_LIBDIRS) $(JEM_LIBDIRS)
+  \end{Source} %$
+  The value of \Code{LIBDIRS} is \emph{not} passed directly to the
+  compiler/linker. It is first expanded by the shell, and then an
+  appropriate compiler flag is prepended to each word in the resulting
+  list, unless the word starts with the string \Code{-NODIR:}. See
+  also \hyperref[makevar:LinkExe]{\Code{LinkExe}}.
+
+\item[LIBS] \label{makevar:LIBS} the list of libraries to be linked
+  with a program. This variable is defined as:
+  \begin{Source}[gobble=4]{make}
+    LIBS = $(MY_LIBS) $(SYS_LIBS) $(JEM_LIBS)
+  \end{Source} %$
+  The value of \Code{LIBDIRS} is \emph{not} passed directly to the
+  compiler/linker. It is first expanded by the shell, and then an
+  appropriate compiler flag is prepended to each word in the resulting
+  list, unless the word starts with the string \Code{-NOLIB:}. See
+  also \hyperref[makevar:LinkExe]{\Code{LinkExe}}.
+
+\item[LinkDLL] \label{makevar:LinkDLL} a sequence of commands for
+  linking a set of object files (the current prerequisites,
+  \Code{\$\^}) into a shared library or DLL (the current target,
+  \Code{\$@}). The compiler/linker is invoked with the following
+  flags:
+  \begin{Source}[gobble=4]{make}
+    $(CXX_FLAGS$(CMODE)) $(CXX_LNK_FLAGS) \
+    $(LIBDIRS$(CMODE)) $(LIBS)
+  \end{Source} %$
+  The compiler wrapper script \Code{\$JEMDIR/\-bin/\-CC} is used to
+  invoke the compiler/linker; the make variable \Code{CXX} is ignored.
+
+\item[LinkExe] \label{makevar:LinkExe} a sequence of commands for
+  linking a set of object files (the current prerequisites,
+  \Code{\$\^}) into an executable program (the current target,
+  \Code{\$@}). The compiler/linker is invoked with the following
+  flags:
+  \begin{Source}[gobble=4]{make}
+    $(CXX_FLAGS$(CMODE)) $(CXX_LNK_FLAGS) \
+    $(LIBDIRS$(CMODE)) $(LIBS)
+  \end{Source} %$
+  The compiler wrapper script \Code{\$JEMDIR/\-bin/\-CC} is used to
+  invoke the compiler/linker; the make variable \Code{CXX} is ignored.
+
+\item[MY_CXX_DBG_FLAGS] \label{makevar:MY-CXX-DBG-FLAGS} extra
+  debugging options to be passed to the compiler. By default, this
+  variable is empty. See also
+  \hyperref[makevar:CXX-DBG-FLAGS]{\Code{CXX\_DBG\_FLAGS}}.
+
+\item[MY_CXX_DLL_FLAGS] \label{makevar:MY-CXX-DLL-FLAGS} extra
+  compiler options for creating a shared library. By default, this
+  variable is empty. See also
+  \hyperref[makevar:CXX-DLL-FLAGS]{\Code{CXX\_DLL\_FLAGS}}.
+
+\item[MY_CXX_LNK_FLAGS] \label{makevar:MY-CXX-LNK-FLAGS} extra
+  compiler options for linking an executable program. By default, this
+  variable is empty. See also
+  \hyperref[makevar:CXX-LNK-FLAGS]{\Code{CXX\_LNK\_FLAGS}}.
+
+\item[MY_CXX_OPT_FLAGS1] \label{makevar:MY-CXX-OPT-FLAGS1} extra
+  level-one optimization options to be passed to the compiler. By
+  default, this variable has the value \Makexp{MY\_CXX\_OPT\_FLAGS}.
+  See also \hyperref[makevar:CXX-OPT-FLAGS1]{\Code{CXX\_OPT\_FLAGS1}}.
+
+\item[MY_CXX_OPT_FLAGS2] \label{makevar:MY-CXX-OPT-FLAGS2} extra
+  level-two optimization options to be passed to the compiler. By
+  default, this variable has the value \Makexp{MY\_CXX\_OPT\_FLAGS}.
+  See also \hyperref[makevar:CXX-OPT-FLAGS2]{\Code{CXX\_OPT\_FLAGS2}}.
+
+\item[MY_CXX_OPT_FLAGS3] \label{makevar:MY-CXX-OPT-FLAGS3} extra
+  level-three optimization options to be passed to the compiler. By
+  default, this variable has the value \Makexp{MY\_CXX\_OPT\_FLAGS}.
+  See also \hyperref[makevar:CXX-OPT-FLAGS3]{\Code{CXX\_OPT\_FLAGS3}}.
+
+\item[MY_CXX_OPT_FLAGS] \label{makevar:MY-CXX-OPT-FLAGS} extra
+  optimizations options to be passed to the compiler at any
+  optimization level. By default, this variable is empty.
+
+\item[MY_CXX_STD_FLAGS] \label{makevar:MY-CXX-STD-FLAGS} extra options
+  that should always be passed to the compiler. See also
+  \hyperref[makevar:CXX-STD-FLAGS]{\Code{CXX\_STD\_FLAGS}}.
+
+\item[MY_INCDIRS] \label{makevar:MY-INCDIRS} extra directories to be
+  searched for header files. See also
+  \hyperref[makevar:INCDIRS]{\Code{INCDIRS}}.
+
+\item[MY_LIBDIRS_DBG] \label{makevar:MY-LIBDIRS-DBG} extra directories
+  to be searched for libraries with debugging information. By default,
+  this variabled has the value \Makexp{MY\_LIBDIRS}. See also
+  \hyperref[makevar:LIBDIRS-DBG]{\Code{LIBDIRS\_DBG}}.
+
+\item[MY_LIBDIRS_OPT] \label{makevar:MY-LIBDIRS-OPT} extra directories
+  to be searched for optimized libraries. By default, this variable
+  has the value \Makexp{MY\_LIBDIRS}. See also
+  \hyperref[makevar:LIBDIRS-OPT]{\Code{LIBDIRS\_OPT}}.
+
+\item[MY_LIBDIRS] \label{makevar:MY-LIBDIRS} extra directories to be
+  searched for libraries. By default, this variable is empty. See also
+  \hyperref[makevar:LIBDIRS]{\Code{LIBDIRS}}.
+
+\item[MY_LIBS] \label{makevar:MY-LIBS} extra directories to be linked
+  with a program. By default, this variable is empty. See also
+  \hyperref[makevar:LIBS]{\Code{LIBS}}.
+
+\item[OBJ_SUFFIX] \label{makevar:OBJ-SUFFIX} the suffix of an object
+  file name. It is equal to \Code{.o} on Unix-like systems, and
+  \Code{.obj} on Windows systems.
+
+\item[OPT_LEVEL] \label{makevar:OPT-LEVEL} the optimization level to
+  be used. It should be either \Code{1}, \Code{2} or \Code{3}. The
+  default value depends on the system and the compiler.
+
+\item[SYS_ARCH] \label{makevar:SYS-ARCH} the (symbolic) name of the
+  system's hardware architecture. It has one of the following values:
+  \begin{Description}[\Code]
+
+  \item[ia32]   Intel 32-bit architecture (x86 processors).
+
+  \item[ia64]   Intel 64-bit architecture (Itanium processors).
+
+  \item[x86_64] AMD 64-bit architecture (also known as Intel Extended
+    Memory Technology).
+
+  \item[ppc]    PowerPC architecture.
+
+  \end{Description}
+
+\item[SYS_INCDIRS] \label{makevar:SYS-INCDIRS} the directories to be
+  searched for system header files. See also
+  \hyperref[makevar:INCDIRS]{\Code{INCDIRS}}.
+
+\item[SYS_LIBDIRS] \label{makevar:SYS-LIBDIRS} the directories to be
+  searched for system libraries. See also
+  \hyperref[makevar:LIBDIRS]{\Code{LIBDIRS}}.
+
+\item[SYS_LIBS] \label{makevar:SYS-LIBS} the system directories to be
+  linked with a program. See also
+  \hyperref[makevar:LIBS]{\Code{LIBS}}.
+
+\item[SYS_NAME] \label{makevar:SYS-NAME} the (symbolic) name of the
+  operating system. It has one of the following values:
+  \begin{Description}[\Code]
+
+  \item[linux]   GNU/Linux.
+
+  \item[darwin]  Apple MacOS X.
+
+  \item[windows] Microsoft Windows.
+
+  \end{Description}
+
+\end{Description}
+
+
+\end{document}

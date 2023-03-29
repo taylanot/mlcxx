@@ -1,0 +1,8 @@
+<map id="jive::gl::DataSet" name="jive::gl::DataSet">
+<area shape="rect" id="node1" title=" " alt="" coords="94,229,221,256"/>
+<area shape="rect" id="node5" href="$classjive_1_1gl_1_1TableData.html" title=" " alt="" coords="5,304,144,331"/>
+<area shape="rect" id="node6" href="$classjive_1_1gl_1_1VectorData.html" title=" " alt="" coords="168,304,315,331"/>
+<area shape="rect" id="node2" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="85,155,229,181"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="109,80,206,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="93,5,221,32"/>
+</map>

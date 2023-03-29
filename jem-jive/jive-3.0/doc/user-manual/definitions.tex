@@ -1,0 +1,265 @@
+%%%%%%%%%%%%%%%%%%%%%%% Document description %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% LaTeX commands
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some handy symbols
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\Inproduct}{\raisebox{0.5mm}
+  {$\scriptscriptstyle \; \bullet \;$}}
+
+\newcommand{\Dee}{\mathrm{d}}
+
+\newcommand{\Nabla}{\bm{\nabla}}
+
+\newcommand{\Landau}{\ensuremath{O}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lengths & counters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newlength{\RowSep}
+\setlength{\RowSep}{1ex}
+\newlength{\IntSpace}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\BlankLine}{\vspace{1.5ex} \noindent}
+
+\newcommand{\Code}[1]{\texttt{#1}}
+
+\newcommand{\Symbol}[1]{\textsl{#1}}
+
+\newcommand{\NeumannBoundary}   {\ensuremath{\Gamma_{\mathrm{N}}}}
+\newcommand{\DirichletBoundary} {\ensuremath{\Gamma_{\mathrm{D}}}}
+
+\newcommand{\smallfrac}[2]{\ensuremath{\mbox{$\frac{{#1}}{{#2}}$}}}
+
+\newcommand{\bm}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+
+\newcommand{\vnorm}[1]{\ensuremath{\|#1\|}}
+
+\newcommand{\Int}[1]{\settowidth{\IntSpace}{${\scriptstyle #1}$} 
+  \int_{#1} \hspace{-0.7 \IntSpace}}
+
+\newcommand{\ns}{\negmedspace}
+
+\newcommand{\NS}{\negthickspace\negthickspace}
+
+\newcommand{\Boundary}[1]{\ensuremath{{\partial}{#1}}}
+
+\newcommand{\URL}[1]{\textsl{#1}}
+
+\newcommand{\Signpost}[1]{\subsubsection*{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some style parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\renewcommand{\labelitemi}{$\circ$}
+\renewcommand{\pdLineSep}{1.5ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Figure environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Environment for displaying a (framed) figure
+
+\newlength{\FigureWidth}
+\setlength{\FigureWidth}{\textwidth}
+\addtolength{\FigureWidth}{-1cm}
+
+\newenvironment{Figure}
+{
+  \begin{figure}
+    \begin{center}
+      \begin{minipage}{\FigureWidth}
+}
+{
+      \end{minipage}
+    \end{center}
+    \vspace{0mm}
+  \end{figure}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Table environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Environment for displaying a (framed) table
+
+\newenvironment{Table}
+{
+  \begin{table}
+    \begin{center}
+      \begin{minipage}{\FigureWidth}
+}
+{
+      \end{minipage}
+    \end{center}
+    \vspace{2mm}
+  \end{table}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The SideStep environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newlength{\SideStepWidth}
+\setlength{\SideStepWidth}{\textwidth}
+\addtolength{\SideStepWidth}{-1cm}
+
+\newenvironment{SideStep}[1]
+{
+  \begin{figure}[t!]
+    \begin{center}
+      \begin{tabular}{|p{\SideStepWidth}|}
+         \hline
+         \begin{center}
+            {\large \textbf{#1}}
+         \end{center}
+         \small
+         \setlength{\parindent}{1em}
+         \BlankLine
+}
+{
+         \\ \\ \hline
+      \end{tabular}
+    \end{center}
+  \end{figure}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Algorithm environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newlength{\AlgorithmWidth}
+\setlength{\AlgorithmWidth}{\FigureWidth}
+\addtolength{\AlgorithmWidth}{-2cm}
+
+% Environment for typesetting algorithms. 
+
+\newenvironment{Algorithm}[1][\AlgorithmWidth]
+{ 
+  \begin{center}
+    \begin{tabular}{|p{#1}|}
+      \hline
+      \begin{tabbing}
+        12\=12\=12\=12\=12\=12\=12\=12\=12\=12\=12\= \+ \kill
+} 
+{ 
+      \end{tabbing}
+      \\ \hline
+    \end{tabular}
+  \end{center}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The ShortAlgorithm environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Environment for typesetting short algorithms, without a caption
+
+\newenvironment{ShortAlgorithm}
+{
+  \begin{list}{}{
+    \setlength{\leftmargin}{1cm}
+    \setlength{\rightmargin}{1cm}
+    \setlength{\labelwidth}{0cm}
+    \setlength{\itemindent}{0cm}
+  }
+  
+  \item
+  \begin{tabbing}
+    12\=12\=12\=12\=12\=12\=12\=12\=12\=12\=12\= \kill
+}
+{
+  \end{tabbing}
+  \end{list}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some useful macro's for within the (Short)Algorithm environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\for}[2]{
+  \textbf{for} ( #1 ) \textbf{do} \+ \\ 
+    #2 \- \\
+  \textbf{end do}
+}
+
+\newcommand{\while}[2]{
+  \textbf{while} ( #1 ) \textbf{do} \+ \\ 
+    #2 \- \\
+  \textbf{end do}
+}
+
+\newcommand{\dowhile}[2]{
+  \textbf{do} \+ \\ 
+    #1 \- \\
+  \textbf{while} ( #2 )
+}
+
+\newcommand{\ifthen}[2]{
+  \textbf{if} ( #1 ) \textbf{then} \+ \\ 
+    #2 \- \\
+  \textbf{end if}
+}
+
+\newcommand{\ifelse}[3]{
+  \textbf{if} ( #1 ) \textbf{then} \+ \\ 
+    #2 \- \\
+  \textbf{else} \+ \\ 
+    #3 \- \\
+  \textbf{end if}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Remarks environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcounter{RemarksCounter}
+
+% Environment for creating a list of remarks. Arguments: none 
+
+\newenvironment{Remarks}
+{
+  \begin{list}
+    {\textbf{Remark \arabic{RemarksCounter}:}}
+    {\usecounter{RemarksCounter}
+    \settowidth{\labelwidth}{\textbf{Remark 99}}
+    \setlength{\leftmargin}{0.5cm}
+    \setlength{\rightmargin}{\leftmargin}
+    \setlength{\itemindent}{\labelwidth}
+    \addtolength{\itemindent}{\labelsep}
+    \addtolength{\itemindent}{-\leftmargin}}
+} 
+{ 
+  \end{list} 
+}
+
+

@@ -1,0 +1,191 @@
+% Author: Ozgur Taylan TURAN
+% Delft University of Technology
+\documentclass{article}
+
+\usepackage{/home/taylanot/texmf/tex/arxivtemplate}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{algorithm2e}
+\usepackage{algpseudocode}
+\usepackage{wrapfig}
+\usetikzlibrary{external}
+\tikzexternalize[prefix=Figures/tikz]
+\newcommand{\includetikz}[2]{ \resizebox{#1}{!}{\input{#2}}}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{pgfplots}
+%\usepackage{float}
+%\usepackage[cochineal,bigdelims,cmintegrals,vvarbb]{newtxmath}
+\usepackage{amsmath}       % blackboard math symbols
+\usepackage{bm}       % blackboard math symbols
+\usepackage[cal=cm]{mathalfa}
+
+% problem
+\newcommand{\ispace}{\mathbb{X}}
+\newcommand{\ospace}{\mathbb{Y}}
+\newcommand{\hypspace}{\mathbb{H}}
+\newcommand{\hyp}{h}
+\newcommand{\inp}{x}
+\newcommand{\out}{y}
+\newcommand{\algo}{\mathcal{A}}
+\newcommand{\nsamp}{N}
+\newcommand{\nsampi}{N_i}
+\newcommand{\samp}{\mathcal{D}_\nsamp}
+\newcommand{\sampi}{\mathcal{D}_{\nsamp_{i}}}
+\newcommand{\prob}{\mathcal{P}}
+\newcommand{\probspace}{\mathbb{P}}
+\newcommand{\pred}{\hat{y}}
+\newcommand{\loss}{\mathcal{L}}
+\newcommand{\risk}{\mathcal{R}}
+\newcommand{\avgrisk}{\bar{\risk}}
+\newcommand{\expect}{\mathbb{E}}
+\newcommand{\Zpos}{\mathbb{Z^+}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\task}{\mathcal{T}}
+
+\newcommand{\algolr}{\mathbb{M}}
+\newcommand{\lc}{\mathcal{C}}
+\newcommand{\nlim}{k}
+\newcommand{\nsamplr}{Q}
+\newcommand{\numlc}{M}
+\newcommand{\samplr}{\mathcal{Z}}
+\newcommand{\model}{\mathcal{M}}
+\newcommand{\hilbert}{\mathbb{H}}
+\newcommand{\data}{\boldsymbol{\alpha}}
+\newcommand{\func}{\boldsymbol{\beta}}
+
+%\newcommand{\slope}{\mathbf{w}}
+%\newcommand{\bias}{b}
+%\newcommand{\task}{\mathcal{T}}
+%\newcommand{\dataset}{\mathcal{Z}}
+%\newcommand{\scaletask}{\mathbf{a}}
+%\newcommand{\inpbias}{\bar{\mathbf{x}}}
+%\newcommand{\phasetask}{\boldsymbol{\phi}}
+%\newcommand{\lab}{y}
+%\newcommand{\labs}{\mathbf{y}}
+%\newcommand{\EE}{\mathcal{E}}
+%\newcommand{\trainset}{Z}
+%\newcommand{\model}{\mathcal{M}}
+%\newcommand{\estim}{\mathcal{\hat{M}}}
+%\newcommand{\noise}{\varepsilon}
+%\newcommand{\var}{\sigma^2}
+%\newcommand{\mean}{\mu}
+%\newcommand{\ridge}{\lambda}
+%\newcommand{\kernel}{\kappa}
+%\newcommand{\weight}{\boldsymbol{\alpha}}
+%\newcommand{\genridge}{\mathbf{h}}
+%\newcommand{\normal}[2]{\mathcal{N}(#1, #2)}
+%\newcommand{\param}{\bar{\mathbf{w}}}
+%\newcommand{\opt}{\mathbf{\hat{\bar{w}}}}
+% GD
+\newcommand{\iter}{n_{{iter}}}
+\newcommand{\lr}{\eta}
+\newcommand{\grad}[1]{\nabla_{#1}}
+%\newcommand{\loss}{\mathcal{L}}
+% math
+\newcommand{\trans}[1]{#1^\text{T}}
+\newcommand{\inv}[1]{#1^{-1}}
+\newcommand{\sine}{\text{sin}}
+\newcommand{\norm}[2]{||#1||_#2}
+
+% matrix
+\newcommand{\design}{{\mathbf{X}}}
+\newcommand{\gram}{{\mathbf{K}}}
+\newcommand{\ones}{\mathbf{1}}
+\newcommand{\zeros}{\mathbf{0}}
+\newcommand{\I}{\mathbf{I}}
+
+% Text Related Commands
+\newcommand{\eg}{\textit{e.g.}}
+
+%% Title
+%\title{Expected Loss of MAML:A Comperative Study}
+\title{Learning "Learning Curves"}
+%%%% Cite as
+%%%% Update your official citation here when published 
+%\thanks{\textit{\underline{Citation}}: 
+%\textbf{Authors. Title. Pages.... DOI:000000/11111.}} 
+
+
+\author{
+  Author1, Author2 \\
+  Affiliation \\
+  Univ \\
+  City\\
+  \texttt{\{Author1, Author2\}email@email} \\
+  %% examples of more authors
+   \And
+  Author3 \\
+  Affiliation \\
+  Univ \\
+  City\\
+  \texttt{email@email} \\
+  %% \AND
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+}
+% For version 1 
+%\newcommand{\version}{v1/}
+% For version 2 
+\newcommand{\version}{v1/}
+\graphicspath{{Figures_\version/}}     % organize your images and other figures under media/ folder
+\begin{document}
+\maketitle
+
+
+\begin{abstract}
+  \input{\version/abstract}
+\end{abstract}
+
+
+% keywords can be removed
+\keywords{meta-learning \and expected performance \and learning-curves \and functional analysis}
+
+\section{Introduction}\label{sec:intro}
+  \input{\version/introduction}
+\section{Related Work}\label{sec:rw}
+  \input{\version/relatedwork}
+\section{Problem Setting}\label{sec:prob}
+  \input{\version/problem}
+\section{Methods}\label{sec:meth}
+  \input{\version/methods}
+\section{Results and Discussion}\label{sec:resdis}
+  \input{\version/resultsanddiscussion}
+\section{Conclusion}\label{sec:conc}
+  \input{\version/conclusions}
+\section*{Acknowledgments}
+%Bibliography
+\bibliographystyle{unsrt}  
+\bibliography{/home/taylanot/Dropbox/archive_bib/LearningCurve.bib,/home/taylanot/Dropbox/archive_bib/SPKR.bib}  
+\newpage
+\section{Appendix}\label{sec:conc}
+  \input{\version/appendix}
+
+
+\end{document}
+

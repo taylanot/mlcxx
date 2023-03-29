@@ -1,0 +1,294 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( algebra )
+
+
+//=======================================================================
+//   class SparseMatrix
+//=======================================================================
+
+/*!
+
+  \brief Encapsulates a sparse matrix.
+
+  The abstract class \c SparseMatrix encapsulates a sparse
+  matrix. Since it is derived from the \c AbstractMatrix class, an
+  instance of the \c SparseMatrix class can be used wherever an
+  instance of the \c AbstractMatrix class is required.
+  
+  The \c SparseMatrix class itself has no data; derived classes are
+  responsible for storing the actual sparse matrix and any additional
+  data structures that they require.
+
+*/
+
+class SparseMatrix : public AbstractMatrix,
+                     public jem::Clonable,
+                     public jem::io::Serializable
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief The type of this class.
+
+  The \c Self type is a convenient synonym for \c SparseMatrix.
+
+*/
+
+  typedef SparseMatrix Self;
+
+
+/*!
+
+  \brief A type containing the sparse matrix data.
+
+  The \c RawMatrix type represents the sparse matrix that is
+  encapsulated by a \c SparseMatrix object. It is an alias for \c
+  jem::numeric::SparseMatrix<double>.
+
+*/
+
+  typedef jem::numeric::SparseMatrix<double> RawMatrix;
+
+
+/*!
+
+  \brief A type representing the structure of a sparse matrix.
+
+  The \c Structure type encapsulates the non-zero pattern of a parse
+  matrix. It is an alias for \c jem::numeric::SparseStructure.
+
+*/
+
+  typedef RawMatrix::Structure Structure;
+
+
+//-----------------------------------------------------------------------
+//   events
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that the structure of this sparse matrix has been
+  modified.
+
+  The \c newStructureEvent is emitted whenever the structure of this
+  sparse matrix has been modified. The argument of the event is a
+  reference to this \c SparseMatrix object.
+
+*/
+
+  jem::util::Event<Self&> newStructureEvent;
+
+
+//-----------------------------------------------------------------------
+//   shape
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the shape of this sparse matrix.
+
+  Retruns the shape of this sparse matrix. The implementation of this
+  function provided by the \c SparseMatrix class simply executes:
+
+  \code
+  return getMatrix().shape();
+  \endcode
+
+  Derived classes may provide a more efficient implementation.
+
+  \return The shape of this sparse matrix.
+
+*/
+
+  virtual Shape shape () const;
+
+
+//-----------------------------------------------------------------------
+//   setMatrix
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Sets the sparse matrix encapsulated by this object.
+
+  Assigns the sparse matrix encapsulated by this object the value \a
+  mat. For performance reasons, the matrix \a mat may be copied by
+  reference. This means that the original matrix should not be
+  modified after calling this function.
+
+  An implementation of this function should emit the event \c \c
+  newStructureEvent. If the new matrix has a different shape than the
+  current matrix, then this function should also emit the event \c
+  newShapeEvent. Otherwise, it should emit the event \c
+  newValuesEvent.
+
+  \param mat - the sparse matrix that is to be copied into this \c
+  SparseMatrix object.
+
+*/
+
+  void setMatrix ( const RawMatrix& mat ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   getMatrix
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the sparse matrix encapsulated by this object.
+
+  Returns a reference to the sparse matrix encapulated by this object.
+  The reference remains valid until this object is destroyed or until
+  the \c setMatrix() member function is called.
+
+  The structure of the returned matrix may not be modified. That is,
+  you may not modify the contents of the row offset and column index
+  arrays. You may modify the matrix values, provided that you call the
+  function \c handleNewValues() afterwards.
+
+  \return A shallow copy of the sparse matrix encapsulated by this
+  object.
+
+*/
+
+  const RawMatrix& getMatrix () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   handleNewValues
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Notifies this object that the contents of the sparse matrix
+  have been modified.
+
+  Notifies this object that its sparse matrix values have been
+  modified and that it should update its internal data structures, if
+  necessary. An implementation of this function should emit the event
+  \c newValuesEvent.
+
+  The implementation provided by the \c SparseMatrix class simply
+  calls \c newValuesEvent.emit().
+
+*/
+
+  void SparseMatrix::handleNewValues ();
+
+
+//-----------------------------------------------------------------------
+//   getValues
+//-----------------------------------------------------------------------
+
+
+/*!
+
+  \brief Returns a reference to the sparse matrix values.
+
+  Returns a reference to a \c Vector that contains the values of the
+  sparse matrix encapsulated by this object. The contents of the
+  vector may be modified, provided that the function \c
+  handleNewValues() is called afterwards.
+
+  This function is equivalent with:
+
+  \code
+  return this->getMatrix().getValues();
+  \endcode
+
+  \return A reference to the values of this sparse matrix.
+
+*/
+
+  const Vector& getValues () const;
+
+
+//-----------------------------------------------------------------------
+//   getStructure
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the structure of this sparse matrix.
+
+  Returns the non-zero pattern of the sparse matrix encapsulated by
+  this object. The contents of returned \c Structure object may \em
+  not be modified.
+
+  This function simply executes
+
+  \code
+  this->getMatrix().getStructure();
+  \endcode
+
+  \return The structure of this sparse matrix.
+
+*/
+
+  Structure getStructure () const;
+
+
+
+//-----------------------------------------------------------------------
+//   re-implemented functions
+//-----------------------------------------------------------------------
+
+
+  static  jem::Class*   getType  ();
+  virtual jem::Class*   getClass () const;
+
+  virtual void          readFrom ( jem::io::ObjectInput&  in );
+  virtual void          writeTo  ( jem::io::ObjectOutput& out ) const;
+
+  virtual jem::Ref<jem::Object>
+                        clone    () const;
+
+  virtual void          matmul   ( const Vector& lhs,
+                                   const Vector& rhs ) const;
+
+};
+
+
+
+JIVE_END_PACKAGE( algebra )

@@ -1,0 +1,8 @@
+<map id="jive::util::DataParser" name="jive::util::DataParser">
+<area shape="rect" id="node1" title=" " alt="" coords="27,304,182,331"/>
+<area shape="rect" id="node6" href="$classjive_1_1fem_1_1DataParser.html" title=" " alt="" coords="25,379,184,405"/>
+<area shape="rect" id="node2" href="$classjem_1_1xml_1_1CompoundParser.html" title=" " alt="" coords="5,229,204,256"/>
+<area shape="rect" id="node3" href="$classjem_1_1xml_1_1Parser.html" title=" " alt="" coords="41,155,169,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="56,80,153,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="41,5,169,32"/>
+</map>

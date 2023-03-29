@@ -1,0 +1,749 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( util )
+
+
+//=======================================================================
+//   class ItemGroup
+//=======================================================================
+
+/*!
+
+  \brief Encapsulates a set of item indices.
+
+  <code>\#include <jive/util/ItemGroup.h></code>
+
+  An \c ItemGroup encapsulates a reference to an \c ItemSet and a set
+  of indices referring to items in that set. Use the \c ItemGroup
+  class to select groups of items in an \c ItemSet. Note that if you
+  need to store and manipulate a (very) large number of item groups,
+  you may be better off using the \c GroupSet class.
+
+  \sa \c GroupSet
+
+*/
+
+class ItemGroup : public jem::Object
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Represents a string type.
+
+  Represents a string type.
+
+*/
+
+  typedef jem::String  String;
+
+
+/*!
+
+  \brief Represents a formatted output stream.
+
+  Represents a formatted text output stream.
+
+*/
+
+  typedef jem::io::PrintWriter  Printer;
+
+
+/*!
+
+  \brief Represents a dictionary.
+
+  Represents a dictionary that maps strings to objects.
+
+*/
+
+  typedef jem::util::Dictionary  Dict;
+
+
+/*!
+
+  \brief Represents a properties set.
+
+  Represents a properties set.
+
+*/
+
+  typedef jem::util::Properties  Properties;
+
+
+//-----------------------------------------------------------------------
+//   events
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Signals that the size of this item group has changed.
+
+  Signals that the size of this item group (that is, the number of
+  indices) has changed. The first event argument is the new size of
+  this item group. The second event argument is a reference to this
+  item group.
+
+*/
+
+  jem::util::Event < int, Self& >  newSizeEvent;
+
+
+/*!
+
+  \brief Signals that the indices have been re-ordered.
+
+  Signals that the item indices in this group have been
+  re-ordered. The first event argument specifies how the indices have
+  been re-ordered. If this argument is denoted by \c iperm, then
+  <code>iperm[i]</code> is the \em new location of the <i>i</i>-th
+  item index. If <code>iperm[i]</code> is a negative number, then the
+  <i>i</i>-th item index has been deleted. The second event argument
+  is a reference to this item group.
+
+*/
+
+  jem::util::Event
+    < const IntVector&, Self& >  newOrderEvent;
+
+
+//-----------------------------------------------------------------------
+//   size
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the size of this item group.
+
+  Returns the number of item indices in this group.
+
+  \return The size of this group:
+    <code>this->getIndices().size()</code>
+
+*/
+
+  
+  virtual int  size () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getIDs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the IDs of the items in this group.
+
+  Returns the IDs of the items in this group. The implementation
+  provided by the \c ItemGroup class simply executes:
+
+  \code
+  IntVector  iitems  ( getIndices()  );
+  IntVector  itemIDs ( iitems.size() );
+
+  getItems()->getItemMap()->getItemIDs ( itemIDs, iitems );
+
+  return itemIDs;
+  \endcode
+  
+  Note that the returned array should not be modified as it may share
+  its data with a private member of this \c ItemGroup object.
+
+  \return An array containing the IDs of the items in this group.
+
+*/
+
+  virtual IntVector  getIDs () const;
+
+
+//-----------------------------------------------------------------------
+//   getIndices
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the indices of the items in this group.
+
+  Returns an array containing the indices of the items in this
+  group. The contents of the returned array should not be modified as
+  the array may share its data with one of the private members of this
+  \c ItemGroup object.
+
+  \return The indices of the items in this group.
+
+*/
+
+  virtual IntVector  getIndices () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getItems
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the item set containing the items in this group.
+
+  Returns a pointer to the item set containing the items selected by
+  this \c ItemGroup object. The pointer is guaranteed not to be \c
+  nullptr and to remain valid throughout the entire lifetime of
+  this \c ItemGroup object.
+
+  \return A pointer to the item set referred to by this item group.
+
+*/
+
+  virtual ItemSet*  getItems () const = 0;
+  
+
+//-----------------------------------------------------------------------
+//   contains
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether this group contains a given item index.
+
+  Tests whether this item group contains the item index \c iitem. The
+  implementation provided by the \c ItemGroup class simply searches
+  the array returned by the \c getIndices() member function; derived
+  classes are encouraged to provide a more efficient implementation.
+
+  \param iitem - a valid item index.
+
+  \pre <code>iitem >= 0 && iitem < getItems()->size()</code>
+
+  \return \c true if this item group contains the index \c iitem, and
+  \c false otherwise.
+
+*/
+
+  virtual bool  contains ( int iitem ) const;
+
+
+//-----------------------------------------------------------------------
+//   filter
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Marks which item indices are not in this group.
+
+  Sets all item indices in the array \a iitems that are not in this
+  group to a negative number. The item indices that are in this group
+  are untouched. The default implementation provided by the \c
+  ItemGroup class calls the \c contains() member function for each
+  index in the array \a iitems.
+
+  \param iitems - an array containing valid item indices.
+
+  \pre <code>min(iitems) >= 0 &&
+             max(iitems) <  getItems()->size()</code>
+
+*/
+
+  virtual void  filter ( const IntVector& iitems ) const;
+
+
+//-----------------------------------------------------------------------
+//   findMembers
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds all item indices that are members of this group.
+
+  Fills the array \a jitems with the item indices in the array \a
+  iitems that are members of this group. The integer returned by this
+  function is the number of indices that have been copied from \a
+  iitems to \a jitems. That is, if \c n denotes the return value, then
+  <code>jitems[slice(BEGIN,n)]</code> contains all the copied indices.
+
+  The current implementation of this function copies all indices from
+  \a iitems to \a jitems; then calls the \c filter() member function;
+  and finally removes all negative indices from \a jitems.
+
+  \param jitems - an array to be filled with the indices in \a iitems
+  that are members of this group.
+
+  \param iitems - an array containing valid item indices.
+  
+  \pre <code>
+    jitems.size() >= iitems.size() && <br>
+    min(iitems)   >= 0 && max(iitems) < getItems()->size()
+  </code>
+
+  \return The number of indices that have been copied from \a iitems
+  to \a jitems.
+
+*/
+
+  int  findMembers ( const IntVector&  jitems,
+                     const IntVector&  iitems ) const;
+
+
+//-----------------------------------------------------------------------
+//   findNonMembers
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Finds all item indices that are not members of this group.
+
+  Fills the array \a jitems with the item indices in the array \a
+  iitems that \em not are members of this group. The integer returned
+  by this function is the number of indices that have been copied from
+  \a iitems to \a jitems.
+
+  \param jitems - an array to be filled with the indices in \a iitems
+  that are not members of this group.
+
+  \param iitems - an array containing valid item indices.
+  
+  \pre <code>
+    jitems.size() >= iitems.size() && <br>
+    min(iitems)   >= 0 && max(iitems) < getItems()->size()
+  </code>
+
+  \return The number of indices that have been copied from \a iitems
+  to \a jitems.
+
+  \sa \c findMembers()
+
+*/
+
+  int  findNonMembers ( const IntVector&  jitems,
+                        const IntVector&  iitems ) const;
+
+
+//-----------------------------------------------------------------------
+//   getUnion
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the union of two item groups.
+
+  Returns an array containing the item indices that are members of
+  either the item group \a first and the item group \a second.
+
+  \param first - an item group.
+
+  \param second - another item group referring to the same item set as
+  \a first.
+
+  \pre <code>first.getItems() == second.getItems()</code>
+
+  \return An item index array containing the union of the groups \a
+  first and \a second.
+
+*/
+
+  static IntVector  getUnion ( const ItemGroup&  first,
+                               const ItemGroup&  second );
+
+
+//-----------------------------------------------------------------------
+//   getIntersection
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the intersection of two item groups.
+
+  Returns an array containing the item indices that are members of
+  both the item group \a first and the item group \a second.
+
+  \param first - an item group.
+
+  \param second - another item group referring to the same item set as
+  \a first.
+
+  \pre <code>first.getItems() == second.getItems()</code>
+
+  \return An item index array containing the intersection of the
+  groups \a first and \a second.
+
+*/
+
+  static IntVector  getIntersection ( const ItemGroup&  first,
+                                      const ItemGroup&  second );
+
+
+
+//-----------------------------------------------------------------------
+//   printTo
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints the contents of this group.
+
+  Writes the contents of this group to the formatted output stream \a
+  out. This function simply executes:
+
+  <code>printGroup ( out, *getItems(), getIndices() )</code>
+
+  \param out - a formatted text output stream.
+
+*/
+
+  inline void  printTo ( Printer&  out ) const;
+
+
+//-----------------------------------------------------------------------
+//   printGroup
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints the contents of a given set of item indices.
+
+  Writes the set of item indices in the array \a iitems to the
+  formatted text output stream \a out. The parameter \a items is the
+  set containing the items to which the indices in \a iitems
+  refer. This function does \em not print any delimiting XML tags.
+
+  \param out - a formatted text output stream.
+
+  \param items - an item set.
+
+  \param iitems - an array containing valid item indices.
+
+  \pre <code>min(iitems) >= 0 && max(iitems) < items.size()</code>
+
+  \sa \c ItemGroupParser \c printSome(), \c printAll()
+
+*/
+
+  static void  printGroup ( Printer&          out,
+                            const ItemSet&    items,
+                            const IntVector&  iitems );
+
+
+//-----------------------------------------------------------------------
+//   printSome
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints all groups in a given dictionary.
+
+  Writes all item groups in the dictionary \a groups to the formatted
+  text output stream \a out. Each group is delimited by a pair of XML
+  tags of which the name is \a tag. However, if \a tag is an empty
+  string, the string returned by the member function \c getTagName()
+  will be used as the name of the XML tags.
+
+  Note that this function will ignore all objects in the dictionary \a
+  groups that are not derived from the \c ItemGroup class.
+
+  \param out - a formatted text output stream.
+
+  \param groups - a dictionary containing a set of item groups.
+
+  \param tag - the (optional) name of the XML tags enclosing each
+  group.
+
+  \sa \c ItemGroupParser, \c printAll()
+
+*/
+
+  static void  printSome ( Printer&       out,
+                           const Dict&    groups,
+                           const String&  tag = "" );
+
+
+//-----------------------------------------------------------------------
+//   printAll
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints all item groups in a global data set.
+
+  Writes all item groups stored in the global data set \a globdat to
+  the formatted text output stream \a out. This function essentially
+  calls the function \c ItemSet::listAll() to find the names of all
+  item set in \a globdat, and then prints all item groups associated
+  with each item set.
+
+  \param out - a formatted text output stream.
+
+  \param globdat - a global data set.
+
+  \sa \c Globdat
+
+*/
+
+  static void  printAll ( Printer&           out,
+                          const Properties&  globdat );
+
+
+//-----------------------------------------------------------------------
+//   getTagName
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns an XML tag name for this group.
+
+  Returns a string that can be used as the name of an XML tag
+  enclosing this item group. This function simply returns:
+
+  <code>getTagName ( getItems()->getItemName() )</code>
+
+  \return An XML tag for this item group.
+
+*/
+
+  String  getTagName () const;
+
+
+/*!
+
+  \brief Returns an XML tag name for a group given an item type name.
+
+  Returns string that can be used as the name of an XML tag enclosing
+  a group referring to items with type name \a itemName. The current
+  implementation of this function returns:
+
+  <code>jem::xml::makeTag( itemName ) + "Group"</code>
+
+  \return An XML tag for an item group.
+
+*/
+
+  static String  getTagName ( const String&  itemName );
+
+
+//-----------------------------------------------------------------------
+//   store
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Stores this item group in a (global) data set.
+
+  Stores this item group in the global data set \a globdat, using \a
+  name as the name of this item group. This function has the same
+  effect as:
+
+  \code
+  Ref<Dict> groups = getFor ( getItems(), globdat );
+
+  dict->insert ( name, this );
+  \endcode
+
+  \param name - the name of this item group.
+
+  \param globdat - a (global) data set.
+
+  \sa \c Globdat
+
+*/
+
+  void  store ( const String&      name,
+                const Properties&  globdat ) const;
+
+
+//-----------------------------------------------------------------------
+//   find
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for a named item group in a (global) data set.
+
+  Searches for an item group named \a name in the global data set \a
+  globdat. The parameter \a items is the item set that is associated
+  with the item group to be found. This function has the same effect
+  as:
+
+  \code
+  Ref<Dict> findFor ( items, globdat );
+
+  if ( dict != nullptr )
+  {
+    return dynamicCast<ItemGroup> ( dict->get( name ) );
+  }
+  else
+  {
+    return nullptr;
+  }
+  \endcode
+
+  \param name - the name of the item group to be found.
+
+  \param items - the item set associated with the group to be found.
+
+  \param globdat - a global data set.
+
+  \pre <code>items != nullptr</code>
+
+  \return A reference to the searched item group, or \c nullptr if that
+  group does not exist in \a globdat.
+
+*/
+
+  static jem::Ref<ItemGroup>  find
+
+    ( const String&             name,
+      const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat );
+
+
+//-----------------------------------------------------------------------
+//   get
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a named item group stored in a (global) data set.
+
+  Returns a reference to the item group named \a name that has been
+  stored in the global data set \a globdat and that refers to the
+  items in the set \a items. An exception is thrown if the group does
+  not exist. The parameter \a context will be used as the context
+  string for the exception.
+
+  \param name - the name of the item group to be retrieved.
+
+  \param items - the item set associated with the group to be
+  retrieved.
+
+  \param globdat - a (global) data set.
+
+  \param context - an error context string.
+
+  \pre <code>items != nullptr</code>
+
+  \return A reference to the item group named \ a name.
+
+  \throws jem::IllegalInputException - if the item group does not
+  exist.
+
+  \sa \c find()
+
+*/
+
+  static jem::Ref<ItemGroup>  get
+
+    ( const String&             name,
+      const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat,
+      const String&             context );
+
+
+//-----------------------------------------------------------------------
+//   findFor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Searches for all groups associated with a given item set.
+
+  Returns a reference to a dictionary that has been stored in the
+  global data set \a globdat and that contains all groups referring to
+  items in the set \a items. If there is no such dictionary, the value
+  \c nullptr is returned.
+
+  \param items - an item set.
+
+  \param globdat - a global data set.
+
+  \pre <code>items != nullptr</code>
+
+  \return A dictionary containing all groups referring to the item set
+  \a items, or \c nullptr.
+
+  \sa \c getFor()
+
+*/
+
+  static jem::Ref<Dict>       findFor
+
+    ( const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat );
+
+
+//-----------------------------------------------------------------------
+//   getFor
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns all groups associated with a given item set.
+
+  Returns a dictionary that has been stored in the global data set \a
+  globdat and that contains all groups referring to items in the set
+  \a items. If there is no such dictionary, a new one will be created
+  and stored in \a globdat. The new dictionary will contain one \c
+  AllItemGroup object named \c "all".
+
+  \param items - an item set.
+
+  \param globdat - a global data set.
+
+  \pre <code>items != nullptr</code>
+
+  \return A dictionary containing all groups referring to the item set
+  \a items.
+
+*/
+
+  static jem::Ref<Dict>       getFor
+
+    ( const jem::Ref<ItemSet>&  items,
+      const Properties&         globdat );
+
+
+ protected:
+
+  virtual                    ~ItemGroup ();
+
+};
+
+
+
+
+
+
+JIVE_END_PACKAGE( util )

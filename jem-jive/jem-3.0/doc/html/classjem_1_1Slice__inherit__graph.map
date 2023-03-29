@@ -1,0 +1,7 @@
+<map id="jem::Slice" name="jem::Slice">
+<area shape="rect" id="node1" title="Selects parts of array&#45;like objects." alt="" coords="96,5,183,32"/>
+<area shape="rect" id="node2" href="$classjem_1_1SliceFrom.html" title="A class for creating a contiguous slice that extends to the end of an array&#45;like object." alt="" coords="5,80,124,107"/>
+<area shape="rect" id="node4" href="$classjem_1_1SliceFromTo.html" title="A class for creating contiguous slices of array&#45;like objects." alt="" coords="148,80,280,107"/>
+<area shape="rect" id="node3" href="$classjem_1_1SliceAll.html" title="A class for creating a contiguous slice that contains all elements of an array&#45;like object." alt="" coords="13,155,116,181"/>
+<area shape="rect" id="node5" href="$classjem_1_1SliceTo.html" title="A class for creating a contiguous slice that starts at the beginning of an array&#45;like object." alt="" coords="164,155,264,181"/>
+</map>

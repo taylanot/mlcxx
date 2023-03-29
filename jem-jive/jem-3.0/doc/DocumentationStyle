@@ -1,0 +1,66 @@
+
+FONT DIRECTIVES AND TAGS
+
+  The `\c' directive is used to denote functions, classes, constants,
+  and other entities. 
+
+  The `<code>' and `</code>' tags are used to write small blurps of
+  code.
+
+  The `\code' and `\endcode' directives are used to write larger
+  sections of code.
+
+  The `\a' directive is used to denote function and template
+  arguments/parameters.
+  
+  The `<i>' and `</i>' tags are used to denote formulas and
+  expressions.
+
+
+FUNCTION DOCUMENTATION
+
+  The documentation of a function consists of the following sections:
+
+  1) A `\brief' section that describes in a single sentence what the
+     functions does.
+
+  2) A main section describing in more details what the function does.
+
+  3) Zero or more `\param' sections describing all function
+     arguments. A dash (`-') should be used to separate a parameter
+     name from its description.
+
+  4) A `\return' section that documents the return value of the
+     function. This section may be omitted if the return value if of
+     type `void'.
+  
+  5) An optional `\pre' section that describes the conditions that
+     must be met when calling this function. This section also
+     describes the conditions that must be met by the parameters
+     passed to this function.
+
+  6) An optional `\post' section describing the conditions that will
+     be met when this function returns.
+
+  7) Zero or more `\exception' sections that document the exceptions
+     that may be thrown by this function. A dash (`-') should be used
+     to separate an exception class name from its documentation.
+
+
+CLASS DOCUMENTATION
+
+  The documentation of a class consists of the following sections:
+
+  1) A `\brief' section providing a short (one sentence) description
+     of the class.
+
+  2) An include directive that should be put into the source code
+     using the class. The format of this directive is as follows:
+     <code>\#include <dir/header.h></code>.
+
+  3) A main section documenting what the class can be used for and how
+     it relates to other classes. If relevant, this section should also
+     describe how the class has been implemented. This information is
+     useful to determine whether a particular use of the class is grossly
+     inefficient.
+

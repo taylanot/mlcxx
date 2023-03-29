@@ -1,0 +1,12 @@
+
+<Include source='rectangle.mesh'/>
+
+<NodeConstraints>
+  u[0]  = 1.0;
+  u[4]  = 1.0;
+  u[8]  = 1.0;
+  u[3]  = 0.0;
+  u[7]  = 0.0;
+  u[11] = 0.0;
+</NodeConstraints>
+

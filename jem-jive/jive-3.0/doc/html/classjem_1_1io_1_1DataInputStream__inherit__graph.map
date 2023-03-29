@@ -1,0 +1,10 @@
+<map id="jem::io::DataInputStream" name="jem::io::DataInputStream">
+<area shape="rect" id="node1" title=" " alt="" coords="192,304,379,331"/>
+<area shape="rect" id="node2" href="$classjem_1_1io_1_1FilterInputStream.html" title=" " alt="" coords="5,229,192,256"/>
+<area shape="rect" id="node3" href="$classjem_1_1io_1_1InputStream.html" title=" " alt="" coords="21,155,176,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="50,80,147,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="35,5,163,32"/>
+<area shape="rect" id="node6" href="$classjem_1_1io_1_1DataInput.html" title=" " alt="" coords="216,229,355,256"/>
+<area shape="rect" id="node7" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="229,155,342,181"/>
+<area shape="rect" id="node8" href="$classDataStreamOptions.html" title=" " alt="" coords="379,229,530,256"/>
+</map>

@@ -1,0 +1,592 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jive, an object oriented toolkit for solving
+ *  partial differential equations.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *  This file is part of Jive, an object oriented toolkit for
+ *  solving partial differential equations.
+ *
+ *  Jive version: 3.0
+ *  Date:         Fri 20 Dec 14:30:12 CET 2019
+ */
+
+
+#include <jive/defines.h>
+
+
+JIVE_BEGIN_PACKAGE( geom )
+
+
+//=======================================================================
+//   class Shape
+//=======================================================================
+
+/*!
+
+  \brief Encapsulates the geometrical properties of a finite element.
+
+  <code>\#include <jive/geom/Shape.h></code>
+
+  The abstract base class \c Shape encapsulates the geometrical
+  properties of a finite element. It can be used to evaluate an
+  integral over the domain of an element, and to evaluate the shape
+  functions of an element.
+
+  A \c Shape object comprises a set of nodes, a set of integration
+  points and corresponding integration weights, and a set of shape
+  functions. Although the number of shape functions and the number of
+  nodes are typically the same, they may also be different.
+
+  A shape has a local coordinate system in which it has a fixed
+  geometry. In other words, the nodes of a shape are located at fixed
+  points in the local coordinate system of that shape. The rank --
+  that is, the number of dimensions -- of the local coordinate system
+  is said to be the <em>local rank</em> of a shape.
+
+  Shapes `live' in a global coordinate system that is typically
+  connected to a finite element mesh or some region in space and/or
+  time. The rank of the global coordinate system is said to be the
+  <em>global rank</em> of a shape. Note that the global rank may
+  differ from the local rank. For instance, a shape representing a
+  surface in a three-dimensional space has global rank three and local
+  rank two.
+
+  A shape does not store the global coordinates of its nodes; these
+  must be passed as a parameter to the \c Shape member functions that
+  require the global coordinates. The advantage of this design is that
+  a single \c Shape object can be used to evaluate the geometrical
+  properties of multiple finite elements.
+
+  \sa \c StdShape
+
+*/
+
+
+class Shape : public jem::Object
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   typedefs
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief A vector type.
+
+  The \c Vector type represents a one-dimensional array of doubles. It
+  is just an alias for \c jive::util::Vector.
+
+*/
+
+  typedef util::Vector  Vector;
+
+
+/*!
+
+  \brief A matrix type.
+
+  The \c Matrix type represents a two-dimensional array of doubles. It
+  is just an alias for \c jive::util::Matrix.
+
+*/
+
+  typedef util::Matrix  Matrix;
+
+
+
+//-----------------------------------------------------------------------
+//   getType
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns a pointer to a \c Class object representing this
+  class.
+
+  Returns a pointer to a \c jem::Class object that represents the \c
+  Shape class. This pointer remains valid during the entire lifetime
+  of the current program.
+
+  \return A pointer to a \c jem::Class object that represents this
+  class.
+
+*/
+
+  static jem::Class* getType ();
+
+
+//-----------------------------------------------------------------------
+//   globalRank
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the global rank of this shape.
+
+  Returns the rank (number of dimensions) of the global coordinate
+  system in which this shape `lives'.
+
+  \return The global rank of this shape.
+
+*/
+
+  virtual int globalRank () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   localRank
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the local rank of this shape.
+
+  Returns the rank (number of dimensions) of the local coordinate
+  defined by this shape.
+
+  \return The local rank of this shape.
+
+*/
+
+  virtual int localRank () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   nodeCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of nodes.
+
+  Returns the number of nodes attached to this shape.
+
+  \return The number of nodes.
+
+*/
+
+  virtual int nodeCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   shapeFuncCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of shape functions.
+
+  Returns the number of shape functions encapsulated by this
+  shape. Note that the number of shape functions and the number of
+  nodes may differ.
+
+  \return The number of shape functions.
+
+*/
+
+  virtual int shapeFuncCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   integrationPointCount
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the number of integration points.
+
+  Returns the number of integration points encapsulated by this shape.
+
+  \return The number of integration points.
+
+*/
+
+  virtual int integrationPointCount () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getLocalNodeCoords
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the coordinates of the nodes in the local coordinate
+  system.
+
+  Returns a matrix containing the local coordinate vectors of the
+  nodes attached to this shape. If \c c denotes the returned matrix,
+  then \c c(i,j) equals the i-th coordinate of the j-th node.
+
+  This function can be useful when testing a new shape class.
+
+*/
+
+  virtual Matrix getLocalNodeCoords () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getIntegrationPoints
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the integration points in the local coordinate
+  system.
+
+  Returns a matrix containing the local coordinates of the integration
+  points encapsulated by this shape. If \c x denotes the returned
+  matrix, then \c x(i,j) yields the i-th coordinate of the j-th
+  integration point.
+
+  For performance reasons the returned matrix may share its data with
+  one of the private members of this shape. One should therefore not
+  modify the contents of the matrix.
+
+  \return A matrix containing the local coordinates of the integration
+  points.
+
+*/
+
+  virtual Matrix getIntegrationPoints () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getGlobalIntegrationPoints
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the integration points in the global coordinate
+  system.
+
+  Fills the matrix \a x with the global coordinates of the integration
+  points encapsulated by this shape: \c x(i,j) is set to the i-th
+  coordinate of the j-th integration point. The matrix \a c should
+  contain the global coordinates of the nodes attached to this shape:
+  \c c(i,j) should be equal to the i-th coordinate of the j-th node.
+
+  The default implementation of this function is given by:
+
+  \code
+
+  Matrix u ( this->getIntegrationPoints() );
+  int    i;
+
+  for ( i = 0; i < u.size(1); i++ )
+  {
+    this->getGlobalPoint ( x(slice(ALL),i), u(slice(ALL),i), c );
+  }
+
+  \endcode
+  
+  \param x - a matrix that will be filled with the global coordinates
+  of the integration points.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    x.size(0) == this->globalRank() && <br>
+    x.size(1) == this->integrationPointCount() && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void getGlobalIntegrationPoints
+
+    ( const Matrix&  x,
+      const Matrix&  c ) const;
+
+
+//-----------------------------------------------------------------------
+//   getIntegrationWeights
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the integration weights in the global coordinate
+  system.
+
+  Fills the vector \a w with the integration weights in the global
+  coordinate system: \c w[i] is set to the weight of the i-th
+  integration point. The matrix \a c should contain the global node
+  coordinates: \c c(i,j) should be equal to the i-th coordinate of the
+  j-th node.
+
+  The following code fragment demonstrates how the integration weights
+  can be used to evaluate the integral of a function over the domain
+  of a shape.
+
+  \code
+
+  // Evaluates the integral of the function
+  //
+  //   f(x,y,z,...) = x + y + z + ...
+  //
+  // over the domain of a given shape.
+
+  double evalIntegral ( const Shape& shape, const Matrix& c )
+  {
+    const int rank    = shape.globalRank ();
+    const int ipCount = shape.integrationPointCount ();
+
+    Matrix x ( rank, ipCount );
+    Vector w ( ipCount );
+
+    double r;
+    double f;
+    int    i;
+
+    shape.getGlobalIntegrationPoints ( x, c );
+    shape.getIntegrationWeights ( w, c );
+
+    r = 0.0;
+
+    for ( i = 0; i < ipCount; i++ )
+    {
+      f  = sum( x(slice(ALL),i) );
+      r += w[i] * f;
+    }
+
+    return r;
+  }
+
+  \endcode
+
+  \param w - a vector that will be filled with the global integration
+  weights.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    w.size()  == this->integrationPointCount() && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+*/
+
+  virtual void getIntegrationWeights
+
+    ( const Vector&  w,
+      const Matrix&  c ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   getShapeFunctions
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Returns the shape functions evaluated in the integration
+  points.
+
+  Returns a matrix containing the values of the shape functions in the
+  integration points of this shape. If the returned matrix is denoted
+  by \c h, then \c h(i,j) equals the value of the i-th shape function
+  in the j-th integration point.
+
+  The contents of the returned matrix should not be modified because
+  it may share its data with one of the private members of this shape.
+
+  \return A matrix containing the values of the shape functions in the
+  integration points.
+
+*/
+
+  virtual Matrix getShapeFunctions () const = 0;
+
+
+//-----------------------------------------------------------------------
+//   evalShapeFunctions
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Computes the shape functions in a given point.
+
+  Fills the vector \a h with the values of the shape functions in a
+  specific point within this shape: \c h[i] is set to the i-th shape
+  function in that point. The vector \a u should contain the \em local
+  coordinates of the point: \c u[i] should be equal to the i-th local
+  coordinate.
+
+  \param h - a vector that will be filled with the values of the shape
+  functions in a specific point within this shape.
+
+  \param u - a vector containing the local coordinates of the
+  specified point.
+
+  \pre <code>
+    h.size() == this->shapeFuncCount() && <br>
+    u.size() == this->localRank() &&
+    this->containsLocalPoint ( u )
+  </code>
+
+*/
+
+  virtual void evalShapeFunctions
+
+    ( const Vector&  h,
+      const Vector&  u ) const = 0;
+  
+
+//-----------------------------------------------------------------------
+//   getGlobalPoint
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Converts a local coordinate vector to a global coordinate
+  vector.
+
+  Fills the vector \a x with the global coordinates of a specific
+  point within this shape: \c x[i] is set to the i-th global
+  coordinate. The vector \a u should contain the local coordinates of
+  that point: \c u[i] should be equal to the i-th local
+  coordinate. The matrix \a c should contain the global node
+  coordinates: \c c(i,j) should be equal to the i-th global coordinate
+  of the j-th node.
+
+  \param x - a vector that will be set to the global coordinates of
+  the specified point.
+
+  \param u - a vector containing the local coordinates of that point.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    x.size()  == this->globalRank() && <br>
+    u.size()  == this->localRank()  && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()  && <br>
+    this->containsLocalPoint ( u )
+  </code>
+  
+*/
+
+  virtual void getGlobalPoint
+
+    ( const Vector&  x,
+      const Vector&  u,
+      const Matrix&  c ) const = 0;
+  
+
+//-----------------------------------------------------------------------
+//   getLocalPoint
+//-----------------------------------------------------------------------
+  
+/*!
+
+  \brief Converts a global coordinate vector to a local coordinate
+  vector.
+
+  This function tries to convert a global coordinate vector to a local
+  coordinate vector. It returns \c true if the conversion succeeds and
+  the global coordinate vector points to a location `near' this
+  shape. Otherwise it returns \c false.
+
+  If the return value equals \c true, the vector \a u will contain the
+  local coordinate vector: \c u[i] will be set to the i-th local
+  coordinate. The vector \a x should contain the global coordinate
+  vector to be converted: \c x[i] should be equal to the i-th global
+  coordinate. The double \a eps specifies the maximum allowed distance
+  -- in the global coordinate system -- between this shape and the
+  location pointed to by the vector \a x. The matrix \a c should
+  contain the global node coordinates: \c c(i,j) should be equal to
+  the i-th coordinate of the j-th node.
+
+  Note that a shape class does not have to support this function. In
+  fact, the default implementation of this function simply throws a \c
+  jem::IllegalOperationException.
+
+  \param u - a vector that will be filled with the local coordinates
+  of the point specified by the global coordinate vector \a x.
+
+  \param x - a global coordinate vector.
+
+  \param eps - the maximum allowed distance between the specified
+  point and this shape.
+
+  \param c - a matrix containing the global node coordinates.
+
+  \pre <code>
+    u.size()  == this->localRank()  && <br>
+    x.size()  == this->globalRank() && <br>
+    eps > 0.0 && <br>
+    c.size(0) == this->globalRank() && <br>
+    c.size(1) == this->nodeCount()
+  </code>
+
+  \return \c true if the conversion succeeds, and \c false otherwise.
+
+*/
+
+  virtual bool getLocalPoint
+
+    ( const Vector&  u,
+      const Vector&  x,
+      double         eps,
+      const Matrix&  c ) const;
+  
+
+//-----------------------------------------------------------------------
+//   containsLocalPoint
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Tests whether a point lies within this shape.
+
+  Returns \c true if the point specified by the local coordinate
+  vector \a u lies within this shape, and \c false otherwise.
+
+  \param u - a local coordinate vector.
+
+  \pre <code>u.size() == this->localRank()</code>
+
+  \return \c true if the specified point lies within this shape, and
+  \c false otherwise.
+
+*/
+
+
+  virtual bool containsLocalPoint ( const Vector& u ) const = 0;
+
+
+//-----------------------------------------------------------------------
+//   other functions
+//-----------------------------------------------------------------------
+
+  virtual jem::Class* getClass () const;
+
+  
+};
+
+
+
+
+
+
+JIVE_END_PACKAGE( geom )

@@ -15,19 +15,35 @@
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {4}{4}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {0}{0}{5}{5/5}{}{0}}
+\headcommand {\slideentry {0}{0}{5}{5/6}{}{0}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\beamer@framepages {5}{5}}
+\headcommand {\beamer@framepages {5}{6}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {0}{0}{6}{6/6}{}{0}}
+\headcommand {\slideentry {0}{0}{6}{7/9}{}{0}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\beamer@framepages {6}{6}}
+\headcommand {\beamer@framepages {7}{9}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {0}{0}{7}{7/7}{}{0}}
+\headcommand {\slideentry {0}{0}{7}{10/10}{}{0}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\beamer@framepages {7}{7}}
-\headcommand {\beamer@partpages {1}{7}}
-\headcommand {\beamer@subsectionpages {1}{7}}
-\headcommand {\beamer@sectionpages {1}{7}}
-\headcommand {\beamer@documentpages {7}}
-\headcommand {\gdef \inserttotalframenumber {7}}
+\headcommand {\beamer@framepages {10}{10}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {0}{0}{8}{11/11}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {11}{11}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {0}{0}{9}{12/12}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {12}{12}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {0}{0}{10}{13/13}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {13}{13}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {0}{0}{11}{14/14}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {14}{14}}
+\headcommand {\beamer@partpages {1}{14}}
+\headcommand {\beamer@subsectionpages {1}{14}}
+\headcommand {\beamer@sectionpages {1}{14}}
+\headcommand {\beamer@documentpages {14}}
+\headcommand {\gdef \inserttotalframenumber {11}}

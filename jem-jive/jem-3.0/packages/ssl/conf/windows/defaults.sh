@@ -1,0 +1,3 @@
+
+SSL_LIBS="libssl"
+

@@ -1,0 +1,663 @@
+
+\chapter{Essential Jem components}
+\label{chapter:essential-jem-components}
+
+As Jive uses components from the Jem library, some knowledge of Jem is
+required before you can start using Jive. This chapter therefore provides
+a summary of the most frequently used classes and functions from Jem.
+After reading this chapter you should be able to understand the example
+programs presented in the next two chapters, and to make modifications to
+these programs. Before you start implementing your own programs, however,
+you are advised to consult the Jem user manual and reference manual. You
+can skip this chapter if you are already familiar with Jem.
+
+The classes and functions discussed in this chapter are divided into four
+categories: core classes that form the foundation of Jem; utility classes
+that implement various common data structures and algorithms; I/O classes
+and functions that provide facilities for reading and writing data; and
+numerical classes and functions that can be used to implement numerical
+algorithms. Each category is dealt with in one of the following four
+sections.
+
+%========================================================================
+
+\section{Core components}
+
+The core classes and functions are located in the package \Code{base}.
+They implement various basic data structures such as strings and arrays;
+they provide support for memory management, multi-threading and
+scripting; and they enable you to access various system-level services
+in a portable way. The core classes that are used frequently in Jive are
+summarized in \autoref{table:jem-core}. These classes are described in
+more detail below.
+
+\begin{table}
+
+  \caption{Summary of the essential core classes.}
+  \label{table:jem-core}
+
+  \begin{center}
+
+    \begin{tabular}{|>{\ttfamily}lp{10cm}|}
+      \hline
+      Name       & Description \\
+      \hline \hline
+      String      & Represents a character string. \\
+      Slice       & Selects parts of array-like objects. \\
+      System      & Provides access to the standard I/O streams
+                    and other system facilities. \\
+      Array       & Implements a multi-dimensional array that
+                    supports slicing and array expressions. \\
+      Collectable & Provides support for automatic garbage
+                    collection. \\
+      Ref         & Implements a `smart' pointer that points to a
+                    collectable object. \\
+      Object      & Defines a common base class for many
+                    classes in Jem. \\
+      Throwable   & Defines a base class for all exceptions thrown
+                    by Jem and Jive. \\
+      \hline
+    \end{tabular}
+
+  \end{center}
+
+\end{table}
+
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{String} class}
+
+The \Code{String} class represents character arrays. It provides a set of
+functions for accessing individual characters, for comparing strings, for
+finding sub-strings, for transforming strings, and for creating string
+slices (more about those in the next section). The \Code{String} class
+also overloads the \Code{+} operator so that one can easily concatenate
+two strings.
+
+Strings are \emph{immutable}. This means that the individual characters
+in a string can not be modified. The only way to change the contents of a
+string is to call one of the assignment operators. You will have to use
+an \Code{Array}, or a similar type of object, if you need to modify the
+individual characters in a string. The \Code{StringBuffer} class can be
+used to create strings with dynamic contents.
+
+Note that the character array stored in a \Code{String} object is
+\emph{not} null-terminated. Use the \Code{CString} class and the
+\Code{makeCString} function to convert a \Code{String} object to a
+null-terminated character array.
+
+Below is a small example involving the \Code{String} class. Note that
+some details, such as include directives and namespace declarations, have
+been omitted to reduce the amount of code.
+
+\IncludeSource{C++}{examples/String.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Slice} class}
+
+\Code{Slice} objects are used to select parts of arrays, strings, and
+other array-like objects. Such a selection, or \emph{slice}, is defined
+by three integers: a begin index, an end index and a stride. The begin
+index is a non-negative integer that points to the first element in the
+slice. The end index is an integer that points one position past the last
+element in the slice. It is always larger than or equal to the begin
+index. The stride is a positive integer that specifies the distance
+between two consecutive elements in the slice. For instance, if the
+stride is three, a slice contains only each third element of an
+array-like object. If the stride equals one, the slice is said to be
+contiguous.
+
+Slices are created by invoking the so-called \emph{slice operator} of an
+array-like object. This operator is a member function -- usually an
+overloaded subscript or function call operator -- that accepts a
+\Code{Slice} object and returns an object representing part of the
+array-like object. The \Code{String} class, for instance, provides an
+overloaded version of the subscript operator that returns a sub-string
+for a given \Code{Slice} object.
+
+\Code{Slice} objects are normally constructed by calling the non-member
+function function \Code{slice()}, that is overloaded for several types of
+slices (contiguous and non-contiguous slices, for instance). These
+functions may be passed instances of the special classes
+\Code{Begin}, \Code{End} and \Code{All} to create slices that start at
+the beginning of an array, extend to the end of an array, or include all
+elements of an array. For convenience, there are three pre-defined
+instances of these classes which are named \Code{BEGIN}, \Code{END} and
+\Code{ALL}, respectively. Note that the class \Code{All} is derived from
+the \Code{Slice} class so an instance of this class can be passed
+directly to a slice operator.
+
+The following code fragment demonstrates how the \Code{Slice} class and
+the \Code{slice()} function can be used to select slices from a
+string.
+
+\IncludeSource{C++}{examples/Slice.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{System} class}
+
+The \Code{System} class provides access to various system-level
+facilities. It can be used to get and set the standard input and output
+streams; get information about the system; get the contents of
+environment variables; and to catch and print exceptions thrown by
+the main function of a program. Since it has only static members, it can
+be viewed as a sort of mini namespace.
+
+The \Code{System} class provides one input stream and four output
+streams: one for writing error messages, one for writing warnings, one
+for writing normal output, and one for writing log messages. The input
+and output streams are initialized when they are accessed for the first
+time.
+
+The example code below prints a message to the standard output stream and
+to the debug output stream (which is routed through the log output
+stream). It then throws an exception that will be caught by the member
+function \Code{System::exec}.
+
+\IncludeSource{C++}{examples/System.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Array} class}
+
+The \Code{Array} class implements a multi-dimensional array of objects.
+It is a class template with two template parameters. The first parameter,
+say \Code{T}, specifies the type of the objects stored in the array. This
+type should define at least a default constructor and a copy
+constructor. The second parameter, say \Code{N}, specifies the
+\emph{rank} -- i.e. the number of dimensions -- of the array. If the rank
+parameter is omitted, a default value of one is assumed.
+
+Each array has a \emph{shape}: an integer tuple (vector) of length equal
+to the rank of the array. The elements of this tuple specify the sizes of
+the array in each dimension. For instance, a three-dimensional array with
+shape $(10,3,5)$ has size~10 in the first dimension, size~3 in the second
+dimension and size~5 in the third dimension.
+
+The elements in an array are identified in the usual way by a set of
+integer indices ranging from zero to the corresponding array size minus
+one. Thus, the index pair $(1,0)$ refers to the second element in the
+first column of a two-dimensional array. The elements can be accessed by
+means of the overloaded subscript and function-call operators.
+
+An array stores its elements in a data block that may be shared with one
+or more other arrays. As a consequence, multiple arrays may provide
+different views to parts of the same data. For instance, a
+one-dimensional array may provide access to a particular column of a
+two-dimensional array. Another consequence of the shared storage scheme
+is that the elements of one array may be modified through another
+array.
+
+The \Code{Array} class defines a set of slice operators -- overloaded
+subscript and function-call operators -- that can be used to select
+regular, rectangular sections of an array. These operators return an
+\Code{Array} object that points to a sub-set of the data block pointed to
+by the \Code{Array} object on which the slice operators are invoked.
+Because the returned array shares its data with the original array, all
+modifications to the returned array will be visible in the original
+one, and the other way around.
+
+Jem provides a set of overloaded operators and functions -- that are not
+members of the \Code{Array} class -- for writing expressions that operate
+on all elements of one or more arrays. These operators and functions
+return special array objects, called \emph{array expressions}, that can
+be assigned to regular \Code{Array} objects. Array expressions can also
+be passed to the overloaded operators and functions to create new array
+expressions. The use of array expressions is often more efficient than
+writing a series of equivalent (nested) loops. One reason is that the
+implementation of array expressions is based on `expression templates', a
+technique that makes it possible to avoid creating temporary array
+objects (see the papers available at \url{http://oonumerics.org} for the
+details). Another reason is that array expressions collapse multiple
+nested loops into a single loop in the common case that all the operands
+are stored contiguously in memory.
+
+The code fragment below demonstrates how to create an array, how to
+access the elements of an array, how to create array slices and how to
+make use of array expressions.
+
+\IncludeSource{C++}{examples/Array.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Collectable} and \Code{Ref} classes}
+
+The \Code{Collectable} class provides support for automatic garbage
+collection. That is, objects derived from the \Code{Collectable}, called
+\emph{collectable objects}, are created on the heap and are automatically
+deleted when they are no longer used. It is not possible to delete
+collectable objects explicitly through a \Code{delete} expression.
+
+Collectable objects are normally accessed through instances of the class
+template \Code{Ref} that mimics the behavior of a pointer. As long as a
+collectable object can be reached through a \Code{Ref} instance, or a
+sequence of \Code{Ref} instances, that object will not be deleted.
+Although one can also access collectable objects through normal pointers,
+it is unspecified whether the existence of a route from a live pointer
+(i.e. a pointer that can be reached from the program) to a
+collectable object prevents the deletion of that object.
+
+Collectable objects must be created with the function template
+\Code{newInstance} that mimics a new expression but returns a \Code{Ref}
+object instead of a normal pointer. The \Code{newInstance} function can
+be supplied a variable number of arguments that will be passed on to the
+matching constructor of the collectable class. A collectable object must
+not be created on the stack. To prevent this from accidentally happening,
+a collectable class should declare its destructor as a protected or
+private member.
+
+The example program below shows how to use the \Code{Collectable} and
+\Code{Ref} classes. It defines and instantiates a trivial collectable
+class, named \Code{Tracer}, that prints a message in its constructor and
+destructor.
+
+\IncludeSource{C++}{examples/Collectable.cpp}
+
+This is the output of the program:
+
+\begin{Verbatim}
+  Tracer::Tracer  ( 1 )
+  Tracer::Tracer  ( 2 )
+  Tracer::~Tracer ( 1 )
+  Tracer::~Tracer ( 2 )
+\end{Verbatim}
+
+When the \Code{Ref} object \Code{t2} is assigned to \Code{t1}, the first
+\Code{Tracer} object is destroyed because no \Code{Ref} is pointing to it
+any more; both \Code{t1} and \Code{t2} point to the second \Code{Tracer}
+object. This object is destroyed when the function \Code{run} exits so
+that both \Code{t1} and \Code{t2} are destroyed.
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Object} class}
+
+Many classes in Jem are directly or indirectly derived from the class
+\Code{Object}. It can therefore be used to implement heterogeneous
+data structures and generic algorithms. For instance, a list
+containing \Code{Object} instances can be used to store instances of
+all classes derived from the \Code{Object} class. The \Code{Object}
+class is derived from \Code{Collectable}, so that all \Code{Object}
+instances are subjected to automatic garbage collection.
+
+Jem provides two non-member functions that can be used to convert
+non-\Code{Object} instances to \Code{Object} instances, and the other way
+around. These two functions are named \Code{toObject()} and
+\Code{toValue()}, respectively. This is illustrated in the following
+example.
+
+\IncludeSource{C++}{examples/Object.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Throwable} class}
+
+The \Code{Throwable} class defines a single base class for all exceptons
+that are thrown by Jem and Jive. By convention, classes derived from the
+\Code{Throwable} class provide a constructor with two string parameters:
+one that describes the context in which the exception occured, and one
+that describes the cause of the exception. These strings can be obtained
+by calling the member functions \Code{where()} and \Code{what()},
+respectively.
+
+There are two families of exception classes: one derived from the
+\Code{Exception} class and one derived from the \Code{RuntimeException}
+class. The first family represents error conditions caused by external
+events, such as wrong input, that a program should handle. The second
+family represents error conditions caused by programming errors that
+should not occur in an error-free program. Here is a brief example
+demonstrating how to handle exceptions.
+
+\IncludeSource{C++}{examples/Exception.cpp}
+
+%========================================================================
+
+\section{Utility components}
+
+The package \Code{util} in Jem provides classes that implement various
+types of containers such as lists, sets, and hash tables; that implement
+an event framework with which you can connect independent software
+components; that enable you to read, write and store configuration data
+in a flexible way; and that provide various handy facilities.
+\autoref{table:jem-util} lists the utility classes that are used
+frequently in Jive. These classes are described in more detail in the
+next few sub-sections.
+
+\begin{table}
+
+  \caption{Summary of the essential utility classes.}
+  \label{table:jem-util}
+
+  \begin{center}
+
+    \begin{tabular}{|>{\ttfamily}lp{10cm}|}
+      \hline
+      Name        & Description \\
+      \hline \hline
+      ArrayBuffer & Implements an expandable array. \\
+      SparseArray & Implements a multi-dimensional sparse array. \\
+      Event       & Encapsulates a list of call-back functions
+                    that are invoked when a specific event occurs. \\
+      Properties  & Implements a hierarchical database containing
+                    name/value pairs. \\
+      \hline
+    \end{tabular}
+
+  \end{center}
+
+\end{table}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{ArrayBuffer} class}
+
+The class template \Code{ArrayBuffer} represents a one-dimensional array
+that can grow and shrink. It is meant to be a helper class for creating
+array objects of type \Code{Array<T,1>} of which the size is not known
+beforehand. Here is an example:
+
+\IncludeSource{C++}{examples/ArrayBuffer.cpp}
+
+An \Code{ArrayBuffer} encapsulates a one-dimensional \Code{Array} object
+that stores the elements in the \Code{ArrayBuffer}. The conversion of an
+\Code{ArrayBuffer} to an \Code{Array} is therefore an efficient
+operation.
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{SparseArray} class}
+
+The class template \Code{SparseArray} represents a multi-dimensional
+sparse array. That is, an array that contains mostly zeroes, where the
+definition of the term ``zero'' depends on the type of the array
+elements. Although the interface of the \Code{SparseArray} class is
+somewhat similar to that of the \Code{Array} class, it is intended to be
+used as a storage container and not as a direct building block for
+numerical algorithms. The \Code{SparseArray} class therefore does not
+implement slice operators and does not provide support for sparse array
+expressions.
+
+Here is an example involving the \Code{SparseArray} class.
+
+\IncludeSource{C++}{examples/SparseArray.cpp}
+
+The output of the program will be like this:
+
+\begin{Verbatim}
+  1 0 0 0
+  0 0 0 0
+  0 0 0 2
+  3 0 0 0
+\end{Verbatim}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Event} class}
+
+The class template \Code{Event} encapsulates a list of call-back
+functions, named \emph{delegates}, that are invoked when the
+\Code{emit()} member function is called. Events can be used, among
+others, to connect independent software components and to implement the
+model-view-controller pattern. The template parameters of the
+\Code{Event} class determine the parameter types of the \Code{emit()}
+member function. These parameters are said to be the parameters of an
+event. The number of parameters can be varied from zero to three, as
+illustrated below:
+
+\IncludeSource{C++}{examples/Event-1.cpp}
+
+To be useful, an event should be connected to one or more delegates
+by calling the non-member function \Code{connect()}. A delegate can be a
+regular function or a non-static member function -- called a method
+-- of a collectable class (that is, a class derived from the
+\Code{Collectable} class). The parameter types of the delegate must be
+compatible with the parameter types of the event. Thus, one can not
+connect an event with a parameter of type \Code{int} to a delegate with
+a parameter of type \Code{int*}. One can, however, connect an event to a
+delegate that has less parameters than the event. In this case, the
+last few parameters of the event will be discarded when the delegate
+is called.
+
+The example below illustrates the power of events. It involves two
+independent classes that are connected to each other through an event.
+The first class, named \Code{Graph} represents a graph that dynamically
+displays a value as function of time. The second class, named
+\Code{Sensor}, represents a device that measures some quantity at a given
+location. Each time it has taken a new measurement, it calls the
+\Code{emit()} member of its event named \Code{newValueEvent}. The
+measurement is passed as an argument to the \Code{emit()} function that
+passes it on to the member function \Code{addPoint()} of the \Code{Graph}
+object that is connected to the event.
+
+\IncludeSource{C++}{examples/Event-2.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Properties} class}
+
+The \Code{Properties} class implements an hierarchical database
+containing a set of name/value pairs called \emph{properties}. It is
+typically used as a repository for configuration data, but it can also be
+used as a flexible in-memory data base.
+
+The name of a property is represented by a \Code{String} instance. The
+value of a property is a variable that has one of the following types:
+\Code{bool}, \Code{int}, \Code{double}, \Code{String},
+\Code{Array<bool>}, \Code{Array<int>}, \Code{Array<double>},
+\Code{Array<String>}, or \Code{Object}. The value of a property can also
+be a \Code{Properties} object so that you can build hierarchical sets of
+properties. A \Code{Properties} object that is contained by another
+\Code{Properties} object is called a \emph{nested} \Code{Properties}
+object.
+
+A \Code{Properties} object can be filled by calling the member functions
+\Code{parseFile()} and \Code{parseFrom()}. The former reads a set of
+properties from a file, while the latter reads a set of properties from
+any text input stream. The contents of a \Code{Properties} object can be
+printed by calling the member function \Code{printTo()} or by calling the
+\Code{print} function.
+
+Individual properties can be inserted into a \Code{Properties} object by
+calling one of the overloaded versions of the \Code{set()} member
+function. They can be extracted from a \Code{Properties} object by
+calling one of the overloaded versions of the \Code{find()} or
+\Code{get()} member functions. The difference between these two functions
+is that the former does nothing if a property does not exist, while the
+latter will throw an exception in that situation. Optionally, these
+functions can check if the value of a property lies within a valid range.
+The following code fragment illustrates how to set and get properties.
+The last statement will throw an exception because the property named
+``x'' does not exist.
+
+A property can be inserted into or extracted from a nested
+\Code{Properties} object by calling the \Code{set()}, \Code{find()} and
+\Code{get()} functions with a \emph{compound property name}. Such a name
+consists of a series of simple names concatenated by periods characters.
+Here is an example:
+
+\IncludeSource{C++}{examples/Properties-2.cpp}
+
+The first statement inserts the integer property ``age'' into the nested
+\Code{Properties} object named ``jones''. If this object does not exist
+it is created on the fly. The second statement reads the double property
+``length'' from the nested \Code{Properties} object named ``brown''. An
+exception is thrown if this object does not exist.
+
+%======================================================================
+
+\section{I/O components}
+
+The \Code{io} package exports classes for performing operations on
+streams of text and binary data, and for getting information about files
+and directories. \autoref{table:jem-io} lists the essential classes that
+will be useful when developing applications with Jive.
+
+\begin{table}
+
+  \caption{Summary of the essential I/O classes.}
+  \label{table:jem-io}
+
+  \begin{center}
+
+    \begin{tabular}{|>{\ttfamily}lp{10cm}|}
+      \hline
+      Name        & Description \\
+      \hline \hline
+      TextInput   & Defines an interface for reading text-based
+                    input. \\
+      TextOutput  & Defines an interface for writing text-based
+                    output. \\
+      Reader      & Represents a text input stream. \\
+      Writer      & Represents a text output stream. \\
+      PrintWriter & Formats a text output stream. \\
+      \hline
+    \end{tabular}
+
+  \end{center}
+
+\end{table}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{TextInput} class}
+
+The \Code{TextInput} class defines an interface for reading data from a
+text input stream. It is typically used to implement functions that parse
+text input and that do not care about the source of the input. The
+\Code{TextInput} class declares only abstract member functions; these
+must be implemented by derived classes.
+
+The non-member function \Code{read()} should be used to read objects from
+a text input stream. Overloaded versions of this function are available
+for reading fundamental objects such as integers and floating point
+numbers, and for reading class instances, such as \Code{String} objects.
+Multiple objects can be read in one statement by calling an overloaded
+template version of the \Code{read()} function that has more than two
+parameters. This is illustrated in the following example.
+
+\IncludeSource{C++}{examples/TextInput.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{TextOutput} class}
+
+The \Code{TextInput} class defines an interface for writing data to a
+text output stream. It is essentially the opposite of the
+\Code{TextInput} class.
+
+The non-member function \Code{print()} should be used to write objects to
+a text output stream. Overloaded versions of this function are available
+for writing fundamental objects such as integers and floating point
+numbers, and for writing class instances. Multiple objects can be written
+in one statement by calling an overloaded template version of the
+\Code{print()} function that has more than two parameters. This is
+illustrated in the following example. Note that the special object
+\Code{endl} is used to print a newline character.
+
+\IncludeSource{C++}{examples/TextOutput.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Reader} class}
+
+The \Code{Reader} class implements the \Code{TextInput} interface and
+provides various additional member functions for operating on text input
+streams. Since the \Code{Reader} class is also derived from the
+\Code{Object} class, \Code{Reader} objects are automatically destroyed
+when they are no longer used.
+
+The \Code{Reader} class does not specify where the input is coming from;
+this is done by various derived classes, including:
+
+\begin{Description}
+
+  \item[StringReader] reads data from a \Code{String} object.
+
+  \item[FileReader] reads data from a text file.
+
+  \item[GzipFileReader] reads data from a compressed text file.
+
+\end{Description}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{Writer} class}
+
+The \Code{Writer} class implements the \Code{TextOutput} interface and
+provides various additional member functions for operating on text output
+streams. It is the opposite of the \Code{Reader} class. In fact, many
+classes derived from the \Code{Reader} class have a corresponding
+class that is derived from the \Code{Writer} class.
+
+The example below shows how to convert a text file into a compressed text
+file using the \Code{FileReader} and \Code{GzipFileWriter} classes. Note
+that an exception will be thrown if the input file does not exist.
+
+\IncludeSource{C++}{examples/Writer.cpp}
+
+%------------------------------------------------------------------------
+
+\subsection*{The \Code{PrintWriter} class}
+
+The class \Code{PrintWriter} can be used for writing formatted text
+output. It provides control over the maximum width of each line, the
+indentation level and the way that numbers are formatted. It is to be
+used as a wrapper around a \Code{Writer} object the specifies where the
+formatted output should go, as illustrated in the following example. Note
+that the public member object named \Code{nformat} contains the settings
+for formatting numbers.
+
+\IncludeSource{C++}{examples/PrintWriter.cpp}
+
+The output of the above code will look like this:
+
+\begin{Verbatim}
+  Thank you for visiting ShopUntilYouDrop! We hope that you will
+  enjoy your new goodies and that we will see you again soon.
+
+  Here is a summary of your purchase:
+
+    Number of items  ......      4
+    Price per item   ......  42.24
+    Total amount     ......  169.0
+
+  Bye bye!
+\end{Verbatim}
+
+%======================================================================
+
+\section{Numerical components}
+
+The \Code{numeric} package contains classes and functions for building
+numerical algorithms. They can be used to multiply matrices and vectors;
+to solve linear systems of equations; to define and evaluate functions;
+and to perform various other types of operations. The essential functions
+and classes are listed in \autoref{table:jem-numeric}.
+
+\begin{table}
+
+  \caption{Summary of the essential numerical classes and functions.}
+  \label{table:jem-numeric}
+
+  \begin{center}
+
+    \begin{tabular}{|>{\ttfamily}lp{10cm}|}
+      \hline
+      Name         & Description \\
+      \hline \hline
+      matmul       & \\
+      MatmulChain  & \\
+      LUSolver     & \\
+      SparseMatrix & \\
+      Function     & \\
+      \hline
+    \end{tabular}
+
+  \end{center}
+
+\end{table}
+
+

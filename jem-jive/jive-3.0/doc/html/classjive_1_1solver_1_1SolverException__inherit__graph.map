@@ -1,0 +1,6 @@
+<map id="jive::solver::SolverException" name="jive::solver::SolverException">
+<area shape="rect" id="node1" title="Signals the failure of a solver or preconditioner." alt="" coords="5,155,212,181"/>
+<area shape="rect" id="node4" href="$classjive_1_1solver_1_1IterativeSolverException.html" title=" " alt="" coords="9,229,208,271"/>
+<area shape="rect" id="node2" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="49,80,168,107"/>
+<area shape="rect" id="node3" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="47,5,170,32"/>
+</map>

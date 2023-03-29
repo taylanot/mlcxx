@@ -1,0 +1,391 @@
+
+#include <jem/base/Array.h>
+#include <jem/base/System.h>
+#include <jem/util/Properties.h>
+#include <jem/numeric/algebra/matmul.h>
+#include <jive/util/XTable.h>
+#include <jive/util/XDofSpace.h>
+#include <jive/util/Assignable.h>
+#include <jive/geom/Line.h>
+#include <jive/model/Model.h>
+#include <jive/model/Actions.h>
+#include <jive/model/StateVector.h>
+#include <jive/model/ModelFactory.h>
+#include <jive/algebra/MatrixBuilder.h>
+#include <jive/fem/NodeSet.h>
+#include <jive/fem/ElementSet.h>
+#include <jive/fem/ElementGroup.h>
+#include "import.h"
+#include "declare.h"
+#include "Array.h"
+
+using jive::geom::IShape;
+using jive::model::Model;
+using jive::util::XTable;
+using jive::util::XDofSpace;
+using jive::util::Assignable;
+using jive::fem::NodeSet;
+using jive::fem::ElementSet;
+using jive::fem::ElementGroup;
+using jive::algebra::MatrixBuilder;
+
+//=======================================================================
+//   class ElasticModel
+//=======================================================================
+
+class ElasticModel : public Model
+{
+ public:
+
+                          ElasticModel
+
+    ( const String&         name,
+      const Properties&     conf,
+      const Properties&     props,
+      const Properties&     globdat );
+
+  virtual bool            takeAction
+
+    ( const String&         action,
+      const Properties&     params,
+      const Properties&     globdat );
+
+
+ private:
+
+  void                    assemble_
+
+    ( MatrixBuilder&        mbld,
+      const Vector&         fint,
+      const Vector&         disp );
+
+  void                    getStress_
+
+    ( XTable&               table,
+      const Vector&         weights,
+      const Vector&         disp );
+
+
+ private:
+
+  Assignable
+    <ElementGroup>        group_;
+  Assignable<NodeSet>     nodes_;
+  Assignable<ElementSet>  elems_;
+  Ref<XDofSpace>          dofs_;
+  Ref<IShape>             shape_;
+  idx_t                   jtype_;
+
+  double                  young_;
+  double                  area_;
+
+};
+
+//-----------------------------------------------------------------------
+//   constructor
+//-----------------------------------------------------------------------
+
+ElasticModel::ElasticModel
+
+  ( const String&      name,
+    const Properties&  conf,
+    const Properties&  props,
+    const Properties&  globdat ) :
+
+    Model ( name )
+
+{
+  using jive::geom::Line2;
+
+  Properties  myProps = props.findProps ( myName_ );
+  Properties  myConf  = conf .makeProps ( myName_ );
+  String      ischeme = "Gauss2";
+
+
+  // Get the element group from the global database.
+
+  group_ = ElementGroup::get  ( myConf,  myProps,
+                                globdat, getContext() );
+  elems_ = group_.getElements ();
+  nodes_ = elems_.getNodes    ();
+
+  // Initialize the internal shape.
+
+  shape_ = Line2::getShape ( "shape", ischeme );
+
+  // Check whether the mesh is valid.
+
+  JEM_PRECHECK ( nodes_.rank() == 1 );
+
+  elems_.checkElements ( getContext(), shape_->nodeCount() );
+
+  // Define the DOFs.
+
+  dofs_  = XDofSpace::get ( nodes_.getData(), globdat );
+  jtype_ = dofs_->addType ( "u" );
+
+  dofs_->addDofs (
+    elems_.getUniqueNodesOf ( group_.getIndices() ),
+    jtype_
+  );
+
+  // Get the material parameters.
+
+  myProps.get ( young_, "young" );
+  myProps.get ( area_,  "area" );
+
+  // Report the used material parameters.
+
+  myConf.set ( "young", young_ );
+  myConf.set ( "area",  area_ );
+}
+
+//-----------------------------------------------------------------------
+//   takeAction
+//-----------------------------------------------------------------------
+
+// Performs an action requested by a module or a parent model.
+
+bool ElasticModel::takeAction
+
+  ( const String&      action,
+    const Properties&  params,
+    const Properties&  globdat )
+
+{
+  using jive::model::Actions;
+  using jive::model::ActionParams;
+  using jive::model::StateVector;
+
+  if ( action == Actions::GET_MATRIX0 )
+  {
+    Ref<MatrixBuilder>  mbld;
+    Vector              fint;
+    Vector              disp;
+
+    // Get the action-specific parameters.
+
+    params.get ( mbld, ActionParams::MATRIX0 );
+    params.get ( fint, ActionParams::INT_VECTOR );
+
+    // Get the current displacements.
+
+    StateVector::get ( disp, dofs_, globdat );
+
+    // Assemble the global stiffness matrix together with
+    // the internal vector.
+
+    assemble_ ( *mbld, fint, disp );
+
+    return true;
+  }
+
+  if ( action == Actions::GET_TABLE )
+  {
+    Ref<XTable>  table;
+    String       name;
+
+    // Get the action-specific parameters.
+
+    params.get ( table, ActionParams::TABLE );
+    params.get ( name,  ActionParams::TABLE_NAME );
+
+    // Check whether the requested table is supported by
+    // this model.
+
+    if ( (name == "stress") &&
+        (table->getRowItems() == nodes_.getData()) )
+    {
+      Vector  weights, disp;
+
+      params      .get ( weights, ActionParams::TABLE_WEIGHTS );
+      StateVector::get ( disp,    dofs_, globdat );
+
+      getStress_ ( *table, weights, disp );
+
+      return true;
+    }
+  }
+
+  if ( action == Actions::COMMIT )
+  {
+    Vector  disp;
+
+    StateVector::get ( disp, dofs_, globdat );
+
+    // Store the maximum displacement in the global database.
+
+    globdat.set ( "var.disp",  max( disp ) );
+
+    return true;
+  }
+
+  return false;
+}
+
+//-----------------------------------------------------------------------
+//   assemble_
+//-----------------------------------------------------------------------
+
+// Assembles the global stiffness matrix and the internal force vector.
+
+void ElasticModel::assemble_
+
+  ( MatrixBuilder&  mbld,
+    const Vector&   fint,
+    const Vector&   disp )
+
+{
+  using jem::numeric::matmul;
+
+  const idx_t  rank      = nodes_.rank         ();
+  const idx_t  ipCount   = shape_->ipointCount ();
+  const idx_t  nodeCount = shape_->nodeCount   ();
+
+  IdxVector    ielems    = group_.getIndices   ();
+
+  Cubix        grads     ( rank, nodeCount, ipCount );
+  Vector       weights   ( ipCount );
+
+  Matrix       elmat     ( nodeCount, nodeCount );
+  Vector       eldisp    ( nodeCount );
+
+  Matrix       coords    ( rank, nodeCount );
+  IdxVector    inodes    ( nodeCount );
+  IdxVector    idofs     ( nodeCount );
+
+
+  for ( idx_t ie = 0; ie < ielems.size(); ie++ )
+  {
+    // Get the global element index.
+
+    idx_t  ielem = ielems[ie];
+
+    // Get the element nodes, coordinates and DOF indices.
+
+    elems_.getElemNodes  ( inodes, ielem );
+    nodes_.getSomeCoords ( coords, inodes );
+    dofs_->getDofIndices ( idofs,  inodes, jtype_ );
+
+    // Get the element shape function gradients and integration
+    // point weights.
+
+    shape_->getShapeGradients ( grads, weights, coords );
+
+    // Assemble the element matrix.
+
+    elmat = 0.0;
+
+    for ( idx_t ip = 0; ip < ipCount; ip++ )
+    {
+      elmat += weights[ip] * area_ * young_ *
+
+        matmul ( grads[ip].transpose(), grads[ip] );
+    }
+
+    // Add the element matrix to the global stiffness matrix.
+
+    mbld.addBlock ( idofs, idofs, elmat );
+
+    // Compute the internal force vector. This is straightforward
+    // because the model is linear.
+
+    eldisp       = disp[idofs];
+    fint[idofs] += matmul ( elmat, eldisp );
+  }
+}
+
+//-----------------------------------------------------------------------
+//   getStress_
+//-----------------------------------------------------------------------
+
+// Computes the average stresses in the nodes.
+
+void ElasticModel::getStress_
+
+  ( XTable&        table,
+    const Vector&  weights,
+    const Vector&  disp )
+
+{
+  using jem::ALL;
+
+  const idx_t  jcol      = table.addColumn   ( "sxx" );
+  const idx_t  rank      = nodes_.rank       ();
+  const idx_t  nodeCount = shape_->nodeCount ();
+
+  IdxVector    ielems    = group_.getIndices ();
+
+  Cubix        grads     ( rank, nodeCount, nodeCount );
+  Matrix       coords    ( rank, nodeCount );
+  IdxVector    inodes    ( nodeCount );
+  IdxVector    idofs     ( nodeCount );
+  Vector       eldisp    ( nodeCount );
+  Vector       stress    ( nodeCount );
+
+  for ( idx_t ie = 0; ie < ielems.size(); ie++ )
+  {
+    // Get the global element index.
+
+    idx_t  ielem = ielems[ie];
+
+    elems_.getElemNodes  ( inodes, ielem );
+    nodes_.getSomeCoords ( coords, inodes );
+    dofs_->getDofIndices ( idofs,  inodes, jtype_ );
+
+    // Get the shape function gradients in the nodes of the
+    // element and compute the stresses in those nodes.
+
+    shape_->getVertexGradients ( grads, coords );
+
+    eldisp = disp[idofs];
+
+    for ( idx_t i = 0; i < nodeCount; i++ )
+    {
+      stress[i] = young_ * dot ( grads(0,ALL,i), eldisp );
+    }
+
+    // Update the table and the table weights.
+
+    table.addColValues ( inodes, jcol, stress );
+
+    weights[inodes] += 1.0;
+  }
+}
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+//-----------------------------------------------------------------------
+//   newElasticModel
+//-----------------------------------------------------------------------
+
+// Creates a new ElasticModel instance.
+
+Ref<Model>           newElasticModel
+
+  ( const String&      name,
+    const Properties&  conf,
+    const Properties&  props,
+    const Properties&  globdat )
+
+{
+  using jem::newInstance;
+
+  return newInstance<ElasticModel> ( name, conf, props, globdat );
+}
+
+//-----------------------------------------------------------------------
+//   declareElasticModel
+//-----------------------------------------------------------------------
+
+// Registers the ElasticModel class with the ModelFactory.
+
+void declareElasticModel ()
+{
+  using jive::model::ModelFactory;
+
+  ModelFactory::declare ( "Elastic", newElasticModel );
+}
+

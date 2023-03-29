@@ -1,0 +1,11 @@
+<map id="jive::algebra::MultiMatmulExtension" name="jive::algebra::MultiMatmulExtension">
+<area shape="rect" id="node1" title=" " alt="" coords="167,201,359,243"/>
+<area shape="rect" id="node3" href="$classjive_1_1algebra_1_1ConstrainedMatrix.html" title=" " alt="" coords="419,5,608,47"/>
+<area shape="rect" id="node4" href="$classjive_1_1algebra_1_1DenseMatrixObject.html" title=" " alt="" coords="417,71,610,112"/>
+<area shape="rect" id="node5" href="$classjive_1_1algebra_1_1DiagMatrixObject.html" title=" " alt="" coords="422,136,605,177"/>
+<area shape="rect" id="node6" href="$classjive_1_1algebra_1_1IdentMatrixObject.html" title=" " alt="" coords="421,201,606,243"/>
+<area shape="rect" id="node7" href="$classjive_1_1algebra_1_1MPMatrixObject.html" title=" " alt="" coords="407,267,620,294"/>
+<area shape="rect" id="node8" href="$classjive_1_1algebra_1_1NullMatrixObject.html" title=" " alt="" coords="424,319,603,360"/>
+<area shape="rect" id="node9" href="$classjive_1_1algebra_1_1SparseMatrixObject.html" title=" " alt="" coords="415,384,611,425"/>
+<area shape="rect" id="node2" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="5,209,119,235"/>
+</map>

@@ -4,11 +4,15 @@
  *
  * Defines Split(), a utility function to split a dataset into a
  * training set and a test set with given number of training points.
+ * This is different than the one in MLPACK where you have to prodive test
+ * ratio for the split.
+ *
+ * You should implement a stratified one if need be!
  */
 #ifndef SPLIT_DATA_H
 #define SPLIT_DATA_H
 
-#include <mlpack/prereqs.hpp>
+//#include <mlpack/prereqs.hpp>
 
 namespace utils {
 namespace data {
@@ -41,16 +45,16 @@ namespace data {
  * @param testRatio Percentage of dataset to use for test set (between 0 and 1).
  */
 template<typename T, typename U>
-void Split(const arma::Mat<T>& input,
-           const arma::Row<U>& inputLabel,
-           arma::Mat<T>& trainData,
-           arma::Mat<T>& testData,
-           arma::Row<U>& trainLabel,
-           arma::Row<U>& testLabel,
-           const size_t trainNum)
+void Split ( const arma::Mat<T>& input,
+             const arma::Row<U>& inputLabel,
+             arma::Mat<T>& trainData,
+             arma::Mat<T>& testData,
+             arma::Row<U>& trainLabel,
+             arma::Row<U>& testLabel,
+             const size_t trainNum )
 {
   const size_t trainSize = trainNum;
-  const size_t testSize = input.n_cols -trainSize;
+  const size_t testSize = input.n_cols - trainSize;
 
   trainData.set_size(input.n_rows, trainSize);
   testData.set_size(input.n_rows, testSize);
@@ -61,13 +65,13 @@ void Split(const arma::Mat<T>& input,
       arma::shuffle(arma::linspace<arma::Col<size_t>>(0, input.n_cols - 1,
                                                       input.n_cols));
 
-  for (size_t i = 0; i != trainSize; ++i)
+  for ( size_t i = 0; i != trainSize; ++i )
   {
     trainData.col(i) = input.col(order[i]);
     trainLabel(i) = inputLabel(order[i]);
   }
 
-  for (size_t i = 0; i != testSize; ++i)
+  for ( size_t i = 0; i != testSize; ++i )
   {
     testData.col(i) = input.col(order[i + trainSize]);
     testLabel(i) = inputLabel(order[i + trainSize]);
@@ -96,10 +100,10 @@ void Split(const arma::Mat<T>& input,
  * @param testRatio Percentage of dataset to use for test set (between 0 and 1).
  */
 template<typename T>
-void Split(const arma::Mat<T>& input,
-           arma::Mat<T>& trainData,
-           arma::Mat<T>& testData,
-           const size_t trainNum)
+void Split ( const arma::Mat<T>& input,
+             arma::Mat<T>& trainData,
+             arma::Mat<T>& testData,
+             const size_t trainNum )
 {
 
   const size_t trainSize = trainNum;
@@ -112,14 +116,11 @@ void Split(const arma::Mat<T>& input,
       arma::shuffle(arma::linspace<arma::Col<size_t>>(0, input.n_cols -1,
                                                       input.n_cols));
 
-  for (size_t i = 0; i != trainSize; ++i)
-  {
+  for ( size_t i = 0; i != trainSize; ++i )
     trainData.col(i) = input.col(order[i]);
-  }
-  for (size_t i = 0; i != testSize; ++i)
-  {
+  for ( size_t i = 0; i != testSize; ++i )
     testData.col(i) = input.col(order[i + trainSize]);
-  }
+
 }
 
 /**
@@ -143,9 +144,9 @@ void Split(const arma::Mat<T>& input,
  */
 template<typename T, typename U>
 std::tuple<arma::Mat<T>, arma::Mat<T>, arma::Row<U>, arma::Row<U>>
-Split(const arma::Mat<T>& input,
-      const arma::Row<U>& inputLabel,
-      const double testRatio)
+Split ( const arma::Mat<T>& input,
+        const arma::Row<U>& inputLabel,
+        const double testRatio )
 {
   arma::Mat<T> trainData;
   arma::Mat<T> testData;
@@ -179,8 +180,8 @@ Split(const arma::Mat<T>& input,
  */
 template<typename T>
 std::tuple<arma::Mat<T>, arma::Mat<T>>
-Split(const arma::Mat<T>& input,
-      const double testRatio)
+Split ( const arma::Mat<T>& input,
+        const double testRatio )
 {
   arma::Mat<T> trainData;
   arma::Mat<T> testData;

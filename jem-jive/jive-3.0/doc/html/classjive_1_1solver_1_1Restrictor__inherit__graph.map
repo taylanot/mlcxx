@@ -1,0 +1,13 @@
+<map id="jive::solver::Restrictor" name="jive::solver::Restrictor">
+<area shape="rect" id="node1" title=" " alt="" coords="581,107,745,133"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1DenseRestrictor.html" title=" " alt="" coords="795,56,1000,83"/>
+<area shape="rect" id="node9" href="$classjive_1_1solver_1_1MPRestrictor.html" title=" " alt="" coords="806,107,989,133"/>
+<area shape="rect" id="node10" href="$classjive_1_1solver_1_1SparseRestrictor.html" title=" " alt="" coords="793,157,1001,184"/>
+<area shape="rect" id="node2" href="$classjive_1_1algebra_1_1AbstractMatrix.html" title="Defines a common interface for different matrix types." alt="" coords="327,107,533,133"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,107,279,133"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,107,133,133"/>
+<area shape="rect" id="node6" href="$classjive_1_1solver_1_1NullSpaceRestrictor.html" title=" " alt="" coords="1050,5,1279,32"/>
+<area shape="rect" id="node7" href="$classjive_1_1solver_1_1SchurRestrictor.html" title=" " alt="" coords="1065,56,1265,83"/>
+<area shape="rect" id="node8" href="$classjive_1_1solver_1_1SmoothRestrictor.html" title=" " alt="" coords="1057,107,1272,133"/>
+<area shape="rect" id="node11" href="$classjive_1_1solver_1_1RigidBodyRestrictor.html" title=" " alt="" coords="1049,157,1280,184"/>
+</map>

@@ -23,44 +23,44 @@ Database file #3: /home/taylanot/Dropbox/archive_bib/CoffeeTalk.bib
 Biblatex version: 3.13
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 1 entry,
+You've used 4 entries,
             6365 wiz_defined-function locations,
-            1195 strings with 8993 characters,
-and the built_in function-call counts, 1604 in all, are:
-= -- 74
-> -- 79
-< -- 1
-+ -- 58
-- -- 35
-* -- 33
-:= -- 381
+            1235 strings with 13354 characters,
+and the built_in function-call counts, 44951 in all, are:
+= -- 2429
+> -- 3067
+< -- 287
++ -- 3024
+- -- 2416
+* -- 2906
+:= -- 6182
 add.period$ -- 0
-call.type$ -- 1
-change.case$ -- 0
-chr.to.int$ -- 46
-cite$ -- 0
-duplicate$ -- 11
-empty$ -- 105
-format.name$ -- 0
-if$ -- 337
+call.type$ -- 4
+change.case$ -- 65
+chr.to.int$ -- 262
+cite$ -- 6
+duplicate$ -- 3624
+empty$ -- 3056
+format.name$ -- 344
+if$ -- 7351
 int.to.chr$ -- 0
-int.to.str$ -- 0
+int.to.str$ -- 9
 missing$ -- 0
-newline$ -- 24
-num.names$ -- 0
-pop$ -- 47
+newline$ -- 229
+num.names$ -- 163
+pop$ -- 1166
 preamble$ -- 2
-purify$ -- 0
+purify$ -- 101
 quote$ -- 0
-skip$ -- 78
+skip$ -- 1009
 stack$ -- 0
-substring$ -- 159
-swap$ -- 1
-text.length$ -- 20
-text.prefix$ -- 0
+substring$ -- 4975
+swap$ -- 1024
+text.length$ -- 243
+text.prefix$ -- 3
 top$ -- 1
-type$ -- 22
+type$ -- 124
 warning$ -- 0
-while$ -- 66
+while$ -- 654
 width$ -- 0
-write$ -- 23
+write$ -- 225

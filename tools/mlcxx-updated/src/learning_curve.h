@@ -15,17 +15,17 @@
 #define LEARNING_CURVE_H
 
 // standard
-#include <tuple>
-#include <iostream>
-#include <omp.h>
-#include <string>
-// mlpack
-#include <mlpack/core/cv/simple_cv.hpp>
-// boost
-#include <boost/assert.hpp>
-// local
-#include <utils/split_data.h>
-#include <utils/save.h>
+//#include <tuple>
+//#include <iostream>
+//#include <omp.h>
+//#include <string>
+//// mlpack
+//#include <mlpack/core/cv/simple_cv.hpp>
+//// boost
+//#include <boost/assert.hpp>
+//// local
+//#include <utils/split_data.h>
+//#include <utils/save.h>
 
 //=============================================================================
 // LCurve_HPT 

@@ -41,7 +41,7 @@ arma::mat loadCSV(const std::string &filename,
 
   arma::mat data_mat = arma::zeros<arma::mat>(datas.size(), datas[0].size());
 
-  for (int i=0; i<datas.size(); i++) {
+  for (size_t i=0; i<datas.size(); i++) {
       arma::mat r(datas[i]);
       data_mat.row(i) = r.t();
   }

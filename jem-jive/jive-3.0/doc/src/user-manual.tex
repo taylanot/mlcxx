@@ -1,0 +1,53 @@
+\documentclass[a4paper,10pt,english]{book}
+
+\usepackage[text={16cm,24cm},centering]{geometry}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage{palatino}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{underscore}
+
+\lstloadlanguages{C++,make,sh,csh}
+\graphicspath{{images/}}
+\hypersetup{colorlinks,raiselinks}
+
+\include{include/definitions}
+
+\begin{document}
+
+\begin{titlepage}
+
+  \begin{center}
+
+    \vspace*{2cm}
+
+    {\Huge \textsc{Jive user manual}}
+
+    \vspace{1cm}
+
+    {\large \textsc{version 2.0}}
+
+    \vspace{2cm}
+
+    {\large \textsc{Dynaflow Research Group}}
+
+  \end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\include{include/chapter-1}
+\include{include/chapter-2}
+\include{include/chapter-3}
+%\include{include/chapter-4}
+
+\end{document}

@@ -1,0 +1,568 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{palatino}
+
+\pagestyle{plain}
+
+
+\topmargin        0cm
+\headheight       0cm
+\headsep          0cm
+\textheight      24cm
+\textwidth       15cm
+\evensidemargin   0cm
+\oddsidemargin    0cm
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macros
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\BlankLine}{\vspace{1.5ex} \noindent}
+\newcommand{\Code}[1]{\texttt{#1}}
+\newcommand{\PBS}[1]{\let\temp=\\#1\let\\=\temp}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{ Jive 1.0 overview }
+
+\author{ Habanera }
+
+\date{ \today }
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\maketitle
+
+%------------------------------------------------------------------------
+
+\section{Introduction}
+
+Jive~1.0 is the successor of Jive~0.9. It is much more flexible than
+its predecessor and it offers many new features that will make it
+easier to develop advanced numerical applications. It also fixes some
+design flaws that have been exposed by the users of the preceding
+versions of Jive.
+
+Although the overall structure of Jive~1.0 largely resembles the one
+of Jive~0.9, programs written for Jive~0.9 will not compile with
+Jive~1.0. This means that the users of Jive~0.9 will have to modify
+their programs in order to use Jive~1.0. Habanera is aware that this
+is an unfortunate situation, and will therefore help to port Jive~0.9
+programs whenever that is needed. Habanera will also make a commitment
+to avoid major incompatibilities between Jive~1.0 and the future
+versions of Jive that will be released in the next few years.
+
+The remainder of this document provides an overview of the features
+that are new in Jive~1.0; it lists all major new classes in Jive~1.0;
+and it provides some help for porting Jive programs from version~0.9
+to version~1.0.
+
+
+%------------------------------------------------------------------------
+
+\section{New features}
+
+\begin{itemize}
+
+\item A set of classes for storing and manipulating many small objects
+  named \emph{items}. Jive~1.0 provides support for three types of
+  items: points, groups, and members. A point is an item that
+  represents a location in an $n$-dimensional space; a group is an
+  item that represents a collection of other items; and a member is an
+  item that represents a part of another item part of an item. A
+  finite element, for instance, can be represented by a group of
+  points, and an integration point of an element can be represented by
+  a member (do not worry if this sounds confusing; a more elaborate
+  explanation of member items is given in the next section). Note that
+  you are not limited to the above three types of items; you can
+  define new types of items by implementing a class that is derived
+  from the class \Code{jive::\-util\-::ItemSet}.
+
+\item Classes for storing (large) sets of data that are related to
+  items such as nodes and elements. Jive~1.0 also provides facilities
+  for reading/writing these data sets to/from a file.
+
+\item Classes for managing degrees of freedom. These classes make it
+  possible to add and remove degrees of freedom during program
+  execution.
+
+\item Support for removing items -- such as elements and nodes -- from
+  the data structures in which they are stored. All data related to
+  these items will be automatically removed too.
+
+\item Support for generic parametric shapes in addition to
+  isoparametric shapes. It is now possible to wrap a parametric shape
+  around a shape object that evaluates its shape functions and their
+  gradients in a standard, local coordinate system. The parametric
+  shape will transform the gradients from the local coordinate system
+  to the global coordinate system.
+
+\item Support for mapping an arbitrary point in the global coordinate
+  system to the corresponding point in the local coordinate system of
+  a shape. This works for all parametric shapes, including curved
+  shapes and boundary shapes (lines in 2-D, surfaces in 3-D).
+
+\item Classes for building sparse matrices with an arbitrary non-zero
+  pattern. In contrast to the previous version, version~1.0 of Jive
+  enables one to assemble a sparse matrix without having to determine
+  its structure in advance.
+
+\item Improved support for storing, adding and deleting linear
+  constraints. There is now a unified class that can be used for all
+  sorts of linear constraints.
+
+\item Improved support for configuring objects, such as solvers, from
+  a configuration file (or some other configuration source). Jive~1.0
+  also provides a set of \emph{factory classes} for creating objects
+  of which the type has been specified in a configuration file.
+
+\item More thorough runtime checking for programming errors. Most
+  classes in Jive~1.0 will check that the arguments passed to their
+  member functions are acceptable, and will throw an exception if that
+  is not the case.
+
+\item A framework for implementing numerical models. This framework
+  makes it possible to treat a model as a black box that performs
+  certain actions -- such as the assembly of a matrix -- when given a
+  command. The framework facilitates the use of independently
+  developed models within one program. It is located in a new Jive
+  package named \Code{model}.
+
+\item A framework for implementing numerical programs. This framework
+  is based on the idea that a program consists of an assembly of
+  \emph{modules} that perform specific tasks. For instance, one module
+  will read the input data, another module will assemble and solve a
+  system of equations, and a third module will write the output data.
+  This design should facilitate the re-use of code in different
+  programs. All components that make up this framework are located in
+  the Jive package \Code{app}.
+
+\item Many performance improvements, especially in the package
+  \Code{geom} of Jive and the package \Code{io} of Jem.
+
+\end{itemize}
+
+
+%------------------------------------------------------------------------
+
+\section{New classes}
+
+%........................................................................
+
+\subsection{New classes in the \Code{util} package}
+
+\begin{itemize}
+
+\item \Code{ItemSet} -- represents a (large) set of small objects
+  named \emph{items}. Items are identified by both an ID and an
+  index. The ID of an item is an arbitrary integer number, while the
+  index of an item always ranges from zero to the total number of
+  items minus one.
+
+\item \Code{ItemGroup} -- represents a selection of items in an
+  \Code{ItemSet}. An \Code{ItemGroup} essentially comprises a pointer
+  to an \Code{ItemSet} and an array of item indices.
+
+\item \Code{PointSet} -- an item set in which each item represents a
+  point in an $n$-dimensional space.
+
+\item \Code{GroupSet} -- an item set in which each item represents a
+  group of other items. A \Code{GroupSet} can be viewed as an array of
+  \Code{ItemGroup} objects that has been optimized for large numbers
+  of groups. A \Code{GroupSet} also provides some functions that are
+  not available when using arrays of \Code{ItemGroup} objects. For
+  instance, a \Code{GroupSet} provides functions for getting the
+  indices of the items in multiple groups and for obtaining the
+  maximum group size. These types of operations are not supported by
+  an array of \Code{ItemGroup} objects.
+
+\item \Code{MemberSet} -- an item set in which each item represents a
+  part of another item. A member comprises two indices: one that
+  refers to another item, and one that refers to a part of that item.
+  It is up to the user to assign a meaning to the second index. For
+  instance, an integration point within an element can be represented
+  by a member item that consists of the element index and the index of
+  the integration point within that element.
+
+\item \Code{ItemsWrapper} -- a base class for implementing `localized'
+  item set wrapper classes that provides meaningful names for the
+  member functions of the wrapped item set. For instance, the wrapper
+  class \Code{ElementSet} in the \Code{fem} package provides logical
+  names for the member functions of the \Code{GroupSet} class that is
+  used to store the element connectivities. This means that one can
+  get the node indices of an element by invoking the member function
+  \Code{get\-Element\-Nodes} on an \Code{ElementSet} instead of the
+  member function \Code{get\-Group\-Members} of the underlying
+  \Code{GroupSet}.
+
+\item \Code{GroupWrapper} -- a base class for implementing `localized'
+  wrapper classes for \Code{ItemGroup} objects. For instance, the
+  wrapper class \Code{Element\-Group} in the \Code{fem} package wraps
+  around an \Code{ItemGroup} object representing a selection of
+  elements.
+
+\item \Code{Table} -- contains double precision data that are related
+  to a set of items. A \Code{Table} object can be viewed as a (sparse)
+  matrix in which each row corresponds with an item and each column
+  with a different type of data. For instance, a 3-D flow field can be
+  represented by a \Code{Table} with three columns that contain the
+  flow velocities in the $x$, $y$ and $z$-directions, respectively.
+  Each row in this table would then contain the three flow velocities
+  for an item such as a point in a grid. \Code{Table} objects can be
+  read/written to/from a file and can also be converted to vectors by
+  means of a \Code{DofSpace} object (see below).
+
+\item \Code{Database} -- a kind of table in which the table entries
+  are arrays of double precision or integer numbers. Since the sizes
+  of these array can vary dynamically, the \Code{Database} class
+  offers a very flexible way to store data that are related to a set
+  of items.
+
+\item \Code{DofSpace} -- associates degrees of freedom with a set of
+  items. That is, a \Code{DofSpace} object keeps track of which
+  degrees of freedom are related to which item, and how these degrees
+  of freedom are mapped to the unknowns in the global system of
+  equations. Degrees of freedom can be added and deleted on the fly,
+  and all degrees of freedom related to an item will be automatically
+  deleted whenever that item is deleted.
+
+\item \Code{Globdat} -- a kind of common block on steroids for storing
+  all `global' data in a program. The \Code{Globdat} class is actually
+  a sort of mini namespace that provides a set of string constants and
+  utility functions; the actual data are stored in a
+  \Code{jem::util::Properties} object. The \Code{Globdat} class also
+  defines a set of conventions that specify how the data are stored in
+  a \Code{jem::\-util::\-Properties} object. Many classes in Jive will
+  help you follow these conventions by providing member functions that
+  store and retrieve instances of that class in and from a
+  \Code{jem::\-util::\-Properties} object containing the global data.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{algebra} package}
+
+\begin{itemize}
+
+\item \Code{MatrixBuilder} -- provides a rich set of functions for
+  building (sparse) matrices.
+
+\item \Code{SparseMatrixBuilder} -- builds a sparse matrix of which
+  the structure is known beforehand.
+
+\item \Code{FlexMatrixBuilder} -- builds a sparse matrix with an
+  arbitrary structure; that is, the structure is determined on the fly
+  as matrix entries are set.
+
+\item \Code{LumpedMatrixBuilder} -- builds a diagonal matrix by
+  summing all off-diagonal matrix entries to the diagonal entry on
+  the same row.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{app} package}
+
+\begin{itemize}
+
+\item \Code{Module} -- a basic block for building programs. A
+  \Code{Module} object should concentrate on performing a specific,
+  well-defined task so that it can be re-used in different programs.
+  In the same way that Unix programs can be connected with pipes,
+  \Code{Module} objects can be connected in a chain (see below); they
+  communicate with each other through a
+  \Code{jem::\-util::\-Properties} object containing the global data
+  of the program.
+
+\item \Code{ChainModule} -- a module that connects a set of modules in
+  a chain; the output of one module will serve as the input of the
+  next module in the chain.
+
+\item \Code{CheckpointModule} -- a module that periodically dumps the
+  entire state of a program (stored in a
+  \Code{jem::\-util::\-Properties} object) to a binary file. This
+  module also enables a program to continue from a previously saved
+  state.
+
+\item \Code{UserconfModule} -- a module that will create a hierarchy
+  of modules at runtime given a description of this hierarchy in a
+  configuration file. This module makes it possible to modify the
+  top-level structure of a program after it has been compiled.
+
+\item \Code{ModuleFactory} -- a factory class that creates new
+  \Code{Module} objects given a set of configuration parameters. By
+  using this class a program can create modules of which the
+  type is specified by a user in a configuration file.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{geom} package}
+
+\begin{itemize}
+
+\item \Code{ParametricShape} -- an \Code{Internal\-Shape} class that
+  implements a parametric mapping of a local coordinate system to the
+  global coordinate system. You can let this class handle the local to
+  global transformation of your own shape functions.
+
+\item \Code{ParametricBoundary} -- a \Code{Boundary\-Shape} class that
+  implements a parametric mapping for boundary shapes.
+
+\item \Code{ShapeFactory} -- a factory class that creates new
+  \Code{Shape} objects given a set of configuration parameters.
+
+\item \Code{IShapeFactory} -- a factory class that creates
+  \Code{InternalShape} objects.
+
+\item \Code{BShapeFactory} -- a factory class that creates
+  \Code{BoundaryShape} objects.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{model} package}
+
+\begin{itemize}
+
+\item \Code{Model} -- encapsulates a numerical model. The \Code{Model}
+  class essentially has one member function -- named \Code{takeAction}
+  -- that can be used to send `commands' to a model. This function has
+  three arguments: a string that specifies what action is to be taken;
+  a \Code{jem::\-util::\-Properties} object containing all input and
+  output parameters for this specific action; and another
+  \Code{jem::\-util::\-Properties} object containing all global data
+  in a program. Because the interface of the \Code{Model} class is
+  very generic, it enables one to combine independently developed
+  models in one program, provided that they use the same conventions
+  for storing the action-specific and global data.
+
+\item \Code{DebugModel} -- a model that wraps around another model and
+  that prints debugging information whenever it is sent a command
+  through its \Code{takeAction} member function.
+
+\item \Code{MultiModel} -- a model that groups a set of \Code{Model}
+  objects into a single model. That is, a \Code{MultiModel} will
+  forward each command to all models that it contains.
+
+\item \Code{ModelFactory} -- a factory class for creating \Code{Model}
+  objects given a set of configuration parameters.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{solver} package}
+
+\begin{itemize}
+
+\item \Code{Constraints} -- encapsulates a set of linear constraints.
+  The \Code{Constraints} class provides functions for storing,
+  retrieving and deleting both point constraints and linear
+  constraints involving multiple degrees of freedom. Dependencies
+  between constraints are automatically resolved as new constraints
+  are added to a \Code{Constraints} object. A \Code{Constraints}
+  object can also track a \Code{DofSpace} object and automatically
+  reorder and delete constraints when the degrees of freedom in the
+  \Code{DofSpace} object are reordered or deleted.
+
+\item \Code{SolverFactory} -- a factory class that creates
+  \Code{Solver} object given a set of configuration parameters.
+
+\end{itemize}
+
+
+%........................................................................
+
+\subsection{New classes in the \Code{fem} package}
+
+\begin{itemize}
+
+\item \Code{NodeSet} -- an \Code{ItemsWrapper} class that wraps around
+  a \Code{PointSet} and that provides more logical names for the
+  member functions of the \Code{PointSet} class.
+
+\item \Code{ElementSet} -- an \Code{ItemsWrapper} class that wraps
+  around a \Code{GroupSet} in which each group represents an element.
+  The members of a group are the nodes attached to an element. The
+  \Code{Element\-Set} provides familiar names for the member functions
+  of the \Code{GroupSet} class.
+
+\item \Code{BoundarySet} -- an \Code{ItemsWrapper} class that wraps
+  around a \Code{Member\-Set} in which each member represents an
+  element boundary.
+
+\item \Code{NodeGroup} -- an \Code{GroupWrapper} class that wraps
+  around a \Code{ItemGroup} that selects a set of nodes.
+
+\item \Code{ElementGroup} -- an \Code{GroupWrapper} class that wraps
+  around a \Code{ItemGroup} that selects a set of elements.
+
+\item \Code{ElementGroup} -- an \Code{GroupWrapper} class that wraps
+  around a \Code{ItemGroup} that selects a set of element boundaries.
+
+\item \Code{Actions} -- defines a set of standard actions that can be
+  implemented by a finite element \Code{Model}. To be precise, the
+  \Code{Actions} class defines a set of string constants that can be
+  passed as the first argument to the \Code{take\-Action} member
+  function of the \Code{Model} class.
+
+\item \Code{Globdat} -- defines a set of string constants that can be
+  used to access finite element data in a
+  \Code{jem::\-util::\-Properties} object containing the global data
+  in a program. Although you are free to give your data objects any
+  names you like, using the names defined by the \Code{Globdat} will
+  facilitate the use of both the classes in Jive and the software
+  components that have been developed by others.
+
+\item \Code{InputModule} -- a \Code{Module} class that reads input
+  data -- including nodes, elements and tables -- from a file and
+  stores those data in a \Code{jem::\-util::\-Properties} object
+  containing the global data in a program.
+
+\item \Code{InitModule} -- a \Code{Module} class that creates a
+  \Code{Model} object and also initializes some other global data such
+  as constraints.
+
+\item \Code{InfoModule} -- a module that prints some information about
+  the state and progress of the current program.
+
+\item \Code{LinsolveModule} -- a \Code{Module} class that assembles a
+  linear system of equations and computes the solution of that
+  system. The system is assembled by sending a specific command to a
+  \Code{Model} object.
+
+\item \Code{OutputModule} -- a \Code{Module} class that writes various
+  data sets to an output file. The data sets to be written and the
+  name of the file can be specified in a configuration file.
+
+\end{itemize}
+
+
+%------------------------------------------------------------------------
+
+\section{Porting from Jive~0.9}
+
+Porting a program from Jive~0.9 to Jive~1.0 mostly involves replacing
+obsolete classes and functions from Jive~0.9 by equivalent classes and
+functions from Jive~1.0. The table below indicates which classes from
+Jive~0.9 can be replaced by which classes from Jive~1.0.
+
+The modifications that are required on a more structural level are
+mainly limited to the way in which a global system of equations is
+assembled. In Jive~0.9 you had to create a set of element locators
+that had to be passed to a \Code{MatrixAssembler} and a
+\Code{VectorAssembler}. In Jive~1.0 you do not have to explicitly
+create the element locator anymore; instead, you can use a
+\Code{DofSpace} object to find out how the entries in an element
+matrix/vector should be mapped to the corresponding entries in the
+global matrix/vector. This design is not only more intuitive in its
+use, but also makes it possible to assemble a matrix of which the
+structure is not known beforehand.
+
+
+\renewcommand{\arraystretch}{1.4}
+
+\setlongtables
+
+\vspace{4ex}
+
+\begin{longtable}[c]{|p{7cm}|>{\PBS\raggedright}p{7cm}|}
+  \hline
+  \textbf{Obsolete class in Jive~0.9} &
+  \textbf{Equivalent class(es) in Jive~1.0} \\
+  \hline
+  \endhead
+  \hline
+  \textbf{Obsolete class in Jive~0.9} &
+  \textbf{Equivalent class(es) in Jive~1.0} \\
+  \hline \hline
+  \endfirsthead
+  \endfoot
+  \hline
+  \endlastfoot
+  %
+  \Code{util::Mesh} &
+  \Code{fem::NodeSet}, \Code{fem::ElementSet} \\
+  \hline
+  \Code{util::Mesh\-Boundary} &
+  \Code{fem::BoundarySet} \\
+  \hline
+  \Code{util::Mesh\-Parser} &
+  \Code{util::DataParser} or \Code{fem::DataParser} \\
+  \hline
+  \Code{util::Index\-Space} &
+  \Code{util::ItemSet} \\
+  \hline
+  \Code{util::IndexSet} &
+  \Code{util::ItemGroup} \\
+  \hline
+  \Code{util::Locator\-Utils} &
+  \Code{util::DofSpace} \\
+  \hline \hline
+  \Code{algebra::StdSparse\-Matrix} &
+  \Code{algebra::Sparse\-Matrix} \\
+  \hline \hline
+  \Code{solver::Point\-Constraints} &
+  \Code{solver::Constraints} \\
+  \hline
+  \Code{solver::Linear\-Constraints} &
+  \Code{solver::Constraints} \\
+  \hline
+  \Code{solver::StdPoint\-Constrainer} &
+  \Code{solver::Point\-Constrainer} \\
+  \hline
+  \Code{solver::Direct\-Point\-Constrainer} &
+  \Code{solver::Point\-Constrainer} \\
+  \hline
+  \Code{solver::Linear\-Constrainer} &
+  \Code{solver::StdConstrainer} \\
+  \hline \hline
+  \Code{fem::Matrix\-Assembler} &
+  \Code{algebra::Matrix\-Builder} \\
+  \hline
+  \Code{fem::Sparse\-Matrix\-Assembler} &
+  \Code{algebra::Flex\-Matrix\-Assembler} or
+  \Code{fem::FEMatrix\-Assembler} \\
+  \hline
+  \Code{fem::Vector\-Assembler} &
+  no longer needed; use class \Code{util::DofSpace} and the function
+  \Code{jem::select} \\
+  \hline
+  \Code{fem::Element} &
+  \Code{model::Model} \\
+  \hline
+  \Code{fem::Boundary\-Element} &
+  \Code{model::Model} \\
+\end{longtable}
+
+
+\end{document}

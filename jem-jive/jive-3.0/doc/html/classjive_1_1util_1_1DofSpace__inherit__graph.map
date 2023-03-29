@@ -1,0 +1,12 @@
+<map id="jive::util::DofSpace" name="jive::util::DofSpace">
+<area shape="rect" id="node1" title="Maps degrees of freedom to a range of indices." alt="" coords="327,81,472,108"/>
+<area shape="rect" id="node4" href="$classjive_1_1solver_1_1CoarseDofSpace.html" title=" " alt="" coords="520,5,729,32"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1SchurDofSpace.html" title=" " alt="" coords="525,56,725,83"/>
+<area shape="rect" id="node6" href="$classjive_1_1util_1_1UniformDofSpace.html" title=" " alt="" coords="525,107,724,133"/>
+<area shape="rect" id="node7" href="$classjive_1_1util_1_1XDofSpace.html" title=" " alt="" coords="547,157,702,184"/>
+<area shape="rect" id="node2" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,81,279,108"/>
+<area shape="rect" id="node3" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,81,133,108"/>
+<area shape="rect" id="node8" href="$classjive_1_1util_1_1DenseDofSpace.html" title=" " alt="" coords="779,107,965,133"/>
+<area shape="rect" id="node9" href="$classjive_1_1util_1_1FlexDofSpace.html" title=" " alt="" coords="786,157,958,184"/>
+<area shape="rect" id="node10" href="$classjive_1_1util_1_1SparseDofSpace.html" title=" " alt="" coords="777,208,967,235"/>
+</map>

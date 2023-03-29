@@ -1,0 +1,12 @@
+<map id="jive::solver::IterativeSolver" name="jive::solver::IterativeSolver">
+<area shape="rect" id="node1" title=" " alt="" coords="517,107,716,133"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1StdIterativeSolver.html" title=" " alt="" coords="764,99,943,141"/>
+<area shape="rect" id="node2" href="$classjive_1_1solver_1_1Solver.html" title="Computes the solution of a linear system of equations." alt="" coords="327,107,469,133"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,107,279,133"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,107,133,133"/>
+<area shape="rect" id="node6" href="$classjive_1_1solver_1_1AGMRES.html" title=" " alt="" coords="991,5,1148,32"/>
+<area shape="rect" id="node7" href="$classjive_1_1solver_1_1CG.html" title=" " alt="" coords="1009,56,1130,83"/>
+<area shape="rect" id="node8" href="$classjive_1_1solver_1_1FGMRES.html" title=" " alt="" coords="992,107,1147,133"/>
+<area shape="rect" id="node9" href="$classjive_1_1solver_1_1GCR.html" title=" " alt="" coords="1004,157,1135,184"/>
+<area shape="rect" id="node10" href="$classjive_1_1solver_1_1GMRES.html" title=" " alt="" coords="995,208,1143,235"/>
+</map>

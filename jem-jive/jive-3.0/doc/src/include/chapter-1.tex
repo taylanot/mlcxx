@@ -1,0 +1,263 @@
+
+\chapter{Introduction}
+
+Jive is an object oriented toolkit, written in C++, that can be used to
+solve partial differential equations (PDEs). It provides a set of
+functions and data structures -- bundled into \emph{classes} -- for
+transforming a PDE into a system of equations; for solving such a system
+of equations; and for computing quantities derived from the solution. In
+particular, Jive provides classes for:
+\begin{itemize}
+
+\item storing and manipulating unstructured grids of arbitrary
+  dimensions;
+
+\item building dense and sparse matrices;
+
+\item performing (sparse) matrix and vector operations;
+
+\item solving linear systems of equations that may be subjected to sets
+  of linear constraints;
+
+\item solving non-linear and time-dependent PDEs;
+
+\item evaluating the geometrical properties of basic shapes such as
+  triangles, tetrahedra, hexahedra, and shapes of arbitrary
+  dimensions;
+
+\item reading/writing commonly used data structures from/to XML-formatted
+  files;
+
+\item running large-scale simulations on parallel computers;
+
+\item and for visualizing 3-D data sets in real time.
+
+\end{itemize}
+Jive is not a ready-to-run program that computes an answer given a set of
+input parameters. To make use of Jive you will have to write your own
+program -- or modify an existing Jive program -- that computes the
+solution of a particular PDE. This may take a more time than simply
+starting a ready-to-run program, but it also enables you to tailor your
+program to the PDE to be solved. What is more, Jive enables you to solve
+virtually any type of PDE whereas ready-to-run programs are restricted to
+a limited set of PDE types.
+
+Although Jive has not been designed for one specific numerical method, it
+currently provides most support for the finite element method. This does
+not mean, however, that Jive can not be used in combination with other
+numerical methods such as the finite difference method. In fact, most
+components provided by Jive are useful for all common numerical methods.
+Some of them can also be used to develop programs that do not solve a PDE
+but perform other types of numerical operations, including data analysis
+and data visualization.
+
+%========================================================================
+
+\section{User profile}
+
+Jive is aimed at researchers who want or need to develop their own
+programs for solving PDEs; for analyzing and processing data; for solving
+large systems of (non-)linear equations; and for other types of numerical
+computations. Jive is also aimed at students who want to gain practical
+experience with various numerical methods for solving PDEs.
+
+To use Jive you should have a working knowledge of the C++ programming
+language. You should also have knowledge of common numerical methods such
+as the finite difference method or the finite element method. Knowledge
+of basic linear algebra algorithms, such as Gaussian elimination, is
+recommended but not required.
+
+%========================================================================
+
+\section{Design overview}
+
+Jive has been designed with five requirements in mind:
+\begin{enumerate}
+
+\item \textbf{portability}: Jive should be portable to all major
+  operating systems and computer architectures.
+
+\item \textbf{flexibility}: Jive should be flexible enough to implement
+  state-of-the-art numerical solution procedures.
+
+\item \textbf{ease of use}: Jive should be easy to use when developing a
+  relatively simple application.
+
+\item \textbf{modularity}: Jive should provide independent software
+  components so that you only have to use those components that you
+  really need.
+
+\item \textbf{efficiency}: Jive should enable you to develop programs
+  that make efficient use of the available computer resources.
+
+\end{enumerate}
+To meet the first requirement, Jive has been built on top of Jem, a C++
+library that provides a portable interface to system-level services. Jem
+also provides a collection of general-purpose functions and classes, such
+as multi-dimensional arrays, that greatly simplify program development.
+These functions and classes used to be part of Jive, but were later moved
+to a separate library that is now named Jem. It is therefore no
+coincidence that the structure of Jem is similar to the structure of
+Jive.
+
+To meet the second and third requirements, Jive provides both low-level
+and high-level software components. The low-level components are generic
+in nature and do not force you to structure your program in a particular
+way. The high-level components, on the other hand, are more specific
+in nature. They are more easy to use but they also force you to adopt a
+specific design or solution procedure. By using the high-level components
+you can quickly build a program that uses a ``standard'' procedure to
+solve a PDE. By falling back to the low-level components you are also
+able to implement a non-standard solution procedure or to customize part
+of a standard solution procedure.
+
+To meet the fourth requirement, Jive, like Jem, consists of largely
+independent \emph{packages} containing collections of related classes and
+functions. By using an event framework -- provided by the Jem library --
+the classes within a package are also largely independent from each
+other.
+
+To meet the fifth and last requirement, Jive stores all large data sets
+in large arrays. This means that the data can be accessed quickly and
+that no additional memory is required for keeping track of the memory
+addresses at which the data are stored.
+
+%========================================================================
+
+\section{Getting started}
+
+Information about Jive is available from various sources: this user
+manual, the online reference manual, the example programs that come with
+Jive, and the web. The online reference manual consists of a set of HTML
+pages that can be accessed from the main index page \Code{doc/index.html}
+in the Jive installation directory and from the Jive website
+(\JiveWebsite). The example programs can be found in the \Code{examples}
+sub-directory in the Jive installation directory.
+
+Since Jive uses components from the Jem library, you will have to be
+somewhat familiar with the Jem library. Information about Jem can be
+obtained from the Jem user manual; from the online reference manual; and
+from the example programs that come with Jem. The online reference
+manual can be viewed by opening the file \Code{doc/index.html} in the Jem
+installation directory. The Jem reference manual is also accessible from
+the Jive reference manual.
+
+To start using Jive you are recommended to take the following steps:
+\begin{enumerate}
+
+\item Browse through the Jem user manual. You do not have to read it
+  thoroughly from front to back; you only need to know how Jem is
+  structured and what types of software components it provides.
+
+\item Make yourself familiar with three concepts that are used frequently
+  in Jive and that are implemented by Jem. These are: garbage collection;
+  arrays and array expressions; and sparse matrices. In particular, you
+  should read the documentation of the following classes: the
+  \Code{Collectable} class; the \Code{Object} class; the \Code{Array}
+  class; and the \Code{SparseMatrix} class. The documentation of these
+  classes can be found in the online reference manual of Jem (the first
+  three classes are part of the package \Code{base} and the last class is
+  part of the package \Code{numeric}).
+
+\item Read at least the next three chapters of this manual. The
+  information provided by the other chapters is not strictly necessary to
+  get started, but you may want to read these chapters to learn more
+  about Jive.
+
+\item Browse through the online reference manual to find out which
+  classes are available. This will give you an impression of the
+  capabilities of Jive.
+
+\end{enumerate}
+
+%========================================================================
+
+\section{Outline of this manual}
+
+\begin{comment}
+  This manual is divided into three parts. The first part --
+  Chapters~\ref{chapter:the-basics}
+  to~\ref{chapter:extended-poisson-solver} -- explains how to start using
+  Jive. After discussing some technical aspects of using Jive, it
+  presents an elaborate example of a program that computes the solution
+  of a simple PDE. The second part -- Chapters~\ref{chapter:utilities}
+  to~\ref{chapter:io} -- focuses on the classes and functions
+  provided by Jive. The aim of this part is to show which classes and
+  functions should be used for which types of operations; to show how the
+  classes are related to each other; and to explain why the classes have
+  been designed the way they are. The third and last part --
+  Chapters~?? to~?? -- discusses various numerical techniques that can be
+  used to solve PDEs. It also shows how these techniques can be
+  implemented efficiently with Jive.
+\end{comment}
+
+\textbf{\autoref{chapter:the-basics}} provides the technical
+information that you need to know to write a program with Jive. In
+particular, it explains what Jive is from a programmer's point of view;
+how Jive is organized; how to use components from Jive -- and Jem --
+in your program; how to use components from Jem in components from Jive
+in your program; and how to compile and link your program.
+
+\textbf{\autoref{chapter:essential-jem-components}} briefly describes the
+essential classes from Jem that are used frequently in Jive. Basic
+knowledge about these classes is required to start programming with Jive.
+
+\textbf{\autoref{chapter:poisson-solver}} walks you through an
+example program that uses the finite element method to compute the
+solution of a simple Poisson problem. This chapter explains how you can
+transform the PDE describing the Poisson problem into a linear system
+of equations and how you can solve this system of equations.
+
+\textbf{\autoref{chapter:mechanics-solver}} describes a more complex
+example program that solves an elastic continuum mechanics problem
+involving large deformations. This program illustrates how to solve a
+non-linear PDE involving multiple unknowns with the finite element
+method.
+
+\begin{comment}
+
+  \textbf{Chapter~\ref{chapter:utilities}} starts the second part of
+  this manual by providing an overview of various general-purpose
+  utility functions and classes. These include classes that represent
+  unstructured grids/meshes; classes that represent the boundary of a
+  grid/mesh; and classes that represent sets of nodes, elements,
+  boundaries and other entities.
+
+  Next, \textbf{Chapter~\ref{chapter:matrices}} focuses on matrices and
+  vectors.  It indicates which classes in Jive -- and in Jem -- can be
+  used to store vectors and various types of matrices; it shows which
+  classes and functions can be used to perform common matrix/vector
+  computations; and it explains how to extend Jive with new matrix
+  classes and matrix/vector algorithms.
+
+  After that, \textbf{Chapter~\ref{chapter:geom}} describes a family of
+  classes that encapsulate the geometrical properties of basic shapes
+  such as lines, triangles, and tetrahedra. You can use these classes to
+  evaluate the shape functions of a finite element; to evaluate the
+  gradients of the shape functions; to evaluate integrals over the
+  domain of an element; and to evaluate other geometrical properties of
+  a finite element, a finite volume cell, or some other geometrical
+  entity.
+
+  \textbf{Chapter~\ref{chapter:fem}} then deals with the classes and
+  functions that have been designed specifically for finite element
+  applications.  After reading this chapter, you will know which classes
+  and functions can be used to implement a finite element model and to
+  assemble a global matrix or vector.
+
+  \textbf{Chapter~\ref{chapter:solvers}} provides an overview of the
+  classes that can be used to solve (large) linear system of equations.
+  It describes the strengths and weaknesses of these solver classes, and
+  it indicates which solver should be used in a particular situation.
+  This chapter also shows how one can apply a set of linear constraints
+  to a system of equations.
+
+  Finally, \textbf{Chapter~\ref{chapter:io}} describes the input/output
+  framework provided by Jive and Jem. This framework consists of a
+  collection of classes that can read and write commonly used data
+  structures from and to XML-formatted files. Since these classes can be
+  combined in an unlimited number of ways, you can easily define an
+  input and output format that best matches the requirements of your
+  application.
+
+\end{comment}

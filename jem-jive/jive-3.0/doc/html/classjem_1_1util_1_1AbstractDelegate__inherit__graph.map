@@ -1,0 +1,4 @@
+<map id="jem::util::AbstractDelegate" name="jem::util::AbstractDelegate">
+<area shape="rect" id="node1" title="Provides a superclass for all delegate types." alt="" coords="5,5,203,32"/>
+<area shape="rect" id="node2" href="$classjem_1_1util_1_1Delegate.html" title="Represents a call&#45;back function that will be invoked by an event." alt="" coords="33,80,175,121"/>
+</map>

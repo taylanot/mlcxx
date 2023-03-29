@@ -1,0 +1,59 @@
+#!/bin/dash
+
+# Generated on Wed Dec 15 18:15:54 CET 2021.
+# CHANGES TO THIS FILE WILL BE LOST.
+
+
+alias pwd='pwd -P'
+
+quote()
+{
+  echo "'$(echo "$1" | sed -e "s/'/'\''/g")'"
+}
+
+
+TOPDIR="${JIVEDIR:?}"
+TOOLKIT=Jive
+
+alias pathto="$JEMDIR/bin/pathto"
+
+
+#========================================================================
+#   Functions
+#========================================================================
+
+#------------------------------------------------------------------------
+#   PrintInfo ( %pkg )
+#------------------------------------------------------------------------
+
+
+PrintInfo()
+{
+  echo "Installs the $TOOLKIT package $1."
+}
+
+
+#------------------------------------------------------------------------
+#   Run ()
+#------------------------------------------------------------------------
+
+
+Run()
+{
+  if [ -e "$PKG_DIR/Makedefs.mk" ]; then
+    cp -f -- "$PKG_DIR/Makedefs.mk" \
+             "$TOPDIR/makefiles/packages/${PKG_NAME}.mk"
+  fi
+
+  if [ -n "$VERBOSE" ]; then
+    echo "The package \`$PKG_NAME' has been successfully installed."
+  fi
+}
+
+
+#========================================================================
+#   Main script
+#========================================================================
+
+
+. "${JEMDIR:?}/scripts/include/pkgtool.sh"

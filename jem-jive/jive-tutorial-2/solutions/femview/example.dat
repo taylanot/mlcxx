@@ -1,0 +1,5 @@
+<NodeConstraints>
+  u[innerEdge] = 1.0;
+  u[outerEdge] = 0.0;
+</NodeConstraints>
+

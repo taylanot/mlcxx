@@ -1,0 +1,190 @@
+\documentclass[a4paper]{article}
+
+\usepackage[text={14cm,24cm},centering]{geometry}
+\usepackage{listings}
+\usepackage{palatino}
+\usepackage{parskip}
+\usepackage{color}
+\usepackage{url}
+
+\lstset{language={},backgroundcolor=\color[gray]{0.95},
+  basicstyle=\ttfamily}
+
+
+%========================================================================
+% Definitions
+%========================================================================
+
+
+\newcommand{\Code}[1]{\texttt{#1}}
+
+
+%========================================================================
+% Document
+%========================================================================
+
+
+\title {Jem/Jive 3.0\\[1ex]
+        Release Notes}
+\author{Dynaflow Research Group}
+\date  {20-12-2019}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Overview}
+
+Version 3.0 of Jem/Jive is a major release with some new features, bug
+fixes, lots of improvements, and, last but not least, an update to the
+C++11 standard. This version should be largely source compatible with
+version 2.2, although you might need to make some small changes to your
+Jem/Jive programs.
+
+The following list provides an overview of the new features and
+improvements. More detailed information can be found in the following
+sections.
+
+\begin{itemize}
+
+  \item Extension of the \Code{NonlinModule} with support for solving
+    non-linear minimisation problems with box constraints. These kind of
+    problems occur, for instance, when using a phase field to describe
+    the propagation of a crack in a solid material.
+
+  \item Extension of the format of properties files; you can now use the
+    \Code{+=} operator to extend a previously defined property.
+
+  \item Improvement of the \Code{Ref} class so that it behaves more like
+    a regular pointer. You no longer need to use the \Code{NIL} constant,
+    but can use \Code{nullptr} instead.
+
+  \item Support for move semantics where that makes sense.
+
+  \item Support for initializer lists for arrays and other sequence
+    types.
+
+  \item Support for the GLFW OpenGL toolkit in addition to the GLUT
+    toolkit.
+
+  \item Complete overhaul of the implementation of the \Code{gl} package.
+    It can now make use of modern shaders to achieve better and faster
+    graphics.
+
+  \item Improved parallel performance of the linear solvers and
+    preconditioners, and that of the coarse grid preconditioner in
+    particular. Improved handling of simulations in which degrees of
+    freedom are added/removed dynamically only in parts of a model.
+
+  \item New class \Code{jem::Flags} for handling bitwise flags in a
+    better way.
+
+  \item Change of the \Code{jem::idx\_t} type from a typedef into a class
+    type. This should be mostly transparent to Jem/Jive applications if
+    you used the \Code{idx\_t} type properly. You may have to change a
+    few \Code{int} variable declarations to \Code{idx\_t} declarations.
+
+  \item New header files with forward declarations. All Jem/Jive packages
+    now provide a header file \Code{<forward.h>} that contains forward
+    declarations for the classes provided by that package.
+
+  \item New Jem package \Code{crypto} for performing
+    encryption/decryption operations. This requires the OpenSSL
+    library.
+
+  \item New Jem package \Code{net} for performing network operations,
+    such as sending and receiving data through sockets.
+
+  \item New Jem package \Code{ssl} for performing network operations over
+    secure sockets. This requires the OpenSSL library.
+
+\end{itemize}
+
+%------------------------------------------------------------------------
+
+\section{Update to the C++11 standard}
+
+Starting with version 3.0, a C++ compiler with support for the C++11
+standard is required to compile and use Jem/Jive. Jem/Jive now support
+move semantics (where that makes sense), initializer lists, the
+\Code{nullptr\_t} type, literal operators (for the \Code{idx\_t} and
+\Code{Time} classes, among others), and the \Code{noexcept} and
+\Code{override} function specifiers, among others.
+
+A consequence of this change is that the \Code{Ref} class now more
+closely resembles a standard pointer. Here are some examples:
+
+\begin{lstlisting}
+  Ref<Object>  obj = nullptr;  // No need to use NIL.
+
+  if ( obj == nullptr ) ...
+
+  if ( obj ) ...
+
+  if ( ! obj ) ...
+\end{lstlisting}
+
+This example shows how to use the literal operators provided by Jem:
+
+\begin{lstlisting}
+  using namespace jem::literals;
+
+  Time   t = 24_hour;
+  idx_t  i = 34_idx;
+
+  t = t + 60_min;
+  i = i + 128_idx;
+\end{lstlisting}
+
+The following example shows how you can use initializer lists:
+
+\begin{lstlisting}
+  Tuple<String,3>  s = { "one", "two", "three" };
+  Array<int>       a = { 1, 2, 3, 4, 5 };
+\end{lstlisting}
+
+The next example demonstrates how you can make use of move semantics:
+
+\begin{lstlisting}
+  Flex<MyClass>  list;  // Assume MyClass supports move semantics.
+
+  while ( condition )
+  {
+    MyClass  tmp;
+
+    // Initialize tmp ...
+
+    list.pushBack ( std::move( tmp ) );
+  }
+\end{lstlisting}
+
+%------------------------------------------------------------------------
+
+\section{Extension of the \Code{Properties} file format}
+
+The \Code{Properties} file format now supports the use of the \Code{+=}
+operator to extend previously defines properties This is best explained
+through an example:
+
+\begin{lstlisting}
+  settings =
+  {
+    list = [ "one", "two", "three" ];
+    word = "Hello";
+  };
+
+  settings +=
+  {
+    more  = 10;          // Add a new member to "settings".
+    list += [ "four" ];  // Extend the "list" array.
+    word += " World!";   // Extend the "word" string.
+  };
+\end{lstlisting}
+
+The \Code{+=} operator is particularly useful if you want to modify an
+existing properties file; you only need to add a section that modifies
+previously defined properties.
+
+\end{document}
+

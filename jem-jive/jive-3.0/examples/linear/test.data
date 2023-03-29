@@ -1,0 +1,20 @@
+
+<NodeConstraints>
+
+  u[leftEdge]  = 2.0;
+  u[rightEdge] = 0.0;
+
+</NodeConstraints>
+
+
+<NodeTable name = "sourceField">
+
+  <Section columns = "u">
+
+    all  0.0
+
+  </Section>
+
+</NodeTable>
+
+

@@ -1,0 +1,13 @@
+<map id="jive::solver::Solver" name="jive::solver::Solver">
+<area shape="rect" id="node1" title="Computes the solution of a linear system of equations." alt="" coords="327,147,469,174"/>
+<area shape="rect" id="node4" href="$classjive_1_1solver_1_1ConstrainedSolver.html" title="Bundles a solver and a constraints handler into a single object." alt="" coords="527,5,707,47"/>
+<area shape="rect" id="node5" href="$classjive_1_1solver_1_1DirectSolver.html" title="Provides an interface for classes that implement direct solution algorithms." alt="" coords="525,71,708,98"/>
+<area shape="rect" id="node8" href="$classjive_1_1solver_1_1IterativeSolver.html" title=" " alt="" coords="517,122,716,149"/>
+<area shape="rect" id="node9" href="$classjive_1_1solver_1_1LocalSolver.html" title=" " alt="" coords="528,173,705,199"/>
+<area shape="rect" id="node10" href="$classjive_1_1solver_1_1SchurSolver.html" title=" " alt="" coords="527,223,706,250"/>
+<area shape="rect" id="node11" href="$classjive_1_1solver_1_1VerboseSolver.html" title=" " alt="" coords="519,274,714,301"/>
+<area shape="rect" id="node2" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,147,279,174"/>
+<area shape="rect" id="node3" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,147,133,174"/>
+<area shape="rect" id="node6" href="$classjive_1_1solver_1_1SkylineLU.html" title=" " alt="" coords="776,46,943,73"/>
+<area shape="rect" id="node7" href="$classjive_1_1solver_1_1SkylineSolver.html" title=" " alt="" coords="764,97,955,123"/>
+</map>

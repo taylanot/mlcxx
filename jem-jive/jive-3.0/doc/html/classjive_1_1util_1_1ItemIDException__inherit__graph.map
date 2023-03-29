@@ -1,0 +1,5 @@
+<map id="jive::util::ItemIDException" name="jive::util::ItemIDException">
+<area shape="rect" id="node1" title=" " alt="" coords="5,155,196,181"/>
+<area shape="rect" id="node2" href="$classjem_1_1Exception.html" title="Provides a single superclass for all exceptions that a program should catch." alt="" coords="41,80,160,107"/>
+<area shape="rect" id="node3" href="$classjem_1_1Throwable.html" title="Provides a single superclass for all exceptions in Jem." alt="" coords="39,5,162,32"/>
+</map>

@@ -1,0 +1,25 @@
+
+<NodeConstraints>
+
+  u[innerEdge] = 0.4;
+  u[outerEdge] = 0.0;
+
+</NodeConstraints>
+
+
+<NodeTable name = "Prescribed">
+
+  <Section columns="u">
+
+    innerEdge 0.4;
+
+  </Section>
+
+</NodeTable>
+
+
+<ElementGroup name = "lunch">
+
+  "all"
+
+</ElementGroup>

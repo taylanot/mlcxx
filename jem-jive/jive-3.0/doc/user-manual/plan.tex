@@ -1,0 +1,283 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt]{article}
+
+\usepackage {palatino}
+\pagestyle  {plain}
+
+
+\topmargin        0cm
+\headheight       0cm
+\headsep          0cm
+\textheight      24cm
+\textwidth       15cm
+\evensidemargin   0cm
+\oddsidemargin    0cm
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macros
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\BlankLine}{\vspace{1.5ex} \noindent}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{ Jive user manual }
+
+\author{ }
+
+\date{\today }
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\maketitle
+
+
+%======================================================================
+% Project description
+%======================================================================
+
+\section{Project description}
+
+\textbf{Objective}: write a manual for the Jive programming toolkit.
+
+\BlankLine
+\textbf{Audience}: the readers of the manual have a university degree
+in a technical science; they have knowledge of common numerical
+methods -- the finite difference method and the finite element method,
+for instance -- for solving partial differential equations; and they have
+knowledge of the C++ programming language.
+
+\BlankLine
+\textbf{Requirements}:
+\begin{itemize}
+
+\item The manual should be written in English.
+
+\item The manual should help people getting started with Jive. In
+  particular, it should:
+
+  \begin{itemize}
+
+  \item explain what one can and can not do with Jive;
+
+  \item explain how Jive is structured (files, packages);
+
+  \item show how to compile and link a program; 
+
+  \item provide an overview of the main software components, or classes;
+
+  \item explain what these classes can be used for;
+
+  \item explain how these classes are related to each other;
+    
+  \item explain how these classes can be used to built numerical
+    applications.
+    
+  \end{itemize}
+  
+\item The manual should primarily be read from front to back. It
+  should also provide easy access to those sections that discuss a
+  specific feature of Jive.
+  
+\item The manual should \emph{not} be used as a detailed reference
+  guide.
+
+\end{itemize}
+
+
+%======================================================================
+% Main question
+%======================================================================
+
+\section{Main question}
+
+How can one use Jive to write a program that solves a particular
+partial differential equation (PDE)?
+
+
+%======================================================================
+% Background questions
+%======================================================================
+
+\section{Background questions}
+
+\begin{itemize}
+
+\item \emph{What is Jive?}
+
+  \begin{itemize}
+    
+  \item A C++ library for implementing programs that solve one or more
+    partial differential equations.
+  
+  \end{itemize}
+
+
+\item \emph{Should I use Jive?}
+
+  \begin{itemize}
+    
+  \item You should consider using Jive if you have knowledge of C++;
+    if you have knowledge of general numerical methods for solving
+    PDEs; and if you want to implement a specific method for solving
+    one or more PDEs.
+
+  \item You should \emph{not} use Jive if you want to have a
+    ready-to-run program.
+
+  \end{itemize}
+
+
+\item \emph{What does Jive provide?}
+
+  \begin{itemize}
+    
+  \item Data structures for storing and manipulating unstructured
+    grids.
+
+  \item Data structures for selecting sets of grid components such as
+    nodes, elements, boundaries, etc.
+
+  \item Data structures for storing dense and sparse matrices.
+    
+  \item Algorithms for building (sparse) matrices, and for performing
+    (sparse) matrix and vector operations.
+
+  \item Algorithms for solving linear systems of equations that may be
+    subjected to a set of linear constraints.
+    
+  \item Facilities for computing element shape functions and their
+    gradients, and for evaluating integrals over the domain of an
+    element.
+    
+  \item Facilities for reading and writing commonly used data
+    structures such as grids, sets, vectors, (sparse) matrices, etc.
+
+  \end{itemize}
+
+
+\item \emph{What other libraries are required when using Jive?}
+
+  \begin{itemize}
+
+  \item The Jem library. To be precise, the core Jem library together
+    with the packages \texttt{numeric} and \texttt{xml}.
+
+  \end{itemize}
+
+
+\item \emph{How can I start using Jive?}
+
+  \begin{itemize}
+
+  \item Read this manual.
+    
+  \item Read the manual of Jem, as Jive is built on top of the Jem C++
+    library.
+
+  \item Study the example programs provided with Jive.
+
+  \item Read the HTML reference manuals of Jive and Jem.
+
+  \end{itemize}
+
+\end{itemize}
+
+
+%======================================================================
+% Key questions
+%======================================================================
+
+\section{Key questions}
+
+\subsection*{Part I: getting started}
+
+\begin{itemize}
+
+\item \emph{How do I start developing a program with Jive?}
+
+  \begin{itemize}
+  
+  \item \emph{What is Jive from a programmer's point of view?}
+    
+  \item \emph{How is Jive organized?}
+    
+  \item \emph{How do I use components from Jive in my program?}
+    
+  \item \emph{Do I also need to use components from Jem?}
+    
+  \item \emph{If so, how do I use components from Jem?}
+    
+  \item \emph{How do I compile and link my programs?}
+
+  \end{itemize}
+
+
+\item \emph{How do I solve a PDE with Jive?}
+
+  \begin{itemize}
+
+  \item \emph{What PDE is considered?}
+
+  \item \emph{Which numerical method will be used?}
+
+  \item \emph{What are the main steps in the solution procedure?}
+
+  \item \emph{Which components from Jive and Jem do I need?}
+
+  \item \emph{How do I create a mesh/grid?}
+
+  \item \emph{How do I compute the element matrices and vectors?}
+
+  \item \emph{How do I assemble the global system of equations?}
+
+  \item \emph{How do I apply constraints?}
+
+  \item \emph{How do I solve the global system of equations?}
+
+  \end{itemize}
+
+\end{itemize}
+
+
+\subsection*{Part II: description of Jive components}
+
+\begin{itemize}
+
+\item \emph{What general utilities are provided by Jive?}
+
+\item \emph{How do I store and manipulate matrices and vectors?}
+    
+\item \emph{How can I evaluate the geometrical properties of lines,
+    triangles, and other basic shapes?}
+
+\item \emph{Which components are available for finite element
+    computations?}
+
+\item \emph{How can I solve a linear system of equations?}
+
+\item \emph{How can I read and write data from and to files?}
+
+\end{itemize}
+
+
+\subsection*{Part III: solution techniques}
+
+
+\end{document}

@@ -1,0 +1,9 @@
+<map id="jive::model::MatrixModel" name="jive::model::MatrixModel">
+<area shape="rect" id="node1" title=" " alt="" coords="71,304,254,331"/>
+<area shape="rect" id="node2" href="$classjive_1_1model_1_1Model.html" title=" " alt="" coords="6,229,149,256"/>
+<area shape="rect" id="node3" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="5,155,149,181"/>
+<area shape="rect" id="node4" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="29,80,126,107"/>
+<area shape="rect" id="node5" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="13,5,141,32"/>
+<area shape="rect" id="node6" href="$classjem_1_1io_1_1Serializable.html" title=" " alt="" coords="173,229,323,256"/>
+<area shape="rect" id="node7" href="$classjem_1_1Interface.html" title="Provides support for creating Java&#45;like interfaces." alt="" coords="191,155,305,181"/>
+</map>

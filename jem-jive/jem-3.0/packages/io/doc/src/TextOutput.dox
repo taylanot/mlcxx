@@ -1,0 +1,480 @@
+
+/*
+ *  Copyright (C) 2019 DRG. All rights reserved.
+ *
+ *  This file is part of Jem, a general purpose programming toolkit.
+ *
+ *  Commercial License Usage
+ *
+ *  This file may be used under the terms of a commercial license
+ *  provided with the software, or under the terms contained in a written
+ *  agreement between you and DRG. For more information contact DRG at
+ *  http://www.dynaflow.com.
+ *
+ *  GNU Lesser General Public License Usage
+ *
+ *  Alternatively, this file may be used under the terms of the GNU
+ *  Lesser General Public License version 2.1 or version 3 as published
+ *  by the Free Software Foundation and appearing in the file
+ *  LICENSE.LGPLv21 and LICENSE.LGPLv3 included in the packaging of this
+ *  file. Please review the following information to ensure the GNU
+ *  Lesser General Public License requirements will be met:
+ *  https://www.gnu.org/licenses/lgpl.html and
+ *  http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+ *
+ *  Jem version: 3.0
+ *  Date:        Fri 20 Dec 14:27:58 CET 2019
+ */
+
+
+#include <jem/defines.h>
+
+
+JEM_BEGIN_PACKAGE( io )
+
+
+//=======================================================================
+//   class TextOutput
+//=======================================================================
+
+/*!
+  \class TextOutput TextOutput.dox jem/io/TextOutput.h
+
+  \brief Provides an interface for writing text-based output.
+
+  The \c TextOutput interface provides a set of (abstract) functions
+  for writing characters and numbers to an output stream. It is
+  typically used to implement functions that write text output and do
+  not care about the destination of the output.
+
+  Many classes in jem provide an overloaded version of the \c <<
+  operator that writes the contents of a class instance in a
+  human-readable format to a text output stream. These so-called
+  <em>print operators</em> can be very useful debugging aids.
+
+  \sa \c Writer, \c TextInput, \c DataOutput.
+
+*/
+
+class TextOutput : public Interface
+{
+ public:
+
+//-----------------------------------------------------------------------
+//   write
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Writes a single character to this output stream.
+
+  Writes the integer \a c, cast to an <code>unsigned char</code>, to
+  this output stream.
+
+  \param c - the character to be written.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual void write ( int c ) = 0;
+
+
+/*!
+
+  \brief Writes multiple copies of a character to this output stream.
+
+  Writes \a n copies of the integer \a c, cast to an <code>unsigned
+  char</code>, to this output stream.
+
+  \param c - the character to be written.
+
+  \param n - the number of copies of the character \a c to be written.
+
+  \pre <code>n >= 0</code>
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual void write ( int c, int n ) = 0;
+
+
+/*!
+  
+  \brief Writes an array of characters to this output stream.
+
+  Writes the first \a n characters stored in the array \a buf to this
+  output stream.
+
+  \param buf - a character array of which the length is at least \a n.
+
+  \param n - the number of characters to be written.
+
+  \pre
+    <code>n >= 0</code> <br>
+    and the array \a buf is at least \a n characters long.
+
+  \post The characters <code>buf[0], ..., buf[n - 1]</code> have been
+  written to this output stream.
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+  virtual void write ( const char* buf, int n ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   printByte
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a formatted byte to this output stream.
+
+  Prints the byte \a b, converted to a character string, to this
+  output stream. You should normally not call this function directly,
+  but use one of the overloaded print operators.
+
+  \param b - the byte to be printed.
+
+  \throws IOException - if an I/O error occurs.
+
+  \sa <code>operator << ( TextOutput&, byte )</code>
+
+*/
+
+  virtual void printByte  ( byte b ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   printBool
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a formatted bool to this output stream.
+
+  Prints the bool \a b, converted to a character string, to this
+  output stream. You should normally not call this function directly,
+  but use one of the overloaded print operators.
+
+  \param b - the bool to be printed.
+
+  \throws IOException - if an I/O error occurs.
+
+  \sa <code>operator << ( TextOutput&, bool )</code>
+
+*/
+  
+  virtual void printBool  ( bool b ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   printInt
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a formatted integer to this output stream.
+
+  Prints the long integer \a i, converted to a character string, to
+  this output stream. You should normally not call this function
+  directly, but use one of the overloaded print operators.
+
+  \param i - the integer to be printed.
+
+  \throws IOException - if an I/O error occurs.
+
+  \sa <code>operator << ( TextOutput&, long )</code>
+
+*/
+
+  virtual void printInt   ( long i ) = 0;
+
+
+//-----------------------------------------------------------------------
+//   printFloat
+//-----------------------------------------------------------------------
+
+/*!
+
+  \brief Prints a formatted double to this output stream.
+
+  Prints the double \a d, converted to a character string, to this
+  output stream. You should normally not call this function directly,
+  but use one of the overloaded print operators.
+
+  \param d - the double to be printed.
+
+  \throws IOException - if an I/O error occurs.
+
+  \sa <code>operator << ( TextOutput&, double )</code>
+
+*/
+
+  virtual void printFloat ( double d ) = 0;
+
+};
+
+
+//=======================================================================
+//   related functions
+//=======================================================================
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a boolean to a text output stream.
+
+  Prints the boolean \a b to the text output stream \a out by calling
+  <code>out.printBool(b)</code>.
+
+  \param out - a text output stream.
+
+  \param b - the boolean to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, bool b );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a byte to a text output stream.
+
+  Prints the byte \a b to the text output stream \a out by calling
+  <code>out.printByte(b)</code>.
+
+  \param out - a text output stream.
+
+  \param b - the byte to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, byte b );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a character to a text output stream.
+
+  Prints the character \a c to the text output stream \a out by
+  calling <code>out.write(c)</code>.
+
+  \param out - a text output stream.
+
+  \param c - the character to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, char c );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a short integer to a text output stream.
+
+  Prints the short integer \a i to the text output stream \a out by
+  calling <code>out.printInt(s)</code>.
+
+  \param out - a text output stream.
+
+  \param i - the short integer to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, short i );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints an integer to a text output stream.
+
+  Prints the integer \a i to the text output stream \a out by calling
+  <code>out.printInt(i)</code>.
+
+  \param out - a text output stream.
+
+  \param i - the integer to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, int i );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a long integer to a text output stream.
+
+  Prints the long integer \a i to the text output stream \a out by
+  calling <code>out.printInt(i)</code>.
+
+  \param out - a text output stream.
+
+  \param i - the long integer to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, long i );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a float to a text output stream.
+
+  Prints the float \a f to the text output stream \a out by calling
+  <code>out.printFloat(f)</code>.
+
+  \param out - a text output stream.
+
+  \param f - the float to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, float f );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a double to a text output stream.
+
+  Prints the double \a d to the text output stream \a out by calling
+  <code>out.printFloat(d)</code>.
+
+  \param out - a text output stream.
+
+  \param d - the double to be printed.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, double d );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Prints a string to a text output stream.
+
+  Prints the null-terminated character array \a s to the text output
+  stream \a out.
+
+  \param out - a text output stream.
+
+  \param s - a null-terminated character array, or \c NULL.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator << ( TextOutput& out, const char* s );
+
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Applies a manipulator function to a text output stream.
+
+  Applies the manipulator function \a manip to the text output stream
+  \a out. This operator is equivalent with:
+
+  <code>return manip( out );</code>
+
+  \param out - a text output stream.
+
+  \param manip - a text output manipulator function.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& operator <<
+
+  ( TextOutput&   out,
+    TextOutput& (*manip) ( TextOutput& ) );
+
+
+//-----------------------------------------------------------------------
+//   endl
+//-----------------------------------------------------------------------
+
+/*!
+  
+  \relates TextOutput
+
+  \brief Writes a newline to a text output stream.
+
+  A manipulator function that writes the newline '\\n' character to the
+  text output stream \a out.
+
+  \param out - a text output stream.
+
+  \return \a out
+
+  \throws IOException - if an I/O error occurs.
+
+*/
+
+inline TextOutput& endl ( TextOutput& out );
+
+
+
+
+
+
+JEM_END_PACKAGE( io )
+

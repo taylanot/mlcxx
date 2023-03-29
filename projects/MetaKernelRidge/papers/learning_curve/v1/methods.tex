@@ -1,0 +1,34 @@
+\subsection{Semi-Parametric Kernel Ridge}
+
+For a learning task $T_i$ of a one-dimensional regression problem in which the input-output relation is given by.
+
+\begin{equation}\label{eq:data}
+  \risk = \lc(\nsamp) + \varepsilon,
+\end{equation}
+
+where $\varepsilon$ is taken to be standard normal.
+
+Kernel Ridge Regression is obtained by utilizing the \textit{Nonparametric Representer Theorem} \cite{scholkopf2002a}. This theorem assumes that $g$ is a strictly increasing function and $\loss$ is a monotonic loss function. (We will assume mean squared loss $\loss:=\sum_i^{\nsamplr}(\model(\nsampi)-\risk_i)^2$ throughout the paper.), Then,
+\begin{equation}
+  \hat{\model} = \min_{\model\in\hilbert} \loss(\model,\risk) + g(||\model||_\hilbert)
+  \label{eq:min}
+\end{equation} 
+has the solution of the form, $\model(\cdot)=\sum^{\samplr}_i\alpha_i k(\cdot,\sampi)$. Where $\hilbert$ is the Reproducing Hilbert Space and $k$ is an arbitrary kernel. Until this point only available samples $\samplr$ are being utilized. To incorporate the other learning curves $(\lc_i)_{i=1}^\numlc$ the \textit{Semi-parametric Representer Theorem }\cite{scholkopf2002a} can be utilzed. This theorem assumes that the underlying function can be modeled as $\tilde{\model}= \model + h$ where $h\in span\{\psi_p\}$ and $\{\psi_p\}_{p=1}^\samplr$ are real-valued functions. Then the supervised learning problem with squared loss is given by:
+\begin{equation}
+  \hat{\tilde{\model}} = \min_{\tilde{\model}\in\hilbert} \loss(\tilde{\model},\risk) + g(||f||_\hilbert).
+  \label{eq:min_semi}
+\end{equation}  
+And, it has the solution in the form of $\tilde{\model}(\cdot)=\sum_i^\nsamplr\alpha_i k(\cdot,\nsampi)+\sum_j^\numlc\beta_j\psi_j(\cdot).$
+This expression allows us to incorporate information coming from other available learning curves. 
+
+Further assuming $g(||f||_\hilbert):=\lambda||f||^2$, the optimal solutions for the Semiparametric Representer Theorem is given by:
+\begin{align}
+  \hat{\data}&=(\mathbf{K}\mathbf{K}+\lambda\mathbf{K}-\mathbf{K}\boldsymbol{\psi}(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}\boldsymbol{\psi}^\text{T}\mathbf{K})^{-1}(\mathbf{K}-\mathbf{K}\boldsymbol{\psi}(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}\boldsymbol{\psi})\boldsymbol{\risk} \\ 
+  \hat{\func}&=(\boldsymbol{\psi}^\text{T}\boldsymbol{\psi})^{-1}(\boldsymbol{\psi}^\text{T}\boldsymbol{\risk}-\boldsymbol{\psi}^\text{T}\mathbf{K}\hat{\data}),
+\label{eq:opt}
+\end{align}
+
+where $\boldsymbol{\alpha}\in\R^{\nsamplr\times 1}$, $\boldsymbol{\beta}\in\R^{\numlc\times 1}$, $\boldsymbol{\psi}\in\R^{\nsamplr\times \numlc}$, $\mathbf{K}\in\R^{\nsamplr\times \nsamplr}$ and $\boldsymbol{\risk} \in\R^{\nsamplr\times 1}$. All the bold symbols represent the concatenated versions of all data points and functions. One might question the need for additional learning curve information or the benefit obtained from the samples. These questions are addressed in Sections \ref{app:1} and \ref{app:2} respectively. By looking at the learning curves and statistical testing of the proposed learning algorithm.
+
+Now, one other question can be related to the selection of functions $\psi_j$. One obvious choice is to use all the available curves, however, with an increasing number of curves the computational complexity of the solution procedure increases. Moreover, the possible noise coming from all the learning curves might hinder the final prediction of the learning curve that is of interest. Thus, we propose Functional Principle Component Analysis (FPCA) as it allows smoothing and selecting only important modes of variation of the underlying learning curves. The reasoning behind FPCA utilization can be seen in Section \ref{app:3}.
+

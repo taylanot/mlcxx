@@ -1,0 +1,13 @@
+<map id="jem::Member" name="jem::Member">
+<area shape="rect" id="node1" title=" " alt="" coords="519,122,627,149"/>
+<area shape="rect" id="node5" href="$classjem_1_1Constructor.html" title=" " alt="" coords="675,71,805,98"/>
+<area shape="rect" id="node8" href="$classjem_1_1Field.html" title=" " alt="" coords="697,122,783,149"/>
+<area shape="rect" id="node11" href="$classjem_1_1Method.html" title=" " alt="" coords="689,173,791,199"/>
+<area shape="rect" id="node2" href="$classjem_1_1NamedObject.html" title=" " alt="" coords="327,122,471,149"/>
+<area shape="rect" id="node3" href="$classjem_1_1Object.html" title="Provides a single superclass for many classes in jem." alt="" coords="181,122,279,149"/>
+<area shape="rect" id="node4" href="$classjem_1_1Collectable.html" title="Provides support for automatic garbage collection." alt="" coords="5,122,133,149"/>
+<area shape="rect" id="node6" href="$classjem_1_1ConstructorTemplate.html" title=" " alt="" coords="866,5,1057,47"/>
+<area shape="rect" id="node7" href="$classjem_1_1DefaultConstructor.html" title=" " alt="" coords="853,71,1069,98"/>
+<area shape="rect" id="node9" href="$classjem_1_1FieldTemplate.html" title=" " alt="" coords="869,122,1054,149"/>
+<area shape="rect" id="node10" href="$classjem_1_1SettableFieldTemplate.html" title=" " alt="" coords="862,173,1061,215"/>
+</map>
