@@ -51,6 +51,29 @@ const int  SEED = 24 ; // KOBEEEE
 
 int main ( int argc, char** argv )
 {
+  {
+    int D, N;
+    double a, p, eps;
+    std::string type;
+
+    D = 1; N = 4; type = "Sine";
+    a = 1.0; p = 0.; eps = 0.0;
+    utils::data::regression::Dataset dataset(D, N);
+
+    dataset.Generate(a, p, type, eps);
+
+    auto inputs = dataset.inputs_;
+    auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
+
+    algo::regression::GP<mlpack::GaussianKernel> model(inputs,labels, 0.,0.1);
+    arma::mat labprior,labposterior;
+    arma::mat inp = arma::regspace<arma::mat>(0,1,N);
+    size_t k=2;
+    model.SamplePrior(k,inp.t(),labprior);
+    model.SamplePosterior(k,inp.t(),labposterior);
+    //PRINT(labprior);
+    //PRINT(labposterior);
+  }
   //{ 
   //  int n_dims   = 1;
   //  int params   = 1; int n_points = 100; 
@@ -94,6 +117,9 @@ int main ( int argc, char** argv )
     ////PRINT_VAR(distance);
     //mlpack::EuclideanDistance metric;
     //PRINT(metric.Evaluate(a,b));
+  //arma::vec ali = {0,0,0,1,2,3,4,5};
+  //ali.elem(find(ali==0)) = 10.;
+  //PRINT(ali);
   //}
   //{
   //    int D = 2; int N = 10000; int Nc = 2;
@@ -103,6 +129,15 @@ int main ( int argc, char** argv )
   //    data._dipping(r, eps);
   //    data.Save("classification.csv");
 
+  //}
+  //{
+  //  auto res = create_saw(100 , 0.1);
+  //  PRINT(std::get<0>(res));
+  //}
+  //{
+  //  arma::rowvec Ns = arma::regspace<arma::rowvec>(5,1,100);
+  //  auto res = create_saw(Ns, 0.1);
+  //  PRINT(res);
   //}
   doctest::Context context;
 

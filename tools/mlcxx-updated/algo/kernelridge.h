@@ -33,7 +33,7 @@ class KernelRidge
   template<typename... Ts>
   KernelRidge<T> ( const arma::mat& inputs,
                    const arma::rowvec& labels,
-                   const double lambda,
+                   const double& lambda,
                    const Ts&... args );
   /**
    * Non-working model 

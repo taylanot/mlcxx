@@ -17,14 +17,14 @@
 
 namespace utils {
 
-arma::mat loadCSV(const std::string &filename, 
-                  const std::string &delimeter = ",")
+arma::mat loadCSV ( const std::string &filename, 
+                    const std::string &delimeter = "," )
 {
   std::ifstream csv(filename);
   std::vector<std::vector<double>> datas;
 
-  for(std::string line; std::getline(csv, line); ) {
-
+  for ( std::string line; std::getline(csv, line); )
+  {
       std::vector<double> data;
 
       // split string by delimeter
@@ -49,7 +49,7 @@ arma::mat loadCSV(const std::string &filename,
   return data_mat;
 }
   arma::mat Load( const std::string& filename,
-                  const bool transpose=false)
+                  const bool transpose=false )
   {
     std:: string ext = Extension(filename);
     arma::mat data;

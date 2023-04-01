@@ -8,6 +8,7 @@
 #define UTILS_H
 
 #include "utils/system.h"
+#include "utils/extract_class.h"
 #include "utils/save.h"
 #include "utils/load.h"
 #include "utils/convert.h"

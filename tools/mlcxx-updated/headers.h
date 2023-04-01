@@ -8,6 +8,7 @@
 
 // Some easy definitions...
 #define ARMA_WARN_LEVEL 1
+#define PI
 #define DOCTEST_CONFIG_IMPLEMENT
 #define PRINT(...) std::cout << __VA_ARGS__ << std::endl; 
 #define PRINT_VAR(...) std::cout << #__VA_ARGS__ << " := " << std::endl << __VA_ARGS__ << std::endl; 
@@ -63,6 +64,7 @@
 // tests
 #include "tests/doctest.h"
 #include "tests/tests.h"
+#include "exp/exp.h"
 //#include "tests/test_arma.h"
 
 // main functions

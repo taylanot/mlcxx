@@ -14,23 +14,23 @@
 #ifndef SAVE_H
 #define SAVE_H
 
-// standard
-#include <string>
-// jem
-#include <jem/base/String.h>
-// local
-#include "convert.h"
+//// standard
+//#include <string>
+//// jem
+//#include <jem/base/String.h>
+//// local
+//#include "convert.h"
 
 namespace utils {
 
-  std::string Extension(const std::string& filename)
+  std::string Extension ( const std::string& filename )
   {
     return filename.substr(filename.find_last_of(".")+1);
   }
 
   template<class T>
-  arma::mat Combine(const T& data1,
-                    const T& data2, bool column=true)
+  arma::mat Combine ( const T& data1,
+                      const T& data2, bool column=true )
   {
     if (column)
     {
@@ -40,12 +40,12 @@ namespace utils {
     {
       return arma::join_cols(data1, data2);
     }
-
   }
+
   template<class T>
-  void Save(const std::string& filename,
-            T& data,
-            const bool transpose=true)
+  void Save ( const std::string& filename,
+              T& data,
+              const bool transpose=true )
   {
     if (transpose)
     {
@@ -62,10 +62,10 @@ namespace utils {
   }
 
   template<class T>
-  void Save(const std::string& filename,
-            T& data1,
-            T& data2,
-            const bool transpose=true)
+  void Save ( const std::string& filename,
+              T& data1,
+              T& data2,
+              const bool transpose=true )
   {
     T data = Combine(data1,data2);
 

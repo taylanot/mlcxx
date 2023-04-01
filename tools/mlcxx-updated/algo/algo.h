@@ -8,7 +8,9 @@
 #define ALGO_H
 
 
+#include "algo/gp.h"
 #include "algo/nmc.h"
+#include "algo/fisherc.h"
 #include "algo/kernelridge.h"
 #include "algo/gradientdescent.h"
 #include "algo/semiparamkernelridge.h"

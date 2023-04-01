@@ -1,5 +1,5 @@
 /**
- * @file nmc.h
+ * @file nmc_impl.h
  * @author Ozgur Taylan Turan
  *
  * Nearest Mean Classifier 
@@ -15,21 +15,26 @@ namespace classification {
 ///////////////////////////////////////////////////////////////////////////////
 // Nearest Mean Classifier 
 ///////////////////////////////////////////////////////////////////////////////
+
 NMC::NMC ( const arma::mat& inputs,
            const arma::rowvec& labels )
 {
   Train(inputs, labels);
 }
+
 void NMC::Train ( const arma::mat& inputs,
                   const arma::rowvec& labels )
 {
+  dim_ = inputs.n_rows;
   unique_ = arma::unique(labels);
   num_class_ = unique_.n_cols;
   parameters_.resize(inputs.n_rows, num_class_);
   arma::uvec index;
   for ( size_t i=0; i<num_class_; i++ )
   {
-    index = arma::find(labels == unique_(i));
+    auto extract = utils::extract_class(inputs, labels, i);
+    //index = arma::find(labels == unique_(i));
+    index = std::get<1>(extract);
     parameters_.col(i) = arma::mean(inputs.cols(index),1);
   }
 }
@@ -70,6 +75,12 @@ double NMC::ComputeError ( const arma::mat& points,
   arma::rowvec temp =  predictions - responses; 
   double total = responses.n_cols;
   return (arma::accu(temp != 0.))/total;
+}
+
+double NMC::ComputeAccuracy ( const arma::mat& points, 
+                              const arma::rowvec& responses ) const
+{
+  return (1. - ComputeError(points, responses))*100;
 }
 
 } // namespace classification

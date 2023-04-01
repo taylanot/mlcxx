@@ -349,7 +349,62 @@ TEST_SUITE("SINEGEN") {
   }
 }
 
+TEST_SUITE("EXTRACT_CLASSES") {
+    int D; int N=10; int Nc=2; double tol = 1e-6;
+    TEST_CASE("1D")
+    {
+      D = 1;
 
+      utils::data::classification::Dataset data(D, N, Nc);
+      std::string type = "Simple";
+      data.Generate(type);
+
+      std::tuple<arma::mat, arma::uvec> collect0;
+      std::tuple<arma::mat, arma::uvec> collect1;
+      collect0 = utils::extract_class(data.inputs_, data.labels_,0);
+      collect1 = utils::extract_class(data.inputs_, data.labels_,1);
+
+      arma::mat out0 = std::get<0>(collect0);
+      arma::mat out1 = std::get<0>(collect1);
+
+      arma::uvec id0 = arma::regspace<arma::uvec>(0,1,N-1);
+      arma::uvec id1 = arma::regspace<arma::uvec>(N,1,2*N-1);
+
+      CHECK ( arma::norm((data.inputs_.cols(id0)-out0)) <= tol );
+      CHECK ( arma::norm(data.inputs_.cols(id1)-out1) <= tol );
+
+      CHECK ( arma::norm(std::get<1>(collect0) - id0) <=tol );
+      CHECK ( arma::norm(std::get<1>(collect1) - id1) <=tol );
+    }
+    TEST_CASE("2D")
+    {
+      D = 2;
+
+      utils::data::classification::Dataset data(D, N, Nc);
+      std::string type = "Simple";
+      data.Generate(type);
+
+      std::tuple<arma::mat, arma::uvec> collect0;
+      std::tuple<arma::mat, arma::uvec> collect1;
+      collect0 = utils::extract_class(data.inputs_, data.labels_,0);
+      collect1 = utils::extract_class(data.inputs_, data.labels_,1);
+
+      arma::mat out0 = std::get<0>(collect0);
+      arma::mat out1 = std::get<0>(collect1);
+
+      arma::uvec id0 = arma::regspace<arma::uvec>(0,1,N-1);
+      arma::uvec id1 = arma::regspace<arma::uvec>(N,1,2*N-1);
+
+      CHECK ( arma::norm((data.inputs_.cols(id0)-out0)) <= tol );
+      CHECK ( arma::norm(data.inputs_.cols(id1)-out1) <= tol );
+
+      CHECK ( arma::norm(std::get<1>(collect0) - id0) <=tol );
+      CHECK ( arma::norm(std::get<1>(collect1) - id1) <=tol );
+    }
+
+
+  
+}
 
 
 

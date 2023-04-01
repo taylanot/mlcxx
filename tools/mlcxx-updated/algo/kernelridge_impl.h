@@ -26,7 +26,7 @@ template<class T>
 template<class... Ts>
 KernelRidge<T>::KernelRidge ( const arma::mat& inputs,
                               const arma::rowvec& labels,
-                              const double lambda,
+                              const double& lambda,
                               const Ts&... args ) :
     cov_(args...), lambda_(lambda)
 {
