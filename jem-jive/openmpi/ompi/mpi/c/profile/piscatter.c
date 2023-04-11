@@ -1,1 +1,0 @@
-../../../../ompi/mpi/c/iscatter.c

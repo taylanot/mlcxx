@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/file_get_atomicity_f.c

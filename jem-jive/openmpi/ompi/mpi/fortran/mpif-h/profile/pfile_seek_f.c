@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/file_seek_f.c

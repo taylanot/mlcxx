@@ -1,1 +1,0 @@
-../../../../ompi/mpi/tool/cvar_write.c

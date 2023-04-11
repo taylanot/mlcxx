@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/group_rank_f.c

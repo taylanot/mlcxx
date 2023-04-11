@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/abort_f.c

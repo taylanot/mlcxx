@@ -1,1 +1,0 @@
-../../../../ompi/mpi/tool/cvar_get_index.c

@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/test_f.c

@@ -1,1 +1,0 @@
-../../../../ompi/mpi/c/ineighbor_alltoall.c

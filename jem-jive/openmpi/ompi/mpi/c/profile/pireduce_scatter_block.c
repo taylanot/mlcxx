@@ -1,1 +1,0 @@
-../../../../ompi/mpi/c/ireduce_scatter_block.c

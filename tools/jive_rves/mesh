@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-for file in $(find Gallery/ -type f); do
-  echo $file
-  python3 converter.py $file
-done

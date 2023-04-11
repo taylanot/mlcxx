@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/type_indexed_f.c

@@ -1,5 +1,0 @@
-INFO - unimodal-nonlinear - Running command 'main'
-INFO - unimodal-nonlinear - Started run with ID "5"
-layers.output.bias tensor([-0.0688])
-layers.output.bias tensor([-0.0688])
-INFO - unimodal-nonlinear - Completed after 0:00:00

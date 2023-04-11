@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/get_accumulate_f.c

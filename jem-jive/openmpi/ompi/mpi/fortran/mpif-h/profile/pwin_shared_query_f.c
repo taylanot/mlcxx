@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/win_shared_query_f.c

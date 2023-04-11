@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/rsend_f.c

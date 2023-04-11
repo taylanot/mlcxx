@@ -1,8 +1,0 @@
-\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
-\babel@toc {english}{}
-\defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {1}{Past Meeting}{3}{0}{1}
-\defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {2}{PINN}{4}{0}{2}
-\defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {3}{Extra}{8}{0}{3}

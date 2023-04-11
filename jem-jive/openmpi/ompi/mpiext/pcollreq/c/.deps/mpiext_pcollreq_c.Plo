@@ -1,3 +1,0 @@
-mpiext_pcollreq_c.lo: mpiext_pcollreq_c.c /usr/include/stdc-predef.h
-
-/usr/include/stdc-predef.h:

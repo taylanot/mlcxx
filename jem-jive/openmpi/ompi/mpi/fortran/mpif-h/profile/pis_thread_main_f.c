@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/is_thread_main_f.c

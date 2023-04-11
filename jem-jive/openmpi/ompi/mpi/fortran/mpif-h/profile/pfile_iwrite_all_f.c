@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/file_iwrite_all_f.c

@@ -1,9 +1,0 @@
-// Input parameters for the elastic example program.
-
-nelm   = 100000;
-force  = 10000.0;
-tract  = 0.0;
-area   = 0.0001;
-young  = 200.0e9;
-length = 1.0;
-

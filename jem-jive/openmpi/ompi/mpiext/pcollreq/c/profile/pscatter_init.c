@@ -1,1 +1,0 @@
-../../../../../ompi/mpiext/pcollreq/c/scatter_init.c

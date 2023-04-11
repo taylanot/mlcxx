@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/reduce_scatter_f.c

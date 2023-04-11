@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/lookup_name_f.c

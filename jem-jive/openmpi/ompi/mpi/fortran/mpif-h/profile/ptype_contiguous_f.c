@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/type_contiguous_f.c

@@ -1,1 +1,0 @@
-../../../../../ompi/mpi/fortran/mpif-h/cart_rank_f.c

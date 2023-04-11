@@ -1,3 +1,0 @@
-# Generated on Wed Dec 15 18:15:54 CET 2021.
-# CHANGES TO THIS FILE WILL BE LOST.
-

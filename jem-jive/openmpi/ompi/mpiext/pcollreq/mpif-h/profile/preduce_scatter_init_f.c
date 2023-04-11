@@ -1,1 +1,0 @@
-../../../../../ompi/mpiext/pcollreq/mpif-h/reduce_scatter_init_f.c

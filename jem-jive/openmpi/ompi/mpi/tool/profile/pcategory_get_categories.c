@@ -1,1 +1,0 @@
-../../../../ompi/mpi/tool/category_get_categories.c
