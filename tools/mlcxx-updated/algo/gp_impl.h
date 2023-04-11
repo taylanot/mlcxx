@@ -11,23 +11,24 @@
 namespace algo { 
 namespace regression {
 
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 // Gaussian Process Regression
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 template<class T>
 template<class... Ts>
-GP<T>::GP ( const arma::mat& inputs,
-            const arma::rowvec& labels,
-            const double& lambda,
-            const Ts&... args ) : cov_(args...), lambda_(lambda)
+GaussianProcess<T>::GaussianProcess ( const arma::mat& inputs,
+                                      const arma::rowvec& labels,
+                                      const double& lambda,
+                                      const Ts&... args ) :
+                                   cov_(args...), lambda_(lambda)
 {
   Train(inputs, labels);
 }
 
 
 template<class T>
-void GP<T>::Train ( const arma::mat& inputs,
-                    const arma::rowvec& labels )
+void GaussianProcess<T>::Train ( const arma::mat& inputs,
+                                 const arma::rowvec& labels )
 {
   train_inp_ = inputs.t();
   N_ = inputs.n_cols;
@@ -42,37 +43,37 @@ void GP<T>::Train ( const arma::mat& inputs,
 }
 
 template<class T>
-void GP<T>::Predict ( const arma::mat& inputs,
-                      arma::rowvec& labels ) const
+void GaussianProcess<T>::Predict ( const arma::mat& inputs,
+                                   arma::rowvec& labels ) const
 {
   arma::mat k_xpx = cov_.GetMatrix(inputs.t(),train_inp_);
   labels = (k_xpx * parameters_).t();
 }
 
 template<class T>
-void GP<T>::PredictVariance ( const arma::mat& inputs,
-                              arma::rowvec& labels ) const
+void GaussianProcess<T>::PredictVariance ( const arma::mat& inputs,
+                                           arma::rowvec& labels ) const
 {
   arma::mat k_xpx = cov_.GetMatrix(inputs.t(),train_inp_);
   arma::mat k_xpxp = cov_.GetMatrix(inputs.t(),inputs.t());
   arma::vec v = arma::solve(L_,k_xpx.t());
   labels = arma::conv_to<arma::rowvec>::from
-                                          ((k_xpxp - arma::dot(v,v)));
+                                          ((k_xpxp - v.t()*v));
 }
 
 template<class T>
-void GP<T>::PredictVariance ( const arma::mat& inputs,
-                              arma::mat& labels ) const
+void GaussianProcess<T>::PredictVariance ( const arma::mat& inputs,
+                                           arma::mat& labels ) const
 {
   arma::mat k_xpx = cov_.GetMatrix(inputs.t(),train_inp_);
   arma::mat k_xpxp = cov_.GetMatrix(inputs.t(),inputs.t());
   arma::mat v = arma::solve(L_,k_xpx.t());
-  labels = k_xpxp - arma::dot(v,v);
+  labels = k_xpxp - v.t()*v;
 }
 
 template<class T>
-double GP<T>::ComputeError ( const arma::mat& inputs,
-                             const arma::rowvec& labels ) const
+double GaussianProcess<T>::ComputeError ( const arma::mat& inputs,
+                                          const arma::rowvec& labels ) const
 {
   arma::rowvec temp;
   Predict(inputs, temp);
@@ -86,34 +87,36 @@ double GP<T>::ComputeError ( const arma::mat& inputs,
 }
 
 template<class T>
-double GP<T>::LogLikelihood ( const arma::mat& inputs,
-                              const arma::rowvec& labels ) const
+double GaussianProcess<T>::LogLikelihood ( const arma::mat& inputs,
+                                           const arma::rowvec& labels ) const
 {
   return -0.5*arma::dot(labels,parameters_) - arma::trace(arma::log(L_))
                                             - 0.5*double(N_)*std::log(2.*M_PI);
 }
 
 template<class T>
-void GP<T>::SamplePosterior ( const size_t& M,
-                              const arma::mat& inputs,
-                              arma::mat& labels ) const
+void GaussianProcess<T>::SamplePosterior ( const size_t& M,
+                                           const arma::mat& inputs,
+                                           arma::mat& labels ) const
 { 
   arma::rowvec mean;
   arma::mat cov;
   Predict(inputs, mean);  
   PredictVariance(inputs, cov);  
+  cov.diag() += 1e-6; // jitter addition
   labels = arma::mvnrnd(mean.t(), cov, M).t();
 }
 
 template<class T>
-void GP<T>::SamplePrior ( const size_t& M,
-                          const arma::mat& inputs,
-                          arma::mat& labels ) const
+void GaussianProcess<T>::SamplePrior ( const size_t& M,
+                                       const arma::mat& inputs,
+                                       arma::mat& labels ) const
 {
   size_t N = inputs.n_cols;
-  arma::mat kxx = cov_.GetMatrix(inputs.t(),inputs.t());  
+  arma::mat cov = cov_.GetMatrix(inputs.t(),inputs.t());  
+  cov.diag() += 1e-6 + lambda_; // jitter addition
   arma::vec mean(N); 
-  labels = arma::mvnrnd(mean, kxx, M).t();
+  labels = arma::mvnrnd(mean, cov, M).t();
 }
 
 } // namespace regression

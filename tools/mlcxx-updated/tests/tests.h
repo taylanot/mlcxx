@@ -11,6 +11,7 @@
 #include "test_algo.h"
 #include "test_stats.h"
 #include "test_opt.h"
-#include "test_arma.h"
+//#include "test_arma.h"
+#include "test_src.h"
 
 #endif

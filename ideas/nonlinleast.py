@@ -1,50 +1,22 @@
 import numpy as np
+import copy as cp
 from scipy.optimize import curve_fit, minimize
 import matplotlib.pyplot as plt
 
 np.random.seed(24)
 
-def func(x, a, b, c):
-    return a * np.exp(-b * x) +c
+def func(x, a):
+    return a[0] * x**2 + a[1]
 
 def data(N=10, noise=False):
-    x =  np.linspace(1,10,N)
-    y =  func(x,1,1,0) 
+    x =  np.linspace(0,10,N)
+    y =  func(x,[1,0]) 
     if noise:
         y += np.random.normal(0,0.1,N)
     return x, y
 
 def res(y, yhat):
     return np.sum((y-yhat)**2)
-
-N = 10
-noise = False
-x, y = data(N, noise)
-
-def obj(param, x=x,y=y):
-    return res(y,func(x,param[0],param[1],param[2]))
-
-
-param1, _ = curve_fit(func, x, y)
-#print(param1)
-result = minimize(obj,[1,2,3],method="L-BFGS-B")
-param = result.x
-
-x_test = np.linspace(0,10,1000);
-y_test = func(x_test, param[0],param[1],param[2])
-y_test1 = func(x_test, param1[0],param1[1],param1[2])
-
-#print(res(func(x_test,1,2,3),y_test))
-#print(res(func(x_test,1,2,3),y_test1))
-
-#plt.plot(x_test,y_test, label='optim-fit')
-#plt.plot(x_test,y_test1, label='curve-fit')
-#plt.scatter(x,y, label='data')
-#plt.plot(x_test,func(x_test,1,2,3), label='real')
-#plt.legend()
-#plt.xlabel('x')
-#plt.ylabel('y')
-#plt.show()
 
 def lm_func(t,p):
     """
@@ -60,7 +32,7 @@ def lm_func(t,p):
     
     #y_hat = p[0,0]*np.exp(-t/p[1,0]) + p[2,0]*np.sin(t/p[3,0])
     
-    return func(t,p[0,0],p[1,0],p[2,0])
+    return func(t,p)
 
 
 def lm_FD_J(t,p,y,dp):
@@ -114,7 +86,6 @@ def lm_FD_J(t,p,y,dp):
         
         # restore p(j)
         p[j,0]=ps[j,0]
-    print(J) 
     return J
     
 
@@ -267,11 +238,11 @@ def lm(p,t,y_dat):
     # weights or a scalar weight value ( weight >= 0 )
     weight = 1/(y_dat.T@y_dat)
     # fractional increment of 'p' for numerical derivatives
-    dp = [-0.001]      
+    dp = [0.001]      
     # lower bounds for parameter values
-    p_min = -100*abs(p)  
+    p_min = -10*abs(p)  
     # upper bounds for parameter values       
-    p_max = 100*abs(p)
+    p_max = 10*abs(p)
 
     MaxIter       = 1000        # maximum number of iterations
     epsilon_1     = 1e-3        # convergence tolerance for gradient
@@ -280,7 +251,7 @@ def lm(p,t,y_dat):
     lambda_0      = 1e-2        # initial value of damping paramter, lambda
     lambda_UP_fac = 11          # factor for increasing lambda
     lambda_DN_fac = 9           # factor for decreasing lambda
-    Update_Type   = 1           # 1: Levenberg-Marquardt lambda update, 2: Quadratic update, 3: Nielsen's lambda update equations 
+    Update_Type   = 3           # 1: Levenberg-Marquardt lambda update, 2: Quadratic update, 3: Nielsen's lambda update equations 
 
     if len(dp) == 1:
         dp = dp*np.ones((Npar,1))
@@ -460,17 +431,34 @@ def lm(p,t,y_dat):
     # convergence history
     cvg_hst = cvg_hst[:iteration,:]
     
-    print('\nLM fitting results:')
-    for i in range(Npar):
-        print('----------------------------- ')
-        print('parameter      = p%i' %(i+1))
-        print('fitted value   = %0.4f' % p[i,0])
-        print('standard error = %0.2f %%' % error_p[i,0])
-    
+    #print('\nLM fitting results:')
+    #for i in range(Npar):
+    #    print('----------------------------- ')
+    #    print('parameter      = p%i' %(i+1))
+    #    print('fitted value   = %0.4f' % p[i,0])
+    #    print('standard error = %0.2f %%' % error_p[i,0])
+    #
     return p,redX2,sigma_p,sigma_y,corr_p,R_sq,cvg_hst
 
-#p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.array([[1.],[2.],[3.]]),x,y)
-for i in range(1):
+N = 10
+noise = True
+x, y = data(N, noise)
+
+def obj(param, x=x,y=y):
+    return res(y,func(x,param))
+
+
+for i in range(100):
     #p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.random.randn(3).reshape(-1,1),x,y)
-    p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.ones(3).reshape(-1,1),x,y)
+    p_init = np.random.uniform(0.,1.,2)
+    p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(p_init.reshape(-1,1),x,y)
+    result = minimize(obj,p_init,method="L-BFGS-B")
+    param1, _ = curve_fit(obj, x, y, p_init)
+    param = result.x
+    print('curvefit:', param1)
+    print('LBFGS:', param)
+    print('LM:', p_fit.flatten())
+
+
+
 #p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.ones(3).reshape(-1,1),x,y)

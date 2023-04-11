@@ -9,7 +9,7 @@
 #ifndef SEMIPARAM_KERNELRIDGE_H
 #define SEMIPARAM_KERNELRIDGE_H
 
-#include <mlpack/prereqs.hpp>
+//#include <mlpack/prereqs.hpp>
 
 namespace algo { 
 namespace regression {

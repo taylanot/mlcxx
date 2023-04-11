@@ -8,11 +8,11 @@
 #ifndef SEMIPARAMKERNELRIDGE_IMPL_H
 #define SEMIPARAMKERNELRIDGE_IMPL_H
 
-// mlpack
-#include <mlpack/core.hpp>
-// local
-#include "semiparamkernelridge.h"
-#include "utils/covmat.h"
+//// mlpack
+//#include <mlpack/core.hpp>
+//// local
+//#include "semiparamkernelridge.h"
+//#include "utils/covmat.h"
 
 using namespace algo::regression;
 

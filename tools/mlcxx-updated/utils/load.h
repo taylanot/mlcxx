@@ -17,6 +17,38 @@
 
 namespace utils {
 
+//-----------------------------------------------------------------------
+// DataAnalytics
+//-----------------------------------------------------------------------
+void DataAnalytics ( arma::mat& data,
+                     const bool& transpose ) 
+{
+  if ( transpose )
+    arma::inplace_trans(data);
+
+  PRINT_VAR(arma::mean(data));
+  PRINT_VAR(arma::median(data));
+  PRINT_VAR(arma::stddev(data));
+  PRINT_VAR(arma::cor(data));
+  PRINT_VAR(arma::max(data));
+  PRINT_VAR(arma::min(data));
+}
+
+//-----------------------------------------------------------------------
+// read_data
+//-----------------------------------------------------------------------
+arma::mat read_data ( const std::string& filename,
+                      const bool& transpose)
+{
+  arma::mat matrix;
+  mlpack::data::DatasetInfo info;
+  mlpack::data::Load(filename,matrix,info,true,transpose);
+  return matrix;
+}
+
+//-----------------------------------------------------------------------
+// loadCSV
+//-----------------------------------------------------------------------
 arma::mat loadCSV ( const std::string &filename, 
                     const std::string &delimeter = "," )
 {

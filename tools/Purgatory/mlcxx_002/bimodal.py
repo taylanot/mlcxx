@@ -44,7 +44,6 @@ def eig(X,Y, mean_sub=True, npc=1):
     eigenfunctions = np.transpose(np.dot(weight_invsqrt,
                                          np.fliplr(eigenvectors)[:, :npc]))
     # (NxN @ Nxnpc)^T -> npcxN
-
     return eigenvalues, eigenfunctions, npc
 
 def eig_alt(X,Y, mean_sub=False, npc=1):
@@ -105,7 +104,7 @@ class func_pca():
         self.fpca.fit(funcdata)
         self.grid = funcdata.argvals['input_dim_0']
         #self.eigenfunctions = self.fpca.eigenfunctions.values
-        _,self.eigenfunctions,_ = eig_alt(self.grid, funcdata.values,npc=comp)#,mean_sub=mean_sub)
+        _,self.eigenfunctions,_ = eig_alt(self.grid, funcdata.values,npc=comp,mean_sub=mean_sub)
         self.eigenfunctions += np.mean(funcdata.values, axis=0)
 
     def __call__(self, xs):
@@ -165,9 +164,9 @@ class SemiParamKernelRidge(BaseEstimator):
         self.X = X
 
     def fit_them_all(self, X, Y, grid=1):
-        ls = np.linspace(0.001,100,grid)
-        lmbdas = np.linspace(0., 1000, grid)
-        Xtrn, Xtst, Ytrn, Ytst = train_test_split(X,Y, test_size=0.5, random_state=2)
+        ls = np.linspace(1.,10,grid)
+        lmbdas = np.linspace(1., 100, grid)
+        Xtrn, Xtst, Ytrn, Ytst = train_test_split(X,Y, test_size=0.1, random_state=2)
         error = np.zeros((grid, grid))
         for i, l in enumerate(ls):
             self.kernel.l = l 
@@ -194,6 +193,7 @@ class SemiParamKernelRidge(BaseEstimator):
         psi_ = self.funcs(X)
         A = np.block([[self.kernel(X, self.X),psi_]])
         return A.dot(self.w)
+
     def predict2(self, X):
         psi_ = self.funcs(X)
         return psi_.dot(self.w[-len(self.funcs)-1:-1].reshape(-1,1))
@@ -219,10 +219,10 @@ class rbf():
         return np.exp(-alpha/self.l**2)
 
 M = 2
-func_id = -1
-Ntrn = 50
-l = 1
-lmbda = 0
+func_id = -20
+Ntrn = 20
+l = 1.
+lmbda = 10.
 
 filename = "LearningCurves/10D-extra/LR-LearningCurves/notune"
 filename2 = "LearningCurves/20D-extra/LR-LearningCurves/notune"
@@ -254,31 +254,33 @@ dataset2 = np.array(dataset2).T
 
 dataset = np.hstack((dataset1, dataset2))
 funcdata = DenseFunctionalData({'input_dim_0':x.flatten()}, dataset.T)
-funcdata = funcdata.smooth(10,10)
-#funcdata = funcdata.smooth(50,10)
+#funcdata = funcdata.smooth(10,10)
+funcdata = funcdata.smooth(50,10)
 
 Y = funcdata.values
+MEAN = Y.mean(axis=0)
 X = funcdata.argvals['input_dim_0']
 
 x_train = np.arange(5,Ntrn,1).reshape(-1,1); y_train=dataset[0:x_train.shape[0],func_id]
 x_test = x; y_test = dataset[:,func_id]
 
-#funcs = func_mean(funcdata,comp=M, mean_sub=False)
-funcs = func_pca(funcdata, M)
+#funcs = func_mean(funcdata,comp=M, mean_sub=True)
+funcs = func_pca(funcdata, M, mean_sub=False)
 #funcs = func_raw(funcdata, M)
-plot(funcdata)
-plt.ylim([0,30])
-plt.show()
+#plot(funcdata)
+#plt.ylim([0,30])
+#plt.show()
 
 kernel = rbf(l=l)
 model = SemiParamKernelRidge(lmbda, kernel, funcs)
-model.fit(x_train,y_train)
+model.fit_inter(x_train,y_train)
 #print(np.linalg.norm(model.beta,2))
 #print(model.beta)
 
 plt.scatter(x_train, y_train, label='training')
-plt.plot(x_test,model.predict(x_test), label='meta')
+plt.plot(x_test,model.predict(x_test)+MEAN, label='meta')
 plt.plot(x_test, y_test,label='test')
+#plt.ylim([0,30])
 plt.xlabel('N')
 plt.ylabel('Error')
 plt.legend()

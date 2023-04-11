@@ -35,9 +35,9 @@ class FISHERC
    * @param inputs X
    * @param labels y
    */
-  FISHERC ( const double& lambda,
-            const arma::mat& inputs,
-            const arma::rowvec& labels );
+  FISHERC ( const arma::mat& inputs,
+            const arma::Row<size_t>& labels,
+            const double& lambda );
                                
   /**
    * @param inputs X
@@ -45,20 +45,20 @@ class FISHERC
    */
 
   FISHERC ( const arma::mat& inputs,
-            const arma::rowvec& labels );
+            const arma::Row<size_t>& labels );
   /**
    * @param inputs X
    * @param labels y
    */
   void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+               const arma::Row<size_t>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
   void Classify ( const arma::mat& inputs,
-                  arma::rowvec& labels ) const;
+                  arma::Row<size_t>& labels ) const;
 
   /**
    * Calculate the Error Rate
@@ -67,7 +67,7 @@ class FISHERC
    * @param labels 
    */
   double ComputeError ( const arma::mat& points, 
-                        const arma::rowvec& responses ) const;
+                        const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
@@ -75,7 +75,7 @@ class FISHERC
    * @param labels 
    */
   double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::rowvec& responses ) const;
+                           const arma::Row<size_t>& responses ) const;
 
   const arma::mat& Parameters() const { return parameters_; }
 
@@ -107,7 +107,7 @@ class FISHERC
   arma::mat parameters_;
   double bias_;
 
-  arma::rowvec unique_;
+  arma::Row<size_t> unique_;
 
 };
 

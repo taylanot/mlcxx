@@ -12,8 +12,8 @@
 #include "algo/nmc.h"
 #include "algo/fisherc.h"
 #include "algo/kernelridge.h"
-#include "algo/gradientdescent.h"
-#include "algo/semiparamkernelridge.h"
+//#include "algo/gradientdescent.h"
+//#include "algo/semiparamkernelridge.h"
 #include "algo/functionalpca.h"
 #include "algo/functionalsmoothing.h"
 

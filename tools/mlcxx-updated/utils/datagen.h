@@ -16,6 +16,10 @@ namespace utils {
 namespace data {
 namespace regression {
 
+//=============================================================================
+// Dataset
+//=============================================================================
+
 struct Dataset 
 {
   size_t size_;
@@ -54,6 +58,8 @@ struct Dataset
                   const std::string& type,
                   const double& noise_std );
 
+  void Generate ( const std::string& type );
+
   void Noise ( const double& noise_std );
 
   void Noise ( const size_t& M,
@@ -63,7 +69,15 @@ struct Dataset
                const arma::rowvec& noise_std );
 
   void Save ( const std::string& filename );
+
+  void Load ( const std::string& filename,
+              const size_t Din,
+              const size_t Dout );
 };
+
+//=============================================================================
+// SineGen
+//=============================================================================
 
 struct SineGen
 {
@@ -89,6 +103,10 @@ struct SineGen
 
 namespace classification{
 
+//=============================================================================
+// Dataset
+//=============================================================================
+
 struct Dataset 
 {
   size_t size_;
@@ -96,7 +114,7 @@ struct Dataset
   size_t num_class_;
 
   arma::mat inputs_;
-  arma::mat labels_;
+  arma::Row<size_t> labels_;
 
   Dataset ( );
   Dataset ( const size_t& D,
@@ -121,6 +139,7 @@ struct Dataset
 
   void Save ( const std::string& filename );
 
+  void Load ( const std::string& filename );
 };
 
 

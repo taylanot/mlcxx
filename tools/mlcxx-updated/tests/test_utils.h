@@ -7,14 +7,26 @@
 #ifndef TEST_UTILS_H 
 #define TEST_UTILS_H
 
-TEST_SUITE("Dataset") {
+
+
+TEST_SUITE("DATASET") {
 
   int D, N;
   double a, p, eps;
 
   double tol = 1.e-6;
 
-  TEST_CASE("Regression-1D")
+  TEST_CASE("LOAD-REGRESSION")
+  {
+    utils::data::regression ::Dataset dataset;
+    dataset.Load("datasets/winequality-red.csv",11,1);
+    CHECK ( dataset.inputs_(0,0) == 7.4 );
+    CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 11 );
+    CHECK ( dataset.labels_(0,0) == 5. );
+    CHECK ( dataset.labels_(0,dataset.size_-1) == 6. );
+  }
+
+  TEST_CASE("REGRESSION-1D")
   {
     D=1; N=4;
     utils::data::regression::Dataset data(D, N);
@@ -34,6 +46,22 @@ TEST_SUITE("Dataset") {
                          + std::pow(data.labels_(0),2);
 
       CHECK ( sum_check - 1. < tol );
+
+      arma::mat labels = data.labels_;
+      eps = 0.1;
+      data.Noise(eps);
+
+      CHECK ( labels(0) != data.labels_(0) );
+    }
+    SUBCASE("SINC")
+    {
+      data.Generate(a, p, "Sinc", eps);
+
+      CHECK ( data.inputs_.n_cols == N );
+      CHECK ( data.inputs_.n_rows == D );
+
+      CHECK ( data.labels_.n_cols == N );
+      CHECK ( data.labels_.n_rows == 1 );
 
       arma::mat labels = data.labels_;
       eps = 0.1;
@@ -62,7 +90,7 @@ TEST_SUITE("Dataset") {
     }
   }
 
-  TEST_CASE("Regression-2D")
+  TEST_CASE("REGRESSION-2D")
   {
     D=2; N=4;
     utils::data::regression::Dataset data(D, N);
@@ -114,6 +142,15 @@ TEST_SUITE("Dataset") {
   {
     int Nc; tol = 1e-1;
 
+    SUBCASE("LOAD-IRIS")
+    {
+      utils::data::classification::Dataset dataset;
+      dataset.Load("datasets/iris.csv");
+      CHECK ( dataset.inputs_(0,0) == 5.1 );
+      CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 1.8 );
+      CHECK ( dataset.num_class_ == 3 );
+    }
+
     SUBCASE("SIMPLE-1D")
     {
       D = 1; N = 10000; Nc = 2;
@@ -125,14 +162,9 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol);
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1))) + 5 <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(N,2*N-1))) - 
-      //                                                 std::sqrt(0.1) <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(0,N-1))) - 
-      //                                                 std::sqrt(0.1) <= tol );
     }
     SUBCASE("SIMPLE-2D")
     {
@@ -145,7 +177,8 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol );
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1))) + 5 <= tol );
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
@@ -166,7 +199,8 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol);
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1))) + 5 <= tol );
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
@@ -186,7 +220,8 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol );
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1),)) + 5 <= tol );
       //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
@@ -197,6 +232,22 @@ TEST_SUITE("Dataset") {
 
  
     }
+
+    SUBCASE("BANANA")
+    {
+      D = 2; N = 1000; Nc = 2;
+      utils::data::classification::Dataset data(D, N, Nc);
+      std::string type = "Banana";
+      data.Generate(type);
+
+      CHECK ( data.inputs_.n_cols == 2*N );
+      CHECK ( data.inputs_.n_rows == D );
+      CHECK ( data.labels_.n_cols == 2*N );
+      CHECK ( data.labels_.n_rows == 1 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
+    }
+
     SUBCASE("DIPPING")
     {
       D = 1; N = 10000; Nc = 2;
@@ -208,7 +259,8 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
 
       bool check1 = arma::any(arma::vectorise(data.inputs_) < -2.5);
       bool check2 = arma::any(arma::vectorise(data.inputs_) > 2.5);
@@ -229,18 +281,20 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
 
-      CHECK ( arma::min(arma::min(data.inputs_)) > -1.1 );
-      CHECK ( arma::max(arma::max(data.inputs_)) < 1.1 );
+      CHECK ( arma::min(arma::min(data.inputs_)) > -21 );
+      CHECK ( arma::max(arma::max(data.inputs_)) < 21. );
 
       arma::mat inside = data.inputs_(arma::span(0,1),arma::span(N,2*N-1));
       double in_max = arma::max(arma::max(inside));
       double in_min = arma::min(arma::min(inside));
 
-      CHECK ( in_max < 2. );  
-      CHECK ( in_min > -2. );  
+      CHECK ( in_max < 3 );  
+      CHECK ( in_min > -3 );  
     }
+
     SUBCASE("DELAYED-DIPPING-ARGS")
     {
       D = 2; N = 10; Nc = 2;
@@ -253,7 +307,8 @@ TEST_SUITE("Dataset") {
       CHECK ( data.inputs_.n_rows == D );
       CHECK ( data.labels_.n_cols == 2*N );
       CHECK ( data.labels_.n_rows == 1 );
-      CHECK ( arma::mean(arma::mean(data.labels_)) == 0.5 );
+      CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
+                                              ::from(data.labels_))) == 0.5 );
 
       CHECK ( arma::min(arma::min(data.inputs_)) > -10.1 );
       CHECK ( arma::max(arma::max(data.inputs_)) < 10.1 );

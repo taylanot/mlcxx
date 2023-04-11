@@ -8,7 +8,6 @@
 
 // Some easy definitions...
 #define ARMA_WARN_LEVEL 1
-#define PI
 #define DOCTEST_CONFIG_IMPLEMENT
 #define PRINT(...) std::cout << __VA_ARGS__ << std::endl; 
 #define PRINT_VAR(...) std::cout << #__VA_ARGS__ << " := " << std::endl << __VA_ARGS__ << std::endl; 
@@ -49,8 +48,9 @@
 #include <boost/serialization/nvp.hpp>
 //mlpack
 
-#include <mlpack/core.hpp>
-//#include <mlpack/methods/linear_regression.hpp>
+//#include <mlpack/core.hpp>
+#include <mlpack.hpp>
+//#include <mlpack/methods/logistic_regression.hpp>
 
 // local
 #include "utils/utils.h"

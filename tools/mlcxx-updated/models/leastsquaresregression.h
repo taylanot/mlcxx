@@ -84,21 +84,22 @@ class LeastSquaresRegression: public BaseModel
           arma::linspace(lambda_bnds_[0],lambda_bnds_[1],tune_res_);
 
         std::vector biases = {bias_bnds_[0], bias_bnds_[1]};
-
-        LCurve_HPT<mlpack::LinearRegression,
+        src::regression::LCurve_HPT<mlpack::LinearRegression,
                         mlpack::MSE,
                         mlpack::SimpleCV> lcurve(Ns,repeat_,cv_valid_);
       
-      return  lcurve.Generate(name_, inputs, labels, lambdas, biases);
+      lcurve.Generate(name_, inputs, labels, lambdas, biases);
+      return lcurve.stats_;
     }
 
     else
     {
 
-      LCurve<mlpack::LinearRegression,
+      src::regression::LCurve<mlpack::LinearRegression,
                         mlpack::MSE> lcurve(Ns,repeat_);
       
-      return  lcurve.Generate(name_,inputs, labels, lambda_, bias_);
+      lcurve.Generate(name_,inputs, labels, lambda_, bias_);
+      return lcurve.stats_;
     }
   }
 
@@ -200,19 +201,21 @@ class KernelLeastSquaresRegression: public BaseModel
       arma::vec params = arma::linspace(kernel_param_bnds_[0],
                                         kernel_param_bnds_[1], tune_res_);
 
-      LCurve_HPT<algo::regression::KernelRidge<T>,
+      src::regression::LCurve_HPT<algo::regression::KernelRidge<T>,
                  mlpack::MSE,
                  mlpack::SimpleCV> lcurve(Ns,repeat_,cv_valid_);
 
-      return  lcurve.Generate(name_, inputs, labels, lambdas, params);
+      lcurve.Generate(name_, inputs, labels, lambdas, params);
+      return lcurve.stats_;
     }
     else
     {
 
-      LCurve<algo::regression::KernelRidge<T>,
+      src::regression::LCurve<algo::regression::KernelRidge<T>,
                         mlpack::MSE> lcurve(Ns,repeat_);
       
-      return  lcurve.Generate(name_, inputs, labels, lambda_);
+      lcurve.Generate(name_, inputs, labels, lambda_);
+      return lcurve.stats_;
     }
   }
 

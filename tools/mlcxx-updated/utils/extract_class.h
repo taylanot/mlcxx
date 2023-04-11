@@ -21,8 +21,8 @@ namespace utils {
 
 std::tuple< arma::mat,
             arma::uvec > extract_class ( const arma::mat& inputs,
-                                         const arma::rowvec& labels,
-                                         const double& label_id )
+                                         const arma::Row<size_t>& labels,
+                                         const size_t& label_id )
 {
   arma::uvec index = arma::find(labels == label_id);
   return std::make_tuple(inputs.cols(index), index);

@@ -13,12 +13,12 @@
 namespace algo { 
 namespace regression {
 
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 // Gaussian Process Regression
-///////////////////////////////////////////////////////////////////////////////
+//=============================================================================
 
 template<class T>
-class GP
+class GaussianProcess
 {
   public:
   /**
@@ -26,7 +26,7 @@ class GP
    * @param args  : kernel parameters
    */
   template<typename... Ts>
-  GP<T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
+  GaussianProcess<T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
 
   /**
    * @param X     : inputs 
@@ -34,10 +34,10 @@ class GP
    * @param args  : kernel parameters 
    */
   template<typename... Ts>
-  GP<T> ( const arma::mat& inputs,
-          const arma::rowvec& labels,
-          const double& lambda,
-          const Ts&... args );
+  GaussianProcess<T> ( const arma::mat& inputs,
+                       const arma::rowvec& labels,
+                       const double& lambda,
+                       const Ts&... args );
   
   /**
    * @param X     : inputs 
@@ -103,11 +103,20 @@ class GP
   void  SamplePosterior ( const size_t& k,
                           const arma::mat& inputs,
                           arma::mat& labels ) const;
-
+  /**
+   * Get Parameters
+   *
+   */
   const arma::vec& Parameters ( ) const { return parameters_; }
 
   arma::vec& Parameters ( ) { return parameters_; }
 
+  /**
+   * Set Lambda
+   *
+   * @param lambda      : lambda
+   */
+  void Lambda( const double& lambda ) { lambda_ = lambda; }
 
   /**
    * Serialize the model.

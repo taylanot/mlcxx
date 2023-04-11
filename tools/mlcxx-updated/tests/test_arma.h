@@ -10,24 +10,24 @@
 
 void test_smpkr()
 {
-  int D, Ntrn, Ntst; D=1; Ntrn=4; Ntst=1000;
-  double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-  utils::data::regression::Dataset trainset(D, Ntrn);
-  utils::data::regression::Dataset testset(D, Ntst);
-
-  trainset.Generate(a, p, "Sine", eps);
-  testset.Generate(a, p, "Sine", eps);
-  auto inputs = trainset.inputs_;
-  auto labels = arma::conv_to<arma::rowvec>::from(trainset.labels_);
-  algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel,
-                                         utils::data::regression::SineGen> 
-                      model(inputs,labels, 0.5, size_t(5), 1.);
-
-  arma::rowvec pred_labels;
-  arma::mat test_inp = arma::sort(testset.inputs_);
-  model.Predict(test_inp, pred_labels);
-  arma::mat test_out = arma::conv_to<arma::mat>::from(pred_labels);
-  utils::Save("pred.csv",test_inp,test_out);
+//  int D, Ntrn, Ntst; D=1; Ntrn=4; Ntst=1000;
+//  double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+//  utils::data::regression::Dataset trainset(D, Ntrn);
+//  utils::data::regression::Dataset testset(D, Ntst);
+//
+//  trainset.Generate(a, p, "Sine", eps);
+//  testset.Generate(a, p, "Sine", eps);
+//  auto inputs = trainset.inputs_;
+//  auto labels = arma::conv_to<arma::rowvec>::from(trainset.labels_);
+//  algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel,
+//                                         utils::data::regression::SineGen> 
+//                      model(inputs,labels, 0.5, size_t(5), 1.);
+//
+//  arma::rowvec pred_labels;
+//  arma::mat test_inp = arma::sort(testset.inputs_);
+//  model.Predict(test_inp, pred_labels);
+//  arma::mat test_out = arma::conv_to<arma::mat>::from(pred_labels);
+//  utils::Save("pred.csv",test_inp,test_out);
   
 
   //utils::data::regression::SineGen funcs(3);
@@ -72,14 +72,14 @@ void test_combine()
   //auto inverse2 = arma::inv(cov2); 
   //std::cout << "***[ Total Elapsed Time : "  << timer.toDouble() << " ]***";
   
-  int N = 2; int M = 3;
-  arma::mat K(N, N, arma::fill::ones);
-  arma::mat psi(N,M, arma::fill::ones);
-  arma::mat A = arma::join_rows(K, 2*psi); 
-  arma::mat B = arma::join_cols(arma::join_rows(K, arma::zeros(N,M)),
-                                                   arma::zeros(M,N+M)); 
-  std::cout << A << std::endl;
-  std::cout << B << std::endl;
+//  int N = 2; int M = 3;
+//  arma::mat K(N, N, arma::fill::ones);
+//  arma::mat psi(N,M, arma::fill::ones);
+//  arma::mat A = arma::join_rows(K, 2*psi); 
+//  arma::mat B = arma::join_cols(arma::join_rows(K, arma::zeros(N,M)),
+//                                                   arma::zeros(M,N+M)); 
+//  std::cout << A << std::endl;
+//  std::cout << B << std::endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -156,28 +156,28 @@ void test_functional()
 
 void test_lc()
 {
-  int D, Ntrn;  D=1; Ntrn=10; 
-  double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-  utils::data::regression::Dataset dataset(D, Ntrn);
+  //int D, Ntrn;  D=1; Ntrn=10; 
+  //double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+  //utils::data::regression::Dataset dataset(D, Ntrn);
 
-  dataset.Generate(a, p, "Linear", eps);
-  auto inputs = dataset.inputs_;
-  auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
+  //dataset.Generate(a, p, "Linear", eps);
+  //auto inputs = dataset.inputs_;
+  //auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
 
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5);
-  int repeat = 2; 
+  //arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5);
+  //int repeat = 2; 
 
-  LCurve<mlpack::LinearRegression,
-         mlpack::MSE> lcurve(Ns,repeat);
-  std::string filename = "CHECK.csv";
-  
-  auto stats = lcurve.Generate(filename, inputs, labels, 0., 1.);
+  //LCurve<mlpack::LinearRegression,
+  //       mlpack::MSE> lcurve(Ns,repeat);
+  //std::string filename = "CHECK.csv";
+  //
+  //auto stats = lcurve.Generate(filename, inputs, labels, 0., 1.);
 
-  arma::mat train_curves = lcurve.train_errors_;
-  arma::mat test_curves = lcurve.train_errors_;
-  
-  PRINT(test_curves);
-  PRINT(train_curves);
+  //arma::mat train_curves = lcurve.train_errors_;
+  //arma::mat test_curves = lcurve.train_errors_;
+  //
+  //PRINT(test_curves);
+  //PRINT(train_curves);
 }
 
 
@@ -186,57 +186,57 @@ void test_lc()
 //-----------------------------------------------------------------------------
 void lrlc(bool tune)
 {
-  int D, N; D=50; N = 1000;
-  double a, p, eps; a = 1.0; p = 0.; eps = 1.;
-  utils::data::regression::Dataset dataset(D, N);
+  //int D, N; D=50; N = 1000;
+  //double a, p, eps; a = 1.0; p = 0.; eps = 1.;
+  //utils::data::regression::Dataset dataset(D, N);
 
-  dataset.Generate(a, p, "Linear", eps);
-  auto inputs = dataset.inputs_;
-  auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
+  //dataset.Generate(a, p, "Linear", eps);
+  //auto inputs = dataset.inputs_;
+  //auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
 
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(5,1,100);
-  int repeat = 1000; double cv_valid = 0.2;
-  
-  std::string filename, rawfilename, dir, rawdir;
+  //arma::irowvec Ns = arma::regspace<arma::irowvec>(5,1,100);
+  //int repeat = 1000; double cv_valid = 0.2;
+  //
+  //std::string filename, rawfilename, dir, rawdir;
 
-  arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,1.,100);
-  //arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,10.,100);
-  if (!tune)
-  {
-    dir = "50D-extra/LR-LearningCurves/notune";
-    rawdir = "50D-extra/LR-LearningCurves/notune/raw";
-    utils::create_dirs(dir);
-    utils::create_dirs(rawdir);
-    for(int i=0; i < int(lambdas.n_cols); i++)
-    {
-    LCurve<mlpack::LinearRegression,
-           mlpack::MSE> lcurve(Ns,repeat);
+  //arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,1.,100);
+  ////arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,10.,100);
+  //if (!tune)
+  //{
+  //  dir = "50D-extra/LR-LearningCurves/notune";
+  //  rawdir = "50D-extra/LR-LearningCurves/notune/raw";
+  //  utils::create_dirs(dir);
+  //  utils::create_dirs(rawdir);
+  //  for(int i=0; i < int(lambdas.n_cols); i++)
+  //  {
+  //  LCurve<mlpack::LinearRegression,
+  //         mlpack::MSE> lcurve(Ns,repeat);
 
-    filename =  dir+"/LR-"+std::to_string(i)+".csv";
-    rawfilename =  rawdir+"/LR-"+std::to_string(i)+".csv";
-    lcurve.Generate(filename, inputs, labels, double(lambdas(i)));
+  //  filename =  dir+"/LR-"+std::to_string(i)+".csv";
+  //  rawfilename =  rawdir+"/LR-"+std::to_string(i)+".csv";
+  //  lcurve.Generate(filename, inputs, labels, double(lambdas(i)));
 
-    utils::Save(rawfilename,lcurve.train_errors_, lcurve.test_errors_);
-    }
-  }
-  else
-  {
-    dir = "50D-extra/LR-LearningCurves/tune";
-    rawdir = "50D-extra/LR-LearningCurves/tune/raw";
-    utils::create_dirs(dir);
-    utils::create_dirs(rawdir);
-    LCurve_HPT<mlpack::LinearRegression,
-           mlpack::MSE,
-           mlpack::SimpleCV> lcurve(Ns,repeat,cv_valid);
+  //  utils::Save(rawfilename,lcurve.train_errors_, lcurve.test_errors_);
+  //  }
+  //}
+  //else
+  //{
+  //  dir = "50D-extra/LR-LearningCurves/tune";
+  //  rawdir = "50D-extra/LR-LearningCurves/tune/raw";
+  //  utils::create_dirs(dir);
+  //  utils::create_dirs(rawdir);
+  //  LCurve_HPT<mlpack::LinearRegression,
+  //         mlpack::MSE,
+  //         mlpack::SimpleCV> lcurve(Ns,repeat,cv_valid);
 
-    filename =  dir+"/LR-tuned.csv";
-    rawfilename =  rawdir+"/LR-tuned.csv";
+  //  filename =  dir+"/LR-tuned.csv";
+  //  rawfilename =  rawdir+"/LR-tuned.csv";
 
-    lcurve.Generate(filename, inputs, labels, lambdas);
+  //  lcurve.Generate(filename, inputs, labels, lambdas);
 
-    utils::Save(rawfilename,lcurve.train_errors_, lcurve.test_errors_);
+  //  utils::Save(rawfilename,lcurve.train_errors_, lcurve.test_errors_);
 
-  }
+  //}
 }
 
 //-----------------------------------------------------------------------------
@@ -254,14 +254,14 @@ void genlrlc()
 //-----------------------------------------------------------------------
 void DataAnalytics(arma::mat data) 
 {
-  arma::inplace_trans(data);
-
-  std::cout << "mean    : " << arma::mean(data) << std::endl;
-  std::cout << "median  : " << arma::median(data) << std::endl;
-  std::cout << "stddev  : " << arma::stddev(data) << std::endl;
-  std::cout << "correl  : " << "\n"  << arma::cor(data) << std::endl;
-  std::cout << "max     : " << arma::max(data) << std::endl;
-  std::cout << "min     : " << arma::min(data) << std::endl;
+//  arma::inplace_trans(data);
+//
+//  std::cout << "mean    : " << arma::mean(data) << std::endl;
+//  std::cout << "median  : " << arma::median(data) << std::endl;
+//  std::cout << "stddev  : " << arma::stddev(data) << std::endl;
+//  std::cout << "correl  : " << "\n"  << arma::cor(data) << std::endl;
+//  std::cout << "max     : " << arma::max(data) << std::endl;
+//  std::cout << "min     : " << arma::min(data) << std::endl;
 }
 
 //-----------------------------------------------------------------------
@@ -269,10 +269,10 @@ void DataAnalytics(arma::mat data)
 //-----------------------------------------------------------------------
 void read_data()
 {
-  arma::mat matrix;
-  mlpack::data::DatasetInfo info;
-  mlpack::data::Load("datasets/iris.csv", matrix, info,false,true);
-  DataAnalytics(matrix);
+//  arma::mat matrix;
+//  mlpack::data::DatasetInfo info;
+//  mlpack::data::Load("datasets/iris.csv", matrix, info,false,true);
+//  DataAnalytics(matrix);
 }
 
 //-----------------------------------------------------------------------
@@ -280,22 +280,22 @@ void read_data()
 //-----------------------------------------------------------------------
 void gd_lm()
 {
-  int D, Ntrn, Ntst; D=1; Ntrn=4; Ntst=1000;
-  double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-  utils::data::regression::Dataset trainset(D, Ntrn);
-  utils::data::regression::Dataset testset(D, Ntst);
+  //int D, Ntrn, Ntst; D=1; Ntrn=4; Ntst=1000;
+  //double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+  //utils::data::regression::Dataset trainset(D, Ntrn);
+  //utils::data::regression::Dataset testset(D, Ntst);
 
-  trainset.Generate(a, p, "Linear", eps);
-  testset.Generate(a, p, "Linear", eps);
-  auto inputs = trainset.inputs_;
-  auto labels = arma::conv_to<arma::rowvec>::from(trainset.labels_);
-  algo::regression::GDLinear model(inputs,labels, true, 0., 0.001, size_t(1000));
+  //trainset.Generate(a, p, "Linear", eps);
+  //testset.Generate(a, p, "Linear", eps);
+  //auto inputs = trainset.inputs_;
+  //auto labels = arma::conv_to<arma::rowvec>::from(trainset.labels_);
+  //algo::regression::GDLinear model(inputs,labels, true, 0., 0.001, size_t(1000));
 
-  arma::rowvec pred_labels;
-  arma::mat test_inp = arma::sort(testset.inputs_);
-  model.Predict(test_inp, pred_labels);
-  arma::mat test_out = arma::conv_to<arma::mat>::from(pred_labels);
-  utils::Save("pred.csv",test_inp,test_out);
+  //arma::rowvec pred_labels;
+  //arma::mat test_inp = arma::sort(testset.inputs_);
+  //model.Predict(test_inp, pred_labels);
+  //arma::mat test_out = arma::conv_to<arma::mat>::from(pred_labels);
+  //utils::Save("pred.csv",test_inp,test_out);
 }
 
 //-----------------------------------------------------------------------

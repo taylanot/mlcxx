@@ -6,7 +6,6 @@
 
 # TODO: Prediction Plots with Train and Test 
 #
-    #
 
 
 
@@ -24,10 +23,12 @@ parser.add_argument("-o", "--order", default="row")
 parser.add_argument("-t", "--type", default="prediction")
 parser.add_argument("-di", "--dinput", default=1)
 parser.add_argument("-do", "--doutput", default=1)
-parser.add_argument("-l", "--legend", default=True)
+parser.add_argument("-l", "--legend", default=str(True))
 parser.add_argument("-s", "--save", default='.pdf')
 parser.add_argument("-v", "--visualize", default=True)
 parser.add_argument("-sz", "--size", default=(8,6))
+parser.add_argument("-xax", "--xaxis", default="normal")
+parser.add_argument("-yax", "--yaxis", default="normal")
 
 args = parser.parse_args()
 
@@ -106,6 +107,10 @@ if args.legend == str(True):
     plt.legend(frameon=False)
 
 if args.visualize:
+    if args.xaxis == 'log':
+        plt.xscale('log')
+    if args.yaxis == 'log':
+        plt.yscale('log')
     plt.show()
 else:
     if args.save == ".pdf":

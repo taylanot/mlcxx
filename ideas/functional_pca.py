@@ -60,6 +60,11 @@ if __name__ == "__main__":
     dense = 600
     x = np.random.normal(0,1,dense)
     x = np.sort(x); X,Y = foo(x);
+    [plt.plot(X, Y[i,:]) for i in range(2000)]
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.show()
+
     #x = np.arange(1,6); X =x; Y=np.array([[1.,2.,3.,4.,5.],[2.,4.,6.,8.,10.]]); 
     #x = np.sort(np.random.uniform(-5,5, dense)); X,Y = foo(x);
 
@@ -67,8 +72,10 @@ if __name__ == "__main__":
 
     eigenvalues, eigenfunctions, npc = eig(X,Y, True)
     [plt.plot(X, eigenfunctions[i]) for i in range(npc)]
-    eigenvalues, eigenfunctions, npc = eig(X,Y, False)
-    [plt.plot(X, eigenfunctions[i]) for i in range(npc)]
+    #eigenvalues, eigenfunctions, npc = eig(X,Y, False)
+    #[plt.plot(X, eigenfunctions[i]) for i in range(npc)]
+    plt.xlabel('x')
+    plt.ylabel('y')
 
     plt.show()
 

@@ -1,6 +1,7 @@
 program = mlcxx
 
-#subdirs = utils src model algo tests stats opt
+#subdirs = utils src model algo tests stats opt datasets
+subdirs = datasets
 
 #include $(JEMDIR)/makefiles/prog.mk
 #include $(JEMDIR)/makefiles/packages/*.mk

@@ -17,39 +17,42 @@ namespace classification {
 ///////////////////////////////////////////////////////////////////////////////
 
 NMC::NMC ( const arma::mat& inputs,
-           const arma::rowvec& labels )
+           const arma::Row<size_t>& labels )
 {
   Train(inputs, labels);
 }
 
 void NMC::Train ( const arma::mat& inputs,
-                  const arma::rowvec& labels )
+                  const arma::Row<size_t>& labels )
 {
+
   dim_ = inputs.n_rows;
   unique_ = arma::unique(labels);
   num_class_ = unique_.n_cols;
   parameters_.resize(inputs.n_rows, num_class_);
   arma::uvec index;
-  for ( size_t i=0; i<num_class_; i++ )
+  arma::Row<size_t>::iterator it = unique_.begin();
+  arma::Row<size_t>::iterator it_end = unique_.end();
+  size_t counter =0;
+  // you should just iterate over the unique labels here instead of starting 
+  // from 0
+  for ( ;it!=it_end; ++it)
   {
-    auto extract = utils::extract_class(inputs, labels, i);
+    auto extract = utils::extract_class(inputs, labels, *it);
     //index = arma::find(labels == unique_(i));
     index = std::get<1>(extract);
-    parameters_.col(i) = arma::mean(inputs.cols(index),1);
+    parameters_.col(counter) = arma::mean(inputs.cols(index),1);
+    counter++;
   }
 }
 
 void NMC::Classify ( const arma::mat& inputs,
-                     arma::rowvec& labels ) const
+                     arma::Row<size_t>& labels ) const
 {
-
   const size_t N =  inputs.n_cols;
   labels.resize(N);
   if ( num_class_ == 1 )
-  {
-    labels.ones();
-    labels *= unique_(0);
-  }
+    labels.fill(unique_(0));
   else
   {
     arma::mat distances(num_class_, N);
@@ -67,18 +70,17 @@ void NMC::Classify ( const arma::mat& inputs,
 }
 
 double NMC::ComputeError ( const arma::mat& points, 
-                           const arma::rowvec& responses ) const
+                           const arma::Row<size_t>& responses ) const
 {
-  arma::rowvec predictions;
+  arma::Row<size_t> predictions;
   Classify(points,predictions);
-
-  arma::rowvec temp =  predictions - responses; 
+  arma::Row<size_t> temp =  predictions - responses; 
   double total = responses.n_cols;
-  return (arma::accu(temp != 0.))/total;
+  return (arma::accu(temp != 0))/total;
 }
 
 double NMC::ComputeAccuracy ( const arma::mat& points, 
-                              const arma::rowvec& responses ) const
+                              const arma::Row<size_t>& responses ) const
 {
   return (1. - ComputeError(points, responses))*100;
 }

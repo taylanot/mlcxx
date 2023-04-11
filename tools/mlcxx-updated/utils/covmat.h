@@ -13,7 +13,7 @@
 #define COVMAT_H
 // standard
 // armadillo
-#include <armadillo>
+//#include <armadillo>
 // local
 
 namespace utils {

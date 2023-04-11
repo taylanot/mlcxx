@@ -30,20 +30,20 @@ class NMC
    * @param labels y
    */
   NMC ( const arma::mat& inputs,
-        const arma::rowvec& labels );
+        const arma::Row<size_t>& labels );
   /**
    * @param inputs X
    * @param labels y
    */
   void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+               const arma::Row<size_t>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
   void Classify ( const arma::mat& inputs,
-                  arma::rowvec& labels ) const;
+                  arma::Row<size_t>& labels ) const;
 
   /**
    * Calculate the Error Rate
@@ -52,7 +52,7 @@ class NMC
    * @param labels 
    */
   double ComputeError ( const arma::mat& points, 
-                        const arma::rowvec& responses ) const;
+                        const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
@@ -60,7 +60,7 @@ class NMC
    * @param labels 
    */
   double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::rowvec& responses ) const;
+                           const arma::Row<size_t>& responses ) const;
 
   const arma::mat& Parameters() const { return parameters_; }
 
@@ -88,7 +88,7 @@ class NMC
 
   arma::mat parameters_;
 
-  arma::rowvec unique_;
+  arma::Row<size_t> unique_;
 
   mlpack::EuclideanDistance metric_;
 

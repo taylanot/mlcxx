@@ -18,18 +18,6 @@ def data(N=10, noise=False):
 def res(y, yhat):
     return np.sum((y-yhat)**2)
 
-#def obj(param, x=x,y=y):
-#    return res(y,func(x,param[0]))
-
-#param1, _ = curve_fit(func, x, y)
-#
-#result = minimize(obj,[1],method="L-BFGS-B")
-#param = result.x
-#
-#x_test = np.linspace(0,10,1000);
-#y_test = func(x_test, param[0])
-#y_test1 = func(x_test, param1[0])
-
 #print(res(func(x_test,1,2,3),y_test))
 #print(res(func(x_test,1,2,3),y_test1))
 
@@ -109,7 +97,6 @@ def lm_FD_J(t,p,y,dp):
         
         # restore p(j)
         p[j,0]=ps[j,0]
-    #print(J) 
     return J
     
 
@@ -191,15 +178,8 @@ def lm_matx(t,p_old,y_old,dX2,J,p,y_dat,weight,dp):
     # Chi-squared error criteria
     Chi_sq = delta_y.T @ ( delta_y * weight )  
 
-    print('weight',weight)
-
-    print("HEY",weight * np.ones((1,Npar)))
-
-    print("HEY2",J * (weight * np.ones((1,Npar))))
-
     JtWJ  = J.T @ ( J * ( weight * np.ones((1,Npar)) ) )
 
-    #print(JtWJ)
 
     JtWdy = J.T @ ( weight * delta_y )
     
@@ -297,10 +277,6 @@ def lm(p,t,y_dat):
         weight = abs(weight)
     # initialize Jacobian with finite difference calculation
     JtWJ,JtWdy,X2,y_hat,J = lm_matx(t,p_old,y_old,1,J,p,y_dat,weight,dp)
-    print("JtWJ :",JtWJ)
-    print("JtWdy:",JtWdy)
-    print("X2   :",X2)
-    print("J    :",J)
     if np.abs(JtWdy).max() < epsilon_1:
         print('*** Your Initial Guess is Extremely Close to Optimal ***')
     
@@ -328,14 +304,11 @@ def lm(p,t,y_dat):
         # incremental change in parameters
         # Marquardt
         if Update_Type == 1:
-            print(JtWJ + lambda_*np.eye(JtWJ.shape[0]))
             h = np.linalg.solve((JtWJ + lambda_*np.eye(JtWJ.shape[0])), JtWdy)  
         # Quadratic and Nielsen
         else:
             h = np.linalg.solve(( JtWJ + lambda_*np.eye(Npar) ), JtWdy)
         # update the [idx] elements
-        print("h:",h)
-        print("lambda:",lambda_)
         p_try = p + h[idx]
         # apply constraints                             
         p_try = np.minimum(np.maximum(p_min,p_try),p_max)       
@@ -355,7 +328,6 @@ def lm(p,t,y_dat):
         if Update_Type == 2:                        
           # One step of quadratic line update in the h direction for minimum X2
           alpha =  np.divide(JtWdy.T @ h, ( (X2_try - X2)/2 + 2*JtWdy.T@h ))
-          print(alpha)
           h = alpha * h
           
           # % update only [idx] elements
@@ -480,11 +452,22 @@ def lm(p,t,y_dat):
     return p,redX2,sigma_p,sigma_y,corr_p,R_sq,cvg_hst
 
 #p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.array([[1.],[2.],[3.]]),x,y)
-N = 100
+N = 1000
 noise = False
 x, y = data(N, noise)
-print("X",x)
-print("y",y)
+
+def obj(param, x=x,y=y):
+    return res(y,func(x,param))
+
+
+param1, _ = curve_fit(obj, x, y)
+
+#result = minimize(obj,[1,1],method="L-BFGS-B")
+#param = result.x
+
+#print("X",x)
+#print("y",y)
+
 for i in range(1):
     #p_fit,Chi_sq,sigma_p,sigma_y,corr,R_sq,cvg_hst = lm(np.random.randn(3).reshape(-1,1),x,y)
     p_init = np.array([1,0.1]).reshape(-1,1);

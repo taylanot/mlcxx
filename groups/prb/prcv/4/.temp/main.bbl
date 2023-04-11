@@ -1,0 +1,115 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\datalist[entry]{nyt/global//global/global}
+\preamble{%
+\providecommand{\noopsort}[1]{}
+  \ifdefined\DeclarePrefChars\DeclarePrefChars{'’-}\else\fi
+}
+
+  \entry{looga}{article}{}
+    \name{author}{2}{}{%
+      {{hash=LM}{%
+         family={Loog},
+         familyi={L\bibinitperiod},
+         given={Marco},
+         giveni={M\bibinitperiod},
+      }}%
+      {{hash=VTJ}{%
+         family={Viering},
+         familyi={V\bibinitperiod},
+         given={Tom\bibnamedelima J},
+         giveni={T\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LMVTJ1}
+    \strng{fullhash}{LMVTJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{abstract}{%
+    Plotting a learner’s generalization performance against the training set
+  size results in a so-called learning curve. This tool, providing insight in
+  the behavior of the learner, is also practically valuable for model
+  selection, predicting the effect of more training data, and reducing the
+  computational complexity of training. We set out to make the (ideal) learning
+  curve concept precise and briefly discuss the aforementioned usages of such
+  curves. The larger part of this survey’s focus, however, is on learning
+  curves that show that more data does not necessarily leads to better
+  generalization performance. A result that seems surprising to many
+  researchers in the field of artificial intelligence. We point out the
+  significance of these findings and conclude our survey with an overview and
+  discussion of open problems in this area that warrant further theoretical and
+  empirical investigation.%
+    }
+    \field{pages}{16}
+    \field{title}{A {{Survey}} of {{Learning Curves}} with {{Bad Behavior}}: Or
+  {{How More Data Need Not Lead}} to {{Better Performance}}}
+    \field{langid}{english}
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/2SUQGJ93/Loog and Viering - A Survey of
+    \verb  Learning Curves with Bad Behavior or .pdf
+    \endverb
+  \endentry
+
+  \entry{scholkopf2002a}{book}{}
+    \name{author}{2}{}{%
+      {{hash=SB}{%
+         family={Schölkopf},
+         familyi={S\bibinitperiod},
+         given={Bernhard},
+         giveni={B\bibinitperiod},
+      }}%
+      {{hash=SAJ}{%
+         family={Smola},
+         familyi={S\bibinitperiod},
+         given={Alexander\bibnamedelima J.},
+         giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {{MIT Press}}%
+    }
+    \keyw{Kernel functions,Support vector machines}
+    \strng{namehash}{SBSAJ1}
+    \strng{fullhash}{SBSAJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{shorttitle}
+    \field{labelyear}{2002}
+    \field{labeldatesource}{}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{isbn}{978-0-262-19475-4}
+    \field{pagetotal}{626}
+    \field{series}{Adaptive Computation and Machine Learning}
+    \field{shorttitle}{Learning with Kernels}
+    \field{title}{Learning with Kernels: Support Vector Machines,
+  Regularization, Optimization, and Beyond}
+    \field{langid}{english}
+    \list{location}{1}{%
+      {{Cambridge, Mass}}%
+    }
+    \verb{file}
+    \verb /home/taylanot/Zotero/storage/WXG7SB9M/Schölkopf and Smola - 2002 -
+    \verb Learning with kernels support vector machines, re.pdf
+    \endverb
+    \field{year}{2002}
+  \endentry
+\enddatalist
+\endinput
