@@ -32,11 +32,12 @@ public:
 
   template<class Functor>
   void Optimize( Functor f,  const arma::mat& x, const arma::rowvec& y,
-            arma::rowvec& p, const double& dp );
+                 arma::rowvec& p, const double& dp );
 
   template<class Functor, class Janctor>
-  void Optimize( Functor f, Janctor J,  const arma::mat& x, const arma::rowvec& y,
-              arma::rowvec& p, const double& dp );
+  void Optimize( Functor f, Janctor J,
+                 const arma::mat& x, const arma::rowvec& y,
+                 arma::rowvec& p, const double& dp );
 
   template<class Functor>
   std::tuple<arma::mat, arma::mat, double> 

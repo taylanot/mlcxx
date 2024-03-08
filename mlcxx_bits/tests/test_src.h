@@ -31,6 +31,29 @@ TEST_SUITE("LEARNINGCURVES") {
       CHECK ( arma::mean(arma::mean(
                       (lcurve.test_errors_ - lcurve.train_errors_))) > 0 );
     }
+
+    SUBCASE("VARIABLE")
+    {
+      int D, Ntrn;  D=1; Ntrn=1000; 
+      double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+      utils::data::regression::Dataset dataset(D, Ntrn);
+      dataset.Generate(a, p, "Linear", eps);
+
+      auto inputs = dataset.inputs_;
+      auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_);
+
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5);
+      arma::irowvec repeat = arma::regspace<arma::irowvec>(2,1,5);
+
+      src::regression::VariableLCurve<mlpack::LinearRegression,
+             mlpack::MSE> lcurve(Ns,repeat);
+      
+      lcurve.Generate(inputs, labels, 0., 1.);
+
+     // CHECK ( arma::mean(arma::mean(
+     //                (lcurve.test_errors_[0] - lcurve.train_errors_[0]))) > 0 );
+    }
+
     SUBCASE("HPT")
     {
       int D, Ntrn;  D=1; Ntrn=1000; 
@@ -79,5 +102,6 @@ TEST_SUITE("LEARNINGCURVES") {
     }
   }
 }
+
 #endif
 

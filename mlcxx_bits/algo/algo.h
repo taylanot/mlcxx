@@ -9,11 +9,10 @@
 
 
 #include "algo/gp.h"
-#include "algo/nmc.h"
-#include "algo/fisherc.h"
+#include "algo/nn.h"
+#include "algo/paramclass.h"
+#include "algo/nonparamclass.h"
 #include "algo/kernelridge.h"
-//#include "algo/gradientdescent.h"
-//#include "algo/semiparamkernelridge.h"
 #include "algo/functionalpca.h"
 #include "algo/functionalsmoothing.h"
 

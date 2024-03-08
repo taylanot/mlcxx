@@ -9,10 +9,13 @@
 #ifndef LLC_H
 #define LLC_H
 
+#include "conf.h"
 #include "saw.h"
-//include "multipeak.h"
-//#include "dipping.h"
-//#include "peaking.h"
+#include "datasets.h"
+#include "lcgen.h"
+#include "utils.h"
+#include "spkr_fit.h"
+#include "curve_fit.h"
 
 #endif
 

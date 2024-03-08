@@ -3,10 +3,7 @@
 # @author Ozgur Taylan Turan
 #
 # Main Plotting Interface for mlcxx results
-
-# TODO: Prediction Plots with Train and Test 
 #
-
 
 
 # General Stuff
@@ -20,18 +17,53 @@ from plotter import *
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--filename", nargs='+')
 parser.add_argument("-o", "--order", default="row")
-parser.add_argument("-t", "--type", default="prediction")
+parser.add_argument("-t", "--type", default="llc")
 parser.add_argument("-di", "--dinput", default=1)
 parser.add_argument("-do", "--doutput", default=1)
-parser.add_argument("-l", "--legend", default=str(True))
-parser.add_argument("-s", "--save", default='.pdf')
-parser.add_argument("-v", "--visualize", default=True)
+parser.add_argument("-l", "--legend", default=str(False))
+parser.add_argument("-s", "--save", default='.tex')
+parser.add_argument("-sn", "--savename", default='plot')
+parser.add_argument("-v", "--visualize", default=bool(True))
 parser.add_argument("-sz", "--size", default=(8,6))
 parser.add_argument("-xax", "--xaxis", default="normal")
 parser.add_argument("-yax", "--yaxis", default="normal")
 
 args = parser.parse_args()
 
+
+
+
+if args.type == "llc":
+    assert (len(args.filename)<2), "Need only one file for the learning curve!"
+    filename, filext = os.path.splitext(args.filename[0])
+    if  filext == ".csv":
+        data = load_csv(args.filename[0], args.order)
+        fig = plt.figure(figsize=args.size)
+        ax = fig.add_subplot(111) 
+        lcurve_llc(ax,data,False,False)
+
+    if  filext == "":
+        paths = [ os.path.join(dp, f) for dp, dn, filenames in \
+                 os.walk(filename) for f in filenames \
+                 if os.path.splitext(f)[1] == '.csv' ]
+        datas = list()
+        for path in paths:
+            datas.append(load_csv(path, args.order))
+        fig = plt.figure(figsize=args.size)
+        ax = fig.add_subplot(111) 
+        [lcurve_llc(ax,data,dots=False,mean=False) for data in datas]
+    plt.xlabel('N')
+    plt.ylabel('Error')
+
+if args.type == "llc-hist":
+    assert (len(args.filename)<2), "Need only one file for the learning curve!"
+    filename, filext = os.path.splitext(args.filename[0])
+    if  filext == ".csv":
+        data = load_csv(args.filename[0], args.order)
+        fig = plt.figure(figsize=args.size)
+        for i in range(50,data.shape[1]):
+            plt.hist(data[i,1:])
+            plt.show()
 
 if args.type == "learning":
     assert (len(args.filename)<2), "Need only one file for the learning curve!"
@@ -51,7 +83,7 @@ if args.type == "learning":
         ax = fig.add_subplot(111) 
         [lcurve(ax,data,error=False,dots=False) for data in datas]
         plt.xlabel('N')
-        plt.ylim([0,20])
+        #plt.ylim([0,20])
         plt.ylabel('Error')
 
 if args.type == "prediction":
@@ -106,7 +138,7 @@ if args.type == "xsys-scatter":
 if args.legend == str(True):
     plt.legend(frameon=False)
 
-if args.visualize:
+if bool(args.visualize):
     if args.xaxis == 'log':
         plt.xscale('log')
     if args.yaxis == 'log':
@@ -114,8 +146,8 @@ if args.visualize:
     plt.show()
 else:
     if args.save == ".pdf":
-        plt.savefig(filename+args.save)
+        plt.savefig(args.savename+args.save)
     elif args.save == ".tex":
-        tikzplotlib.save(filename+'.tex')
+        tikzplotlib.save(args.savename+'.tex')
 
 

@@ -20,12 +20,13 @@
 double _nchoosek ( const size_t& n,
                    const size_t& k )
 {
-  if ( k == 0 )
-    return 1;
-  else
-    return boost::math::factorial<double> (n) / 
-                                      ( boost::math::factorial<double> (k) *
-                                        boost::math::factorial<double> (n-k) );
+  //if ( k == 0 )
+  //  return 1;
+  //else
+  //  return boost::math::factorial<double> (n) / 
+  //                                    ( boost::math::factorial<double> (k) *
+  //                                      boost::math::factorial<double> (n-k) );
+  return boost::math::binomial_coefficient<double>(unsigned(n),unsigned(k));
 }
 
 //-----------------------------------------------------------------------------
@@ -83,7 +84,7 @@ std::tuple<arma::rowvec,
 //   @param Ns    : training points to calculate Risk
 //   @param prob  : initial probability of point A
 //-----------------------------------------------------------------------------
-arma::rowvec create_saw ( arma::rowvec& Ns,
+arma::rowvec create_saw ( arma::irowvec& Ns,
                           const double& prob )
 {
   arma::rowvec R(arma::size(Ns));
@@ -97,12 +98,12 @@ arma::rowvec create_saw ( arma::rowvec& Ns,
   double wemp, Rt;
   size_t NB;
   
-  arma::rowvec::iterator it = Ns.begin(); 
-  arma::rowvec::iterator it_end = Ns.end(); 
+  arma::irowvec::iterator it = Ns.begin(); 
+  arma::irowvec::iterator it_end = Ns.end(); 
   size_t  counter = 0;
   for ( ; it != it_end ; ++it )
   {
-    for ( size_t NA=0; NA < (*it); NA++ )
+    for ( size_t NA=0; NA < size_t(*it); NA++ )
     {
       NB = (*it) - NA;
       if ( NA*xA > NB*xB )

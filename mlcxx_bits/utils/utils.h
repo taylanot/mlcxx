@@ -8,14 +8,13 @@
 #define UTILS_H
 
 #include "utils/system.h"
-#include "utils/extract_class.h"
-#include "utils/save.h"
-#include "utils/load.h"
-#include "utils/convert.h"
+#include "utils/sandl.h"
+#include "utils/classutils.h"
 #include "utils/datagen.h"
 #include "utils/covmat.h"
-#include "utils/data_prep.h"
 #include "utils/split_data.h"
+#include "utils/parallel.h"
+#include "utils/transform.h"
 
 #endif
 

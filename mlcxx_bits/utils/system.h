@@ -14,19 +14,60 @@
 
 namespace utils {
 
-//-----------------------------------------------------------------------
-//  create_dirs
-//-----------------------------------------------------------------------
-
-void create_dirs( const std::string& dirs )
+//=============================================================================
+//  split_path 
+//=============================================================================
+std::vector<std::filesystem::path> split_path 
+                                ( const std::filesystem::path& paths )
 {
-  std::string command = "mkdir -p "+dirs;
-  const int dir_err = system(command.c_str());
-  std::string err_msg = "Something went wrong with mkdir!";
-  if ( dir_err != 0)
-   BOOST_THROW_EXCEPTION( std::runtime_error( err_msg ) );
+  std::vector<std::filesystem::path> list;
+  for ( auto& path: paths )
+  {
+    list.push_back(path); 
+  }
+  return list;
 }
 
+//=============================================================================
+// remove_path 
+//=============================================================================
+std::filesystem::path remove_path ( const std::filesystem::path& path,
+                                    const std::filesystem::path& path_rem )
+{
+  auto dirs = split_path(path);
+  auto remdirs = split_path(path_rem);
+
+  for ( auto rem: remdirs )
+  {
+   auto it = std::find(dirs.begin(), dirs.end(), rem);
+   dirs.erase(it);
+  }
+
+  std::filesystem::path update;
+  for ( auto dir: dirs )
+  {
+   update /= dir;
+  }
+  return update;
+}
+
+////=============================================================================
+//// to_string
+////=============================================================================
+//std::string to_string ( const jem::String& data )
+//{
+//  const char* dataptr = data.addr();
+//  return std::string(dataptr, data.size());
+//}
+//
+////=============================================================================
+//// to_char
+////=============================================================================
+//const char* to_char ( const jem::String& data )
+//{
+//  const char* dataptr = data.addr();
+//  return dataptr;
+//}
 } // namespace utils
 
 #endif 

@@ -20,7 +20,8 @@ namespace functional {
 // @param labels    : labels (MxN) 
 //-----------------------------------------------------------------------------
 std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
-                                         const arma::mat& labels )
+                                         const arma::mat& labels,
+                                         const bool mean_add = "false" )
 {
 
   arma::vec eigenvalues;
@@ -50,7 +51,8 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
   for(size_t i=0; i < M; i++)
     adj_labels.row(i) = labels.row(i) - mean;
 
-  arma::mat covariance = (adj_labels.t() * adj_labels)/(N-1);
+  arma::mat covariance = (adj_labels.t() * adj_labels)/(M-1);
+
   covariance += covariance.t();
   covariance *= 0.5;
   arma::mat variance = sqrt_W * covariance * sqrt_W;
@@ -61,6 +63,8 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
   eigenvectors = arma::reverse(eigenvectors,1);
 
   eigenfunctions = (inv_sqrt_W*eigenvectors).t();
+  if ( mean_add )
+    eigenfunctions.each_row() += mean;
   return std::make_tuple(eigenvalues, eigenfunctions);
 }
 
@@ -83,17 +87,20 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
   size_t N = inputs.n_cols;
 
   auto res = ufpca(inputs, labels);
-  
   eigenvalues = std::get<0>(res); 
   eigenfunctions = std::get<1>(res); 
   arma::vec cum_ppc= arma::cumsum(eigenvalues) / arma::sum(eigenvalues);
 
   arma::uvec cum_ppc_index = arma::find( cum_ppc > ppc, 1);
   npc = cum_ppc_index[0];
+  // Just a tiny hack for getting all the values if the first pc is able to 
+  // represent the whole function
+  if (npc == 0)
+    npc = 1;
   
   eigvals = eigenvalues.subvec(arma::span(0,npc-1));
-
   eigfuncs = eigenfunctions(arma::span(0,npc-1),arma::span(0,N-1));
+
   return std::make_tuple(eigvals, eigfuncs);
 }
 
@@ -120,9 +127,8 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
   eigenfunctions = std::get<1>(res); 
 
   eigvals = eigenvalues.subvec(arma::span(0,npc-1));
-
-
   eigfuncs = eigenfunctions(arma::span(0,npc-1),arma::span(0,N-1));
+
   return std::make_tuple(eigvals, eigfuncs);
 }
 
