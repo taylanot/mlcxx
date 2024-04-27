@@ -15,6 +15,7 @@
 #include "utils/split_data.h"
 #include "utils/parallel.h"
 #include "utils/transform.h"
+#include "utils/data_mani.h"
 
 #endif
 

@@ -126,15 +126,11 @@ arma::mat Load ( const T& filename,
 //-----------------------------------------------------------------------
 template<class T>
 std::tuple<arma::mat,arma::field<std::string>> 
-                      LoadwHeader ( const T& filename,
-                                    const bool& transpose )
+                      LoadwHeader ( const T& filename )
 {
   arma::mat matrix;
   arma::field<std::string> header;
   matrix.load(arma::csv_name(filename, header));
-  if (transpose)
-    arma::inplace_trans(matrix);
-
   return std::make_tuple(matrix,header);
 }
 //-----------------------------------------------------------------------
@@ -227,16 +223,20 @@ std::tuple<arma::mat,arma::mat>
 }
 
 //-----------------------------------------------------------------------
-// BulkLoadSplit2: Can be usefull for functional analysis this version is 
+// BulkLoadSplit: Can be usefull for functional analysis this version is 
 //  for header included files.
 //  * Only for regression data
 //-----------------------------------------------------------------------
-std::tuple<arma::mat,arma::mat> 
-          BulkLoadSplit2 ( const std::filesystem::path& path,
-                          const double& test_size,
-                          const bool& transpose )
+std::tuple<arma::mat,arma::mat,
+           arma::field<std::string>,arma::field<std::string>>
+          BulkLoadSplit ( const std::filesystem::path& path,
+                          const double& test_size )
 {
   arma::mat data, train_data, test_data, temp, inp, labs;
+  arma::field<std::string> temp_header;
+  std::string first_header;
+  size_t train_size_ = 0; 
+  size_t test_size_ = 0; 
   size_t num_files = 0;
   for (const auto & entry : std::filesystem::recursive_directory_iterator(path))
   {
@@ -246,45 +246,94 @@ std::tuple<arma::mat,arma::mat>
     }
   }
 
+  arma::field<arma::field<std::string>> train_headers(num_files);
+  arma::field<arma::field<std::string>> test_headers(num_files);
   size_t counter = 0;
   for (const auto & entry : std::filesystem::recursive_directory_iterator(path))
   {
     if ( std::filesystem::is_regular_file(entry) )
     {
-      temp = Load(entry.path(), transpose);
-      if ( counter == 0 )
-        data = temp;
+      auto temp_load = LoadwHeader(entry.path());
+      temp = std::get<0>(temp_load);
+      arma::mat x = temp.col(0);
+      arma::mat y = temp.cols(1,temp.n_cols-1);
+      temp_header = std::get<1>(temp_load);
+      first_header = temp_header(0);
+      temp_header = temp_header.cols(1,temp_header.n_cols-1);
+
+
+      size_t num_train = (1-test_size)*y.n_cols;
+
+      arma::uvec idx = arma::randperm(y.n_cols);
+
+      size_t num_test = y.n_cols - num_train;
+
+      if (counter == 0)
+      {
+        train_data = y.cols(idx(arma::span(0,num_train-1)));
+        test_data = y.cols(idx(arma::span(num_train,idx.n_elem-1)));
+      }
+
       else
       {
-        if ( transpose )
-          data = arma::join_cols(data,temp.rows(1,temp.n_rows-1));
-        else 
-          data = arma::join_rows(data,temp.cols(1,temp.n_cols-1));
+        train_data = arma::join_rows(train_data,
+            y.cols(idx(arma::span(0,num_train-1))));
+        test_data = arma::join_rows(test_data,
+            y.cols(idx(arma::span(num_train,idx.n_elem-1))));
       }
+
+      arma::field<std::string> temp_train(1,num_train);
+      arma::field<std::string> temp_test(1,num_test);
+      
+      size_t c1 = 0;
+      size_t c2 = 0;
+
+      for (size_t i=0; i<idx.n_rows;i++)
+      {
+        if (i<num_train)
+        {
+          temp_train(c1++) = temp_header(idx(i));
+        }
+        else
+        {
+          temp_test(c2++) = temp_header(idx(i));
+        }
+      }
+
+      train_size_ += num_train;
+      test_size_ += num_test;
+      train_headers(counter) = temp_train;
+      test_headers(counter) = temp_test;
       counter++;
+    }
+
+  }
+
+  arma::field<std::string> train_header(1,train_size_+1);
+  arma::field<std::string> test_header(1,test_size_+1);
+  train_header(0)=first_header;test_header(0)=first_header;
+  size_t c1 = 1;
+  size_t c2 = 1;
+
+  for (size_t i=0; i<num_files;i++)
+  {
+    for (size_t j=0; j<train_headers(i).n_cols;j++)
+    {
+      train_header(c1++) = train_headers(i).at(j);
+    }
+
+
+    for (size_t j=0; j<test_headers(i).n_cols;j++)
+    {
+      test_header(c2++) = test_headers(i).at(j);
     }
   }
 
-  if ( transpose )
-  {
-    inp = data.row(0);
-    data = data.rows(1,data.n_rows-1);
-    arma::inplace_trans(data);
-    mlpack::data::Split(data,train_data,test_data,test_size);
-    arma::inplace_trans(train_data);
-    arma::inplace_trans(test_data);
-    train_data = arma::join_cols(inp, train_data);
-    test_data = arma::join_cols(inp, test_data);
-  }
-  else
-  {
-    inp = data.col(0);
-    data = data.cols(1,data.n_cols-1);
-    mlpack::data::Split(data,train_data,test_data,test_size);
-    train_data = arma::join_rows(inp, train_data);
-    test_data = arma::join_rows(inp, test_data);
-  }
-  return std::make_tuple(train_data, test_data);
+  inp = temp.col(0);
+  train_data = arma::join_rows(inp, train_data);
+  test_data = arma::join_rows(inp, test_data);
+
+  return std::make_tuple(train_data,test_data,train_header,test_header);
 }
 
 //-----------------------------------------------------------------------------

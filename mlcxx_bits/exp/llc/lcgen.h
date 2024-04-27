@@ -54,7 +54,6 @@ void lc_class ( )
   
   for ( size_t i=0; i<conf::class_set.size(); i++)
   {
-    //#pragma omp parallel for 
     for ( size_t data_id =0; data_id<conf::Nhyper; data_id++ )
     {
       utils::data::classification::Dataset dataset;
@@ -172,7 +171,7 @@ void lc_reg( )
 
   
   arma::field<std::string> header(
-                        ((conf::reg_set.size())*conf::Nhyper*conf::Nhyper)+1);
+                        ((conf::reg_set.size()-2)*conf::Nhyper*conf::Nhyper)+1);
   //arma::mat mean_train_error(conf::Ns.n_cols,
   //          (conf::reg_set.size()*conf::Nhyper*conf::Nhyper));
   //arma::mat std_train_error(conf::Ns.n_cols,
@@ -180,15 +179,14 @@ void lc_reg( )
   //arma::mat std_test_error(conf::Ns.n_cols,
   //          (conf::reg_set.size()*conf::Nhyper*conf::Nhyper));
   arma::mat mean_test_error(conf::Ns_reg.n_cols,
-            ((conf::reg_set.size())*conf::Nhyper*conf::Nhyper));
+            ((conf::reg_set.size()-2)*conf::Nhyper*conf::Nhyper));
   header(0) = "N";
 
   src::regression::LCurve<MODEL, mlpack::MSE> 
                                             lcurve(conf::Ns_reg,
                                                    int(conf::repeat));
-  for ( size_t i=0; i<conf::reg_set.size(); i++)
+  for ( size_t i=0; i<conf::reg_set.size()-2; i++)
   {
-    #pragma omp parallel for 
     for ( size_t data_id =0; data_id<conf::Nhyper; data_id++ )
     {
 
@@ -256,7 +254,7 @@ void lc_reg_nn( )
 
   
   arma::field<std::string> header(
-                        ((conf::reg_set.size())*conf::Nhyper*conf::Nhyper)+1);
+                        ((conf::reg_set.size()-2)*conf::Nhyper*conf::Nhyper)+1);
   //arma::mat mean_train_error(conf::Ns.n_cols,
   //          (conf::reg_set.size()*conf::Nhyper*conf::Nhyper));
   //arma::mat std_train_error(conf::Ns.n_cols,
@@ -264,15 +262,14 @@ void lc_reg_nn( )
   //arma::mat std_test_error(conf::Ns.n_cols,
   //          (conf::reg_set.size()*conf::Nhyper*conf::Nhyper));
   arma::mat mean_test_error(conf::Ns_reg.n_cols,
-            ((conf::reg_set.size())*conf::Nhyper*conf::Nhyper));
+            ((conf::reg_set.size()-2)*conf::Nhyper*conf::Nhyper));
   header(0) = "N";
 
   src::regression::LCurve<MODEL, mlpack::MSE> 
                                             lcurve(conf::Ns_reg,
                                                 size_t(conf::repeat));
-  for ( size_t i=0; i<conf::reg_set.size(); i++)
+  for ( size_t i=0; i<conf::reg_set.size()-2; i++)
   {
-    #pragma omp for 
     for ( size_t data_id =0; data_id<conf::Nhyper; data_id++ )
     {
       utils::data::regression::Dataset dataset;
@@ -514,27 +511,34 @@ void normalize(  )
   {
     arma::mat train, test, ytrn, ytst; 
     arma::field<std::string> header_train, header_test; 
+
     train.load(arma::csv_name(path/"train_original.csv",
                                                       header_train));   
     test.load(arma::csv_name(path/"test_original.csv",
-                                                      header_train));   
+                                                      header_test));   
     arma::vec X = train.col(0);
-    ytrn = train.cols(1,train.n_cols);
-    ytst = test.cols(1,train.n_cols);
+    ytrn = train.cols(1,train.n_cols-1);
+    ytst = test.cols(1,test.n_cols-1);
     arma::vec temp;
-    for (size_t i=0; i<ytrn.n_cols; i++)
+
+    for (size_t i=0; i<ytrn.n_cols-1; i++)
     {
       temp = ytrn.col(i);
-      ytrn.col(i) = ytrn.col(i)/arma::trapz(X,temp);
-      temp = ytst.col(i);
-      ytst.col(i) = ytst.col(i)/arma::trapz(X,temp);
+      ytrn.col(i) = ytrn.col(i)/arma::trapz(X,temp).eval()(0);
+      
     }
+
+    for (size_t i=0; i<ytst.n_cols-1; i++)
+    {
+      temp = ytst.col(i);
+      ytst.col(i) = ytst.col(i)/arma::trapz(X,temp).eval()(0);
+    }
+
     arma::mat save_train = arma::join_horiz(X,ytrn);
     arma::mat save_test = arma::join_horiz(X,ytst);
-    save_train.save(arma::csv_name(conf::train_path_class/"train.csv",
-                                                      header_train));
-    save_train.save(arma::csv_name(conf::train_path_class/"train.csv",
-                                                      header_train));
+
+    save_train.save(arma::csv_name(path/"train.csv",header_train));
+    save_test.save(arma::csv_name(path/"test.csv",header_test));
 
   };
 
@@ -550,7 +554,7 @@ void split ( )
   
   auto splity = [](const std::filesystem::path& path) 
   {
-    auto splitted = utils::BulkLoadSplit2(path,0.2,false);
+    auto splitted = utils::BulkLoadSplit(path,0.2);
     arma::mat train = std::get<0>(splitted);
     arma::mat test = std::get<1>(splitted);
     utils::Save(path/"train_original.csv", train,false);

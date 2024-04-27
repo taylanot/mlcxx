@@ -10,5 +10,5 @@ After installing these packages you should be able to use the makefile and run t
 
 **If you are feeling lazy, download my image:** 
 ```
-docker pull taylanot/cxx-dev:taylanot 
+docker pull taylanot/cxx-dev:latest
 ```

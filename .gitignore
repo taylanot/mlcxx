@@ -1,6 +1,10 @@
 # Prerequisites
 *.d
-
+# SOME FILES
+*.csv
+*.bin
+# HIDDEN DIRS
+.*
 # Compiled Object files
 *.slo
 *.lo

@@ -22,7 +22,7 @@ namespace conf {
                                            {"gaussian","banana","rdip", "ddip"};
 
   const std::vector<std::string> reg_set = 
-                           {"elinear","esinc","esine", "dgp", "saw"};
+                           {"elin","esinc","esine", "dgp", "saw"};
 
   const std::filesystem::path data_class_dir = root/"data/classification";
   const std::filesystem::path data_reg_dir = root/"data/regression";
@@ -105,35 +105,40 @@ namespace conf {
                                           "gausskernelridge"};
 
   const size_t idx = Ns.n_cols-1;
-  const size_t restart_opt = 1000;
+  const size_t restart_opt = 100;
 
-  const arma::rowvec Ntrns = {50};
+  const arma::rowvec Ntrns = {10,25};
+  /* const arma::rowvec Ntrns = {50}; */
   
   const std::string type_func = "pca";
 
-  const double valid = 0.2; const size_t ngrid = 10;
-  const arma::rowvec lambdas = arma::linspace<arma::rowvec>(1.,10,ngrid);
+  const double valid = 0.2; const size_t ngrid = 20;
+  /* const arma::rowvec lambdas = arma::linspace<arma::rowvec>(1.,10,ngrid); */
+  const arma::rowvec lambdas = arma::logspace<arma::rowvec>(0,2,ngrid);
+  /* const arma::rowvec lambdas = arma::linspace<arma::rowvec>(1e-6,1,ngrid); */
   //const arma::Row<size_t> npcs = arma::regspace<arma::Row<size_t>>
   //                                                              (1,1,ngrid);
   const arma::Row<size_t> npcs = arma::regspace<arma::Row<size_t>>
                                                                 (1,2,2*ngrid);
 
-  const arma::rowvec ls = arma::linspace<arma::rowvec>(1.,10.,ngrid);
+  /* const arma::rowvec ls = arma::linspace<arma::rowvec>(1.,10.,ngrid); */
+  const arma::rowvec ls = arma::logspace<arma::rowvec>(1,2,ngrid);
 
 
-  const std::filesystem::path train_root = root/"LCDB";
-  const std::filesystem::path test_root = root/"LCDB";
-  const std::filesystem::path train_file = "train_original.csv";
-  const std::filesystem::path test_file = "test_original.csv";
+  const std::filesystem::path train_root = root/"LCDB_0_12";
+  const std::filesystem::path test_root = root/"LCDB_0_12";
+  //const std::filesystem::path train_file = "train_original.csv";
+  //const std::filesystem::path test_file = "test_original.csv";
   //const std::filesystem::path train_file = "train.csv";
-  //const std::filesystem::path test_file = "test.csv";
+  const std::filesystem::path train_file = "pca_.csv";
+  const std::filesystem::path test_file = "test.csv";
   const std::filesystem::path at_file = "last.csv";
   const std::filesystem::path err_file = "error.csv";
   const std::filesystem::path pred_file = "predictions.csv";
 
   const std::vector<std::string> run_keys = { "all", "all", "qdc","ldc","nmc",
                                               "saw", "gausskernelridge"};
-  const size_t expid = 5;
+  const size_t expid = 1;
   const std::string which = run_keys[expid];
   const bool subset = std::count(keys.begin(), keys.end(), which);
     

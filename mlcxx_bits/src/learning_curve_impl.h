@@ -1048,6 +1048,43 @@ void LCurve<MODEL,LOSS>::Generate ( const arma::mat& inputs,
 template<class MODEL,
          class LOSS>
 template<class... Ts>
+void LCurve<MODEL,LOSS>::StratifiedGenerate ( const arma::mat& inputs,
+                                              const arma::Row<size_t>& labels,
+                                              const Ts&... args )
+{
+
+  BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
+        "There are not enough data for test set creation!" );
+
+  #pragma omp parallel for collapse(2)
+  for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
+    for(size_t j=0; j < size_t(repeat_); j++)
+    {
+      const auto res = utils::data::StratifiedSplit(inputs,
+                                          labels, size_t(Ns_(i)));
+      arma::mat Xtrn = std::get<0>(res);
+      arma::mat Xtst = std::get<1>(res);
+      arma::Row<size_t> ytrn = std::get<2>(res);
+      arma::Row<size_t> ytst = std::get<3>(res);
+      MODEL model(Xtrn, ytrn, args...);
+      test_errors_(j,i) = (100. - model.ComputeAccuracy(Xtst, ytst)) / 100.;
+      train_errors_(j,i) = (100. - model.ComputeAccuracy(Xtrn, ytrn)) / 100.;
+    }
+
+    arma::mat train = arma::join_cols(arma::mean(train_errors_),
+                                      arma::stddev(train_errors_));
+    arma::mat test = arma::join_cols(arma::mean(test_errors_),
+                                     arma::stddev(test_errors_));
+
+    results_ = 
+      arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
+
+    stats_ = std::make_tuple(std::move(train),
+                             std::move(test));
+}
+template<class MODEL,
+         class LOSS>
+template<class... Ts>
 void LCurve<MODEL,LOSS>::Generate 
                                   ( const utils::data::classification::Dataset& 
                                                                       trainset,

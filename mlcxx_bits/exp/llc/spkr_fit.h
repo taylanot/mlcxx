@@ -124,6 +124,7 @@ class SFUNCS
     idx.resize(X.n_cols);
     for ( size_t i=0; i < X.n_cols; i++)
     {
+      // What is this doing now?
       tempid = arma::find(X_ == double(X(0,i)));
       idx(i) = tempid(0);
     }

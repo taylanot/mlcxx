@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef DATA_MANI_H
+#define DATA_MANI_H
 
 namespace utils {
 
@@ -24,6 +24,21 @@ std::vector<std::filesystem::path> split_path
   for ( auto& path: paths )
   {
     list.push_back(path); 
+  }
+  return list;
+}
+
+//=============================================================================
+//  split_path 
+//=============================================================================
+std::vector<std::string> split_path 
+                                ( const std::string& paths )
+{
+  std::filesystem::path temp = paths;
+  std::vector<std::string> list;
+  for ( auto& path: temp)
+  {
+    list.push_back(path.string()); 
   }
   return list;
 }

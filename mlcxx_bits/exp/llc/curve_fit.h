@@ -14,6 +14,91 @@ namespace llc {
 // CurveFit : Fits a given objective with given optimizer
 //=============================================================================
 template<class Objective, class Optimizer> 
+class CurveFit2
+{
+  public:
+  CurveFit2 ( size_t n_param, size_t n_train ) : n_restart_(100),
+                                                n_param_(n_param),
+                                                n_train_(n_train) { };
+
+  CurveFit2 ( size_t n_restart, size_t n_param, size_t n_train ) :
+                                                   n_restart_(n_restart),
+                                                   n_param_(n_param),
+                                                   n_train_(n_train) { };
+
+
+  std::tuple<arma::vec,double> Fit ( const arma::mat& X,
+                                     const arma::rowvec& y )
+  {
+    arma::mat X_beg = X.cols(0,n_train_-1);
+    arma::rowvec y_beg = y.cols(0,n_train_-1);
+
+    arma::mat X_test = X.cols(n_train_,X.n_cols-1);
+    arma::rowvec y_test = y.cols(n_train_,y.n_cols-1);
+
+    arma::mat xtrn,xtst;
+    arma::rowvec ytrn,ytst;
+    mlpack::data::Split ( X_beg, y_beg, xtrn,xtst,ytrn,ytst, conf::valid );
+
+    train_obj_ = Objective(xtrn,ytrn);
+    fit_obj_= Objective(X_beg,y_beg);
+    opt_.MaxIterations() = max_iter_;
+    arma::vec theta(n_param_);
+    loss_.resize(n_restart_);
+
+    for ( size_t i=0; i<n_restart_; i++ )
+    {
+     theta.randn();
+     opt_.Optimize(train_obj_, theta);
+     param_[i] = theta;
+     loss_(i) = train_obj_.ComputeError(theta,xtst,ytst);
+    } 
+    size_t idx = loss_.index_min(); 
+    best_ = param_[idx];
+
+    opt_.Optimize(fit_obj_, best_);
+
+    return std::make_tuple(best_, fit_obj_.Evaluate(best_));
+
+  }
+
+  double ComputeError ( const arma::mat& X,
+                        const arma::rowvec& y )
+  {
+    arma::rowvec res = Predict(X) - y;
+    return arma::dot(res,res)/res.n_elem;
+  }
+
+  double ComputeErrorAt ( const arma::mat& X,
+                          const arma::rowvec& y,
+                          const size_t& idx )
+  {
+    arma::mat X_test = X.col(idx);
+    arma::rowvec y_test = y.col(idx);
+
+    return ComputeError(X_test, y_test);
+  }
+  arma::rowvec Predict ( const arma::mat& Xp )
+  {
+    return fit_obj_.Predict(best_,Xp);
+  }
+  
+  public:
+  size_t n_restart_;
+  size_t n_param_;
+  size_t max_iter_;
+  size_t n_train_;
+  arma::vec loss_;
+  std::map<int,arma::vec> param_;
+  arma::vec best_;
+  Optimizer opt_;
+  Objective train_obj_;
+  Objective fit_obj_;
+};
+//=============================================================================
+// CurveFit : Fits a given objective with given optimizer
+//=============================================================================
+template<class Objective, class Optimizer> 
 class CurveFit
 {
   public:
@@ -29,21 +114,42 @@ class CurveFit
   std::tuple<arma::vec,double> Fit ( const arma::mat& X,
                                      const arma::rowvec& y )
   {
-    Objective obj(X,y);
+    arma::mat xtrn,xtst;
+    arma::rowvec ytrn,ytst;
+    mlpack::data::Split ( X, y, xtrn,xtst,ytrn,ytst, conf::valid );
+
+    Objective obj(xtrn,ytrn);
+    Objective obj2(X,y);
     Optimizer opt;
     opt.MaxIterations() = max_iter_;
     arma::vec theta(n_param_);
     loss_.resize(n_restart_);
+
+    /* for ( size_t i=0; i<n_restart_; i++ ) */
+    /* { */
+    /*  theta.randn(); */
+    /*  opt.Optimize(obj, theta); */
+    /*  param_[i] = theta; */
+    /*  loss_(i) = obj.ComputeError(theta,xtst,ytst); */
+    /* } */ 
+    /* size_t idx = loss_.index_min(); */ 
+
+    /* return std::make_tuple(param_[idx], loss_(idx)); */
 
     for ( size_t i=0; i<n_restart_; i++ )
     {
      theta.randn();
      opt.Optimize(obj, theta);
      param_[i] = theta;
-     loss_(i) = obj.Evaluate(theta);
+     loss_(i) = obj.ComputeError(theta,xtst,ytst);
     } 
     size_t idx = loss_.index_min(); 
-    return std::make_tuple(param_[idx], loss_(idx));
+    theta = param_[idx];
+
+    opt.Optimize(obj2, theta);
+
+    return std::make_tuple(theta, obj.Evaluate(theta));
+
   }
 
   double ComputeError ( const arma::mat& X,
@@ -110,7 +216,9 @@ class CurveFit
 class WBL4
 {
   public:
-  
+
+  WBL4 ( ) { } 
+
   WBL4 ( const arma::mat& X,
          const arma::rowvec& y ) : X_(X), y_(y) { }
   
@@ -149,10 +257,17 @@ class WBL4
     return (-theta(1,0)*arma::exp(- theta(0,0)*arma::pow(X,theta(3,0)))+
                                                             theta(2,0)) ;
   }
+
+  double ComputeError(const arma::mat& theta, const arma::mat& X,
+                                                    const arma::rowvec& y)
+  {
+    arma::rowvec res = Predict(theta,X) - y ;
+    return arma::dot(res,res)/res.n_cols;
+  }
   private:
   
-  const arma::mat& X_;
-  const arma::rowvec& y_;
+  arma::mat X_;
+  arma::rowvec y_;
 };
 
 //=============================================================================
@@ -161,6 +276,8 @@ class WBL4
 class MMF4
 {
   public:
+
+  MMF4 ( ) { } 
   
   MMF4 ( const arma::mat& X,
          const arma::rowvec& y ) : X_(X), y_(y) { }
@@ -206,19 +323,24 @@ class MMF4
     return (theta(0,0)*theta(1,0) + theta(2,0)*arma::pow(X,theta(3,0))) /
                                    (theta(2,0)+arma::pow(X,theta(3,0)));
   }
+  double ComputeError(const arma::mat& theta, const arma::mat& X,
+                                                    const arma::rowvec& y)
+  {
+    arma::rowvec res = Predict(theta,X) - y ;
+    return arma::dot(res,res)/res.n_cols;
+  }
   private:
   
-  const arma::mat& X_;
-  const arma::rowvec& y_;
+  arma::mat X_;
+  arma::rowvec y_;
 };
-
 //-----------------------------------------------------------------------------
 // run_curve_fit : Run Curve Fit 
 //-----------------------------------------------------------------------------
 void run_curve_fit ( )
 {
-  std::filesystem::path mmf4_path = "MMF4";
-  std::filesystem::path wbl4_path = "WBL4";
+  std::filesystem::path mmf4_path = "MMF4_fairest";
+  std::filesystem::path wbl4_path = "WBL4_fairest";
 
   //arma::mat data = utils::Load(conf::test_path/conf::test_file, true);
   arma::field<std::string> header;
@@ -233,11 +355,17 @@ void run_curve_fit ( )
   {
     std::filesystem::path addition = std::to_string(size_t(conf::Ntrns(i)));
 
-    CurveFit<WBL4, ens::L_BFGS> wbl4_fit(conf::restart_opt,4,conf::Ntrns(i));
-    CurveFit<MMF4, ens::L_BFGS> mmf4_fit(conf::restart_opt,4,conf::Ntrns(i));
+    CurveFit2<WBL4, ens::L_BFGS> wbl4_fit(conf::restart_opt,4,conf::Ntrns(i));
+    CurveFit2<MMF4, ens::L_BFGS> mmf4_fit(conf::restart_opt,4,conf::Ntrns(i));
 
     arma::mat mmf4_error(1,ys.n_rows);
     arma::mat wbl4_error(1,ys.n_rows);
+    arma::mat mmf4_error_at(1,ys.n_rows);
+    arma::mat wbl4_error_at(1,ys.n_rows);
+    arma::mat mmf4_pred(ys.n_cols,ys.n_rows);
+    arma::mat wbl4_pred(ys.n_cols,ys.n_rows);
+
+
 
     arma::rowvec y;
 
@@ -250,33 +378,130 @@ void run_curve_fit ( )
       utils::remove_path(conf::exp_id/wbl4_path/addition/conf::test_path,
                                     conf::test_root);
 
-
     for ( size_t j=0; j<ys.n_rows; j++)
-    //for ( size_t j=0; j<1; j++)
+    /* for ( size_t j=0; j<1; j++) */
     {
       y = ys.row(j);
+      wbl4_fit.Fit(X,y);
+      mmf4_fit.Fit(X,y);
       check = std::filesystem::exists(wbl4_path_clean/conf::err_file);
       if ( !check )
+      {
         wbl4_error.col(j) = wbl4_fit.ComputeError(X,y);
+        wbl4_error_at.col(j) = wbl4_fit.ComputeErrorAt(X,y,conf::idx);
+        wbl4_pred.col(j) = wbl4_fit.Predict(X).t();
+      }
       check = std::filesystem::exists(mmf4_path_clean/conf::err_file);
       if ( !check )
+      {
         mmf4_error.col(j) = mmf4_fit.ComputeError(X,y);
+        mmf4_error_at.col(j) = mmf4_fit.ComputeErrorAt(X,y,conf::idx);
+        mmf4_pred.col(j) = mmf4_fit.Predict(X).t();
+      }
     }
     
     std::filesystem::create_directories(mmf4_path_clean);
     std::filesystem::create_directories(wbl4_path_clean);
-
-    //utils::Save(mmf4_path_clean/conf::err_file,mmf4_error);
-    //utils::Save(wbl4_path_clean/conf::err_file,wbl4_error);
 
     mmf4_error.save(arma::csv_name(mmf4_path_clean/conf::err_file,
                             header.cols(1,ys.n_rows)));
     wbl4_error.save(arma::csv_name(wbl4_path_clean/conf::err_file,
                             header.cols(1,ys.n_rows)));
 
+    mmf4_error_at.save(arma::csv_name(mmf4_path_clean/conf::at_file,
+                               header.cols(1,ys.n_rows)));
+    wbl4_error_at.save(arma::csv_name(wbl4_path_clean/conf::at_file,
+                               header.cols(1,ys.n_rows)));
+
+    wbl4_pred.save(arma::csv_name(wbl4_path_clean/conf::pred_file,
+                            header.cols(1,ys.n_rows)));
+    mmf4_pred.save(arma::csv_name(mmf4_path_clean/conf::pred_file,
+                            header.cols(1,ys.n_rows)));
+
+
 
   }
 }
+
+/* //----------------------------------------------------------------------------- */
+/* // run_curve_fit : Run Curve Fit */ 
+/* //----------------------------------------------------------------------------- */
+/* void run_curve_fit ( ) */
+/* { */
+/*   std::filesystem::path mmf4_path = "MMF4_fairer"; */
+/*   std::filesystem::path wbl4_path = "WBL4_fairer"; */
+
+/*   //arma::mat data = utils::Load(conf::test_path/conf::test_file, true); */
+/*   arma::field<std::string> header; */
+/*   arma::mat data; */
+/*   data.load(arma::csv_name(conf::test_path/conf::test_file, header)); */   
+/*   arma::inplace_trans(data); */
+
+/*   arma::mat X = data.row(0); */
+/*   arma::mat ys = data.rows(1,data.n_rows-1); */
+
+/*   for ( size_t i=0; i<conf::Ntrns.n_cols; i++ ) */
+/*   { */
+/*     std::filesystem::path addition = std::to_string(size_t(conf::Ntrns(i))); */
+
+/*     CurveFit2<WBL4, ens::L_BFGS> wbl4_fit(conf::restart_opt,4,conf::Ntrns(i)); */
+/*     CurveFit2<MMF4, ens::L_BFGS> mmf4_fit(conf::restart_opt,4,conf::Ntrns(i)); */
+
+/*     arma::mat mmf4_error(1,ys.n_rows); */
+/*     arma::mat wbl4_error(1,ys.n_rows); */
+/*     arma::mat mmf4_error_at(1,ys.n_rows); */
+/*     arma::mat wbl4_error_at(1,ys.n_rows); */
+
+
+/*     arma::rowvec y; */
+
+/*     bool check; */
+
+/*     std::filesystem::path mmf4_path_clean = */ 
+/*       utils::remove_path(conf::exp_id/mmf4_path/addition/conf::test_path, */
+/*                                     conf::test_root); */
+/*     std::filesystem::path wbl4_path_clean = */ 
+/*       utils::remove_path(conf::exp_id/wbl4_path/addition/conf::test_path, */
+/*                                     conf::test_root); */
+
+
+/*     for ( size_t j=0; j<ys.n_rows; j++) */
+/*     /1* for ( size_t j=0; j<1; j++) *1/ */
+/*     { */
+/*       y = ys.row(j); */
+/*       check = std::filesystem::exists(wbl4_path_clean/conf::err_file); */
+/*       if ( !check ) */
+/*       { */
+/*         wbl4_error.col(j) = wbl4_fit.ComputeError(X,y); */
+/*         wbl4_error_at.col(j) = wbl4_fit.ComputeErrorAt(X,y,conf::idx); */
+/*       } */
+/*       check = std::filesystem::exists(mmf4_path_clean/conf::err_file); */
+/*       if ( !check ) */
+/*       { */
+/*         mmf4_error.col(j) = mmf4_fit.ComputeError(X,y); */
+/*         mmf4_error_at.col(j) = mmf4_fit.ComputeErrorAt(X,y,conf::idx); */
+/*       } */
+/*     } */
+    
+/*     std::filesystem::create_directories(mmf4_path_clean); */
+/*     std::filesystem::create_directories(wbl4_path_clean); */
+
+/*     //utils::Save(mmf4_path_clean/conf::err_file,mmf4_error); */
+/*     //utils::Save(wbl4_path_clean/conf::err_file,wbl4_error); */
+
+/*     mmf4_error.save(arma::csv_name(mmf4_path_clean/conf::err_file, */
+/*                             header.cols(1,ys.n_rows))); */
+/*     wbl4_error.save(arma::csv_name(wbl4_path_clean/conf::err_file, */
+/*                             header.cols(1,ys.n_rows))); */
+
+/*     mmf4_error_at.save(arma::csv_name(mmf4_path_clean/conf::at_file, */
+/*                                header.cols(1,ys.n_rows))); */
+/*     wbl4_error_at.save(arma::csv_name(wbl4_path_clean/conf::at_file, */
+/*                                header.cols(1,ys.n_rows))); */
+
+
+/*   } */
+/* } */
 
 //-----------------------------------------------------------------------------
 // run_curve_fit_pred: Run Curve Fit for a given curve id

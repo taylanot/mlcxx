@@ -382,6 +382,11 @@ public:
                   const arma::Row<size_t>& labels,
                   const Ts&... args );
 
+  template<class... Ts>
+  void StratifiedGenerate ( const arma::mat& inputs,
+                            const arma::Row<size_t>& labels,
+                            const Ts&... args );
+
   /* Save the stats to a file
    *
    * @param filename  : filename with extension to save
@@ -447,6 +452,12 @@ public:
   void Generate ( const arma::mat& inputs,
                   const arma::Row<size_t>& labels,
                   const Ts&... args );
+
+  template<class... Ts>
+  void StratifiedGenerate ( const arma::mat& inputs,
+                            const arma::Row<size_t>& labels,
+                            const Ts&... args );
+
 
   /* Generate Learning Curves 
    *

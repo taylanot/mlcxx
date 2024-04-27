@@ -328,7 +328,7 @@ void Dataset::Generate ( const std::string& type )
       mean2 = {+5,0};
     }
     if ( type == "Hard" )
-      eps = 2.;
+      eps = 4.;
     else
       eps = 0.1;
     _2classgauss(mean1, mean2, eps, 0.);

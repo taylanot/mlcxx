@@ -70,6 +70,16 @@ arma::mat kernelsmoothing ( const arma::mat& inputs,
   }  
   return predictions;
 }
+
+template<class T>
+arma::mat kernelsmoothing ( const arma::mat& inputs,
+                            const arma::mat& labels,
+                            const double& bandwidth    )
+{
+  return kernelsmoothing<T>( inputs,labels,inputs,bandwidth );
+
+}
+
 } // functional
 } // utils
 #endif 

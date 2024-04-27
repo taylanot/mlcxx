@@ -27,6 +27,15 @@ void func_run( char* argv )
   m["llc-nnc"]   = experiments::llc::gen_nnc;
   m["llc-nmc"]   = experiments::llc::gen_nmc;
 
+  m["llc-saw"]   = experiments::llc::gen_saw;
+  m["llc-lin"]   = experiments::llc::gen_lin;
+  m["llc-dgp"]   = experiments::llc::gen_dgp;
+  m["llc-nn-adam"]   = experiments::llc::gen_nn_adam;
+  m["llc-sgd"]   = experiments::llc::gen_nn_sgd;
+  m["llc-lkr"]   = experiments::llc::gen_lkr;
+  m["llc-gkr"]   = experiments::llc::gen_gkr;
+
+
   m["llc-curvefit"] = experiments::llc::run_curve_fit;
   m["llc-curvefitat"] = experiments::llc::run_curve_fit_at;
   m["llc-curvefit-pred"] = experiments::llc::run_curve_fit_pred;
