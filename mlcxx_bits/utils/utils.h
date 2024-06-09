@@ -16,6 +16,11 @@
 #include "utils/parallel.h"
 #include "utils/transform.h"
 #include "utils/data_mani.h"
+#include "utils/similarity.h"
+#include "utils/root.h"
+#include "utils/deriv.h"
+#include "utils/mean_estim.h"
+#include "utils/dists.h"
 
 #endif
 

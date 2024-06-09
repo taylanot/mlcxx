@@ -33,6 +33,8 @@ struct Dataset
   void Set ( const size_t& D,
              const size_t& N );
 
+  void Outlier_ ( const size_t& Nout );
+
   void Generate ( const double& scale,
                   const double& phase,
                   const std::string& type ) ;

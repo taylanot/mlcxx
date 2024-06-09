@@ -6,6 +6,8 @@
  *
  */
 
+// default seed
+const unsigned int SEED = 8 ; // KOBEEEE
 // Some easy definitions...
 //#define ARMA_USE_HDF5
 #define ARMA_WARN_LEVEL 1
@@ -40,6 +42,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <filesystem>
+#include <random>
 
 // boost 
 #include <boost/assert.hpp>
@@ -49,6 +52,7 @@
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 #include <boost/serialization/nvp.hpp>
+#include <boost/random.hpp>
 
 //mlpack
 #include <mlpack.hpp>
@@ -62,11 +66,9 @@
 #include "stats/hypothesis.h"
 
 // tests
-#include "tests/doctest.h"
-#include "tests/tests.h"
+
 #include "exp/exp.h"
 
 // main functions
 #include "funcs.h"
-
 

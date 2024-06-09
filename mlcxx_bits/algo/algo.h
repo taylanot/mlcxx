@@ -15,5 +15,6 @@
 #include "algo/kernelridge.h"
 #include "algo/functionalpca.h"
 #include "algo/functionalsmoothing.h"
+#include "algo/approx.h"
 
 #endif

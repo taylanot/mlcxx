@@ -107,7 +107,7 @@ namespace conf {
   const size_t idx = Ns.n_cols-1;
   const size_t restart_opt = 100;
 
-  const arma::rowvec Ntrns = {10,25};
+  const arma::rowvec Ntrns = {10,25,50};
   /* const arma::rowvec Ntrns = {50}; */
   
   const std::string type_func = "pca";
@@ -123,6 +123,10 @@ namespace conf {
 
   /* const arma::rowvec ls = arma::linspace<arma::rowvec>(1.,10.,ngrid); */
   const arma::rowvec ls = arma::logspace<arma::rowvec>(1,2,ngrid);
+  
+  const size_t n_cluster = 10;
+
+  const size_t n_closest = 100;
 
 
   const std::filesystem::path train_root = root/"LCDB_0_12";
@@ -130,7 +134,7 @@ namespace conf {
   //const std::filesystem::path train_file = "train_original.csv";
   //const std::filesystem::path test_file = "test_original.csv";
   //const std::filesystem::path train_file = "train.csv";
-  const std::filesystem::path train_file = "pca_.csv";
+  const std::filesystem::path train_file = "clusters_.csv";
   const std::filesystem::path test_file = "test.csv";
   const std::filesystem::path at_file = "last.csv";
   const std::filesystem::path err_file = "error.csv";
@@ -147,11 +151,11 @@ namespace conf {
   { 
     train_root/"classification",                    // "0"
     train_root/"regression",                        // "1"
-    train_root/"classification",                    // "2" only qdc
-    train_root/"classification",                    // "3" only ldc
-    train_root/"classification",                    // "4" only nmc
-    train_root/"regression",                        // "5" only saw 
-    train_root/"regression",                        // "6" only kr
+    /* train_root/"classification",                    // "2" only qdc */
+    /* train_root/"classification",                    // "3" only ldc */
+    /* train_root/"classification",                    // "4" only nmc */
+    /* train_root/"regression",                        // "5" only saw */ 
+    /* train_root/"regression",                        // "6" only kr */
   };
 
   const std::vector<std::filesystem::path> test_paths = 
@@ -159,11 +163,11 @@ namespace conf {
     // FINAL
     test_root/"classification",                    // "0"
     test_root/"regression",                        // "1"
-    test_root/"classification",                    // "2" only qdc   
-    test_root/"classification",                    // "3" only ldc   
-    test_root/"classification",                    // "4" only nmc   
-    test_root/"regression",                        // "5" only saw   
-    test_root/"regression",                        // "6" only kr
+    /* test_root/"classification",                    // "2" only qdc */   
+    /* test_root/"classification",                    // "3" only ldc */   
+    /* test_root/"classification",                    // "4" only nmc */   
+    /* test_root/"regression",                        // "5" only saw */   
+    /* test_root/"regression",                        // "6" only kr */
   };
 
   const std::filesystem::path train_path = train_paths[expid];

@@ -7,6 +7,88 @@
 #ifndef TEST_ALGO_H 
 #define TEST_ALGO_H
 
+TEST_SUITE("TAYLOR") {
+  //=============================================================================
+  // X^2: Just a function
+  //=============================================================================
+  class X2
+  {
+    public:
+
+    X2 ( ) { } 
+
+    
+    arma::vec Evaluate (const arma::vec& mu)
+    { 
+      return arma::pow(mu,2);
+    }
+
+    void Gradient ( const arma::vec& mu,
+                    arma::mat& gradient )
+    {
+      gradient = 2*mu;
+    }
+
+    void Gradient_ ( const arma::vec& mu,
+                     arma::mat& gradient )
+    {
+      gradient = utils::fdiff(*this, mu);
+    }
+
+  };
+
+  //=============================================================================
+  // Sine : Just a function
+  //=============================================================================
+  class Sine
+  {
+    public:
+
+    Sine( ) { } 
+
+    
+    arma::vec Evaluate (const arma::vec& mu)
+    { 
+      return arma::sin(mu);
+    }
+
+    void Gradient ( const arma::vec& mu,
+                    arma::mat& gradient )
+    {
+      gradient = arma::cos(mu);
+    }
+
+    void Gradient_ ( const arma::vec& mu,
+                     arma::mat& gradient )
+    {
+      gradient = utils::fdiff(*this, mu);
+    }
+
+  };
+  TEST_CASE("RandomFunctions")
+  {
+    arma::mat x = arma::linspace<arma::mat>(-0.1,0.1,50);
+    arma::inplace_trans(x);
+    arma::mat x0(1,1);
+    double tol = 1e-2;
+    algo::approx::Taylor foo(1, 1e-6, "central");
+
+    SUBCASE("X2")
+    {
+      X2 func;
+      foo.Train(func, x0);
+      CHECK(foo.ComputeError(x,
+              arma::conv_to<arma::rowvec>::from(func.Evaluate(x.t())))<tol);
+    }
+    SUBCASE("Sine")
+    {
+      Sine func;
+      foo.Train(func, x0);
+      CHECK(foo.ComputeError(x,
+              arma::conv_to<arma::rowvec>::from(func.Evaluate(x.t())))<tol);
+    }
+  }
+}
 TEST_SUITE("FUNCTIONALPCA") {
   TEST_CASE("UFPCA")
   {

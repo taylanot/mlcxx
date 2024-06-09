@@ -6,7 +6,9 @@
  *
  * TODO: 
  * - Should we go for an inherited version? Will cost compilation time though?
- * - Write it much cleaner.
+ * - Write it much cleaner. Well I think one thing I realized is that the loss
+ *   template is useless in this case. This is why loss template should be 
+ *   removed from all learning curve classes! 
  *
  *
  */

@@ -7,6 +7,130 @@
 #ifndef TEST_UTILS_H 
 #define TEST_UTILS_H
 
+TEST_SUITE("MEANESTIMATION") {
+
+  arma::mat data = arma::randn(1,1000);
+  double tol = 1.e-6;
+
+  TEST_CASE("LEE")
+  {
+    CHECK( std::abs(utils::lee(data).eval()(0,0)-arma::mean(data,1).eval()(0)) 
+                                                                        > tol );
+  }
+
+  TEST_CASE("CATONI")
+  {
+    CHECK( 
+        std::abs(utils::catoni(data).eval()(0,0)-arma::mean(data,1).eval()(0)) 
+                                                                        > tol );
+  }
+
+  TEST_CASE("TRIMMED")
+  {
+    CHECK( 
+        std::abs(utils::tmean(data,10).eval()(0,0)-arma::mean(data,1).eval()(0)) 
+                                                                        > tol );
+  }
+
+  TEST_CASE("MEDIANOFMEANS")
+  {
+    CHECK( 
+        std::abs(utils::mediomean(data,10).eval()(0)-
+                                          arma::mean(data,1).eval()(0)) > tol );
+  }
+
+}
+
+TEST_SUITE("ROOT&FDIFF") {
+  //=============================================================================
+  // X^2: Just a function
+  //=============================================================================
+  class X2
+  {
+    public:
+
+    X2 ( ) { } 
+
+    
+    arma::vec Evaluate (const arma::vec& mu)
+    { 
+      return arma::pow(mu,2);
+    }
+
+    void Gradient ( const arma::vec& mu,
+                    arma::mat& gradient )
+    {
+      gradient = 2*mu;
+    }
+
+    void Gradient_ ( const arma::vec& mu,
+                     arma::mat& gradient )
+    {
+      gradient = utils::fdiff(*this, mu);
+    }
+
+  };
+
+  double tol = 1.e-2;
+  arma::vec mu = arma::ones(1);
+  arma::vec mus = arma::linspace(-1,1);
+  X2 obj;
+
+  TEST_CASE("FDIFF")
+  {
+    arma::mat exact, approx;
+    arma::vec theta(1);
+    for (const auto& mu: mus)
+    {
+      theta = mu;
+      obj.Gradient(theta,exact);
+      obj.Gradient_(theta,approx);
+      CHECK ( arma::abs(exact-approx).eval()(0,0) < tol );
+    }
+  }
+
+  TEST_CASE("ROOT")
+  {
+    utils::fsolve(obj,mu);
+    CHECK ( mu.n_elem == 1 );
+    CHECK ( arma::abs(mu).eval()(0,0) < tol );
+  }
+}
+
+
+TEST_SUITE("SIMILARITY") {
+  
+  arma::mat vec("5 2");
+  arma::mat vec_("4 -10");
+  arma::mat mat("5 2 ; 4 -10"); 
+
+  arma::mat curve("1 1 1");
+  arma::mat curve_("0.5 0.5 0.5");
+  arma::mat curves("1 1 1; 0.5 0.5 0.5");
+
+  size_t same = 1;
+  size_t notsame = 0;
+
+  TEST_CASE("COSINE")
+  {
+    CHECK ( size_t(utils::cos_sim(vec,vec)(0)) ==  same );
+    CHECK ( size_t(utils::cos_sim(vec,vec_)(0)) ==  notsame );
+    arma::rowvec res = utils::cos_sim(mat,vec);
+    CHECK ( size_t(res.n_elem) == size_t(mat.n_rows));
+    CHECK ( size_t(res(0)) == same );
+    CHECK ( size_t(res(1)) == notsame );
+  }
+  TEST_CASE("CURVE")
+  {
+    CHECK ( size_t(utils::curve_sim(curve,curve)(0)) ==  same );
+    CHECK ( size_t(utils::curve_sim(curve,curve_)(0)) ==  notsame );
+    arma::rowvec res = utils::curve_sim(curves,curve);
+    CHECK ( size_t(res.n_elem) == size_t(curves.n_rows));
+    CHECK ( size_t(res(0)) == same );
+    CHECK ( res(1) < same );
+  }
+}
+ 
 TEST_SUITE("DATASET") {
 
   int D, N;
@@ -28,11 +152,11 @@ TEST_SUITE("DATASET") {
   {
     D=1; N=4;
     utils::data::regression::Dataset data(D, N);
-    a = 1.0; p = 0.; eps = 0.0;
+    a = 1.0; p = 0.; eps = 0.1;
 
-    SUBCASE("SINE")
+    SUBCASE("Outlier-1")
     {
-      data.Generate(a, p, "Sine", eps);
+      data.Generate("Outlier-1");
 
       CHECK ( data.inputs_.n_cols == N );
       CHECK ( data.inputs_.n_rows == D );
@@ -40,26 +164,37 @@ TEST_SUITE("DATASET") {
       CHECK ( data.labels_.n_cols == N );
       CHECK ( data.labels_.n_rows == 1 );
 
-      //double sum_check = std::pow(std::cos(data.inputs_(0,0)),2) 
-      //                   + std::pow(data.inputs_(0,0),2);
+    }
 
-      //CHECK ( sum_check - 1. < tol );
+    SUBCASE("SINE")
+    {
+      data.Generate(a, p, "Sine");
+
+      CHECK ( data.inputs_.n_cols == N );
+      CHECK ( data.inputs_.n_rows == D );
+
+      CHECK ( data.labels_.n_cols == N );
+      CHECK ( data.labels_.n_rows == 1 );
+
+      CHECK ( data.labels_(0) == arma::sin(data.inputs_).eval()(0,0) );
 
       arma::mat labels = data.labels_;
-      eps = 0.1;
       data.Noise(eps);
 
       CHECK ( labels(0) != data.labels_(0) );
     }
     SUBCASE("SINC")
     {
-      data.Generate(a, p, "Sinc", eps);
+      data.Generate(a, p, "Sinc");
 
       CHECK ( data.inputs_.n_cols == N );
       CHECK ( data.inputs_.n_rows == D );
 
       CHECK ( data.labels_.n_cols == N );
       CHECK ( data.labels_.n_rows == 1 );
+
+      CHECK ( data.labels_(0) == 
+          (arma::sin(data.inputs_)/data.inputs_).eval()(0,0) );
 
       arma::mat labels = data.labels_;
       eps = 0.1;
@@ -70,7 +205,7 @@ TEST_SUITE("DATASET") {
 
     SUBCASE("LINEAR")
     {
-      data.Generate(a, p, "Linear", eps);
+      data.Generate(a, p, "Linear");
 
       CHECK ( data.inputs_.n_cols == N );
       CHECK ( data.inputs_.n_rows == D );
@@ -78,10 +213,9 @@ TEST_SUITE("DATASET") {
       CHECK ( data.labels_.n_cols == N );
       CHECK ( data.labels_.n_rows == 1 );
       
-      CHECK ( data.inputs_(0,0) == data.labels_(0) ); 
+      CHECK ( data.labels_(0) == data.inputs_(0,0) );
 
       arma::mat labels = data.labels_;
-      eps = 0.1;
       data.Noise(eps);
 
       CHECK ( labels(0) != data.labels_(0) );

@@ -1,0 +1,270 @@
+/**
+ * @file root.h
+ * @author Ozgur Taylan Turan
+ *
+ * Root finding related stuff
+ *
+ * TODO: 
+ *
+ *
+ */
+
+#ifndef ROOT_H
+#define ROOT_H
+
+namespace utils {
+//=============================================================================
+// Multivariate Broyden
+//=============================================================================
+template<class OBJ, class T=arma::vec>
+void broyden(OBJ& obj, T& mu, const double tol = 1e-6,
+                              const size_t max_iter = 1000000)
+{
+  arma::mat J;
+  arma::vec fx = obj.Evaluate(mu);
+  size_t iter = 0;
+  while ( iter < max_iter )
+  {
+    arma::vec dx = arma::solve(J, -fx);
+    // Update the solution
+    mu += dx;
+    // Update the solution 
+    arma::vec df = obj.Evaluate(mu) - fx;
+    fx += df;
+    J = J + ((df - J * dx) * dx.t()) / arma::dot(dx, dx);
+    if (arma::norm(fx, "inf") > tol)
+      break;
+    iter++;
+  }
+  BOOST_ASSERT_MSG(iter < max_iter, "Could not find a solution!" );
+  
+}
+//=============================================================================
+// 1D Broyden with Sherman-Morison formula
+//=============================================================================
+template<class OBJ>
+void broyden1(OBJ& obj, double& x, const double tol = 1e-6,
+                              const size_t max_iter = 100000)
+{
+  double j, jinv, dx, fx, df, u;
+  obj.Gradient(x, j);
+  jinv = 1./j;
+  fx = obj.Evaluate(x);
+  size_t iter = 0;
+  while ( iter < max_iter )
+  {
+    dx =  - fx * jinv;
+    x += dx;
+    df = obj.Evaluate(x) - fx;
+    fx += df;
+    u =  jinv * df;
+    jinv += (dx-u) * (dx*jinv) / (dx * u);
+    if ( std::abs(fx) < tol )
+      break;
+    iter++;
+  }
+  BOOST_ASSERT_MSG((iter < max_iter), "Could not find a solution!" );
+}
+//=============================================================================
+// A simple line-search
+//=============================================================================
+template<class OBJ, class T=arma::vec>
+double line_search(OBJ& obj, const T& x, const T& d, const double tol) {
+    double alpha = 0;
+    double beta = 1;
+    auto phi = [&](double a) {
+        T x_new = x + a * d;
+        return arma::norm(obj.Evaluate(x_new), 2);
+    };
+
+    while (phi(beta) < phi(beta / 2)) {
+        beta *= 2;
+    }
+
+    while (beta - alpha > tol) {
+        double mid1 = alpha + (beta - alpha) / 3;
+        double mid2 = beta - (beta - alpha) / 3;
+        if (phi(mid1) < phi(mid2)) {
+            beta = mid2;
+        } else {
+            alpha = mid1;
+        }
+    }
+
+    return (alpha + beta) / 2;
+}
+
+//=============================================================================
+// Modified Powell method aka hybrid in minpack
+//=============================================================================
+template<class OBJ, class T=arma::vec>
+void hybrid(OBJ& obj, T& x, const double tol = 1e-6,
+                            const size_t max_iter = 100000 )
+{
+  size_t n = x.n_elem;
+  arma::mat direc = arma::eye<arma::mat>(n, n);
+
+  size_t iter = 0;
+  while (iter < max_iter)
+  {
+    T x_old = x;
+
+    for (size_t i = 0; i < n; ++i)
+    {
+      T d = direc.col(i);
+      double alpha = line_search(obj, x, d, tol);
+      x += alpha * d;
+    }
+
+    if (arma::norm(x - x_old, "inf") < tol)
+      return;
+
+    T d = x - x_old;
+    double alpha = line_search(obj, x, d, tol);
+    x += alpha * d;
+
+    direc.shed_col(0);
+    direc.insert_cols(n-1, d);
+
+    if (arma::norm(x - x_old, "inf") < tol)
+      return;
+    
+    iter++;
+  }
+
+  BOOST_ASSERT_MSG(iter > max_iter, 
+      "Could not find a solution with modified Powell algo!" );
+}
+
+
+template<class OBJ, class T=arma::vec, class... Ts>
+void fsolve(OBJ& obj, T& mu, std::string type="broyden", const Ts&... args)
+{
+  BOOST_ASSERT_MSG( type == "broyden" || type == "hybrid",
+      "Only available option is broyden and hybrid for now..."); 
+  if (type == "broyden")
+    broyden(obj, mu, args...);
+  else
+    hybrid(obj, mu, args...);
+}
+
+template<class OBJ, class T=arma::vec, class... Ts>
+void fsolve1(OBJ& obj, T& mu, std::string type="broyden1", const Ts&... args)
+{
+  BOOST_ASSERT_MSG( type == "broyden1",
+      "Only available option is broyden1 for now..."); 
+  if (type == "broyden1")
+    broyden1(obj, mu, args...);
+}
+} // namespace utils
+#endif
+
+
+/**
+ * @file deriv.h
+ * @author Ozgur Taylan Turan
+ *
+ * Derivative related stuff
+ *
+ * TODO: 
+ *
+ *
+ */
+
+#ifndef DERIV_H
+#define DERIV_H
+
+namespace utils {
+
+template<class FUNC>
+arma::mat fdiff(FUNC& f, const arma::vec& x,
+                const std::string& type="central",
+                const double& h = 1e-8, const size_t order = 1 ) 
+{
+    BOOST_ASSERT_MSG ( (type == "central" || type == "forward" ||
+          type == "backward"), "Not a valid type for central difference!");
+
+    BOOST_ASSERT_MSG( order == 1 || order == 2, "Check the order!");
+
+    size_t n = x.n_elem;
+
+    // Create matrices for forward and backward perturbed points
+    arma::mat E = arma::eye(n, n);
+    arma::mat xcp = arma::repmat(x, 1, n);
+    arma::mat x_ = xcp + h * E;
+    arma::mat x__ = xcp + 2 * h * E;
+    arma::mat _x = xcp - h * E;
+    arma::mat __x = xcp - 2 * h * E;
+
+    // Compute the gradient using central difference formula
+    arma::mat grad;
+    if (type == "central")
+    {
+      if (order == 1)
+        grad = (f.Evaluate(x_) - f.Evaluate(_x)) / (2 * h);
+      else if (order == 2)
+        grad = (f.Evaluate(x_) - 2*f.Evaluate(_x) + f.Evaluate(_x)) / h;
+    }
+    else if (type == "forward")
+    {
+      if (order == 1)
+        grad = (f.Evaluate(x_) - f.Evaluate(xcp)) / h;
+      else if (order == 2)
+        grad = (f.Evaluate(xcp) - 2*f.Evaluate(x_) + f.Evaluate(x__)) / h;
+    }
+    else
+    {
+      if (order == 1)
+        grad = (f.Evaluate(xcp) - f.Evaluate(_x)) / h;
+      else if (order == 2)
+        grad = (1.5*f.Evaluate(xcp) - 2*f.Evaluate(_x) - 0.5*f.Evaluate(__x)) 
+                                                                            / h;
+    }
+    return grad;
+}
+
+template<class FUNC>
+double fdiff1(FUNC& f, const double& x,
+              const std::string& type="central",
+              const double& h = 1e-8, const size_t order = 1 ) 
+{
+    BOOST_ASSERT_MSG ( (type == "central" || type == "forward" ||
+          type == "backward"), "Not a valid type for central difference!");
+
+    BOOST_ASSERT_MSG( order == 1 || order == 2, "Check the order!");
+
+    // Create matrices for forward and backward perturbed points
+    double xcp = x;
+    double x_ = xcp + h;
+    double x__ = xcp + 2*h ;
+    double _x = xcp - h;
+    double __x = xcp - 2*h ;
+
+    // Compute the gradient using central difference formula
+    double grad;
+    if (type == "central")
+    {
+      if (order == 1)
+        grad = (f.Evaluate(x_) - f.Evaluate(_x)) / (2 * h);
+      else if (order == 2)
+        grad = (f.Evaluate(x_) - 2*f.Evaluate(_x) + f.Evaluate(_x)) / h;
+    }
+    else if (type == "forward")
+    {
+      if (order == 1)
+        grad = (f.Evaluate(x_) - f.Evaluate(xcp)) / h;
+      else if (order == 2)
+        grad = (f.Evaluate(xcp) - 2*f.Evaluate(x_) + f.Evaluate(x__)) / h;
+    }
+    else
+    {
+      if (order == 1)
+        grad = (f.Evaluate(xcp) - f.Evaluate(_x)) / h;
+      else if (order == 2)
+        grad = (1.5*f.Evaluate(xcp) - 2*f.Evaluate(_x) - 0.5*f.Evaluate(__x)) 
+                                                                            / h;
+    }
+    return grad;
+}
+} // namespace utils
+#endif

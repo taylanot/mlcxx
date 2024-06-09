@@ -30,6 +30,7 @@ void Dataset::Generate ( const double& scale,
                          const std::string& type )
 {
   inputs_ = arma::randn(dimension_,size_);
+
   if (type == "Linear")
   {
     labels_ = scale*(arma::ones(dimension_)).t() * inputs_ +  phase;;
@@ -90,6 +91,33 @@ void Dataset::Load ( const std::string& filename,
   dimension_ = Din;
   inputs_ = data.rows(0,dimension_-1);
   labels_ = data.row(dimension_);
+}
+
+void Dataset::Outlier_( const size_t& Nout )
+{
+    BOOST_ASSERT_MSG( dimension_ == 1,
+        "Only 1 dimensional Outlier dataset is defined!" );
+    BOOST_ASSERT_MSG( size_ > Nout,
+        "Number of outliers is bigger than dataset size" );
+    arma::mat inp1 = arma::randn(dimension_,size_t(size_/2)-size_t(Nout/2));
+    inp1 +=1;
+    arma::mat inp2 = arma::randn(dimension_,size_t(size_/2)-size_t(Nout/2));
+    inp2 -=1;
+    arma::mat out1 = arma::zeros(dimension_,size_t(Nout/2)); out1 -= 1000;
+    arma::mat out2 = arma::zeros(dimension_,size_t(Nout/2)); out2 += 1000;
+    arma::mat lab1 = arma::ones(dimension_,size_t(size_/2));
+    arma::mat lab2 = arma::ones(dimension_,size_t(size_/2)); lab2 -= 2;
+    inputs_ = arma::join_horiz(inp1,out1,inp2,out2);
+    labels_ = arma::join_horiz(lab1,lab2);
+
+}
+void Dataset::Generate( const std::string& type )
+{
+  if (type == "Outlier-1")
+    Dataset::Outlier_(1);
+
+  else if (type == "Outlier-10")
+    Dataset::Outlier_(10);
 }
 
 void Dataset::Load ( const std::string& filename,
