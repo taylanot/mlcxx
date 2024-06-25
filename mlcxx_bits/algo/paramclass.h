@@ -15,7 +15,7 @@ namespace classification {
 //=============================================================================
 // Linear Discriminant Classifier
 //=============================================================================
-
+template<class T=DTYPE>
 class LDC
 {
   public:
@@ -35,7 +35,7 @@ class LDC
    * @param labels  : y
    * @param lambda  : regularization
    */
-  LDC ( const arma::mat& inputs,
+  LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const double& lambda );
    /**
@@ -44,31 +44,31 @@ class LDC
    * @param lambda  : regularization
    * @param priors  : known priors
    */
-  LDC ( const arma::mat& inputs,
+  LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const double& lambda,
-        const arma::rowvec& priors );
+        const arma::Row<T>& priors );
                                
   /**
    * @param inputs  : X
    * @param labels  : y
    */
 
-  LDC ( const arma::mat& inputs,
+  LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X
    * @param labels  : y
    */
-  void Train ( const arma::mat& inputs,
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X*
    * @param labels  : y*
    */
-  void Classify ( const arma::mat& inputs,
+  void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
   /**
@@ -77,8 +77,8 @@ class LDC
    * @param inputs  : X*
    * @param labels  : y* 
    */
-  double ComputeError ( const arma::mat& points, 
-                        const arma::Row<size_t>& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points, 
+                   const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
@@ -86,8 +86,8 @@ class LDC
    * @param labels  : y*
    * 
    */
-  double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const;
+  T ComputeAccuracy ( const arma::Mat<T>& points, 
+                      const arma::Row<size_t>& responses ) const;
 
   /**
    * Serialize the model.
@@ -117,21 +117,21 @@ class LDC
 
   double jitter_ = 0.;
   
-  std::map<size_t, arma::rowvec> means_;
-  std::map<size_t, arma::mat> covs_;
+  std::map<size_t, arma::Row<T>> means_;
+  std::map<size_t, arma::Mat<T>> covs_;
 
-  arma::mat cov_;
-  arma::mat mean_;
+  arma::Mat<T> cov_;
+  arma::Mat<T> mean_;
 
   arma::Row<size_t> unique_;
-  arma::rowvec priors_;
+  arma::Row<T> priors_;
 
 };
 
 //=============================================================================
 // Quadratic Discriminant Classifier
 //=============================================================================
-
+template<class T=DTYPE>
 class QDC
 {
   public:
@@ -151,7 +151,7 @@ class QDC
    * @param labels  : y
    * @param lambda  : regularization
    */
-  QDC ( const arma::mat& inputs,
+  QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const double& lambda );
    /**
@@ -160,31 +160,30 @@ class QDC
    * @param lambda  : regularization
    * @param priors  : known priors
    */
-  QDC ( const arma::mat& inputs,
+  QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const double& lambda,
-        const arma::rowvec& priors );
+        const arma::Row<T>& priors );
                                
   /**
    * @param inputs  : X
    * @param labels  : y
    */
-
-  QDC ( const arma::mat& inputs,
+  QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X
    * @param labels  : y
    */
-  void Train ( const arma::mat& inputs,
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X*
    * @param labels  : y*
    */
-  void Classify ( const arma::mat& inputs,
+  void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
   /**
@@ -193,8 +192,8 @@ class QDC
    * @param inputs  : X*
    * @param labels  : y* 
    */
-  double ComputeError ( const arma::mat& points, 
-                        const arma::Row<size_t>& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points, 
+                   const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
@@ -202,8 +201,8 @@ class QDC
    * @param labels  : y*
    * 
    */
-  double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const;
+  T ComputeAccuracy ( const arma::Mat<T>& points, 
+                      const arma::Row<size_t>& responses ) const;
 
   /**
    * Serialize the model.
@@ -234,12 +233,12 @@ class QDC
   
   double jitter_ = 1.e-12;
 
-  std::map<size_t, arma::rowvec> means_;
-  std::map<size_t, arma::mat> covs_;
-  std::map<size_t, arma::mat> icovs_;
+  std::map<size_t, arma::Row<T>> means_;
+  std::map<size_t, arma::Mat<T>> covs_;
+  std::map<size_t, arma::Mat<T>> icovs_;
 
   arma::Row<size_t> unique_;
-  arma::rowvec priors_;
+  arma::Row<T> priors_;
 
 };
 
@@ -247,6 +246,7 @@ class QDC
 // Fisher's Linear Discriminant Classifier
 //=============================================================================
 
+template<class T=DTYPE>
 class FDC
 {
   public:
@@ -266,29 +266,29 @@ class FDC
    * @param inputs X
    * @param labels y
    */
-  FDC ( const arma::mat& inputs,
-            const arma::Row<size_t>& labels,
-            const double& lambda );
+  FDC ( const arma::Mat<T>& inputs,
+        const arma::Row<size_t>& labels,
+        const double& lambda );
                                
   /**
    * @param inputs X
    * @param labels y
    */
 
-  FDC ( const arma::mat& inputs,
-            const arma::Row<size_t>& labels );
+  FDC ( const arma::Mat<T>& inputs,
+        const arma::Row<size_t>& labels );
   /**
    * @param inputs X
    * @param labels y
    */
-  void Train ( const arma::mat& inputs,
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Classify ( const arma::mat& inputs,
+  void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
   /**
@@ -297,20 +297,20 @@ class FDC
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points, 
-                        const arma::Row<size_t>& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points, 
+                   const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
    * @param inputs 
    * @param labels 
    */
-  double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const;
+  T ComputeAccuracy ( const arma::Mat<T>& points, 
+                      const arma::Row<size_t>& responses ) const;
 
-  const arma::mat& Parameters() const { return parameters_; }
+  const arma::Mat<T>& Parameters() const { return parameters_; }
 
-  arma::mat& Parameters() { return parameters_; }
+  arma::Mat<T>& Parameters() { return parameters_; }
 
 
   /**
@@ -335,7 +335,7 @@ class FDC
 
   double lambda_;
 
-  arma::mat parameters_;
+  arma::Mat<T> parameters_;
   double bias_;
 
   arma::Row<size_t> unique_;
@@ -345,7 +345,8 @@ class FDC
 //=============================================================================
 // Nearest Mean Classifier 
 //=============================================================================
-
+//
+template<class T=DTYPE>
 class NMC
 {
   public:
@@ -359,7 +360,7 @@ class NMC
    * @param inputs X
    * @param labels y
    */
-  NMC ( const arma::mat& inputs,
+  NMC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels );
 
   // THINGS I DO FOR LOVE! (STUPID COMPILERS) //
@@ -368,21 +369,21 @@ class NMC
    * @param labels y
    * @param shrink s
    */
-  NMC ( const arma::mat& inputs,
+  NMC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const double& shrink );
   /**
    * @param inputs X
    * @param labels y
    */
-  void Train ( const arma::mat& inputs,
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Classify ( const arma::mat& inputs,
+  void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
   /**
@@ -391,20 +392,20 @@ class NMC
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points, 
-                        const arma::Row<size_t>& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points, 
+                   const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
    * @param inputs 
    * @param labels 
    */
-  double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const;
+  T ComputeAccuracy ( const arma::Mat<T>& points, 
+                      const arma::Row<size_t>& responses ) const;
 
-  const arma::mat& Parameters() const { return parameters_; }
+  const arma::Mat<T>& Parameters() const { return parameters_; }
 
-  arma::mat& Parameters() { return parameters_; }
+  arma::Mat<T>& Parameters() { return parameters_; }
 
 
   /**
@@ -430,8 +431,8 @@ class NMC
   size_t num_class_;
   double shrink_;
   
-  arma::mat centroid_;
-  arma::mat parameters_;
+  arma::Mat<T> centroid_;
+  arma::Mat<T> parameters_;
 
   arma::Row<size_t> unique_;
 

@@ -17,7 +17,7 @@ namespace regression {
 //=============================================================================
 
 template<class T = mlpack::data::StandardScaler,
-         class D = utils::data::regression::Dataset>
+         class D = utils::data::regression::Dataset<>>
 class Transformer
 {
   public:
@@ -39,13 +39,14 @@ class Transformer
 };
 
 } 
+
 namespace classification{
 //=============================================================================
 // Transformer
 //=============================================================================
 
 template<class T = mlpack::data::StandardScaler,
-         class D = utils::data::classification::Dataset>
+         class D = utils::data::classification::Dataset<>>
 class Transformer
 {
   public:
@@ -60,10 +61,9 @@ class Transformer
 
 };
 
-} // regressionnamespace //
+} // classification namespace 
 } // data namespace
 } // utils namespace
-  //
 #include "transform_impl.h"  
 
 #endif

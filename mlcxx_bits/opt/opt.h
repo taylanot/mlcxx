@@ -9,6 +9,7 @@
 
 
 #include "opt/diff.h"
-#include "opt/optim.h"
+#include "opt/root.h"
+#include "opt/lm.h"
 
 #endif

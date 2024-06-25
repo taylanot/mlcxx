@@ -3,7 +3,7 @@
  * @author Ozgur Taylan Turan
  *
  * A simple toy data generation interface
- *
+ * Code a Simple DataLoader Class 
  *
  */
 
@@ -17,14 +17,14 @@ namespace regression {
 //=============================================================================
 // Dataset
 //=============================================================================
-
+template<class T=DTYPE>
 struct Dataset 
 {
   size_t size_;
   size_t dimension_;
 
-  arma::mat inputs_;
-  arma::mat labels_;
+  arma::Mat<T> inputs_;
+  arma::Mat<T> labels_;
 
   Dataset ( );
   Dataset ( const size_t& D,
@@ -56,14 +56,16 @@ struct Dataset
   void Load ( const std::string& filename,
               const size_t& Din,
               const size_t& Dout,
-              const bool& transpose,
-              const bool& count );
+              const bool transpose = true,
+              const bool count = false );
 
   void Load ( const std::string& filename,
               const arma::uvec& ins,
               const arma::uvec& outs, 
-              const bool& transpose,
-              const bool& count );
+              const bool transpose = true,
+              const bool count = false );
+
+  arma::Row<T> GetLabels( const size_t id );
 
 };
 
@@ -72,15 +74,16 @@ struct Dataset
 namespace functional
 {
 
+template<class T=DTYPE>
 struct Dataset 
 {
   size_t size_;
   size_t dimension_;
   size_t nfuncs_;
-  arma::mat weights_;
+  arma::Mat<T> weights_;
 
-  arma::mat inputs_;
-  arma::mat labels_;
+  arma::Mat<T> inputs_;
+  arma::Mat<T> labels_;
 
   Dataset ( );
   Dataset ( const size_t& D,
@@ -93,19 +96,19 @@ struct Dataset
                   const double& noise_std );
 
   void Generate ( const std::string& type,
-                  const arma::rowvec& noise_std );
+                  const arma::Row<T>& noise_std );
 
   void Noise ( const double& noise_std );
 
-  void Noise ( const arma::rowvec& noise_std );
+  void Noise ( const arma::Row<T>& noise_std );
 
   void Save ( const std::string& filename );
 
   void Load ( const std::string& filename,
               const size_t& Din,
               const size_t& Dout, 
-              const bool& transpose,
-              const bool& count );
+              const bool& transpose = true,
+              const bool& count = false );
 
   void Normalize ( );
 
@@ -116,31 +119,31 @@ struct Dataset
 //=============================================================================
 // SineGen
 //=============================================================================
-
+template<class T=DTYPE>
 struct SineGen
 {
   size_t size_;
   size_t dimension_;
 
-  arma::rowvec a_;
-  arma::rowvec p_;
+  arma::Row<T> a_;
+  arma::Row<T> p_;
 
   SineGen ( );
   SineGen ( const size_t& M );
 
-  arma::mat Predict ( const arma::mat& inputs,
-                      const std::string& type ) const;
+  arma::Mat<T> Predict ( const arma::Mat<T>& inputs,
+                         const std::string& type  = "Phase" ) const;
 
-  arma::mat Predict ( const arma::mat& inputs,
+  arma::Mat<T> Predict ( const arma::Mat<T>& inputs,
+                         const std::string& type,
+                         const double& eps ) const;
+
+  arma::Mat<T> Mean ( const arma::Mat<T>& inputs,
+                      const std::string& type = "Phase" ) const;
+
+  arma::Mat<T> Mean ( const arma::Mat<T>& inputs,
                       const std::string& type,
                       const double& eps ) const;
-
-  arma::mat Mean ( const arma::mat& inputs,
-                   const std::string& type ) const;
-
-  arma::mat Mean ( const arma::mat& inputs,
-                   const std::string& type,
-                   const double& eps ) const;
 
   size_t GetM ( );
 
@@ -153,13 +156,14 @@ namespace classification{
 // Dataset
 //=============================================================================
 
+template<class T=DTYPE>
 struct Dataset 
 {
   size_t size_;
   size_t dimension_;
   size_t num_class_;
 
-  arma::mat inputs_;
+  arma::Mat<T> inputs_;
   arma::Row<size_t> labels_;
 
   Dataset ( );
@@ -178,8 +182,8 @@ struct Dataset
   void _dipping ( const double& r,
                   const double& noise_std );
 
-  void _2classgauss ( const arma::vec& mean1,
-                      const arma::vec& mean2,
+  void _2classgauss ( const arma::Col<T>& mean1,
+                      const arma::Col<T>& mean2,
                       const double& eps,
                       const double& delta );
 
@@ -188,8 +192,8 @@ struct Dataset
   void Save ( const std::string& filename );
 
   void Load ( const std::string& filename,
-              const bool& transpose,
-              const bool& count  );
+              const bool& transpose = true ,
+              const bool& count = false );
 
 };
 

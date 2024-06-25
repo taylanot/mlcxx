@@ -80,11 +80,11 @@ void extract_pca(const std::vector<std::string>& names)
   arma::uvec idx;
   if (names.size() == 4)
   {
-    idx = utils::select_headers(train_header,{names[0],names[2]});
+    idx = utils::data::select_headers(train_header,{names[0],names[2]});
   }
   else if (names.size() == 2)
   {
-    idx = utils::select_header(train_header,names[0]);
+    idx = utils::data::select_header(train_header,names[0]);
   }
   arma::mat yt = train_data.cols(idx); arma::inplace_trans(yt);
   arma::mat xt = train_data.col(0); arma::inplace_trans(xt);

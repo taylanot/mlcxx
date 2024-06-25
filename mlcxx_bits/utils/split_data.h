@@ -12,8 +12,6 @@
 #ifndef SPLIT_DATA_H
 #define SPLIT_DATA_H
 
-//#include <mlpack/prereqs.hpp>
-
 namespace utils {
 namespace data {
 /**

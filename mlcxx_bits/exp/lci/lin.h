@@ -18,7 +18,7 @@ void classify ( )
   utils::data::classification::Dataset dataset(2, conf::N, 2);
   dataset.Generate(conf::classtype);
 
-  src::classification::LCurve<algo::classification::LDC,
+  src::classification::LCurve<algo::classification::LDC<>,
                               mlpack::Accuracy> lcurve(conf::Ns,conf::repeat);
 
   lcurve.Generate(dataset.inputs_,dataset.labels_,1e-5);

@@ -22,51 +22,52 @@ namespace regression {
 // Kernel Ridge Regression
 ///////////////////////////////////////////////////////////////////////////////
 
-template<class T>
+template<class KERNEL, class T>
 template<class... Ts>
-KernelRidge<T>::KernelRidge ( const arma::mat& inputs,
-                              const arma::rowvec& labels,
-                              const double& lambda,
-                              const Ts&... args ) :
+KernelRidge<KERNEL,T>::KernelRidge ( const arma::Mat<T>& inputs,
+                                     const arma::Row<T>& labels,
+                                     const double& lambda,
+                                     const Ts&... args ) :
     cov_(args...), lambda_(lambda)
 {
   Train(inputs, labels);
 }
 
 
-template<class T>
-void KernelRidge<T>::Train ( const arma::mat& inputs,
-                             const arma::rowvec& labels )
+template<class KERNEL, class T>
+void KernelRidge<KERNEL,T>::Train ( const arma::Mat<T>& inputs,
+                                    const arma::Row<T>& labels )
 {
-  train_inp_ = inputs.t();
+  train_inp_ = inputs;
   
-  arma::mat k_xx = cov_.GetMatrix(train_inp_,train_inp_);
+  arma::Mat<T> k_xx = cov_.GetMatrix(train_inp_,train_inp_);
 
-  arma::mat KLambda = k_xx+
-       (lambda_ + 1.e-6) * arma::eye<arma::mat>(k_xx.n_rows, k_xx.n_rows);
+  arma::Mat<T> KLambda = k_xx+
+       (lambda_ + 1.e-6) * arma::eye<arma::Mat<T>>(k_xx.n_rows, k_xx.n_rows);
 
-  parameters_ = arma::solve(KLambda, labels.t());
+  parameters_ = 
+    arma::conv_to<arma::Row<T>>::from(arma::solve(KLambda, labels.t()));
 }
 
-template<class T>
-void KernelRidge<T>::Predict ( const arma::mat& inputs,
-                               arma::rowvec& labels ) const
+template<class KERNEL, class T>
+void KernelRidge<KERNEL,T>::Predict ( const arma::Mat<T>& inputs,
+                                            arma::Row<T>& labels ) const
 {
-  arma::mat k_xpx = cov_.GetMatrix(inputs.t(),train_inp_);
-  labels = (k_xpx * parameters_).t();
+  arma::Mat<T> k_xpx = cov_.GetMatrix(inputs,train_inp_);
+  labels = (parameters_ * k_xpx );
 }
 
-template<class T>
-double KernelRidge<T>::ComputeError ( const arma::mat& inputs,
-                                      const arma::rowvec& labels ) const
+template<class KERNEL, class T>
+T KernelRidge<KERNEL,T>::ComputeError ( const arma::Mat<T>& inputs,
+                                        const arma::Row<T>& labels ) const
 {
-  arma::rowvec temp;
+  arma::Row<T> temp;
   Predict(inputs, temp);
   const size_t n_points = inputs.n_cols;
 
   temp = labels - temp;
 
-  const double cost = arma::dot(temp, temp) / n_points;
+  const T cost = (arma::dot(temp, temp) / n_points);
 
   return cost;
 }
@@ -74,29 +75,29 @@ double KernelRidge<T>::ComputeError ( const arma::mat& inputs,
 ///////////////////////////////////////////////////////////////////////////////
 // Kernel Regression
 ///////////////////////////////////////////////////////////////////////////////
-template<class T>
+template<class KERNEL, class T>
 template<class... Ts>
-Kernel<T>::Kernel ( const arma::mat& inputs,
-                    const arma::rowvec& labels,
-                    const Ts&... args ) : cov_(args...)
+Kernel<KERNEL,T>::Kernel ( const arma::Mat<T>& inputs,
+                           const arma::Row<T>& labels,
+                           const Ts&... args ) : cov_(args...)
 {
   Train(inputs, labels);
 }
 
 
-template<class T>
-void Kernel<T>::Train ( const arma::mat& inputs,
-                        const arma::rowvec& labels )
+template<class KERNEL, class T>
+void Kernel<KERNEL,T>::Train ( const arma::Mat<T>& inputs,
+                               const arma::Row<T>& labels )
 {
-  train_inp_ = inputs.t();
+  train_inp_ = inputs;
   train_lab_ = labels;
 }
 
-template<class T>
-void Kernel<T>::Predict ( const arma::mat& inputs,
-                          arma::rowvec& labels ) const
+template<class KERNEL, class T>
+void Kernel<KERNEL,T>::Predict ( const arma::Mat<T>& inputs,
+                                       arma::Row<T>& labels ) const
 {
-  arma::mat sim = cov_.GetMatrix(train_inp_, inputs.t());
+  arma::Mat<T> sim = cov_.GetMatrix(train_inp_, inputs);
   const size_t N = sim.n_rows;
   for(size_t i=0; i<N; i++)
   {
@@ -105,17 +106,17 @@ void Kernel<T>::Predict ( const arma::mat& inputs,
   labels = train_lab_ * sim;
 }
 
-template<class T>
-double Kernel<T>::ComputeError ( const arma::mat& inputs,
-                                 const arma::rowvec& labels ) const
+template<class KERNEL, class T>
+T Kernel<KERNEL,T>::ComputeError ( const arma::Mat<T>& inputs,
+                                        const arma::Row<T>& labels ) const
 {
-  arma::rowvec temp;
+  arma::Row<T> temp;
   Predict(inputs, temp);
   const size_t n_points = inputs.n_cols;
 
   temp = labels - temp;
 
-  const double cost = arma::dot(temp, temp) / n_points;
+  const T cost = (arma::dot(temp, temp) / n_points);
 
   return cost;
 }
@@ -125,24 +126,24 @@ double Kernel<T>::ComputeError ( const arma::mat& inputs,
 ///////////////////////////////////////////////////////////////////////////////
 
 
-template<class T, class F>
+template<class KERNEL,class FUNC,class T>
 template<class... Ts>
-SemiParamKernelRidge2<T,F>::
-SemiParamKernelRidge2 ( const arma::mat& inputs,
-                           const arma::rowvec& labels,
-                           const double& lambda,
-                           const size_t& num_funcs,
-                           const Ts&... args ) :
+SemiParamKernelRidge2<KERNEL,FUNC,T>::
+SemiParamKernelRidge2 ( const arma::Mat<T>& inputs,
+                        const arma::Row<T>& labels,
+                        const double& lambda,
+                        const size_t& num_funcs,
+                        const Ts&... args ) :
     cov_(args...), lambda_(lambda), M_(num_funcs), perc_(0.), func_(num_funcs)
 {
   Train(inputs, labels);
 }
 
-template<class T, class F>
+template<class KERNEL,class FUNC,class T>
 template<class... Ts>
-SemiParamKernelRidge2<T,F>::
-SemiParamKernelRidge2 ( const arma::mat& inputs,
-                        const arma::rowvec& labels,
+SemiParamKernelRidge2<KERNEL,FUNC,T>::
+SemiParamKernelRidge2 ( const arma::Mat<T>& inputs,
+                        const arma::Row<T>& labels,
                         const double& lambda,
                         const double& perc,
                         const Ts&... args ) :
@@ -157,82 +158,84 @@ SemiParamKernelRidge2 ( const arma::mat& inputs,
   Train(inputs, labels);
 }
 
-template<class T, class F>
-void SemiParamKernelRidge2<T,F>::Train ( const arma::mat& inputs,
-                                         const arma::rowvec& labels )
+template<class KERNEL,class FUNC,class T>
+void SemiParamKernelRidge2<KERNEL,FUNC,T>::Train ( const arma::Mat<T>& inputs,
+                                                   const arma::Row<T>& labels )
 {
-  train_inp_ = inputs.t();
-  N_ = train_inp_.n_rows;
+  train_inp_ = inputs;
+  N_ = train_inp_.n_cols;
 
   psi_ = func_.Predict(inputs); 
 
   if (M_ == 0)
     M_ = func_.GetM();
 
-  arma::mat k_xx = cov_.GetMatrix(train_inp_,train_inp_);
+  arma::Mat<T> k_xx = cov_.GetMatrix(train_inp_,train_inp_);
 
-  arma::mat K = k_xx +
-       (1.e-8) * arma::eye<arma::mat>(k_xx.n_rows, k_xx.n_rows);
+  arma::Mat<T> K = k_xx +
+       (1.e-8) * arma::eye<arma::Mat<T>>(k_xx.n_rows, k_xx.n_rows);
   
-  arma::mat A = arma::join_rows(K, psi_.t()); 
-  arma::mat B = arma::join_cols(arma::join_rows(K, arma::zeros(N_,M_)),
-                                arma::zeros(M_,N_+M_)); 
+  arma::Mat<T> A = arma::join_rows(K, psi_.t()); 
+  arma::Mat<T> B = arma::join_cols(arma::join_rows(K,
+                                arma::zeros<arma::Mat<T>>(N_,M_)),
+                                arma::zeros<arma::Mat<T>>(M_,N_+M_)); 
 
-  parameters_ = arma::solve(A.t() * A + lambda_ * B.t(), A.t() * (labels.t()-
-                                                      func_.Mean(inputs).t()));
+  parameters_ = arma::conv_to<arma::Row<T>>::from(
+    arma::solve(A.t() * A + lambda_ * B.t(), A.t() * (labels.t()-
+                                                      func_.Mean(inputs).t())));
   
 }
 
-template<class T, class F>
-void SemiParamKernelRidge2<T,F>::Predict ( const arma::mat& inputs,
-                                           arma::rowvec& labels )// const
+template<class KERNEL,class FUNC,class T>
+void SemiParamKernelRidge2<KERNEL,FUNC,T>::Predict ( const arma::Mat<T>& inputs,
+                                                           arma::Row<T>& labels )
 {
-  arma::mat K = cov_.GetMatrix(inputs.t(),train_inp_);
-  arma::mat psi = func_.Predict(inputs);
-  arma::mat A = arma::join_rows(K, psi.t()); 
-  labels = (A * parameters_).t() + func_.Mean(inputs);
+  arma::Mat<T> K = cov_.GetMatrix(inputs,train_inp_);
+  arma::Mat<T> psi = func_.Predict(inputs);
+  arma::Mat<T> A = arma::join_rows(K, psi.t()); 
+  labels = (A * parameters_.t()).t() + func_.Mean(inputs);
 }
 
-template<class T, class F>
-double SemiParamKernelRidge2<T,F>::ComputeError ( const arma::mat& inputs,
-                                                  const arma::rowvec& labels )
-                                                                         //const
+template<class KERNEL,class FUNC,class T>
+T SemiParamKernelRidge2<KERNEL,FUNC,T>::ComputeError
+                                        ( const arma::Mat<T>& inputs,
+                                          const arma::Row<T>& labels )
 {
-  arma::rowvec temp;
+  arma::Row<T> temp;
   Predict(inputs, temp);
   const size_t n_points = inputs.n_cols;
 
   temp = labels - temp;
 
-  const double cost = arma::dot(temp, temp) / n_points;
+  const T cost = (arma::dot(temp, temp) / n_points);
 
   return cost;
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Semi-Parametric Kernel Ridge Regression
 ///////////////////////////////////////////////////////////////////////////////
-
-
-template<class T, class F>
+template<class KERNEL,class FUNC,class T>
 template<class... Ts>
-SemiParamKernelRidge<T,F>::SemiParamKernelRidge ( const arma::mat& inputs,
-                                                  const arma::rowvec& labels,
-                                                  const double& lambda,
-                                                  const size_t& num_funcs,
-                                                  const Ts&... args ) :
+SemiParamKernelRidge<KERNEL,FUNC,T>::SemiParamKernelRidge 
+                                                  ( const arma::Mat<T>& inputs,
+                                                    const arma::Row<T>& labels,
+                                                    const double& lambda,
+                                                    const size_t& num_funcs,
+                                                    const Ts&... args ) :
     cov_(args...), lambda_(lambda), M_(num_funcs), perc_(0.), func_(num_funcs)
 {
   Train(inputs, labels);
 }
 
-template<class T, class F>
+template<class KERNEL,class FUNC,class T>
 template<class... Ts>
-SemiParamKernelRidge<T,F>::SemiParamKernelRidge ( const arma::mat& inputs,
-                                                  const arma::rowvec& labels,
-                                                  const double& lambda,
-                                                  const double& perc,
-                                                  const Ts&... args ) :
-
+SemiParamKernelRidge<KERNEL,FUNC,T>::SemiParamKernelRidge
+                                                  ( const arma::Mat<T>& inputs,
+                                                    const arma::Row<T>& labels,
+                                                    const double& lambda,
+                                                    const double& perc,
+                                                    const Ts&... args ) :
     cov_(args...), lambda_(lambda), M_(0), perc_(perc), func_(perc)
 {
   //BOOST_ASSERT_MSG( (perc_<=1. && perc_>0.), "CHECK given Percentage");
@@ -244,54 +247,55 @@ SemiParamKernelRidge<T,F>::SemiParamKernelRidge ( const arma::mat& inputs,
   Train(inputs, labels);
 }
 
-template<class T, class F>
-void SemiParamKernelRidge<T,F>::Train ( const arma::mat& inputs,
-                                        const arma::rowvec& labels )
+template<class KERNEL,class FUNC,class T>
+void SemiParamKernelRidge<KERNEL,FUNC,T>::Train ( const arma::Mat<T>& inputs,
+                                                  const arma::Row<T>& labels )
 {
-  train_inp_ = inputs.t();
-  N_ = train_inp_.n_rows;
+  train_inp_ = inputs;
+  N_ = train_inp_.n_cols;
 
   psi_ = func_.Predict(inputs); 
 
   if (M_ == 0)
     M_ = func_.GetM();
 
-  arma::mat k_xx = cov_.GetMatrix(train_inp_,train_inp_);
+  arma::Mat<T> k_xx = cov_.GetMatrix(train_inp_,train_inp_);
 
-  arma::mat K = k_xx +
-       (1.e-8) * arma::eye<arma::mat>(k_xx.n_rows, k_xx.n_rows);
+  arma::Mat<T> K = k_xx +
+       (1.e-8) * arma::eye<arma::Mat<T>>(k_xx.n_rows, k_xx.n_rows);
   
-  arma::mat A = arma::join_rows(K, psi_.t()); 
-  arma::mat B = arma::join_cols(arma::join_rows(K, arma::zeros(N_,M_)),
-                                arma::zeros(M_,N_+M_)); 
+  arma::Mat<T> A = arma::join_rows(K, psi_.t()); 
+  arma::Mat<T> B = arma::join_cols(arma::join_rows(K,
+                                          arma::zeros<arma::Mat<T>>(N_,M_)),
+                                          arma::zeros<arma::Mat<T>>(M_,N_+M_)); 
 
-
-  parameters_ = arma::solve(A.t() * A + lambda_ * B.t(), A.t() * labels.t());
+  parameters_ = arma::conv_to<arma::Row<T>>::from(
+    arma::solve(A.t() * A + lambda_ * B.t(), A.t() * labels.t()));
   
 }
 
-template<class T, class F>
-void SemiParamKernelRidge<T,F>::Predict ( const arma::mat& inputs,
-                                           arma::rowvec& labels )// const
+template<class KERNEL,class FUNC,class T>
+void SemiParamKernelRidge<KERNEL,FUNC,T>::Predict ( const arma::Mat<T>& inputs,
+                                                          arma::Row<T>& labels )
 {
-  arma::mat K = cov_.GetMatrix(inputs.t(),train_inp_);
-  arma::mat psi = func_.Predict(inputs);
-  arma::mat A = arma::join_rows(K, psi.t()); 
-  labels = (A * parameters_).t();
+  arma::Mat<T> K = cov_.GetMatrix(inputs,train_inp_);
+  arma::Mat<T> psi = func_.Predict(inputs);
+  arma::Mat<T> A = arma::join_rows(K, psi.t()); 
+  labels = (A * parameters_.t()).t();
 }
 
-template<class T, class F>
-double SemiParamKernelRidge<T,F>::ComputeError ( const arma::mat& inputs,
-                                                 const arma::rowvec& labels )
-                                                                         //const
+template<class KERNEL,class FUNC,class T>
+T SemiParamKernelRidge<KERNEL,FUNC,T>::ComputeError
+                                                ( const arma::Mat<T>& inputs,
+                                                  const arma::Row<T>& labels )
 {
-  arma::rowvec temp;
+  arma::Row<T> temp;
   Predict(inputs, temp);
   const size_t n_points = inputs.n_cols;
 
   temp = labels - temp;
 
-  const double cost = arma::dot(temp, temp) / n_points;
+  const T cost = (arma::dot(temp, temp) / n_points);
 
   return cost;
 }

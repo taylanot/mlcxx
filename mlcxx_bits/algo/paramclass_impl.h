@@ -16,32 +16,36 @@ namespace classification {
 // Linear Discriminant Classifier 
 //=============================================================================
 
-LDC::LDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels ) : lambda_(0.)
+template<class T>
+LDC<T>::LDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels ) : lambda_(0.)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-LDC::LDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& lambda,
-           const arma::rowvec& priors ) : lambda_(lambda), priors_(priors)
+template<class T>
+LDC<T>::LDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& lambda,
+              const arma::Row<T>& priors ) : lambda_(lambda), priors_(priors)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-LDC::LDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& lambda ) : lambda_(lambda)
+template<class T>
+LDC<T>::LDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& lambda ) : lambda_(lambda)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-void LDC::Train ( const arma::mat& inputs,
-                  const arma::Row<size_t>& labels )
+template<class T>
+void LDC<T>::Train ( const arma::Mat<T>& inputs,
+                     const arma::Row<size_t>& labels )
 {
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
@@ -53,7 +57,7 @@ void LDC::Train ( const arma::mat& inputs,
   arma::Row<size_t>::iterator it = unique_.begin();
   arma::Row<size_t>::iterator end = unique_.end();
 
-  arma::mat inx;
+  arma::Mat<T> inx;
 
   for(; it!=end; it++)
   {
@@ -61,10 +65,10 @@ void LDC::Train ( const arma::mat& inputs,
 
     inx = std::get<0>(extract);
     
-    means_[*it] = arma::conv_to<arma::rowvec>::from(arma::mean(inx,1));
+    means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
     if ( inx.n_cols == 1 )
     {
-      covs_[*it] = arma::eye(dim_,dim_);
+      covs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
     }
     else
     {
@@ -76,20 +80,20 @@ void LDC::Train ( const arma::mat& inputs,
   cov_ = cov_.i() / num_class_;
 }
 
-void LDC::Classify ( const arma::mat& inputs,
-                     arma::Row<size_t>& labels ) const
+template<class T>
+void LDC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels ) const
 {
   const size_t N = inputs.n_cols;
   labels.resize(N);
-  arma::rowvec temp_labels;
 
   if ( num_class_ == 1 )
     labels.fill(unique_(0));
   else
   {
-    std::map<size_t, arma::rowvec> scores;
+    std::map<size_t, arma::Row<T>> scores;
 
-    arma::rowvec class_scores;
+    arma::Row<T> class_scores;
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
       class_scores.resize(num_class_);
@@ -105,18 +109,19 @@ void LDC::Classify ( const arma::mat& inputs,
   }
 }
 
-double LDC::ComputeError ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const
+template<class T>
+T LDC<T>::ComputeError ( const arma::Mat<T>& points, 
+                         const arma::Row<size_t>& responses ) const
 {
   arma::Row<size_t> predictions;
   Classify(points,predictions);
   arma::Row<size_t> temp =  predictions - responses; 
-  double total = responses.n_cols;
-  return (arma::accu(temp != 0))/total;
+  return (arma::accu(temp != 0))/T(predictions.n_elem);
 }
 
-double LDC::ComputeAccuracy ( const arma::mat& points, 
-                              const arma::Row<size_t>& responses ) const
+template<class T>
+T LDC<T>::ComputeAccuracy ( const arma::Mat<T>& points, 
+                            const arma::Row<size_t>& responses ) const
 {
   return (1. - ComputeError(points, responses))*100;
 }
@@ -125,32 +130,36 @@ double LDC::ComputeAccuracy ( const arma::mat& points,
 // Quadratic Discriminant Classifier 
 //=============================================================================
 
-QDC::QDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels ) : lambda_(0.)
+template<class T>
+QDC<T>::QDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels ) : lambda_(0.)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-QDC::QDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& lambda,
-           const arma::rowvec& priors ) : lambda_(lambda), priors_(priors)
+template<class T>
+QDC<T>::QDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& lambda,
+              const arma::Row<T>& priors ) : lambda_(lambda), priors_(priors)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-QDC::QDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& lambda ) : lambda_(lambda)
+template<class T>
+QDC<T>::QDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& lambda ) : lambda_(lambda)
 {
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
-void QDC::Train ( const arma::mat& inputs,
-                  const arma::Row<size_t>& labels )
+template<class T>
+void QDC<T>::Train ( const arma::Mat<T>& inputs,
+                     const arma::Row<size_t>& labels )
 {
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
@@ -160,18 +169,18 @@ void QDC::Train ( const arma::mat& inputs,
   arma::Row<size_t>::iterator it = unique_.begin();
   arma::Row<size_t>::iterator end = unique_.end();
 
-  arma::mat inx;
+  arma::Mat<T> inx;
 
   for(; it!=end; it++)
   {
     auto extract = utils::extract_class(inputs, labels, *it);
 
     inx = std::get<0>(extract);
-    means_[*it] = arma::conv_to<arma::rowvec>::from(arma::mean(inx,1));
+    means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
     if ( inx.n_cols == 1 )
     {
-      covs_[*it] = arma::eye(dim_,dim_);
-      icovs_[*it] = arma::eye(dim_,dim_);
+      covs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
+      icovs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
     }
     else
     {
@@ -183,21 +192,22 @@ void QDC::Train ( const arma::mat& inputs,
   }
 }
 
-void QDC::Classify ( const arma::mat& inputs,
-                     arma::Row<size_t>& labels ) const
+template<class T>
+void QDC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels ) const
 {
   const size_t N = inputs.n_cols;
   labels.resize(N);
-  arma::rowvec temp_labels;
+  arma::Row<T> temp_labels;
 
   if ( num_class_ == 1 )
     labels.fill(unique_(0));
   else
   {
-    std::map<size_t, arma::rowvec> scores;
+    std::map<size_t, arma::Row<T>> scores;
 
-    arma::rowvec class_scores;
-    arma::rowvec norm;
+    arma::Row<T> class_scores;
+    arma::Row<T> norm;
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
       class_scores.resize(num_class_);
@@ -214,18 +224,19 @@ void QDC::Classify ( const arma::mat& inputs,
   }
 }
 
-double QDC::ComputeError ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const
+template<class T>
+T QDC<T>::ComputeError ( const arma::Mat<T>& points, 
+                         const arma::Row<size_t>& responses ) const
 {
   arma::Row<size_t> predictions;
   Classify(points,predictions);
   arma::Row<size_t> temp =  predictions - responses; 
-  double total = responses.n_cols;
-  return (arma::accu(temp != 0))/total;
+  return (arma::accu(temp != 0))/T(predictions.n_elem);
 }
 
-double QDC::ComputeAccuracy ( const arma::mat& points, 
-                              const arma::Row<size_t>& responses ) const
+template<class T>
+T QDC<T>::ComputeAccuracy ( const arma::Mat<T>& points, 
+                            const arma::Row<size_t>& responses ) const
 {
   return (1. - ComputeError(points, responses))*100;
 }
@@ -234,21 +245,24 @@ double QDC::ComputeAccuracy ( const arma::mat& points,
 // Fisher's Linear Discriminant 
 //=============================================================================
 
-FDC::FDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels ) : lambda_(1.e-5)
+template<class T>
+FDC<T>::FDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels ) : lambda_(1.e-5)
 {
   Train(inputs, labels);
 }
 
-FDC::FDC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& lambda ) : lambda_(lambda)
+template<class T>
+FDC<T>::FDC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& lambda ) : lambda_(lambda)
 {
   Train(inputs, labels);
 }
 
-void FDC::Train ( const arma::mat& inputs,
-                  const arma::Row<size_t>& labels )
+template<class T>
+void FDC<T>::Train ( const arma::Mat<T>& inputs,
+                     const arma::Row<size_t>& labels )
 {
   dim_ = inputs.n_rows;
   unique_ = arma::unique(labels);
@@ -256,8 +270,8 @@ void FDC::Train ( const arma::mat& inputs,
   BOOST_ASSERT_MSG( num_class_ <= 2,
                      "Only up to2 class classification is supported for now!");
 
-  arma::mat C0, C1, inputs0, inputs1;
-  arma::vec m0, m1;
+  arma::Mat<T> C0, C1, inputs0, inputs1;
+  arma::Col<T> m0, m1;
   arma::uvec id0, id1;
   
   if ( num_class_ == 2 )
@@ -265,6 +279,7 @@ void FDC::Train ( const arma::mat& inputs,
     // extract class information from data
     auto extract0 = utils::extract_class(inputs, labels, unique_(0));
     auto extract1 = utils::extract_class(inputs, labels, unique_(1));
+
     inputs0 = std::get<0>(extract0); id0 = std::get<1>(extract0);
     inputs1 = std::get<0>(extract1); id1 = std::get<1>(extract1);
 
@@ -275,19 +290,20 @@ void FDC::Train ( const arma::mat& inputs,
     // within scatter
     C0 = inputs0*inputs0.t(); C1 = inputs1*inputs1.t();
     // total scatter
-    arma::mat C = C0 + C1 + arma::eye(arma::size(C0)) * lambda_;
+    arma::Mat<T> C = C0 + C1 + arma::eye<arma::Mat<T>>(arma::size(C0)) * lambda_;
     parameters_ = arma::solve(C, m1-m0);
     bias_ = arma::dot((m1+m0),parameters_)*0.5 -
                                                std::log(id1.n_rows/id0.n_rows);
   }
 }
 
-void FDC::Classify ( const arma::mat& inputs,
-                         arma::Row<size_t>& labels ) const
+template<class T>
+void FDC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels ) const
 {
   const size_t N = inputs.n_cols;
   labels.resize(N);
-  arma::rowvec temp_labels;
+  arma::Row<T> temp_labels;
   if ( num_class_ == 1 )
     labels.fill(unique_(0));
   else
@@ -304,18 +320,19 @@ void FDC::Classify ( const arma::mat& inputs,
   }
 }
 
-double FDC::ComputeError ( const arma::mat& points, 
-                               const arma::Row<size_t>& responses ) const
+template<class T>
+T FDC<T>::ComputeError ( const arma::Mat<T>& points, 
+                         const arma::Row<size_t>& responses ) const
 {
   arma::Row<size_t> predictions;
   Classify(points,predictions);
   arma::Row<size_t> temp =  predictions - responses; 
-  double total = responses.n_cols;
-  return (arma::accu(temp != 0))/total;
+  return (arma::accu(temp != 0))/T(predictions.n_elem);
 }
 
-double FDC::ComputeAccuracy ( const arma::mat& points, 
-                                  const arma::Row<size_t>& responses ) const
+template<class T>
+T FDC<T>::ComputeAccuracy ( const arma::Mat<T>& points, 
+                            const arma::Row<size_t>& responses ) const
 {
   return (1. - ComputeError(points, responses))*100;
 }
@@ -323,22 +340,24 @@ double FDC::ComputeAccuracy ( const arma::mat& points,
 //=============================================================================
 // Nearest Mean Classifier 
 //=============================================================================
-
-NMC::NMC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels,
-           const double& shrink ) : shrink_(shrink)
+template<class T>
+NMC<T>::NMC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels,
+              const double& shrink ) : shrink_(shrink)
 {
   Train(inputs, labels);
 }
 
-NMC::NMC ( const arma::mat& inputs,
-           const arma::Row<size_t>& labels ) : shrink_(0.)
+template<class T>
+NMC<T>::NMC ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels ) : shrink_(0.)
 {
   Train(inputs, labels);
 }
 
-void NMC::Train ( const arma::mat& inputs,
-                  const arma::Row<size_t>& labels )
+template<class T>
+void NMC<T>::Train ( const arma::Mat<T>& inputs,
+                     const arma::Row<size_t>& labels )
 {
 
   dim_ = inputs.n_rows;
@@ -368,26 +387,26 @@ void NMC::Train ( const arma::mat& inputs,
   // Just for the shrinkage part 
   if (shrink_ > 0 && num_class_ != 1) 
   {
-    arma::mat nk = arma::ones(num_class_,1);
-    arma::mat m = arma::sqrt(1./nk)-1/size_;
+    arma::Mat<T> nk = arma::ones<arma::Mat<T>>(num_class_,1);
+    arma::Mat<T> m = arma::sqrt(1./nk)-1/size_;
     arma::uvec labs = arma::conv_to<arma::uvec>::from(labels);
-    arma::mat variance = arma::sum(
-                              arma::pow(inputs - parameters_.cols(labs),2),1);
-    arma::mat s = arma::sqrt(variance/(size_-num_class_)).t();
-    arma::mat ms = m*s;
+    arma::Mat<T> variance = arma::sum(arma::pow(inputs - parameters_.cols(labs),2),1);
+    arma::Mat<T> s = arma::sqrt(variance/(size_-num_class_)).t();
+    arma::Mat<T> ms = m*s;
     arma::inplace_trans(ms);
-    arma::mat devi = (parameters_.each_col() - centroid_) / ms;
-    arma::mat signs = arma::sign(devi);
-    arma::mat dev = arma::abs(devi) - shrink_;
+    arma::Mat<T> devi = (parameters_.each_col() - centroid_) / ms;
+    arma::Mat<T> signs = arma::sign(devi);
+    arma::Mat<T> dev = arma::abs(devi) - shrink_;
     dev = arma::clamp(dev, 0, arma::datum::inf);
     dev  %= signs; 
-    arma::mat msd = dev % ms;
+    arma::Mat<T> msd = dev % ms;
     parameters_ = centroid_ + msd.each_col();
   }
 }
 
-void NMC::Classify ( const arma::mat& inputs,
-                     arma::Row<size_t>& labels ) const
+template<class T>
+void NMC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels ) const
 {
 
   const size_t N =  inputs.n_cols;
@@ -396,7 +415,7 @@ void NMC::Classify ( const arma::mat& inputs,
     labels.fill(unique_(0));
   else
   {
-    arma::mat distances(num_class_, N);
+    arma::Mat<T> distances(num_class_, N);
     arma::urowvec index(N);
     for ( size_t j=0; j<N; j++ )
     {
@@ -412,19 +431,20 @@ void NMC::Classify ( const arma::mat& inputs,
  
 }
 
-double NMC::ComputeError ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const
+template<class T>
+T NMC<T>::ComputeError ( const arma::Mat<T>& points, 
+                         const arma::Row<size_t>& responses ) const
 {
   arma::Row<size_t> predictions;
   
   Classify(points,predictions);
   arma::Row<size_t> temp =  predictions - responses; 
-  double total = responses.n_cols;
-  return (arma::accu(temp != 0))/total;
+  return (arma::accu(temp != 0))/T(predictions.n_elem);
 }
 
-double NMC::ComputeAccuracy ( const arma::mat& points, 
-                              const arma::Row<size_t>& responses ) const
+template<class T>
+T NMC<T>::ComputeAccuracy ( const arma::Mat<T>& points, 
+                            const arma::Row<size_t>& responses ) const
 {
   return (1. - ComputeError(points, responses))*100;
 }

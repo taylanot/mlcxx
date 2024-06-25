@@ -22,11 +22,11 @@ void lc_class ( )
 {
   std::filesystem::path save_dir, filename, model_name, ids; 
 
-  if ( typeid(MODEL) == typeid(algo::classification::NMC) )
+  if ( typeid(MODEL) == typeid(algo::classification::NMC<>) )
     model_name = "nmc";
-  else if ( typeid(MODEL) == typeid(algo::classification::QDC) )
+  else if ( typeid(MODEL) == typeid(algo::classification::QDC<>) )
     model_name = "qdc";
-  else if ( typeid(MODEL) == typeid(algo::classification::LDC) )
+  else if ( typeid(MODEL) == typeid(algo::classification::LDC<>) )
     model_name = "ldc";
   else if ( typeid(MODEL) == typeid(algo::classification::NNC) )
     model_name = "nnc";
@@ -112,7 +112,7 @@ void gen_ldc ( )
 {
   PRINT("***Generating Learning Curves for LDC...")
 
-  lc_class<algo::classification::LDC>();
+  lc_class<algo::classification::LDC<>>();
 
   PRINT("***Generating Learning Curves for LDC...[DONE]")
 }
@@ -121,7 +121,7 @@ void gen_qdc ( )
 {
   PRINT("***Generating Learning Curves for QDC...")
 
-  lc_class<algo::classification::QDC>();
+  lc_class<algo::classification::QDC<>>();
 
   PRINT("***Generating Learning Curves for QDC...[DONE]")
 }
@@ -139,7 +139,7 @@ void gen_nmc ( )
 {
   PRINT("***Generating Learning Curves for NMC...")
 
-  lc_class<algo::classification::NMC>();
+  lc_class<algo::classification::NMC<>>();
 
   PRINT("***Generating Learning Curves for NMC...[DONE]")
 }

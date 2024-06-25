@@ -11,7 +11,8 @@
 
 namespace algo { 
 namespace approx {
-  
+
+template<class T=DTYPE>  
 class Taylor
 {
   public:
@@ -32,20 +33,20 @@ class Taylor
    * @param around : x0
    */
   template<class FUNC>
-  Taylor ( FUNC& f, const arma::mat& x0 ) {Train(f,x0);};
+  Taylor ( FUNC& f, const arma::Mat<T>& x0 ) {Train(f,x0);};
 
   /**
    * @param around : x0
    */
   template<class FUNC>
-  void Train (  FUNC& f, const arma::mat& x0 );
+  void Train (  FUNC& f, const arma::Mat<T>& x0 );
 
   /**
    * @param inputs  : X*
    * @param labels : y*
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels ) const;
+  void Predict ( const arma::Mat<T>& inputs,
+                 arma::Row<T>& labels ) const;
 
   /**
    * Calculate the Error Rate
@@ -53,8 +54,8 @@ class Taylor
    * @param inputs  : X*
    * @param labels  : y* 
    */
-  double ComputeError ( const arma::mat& x , 
-                        const arma::rowvec& y ) const;
+  T ComputeError ( const arma::Mat<T>& x , 
+                   const arma::Row<T>& y ) const;
   /**
    * Calculate the Accuracy
    *
@@ -62,7 +63,7 @@ class Taylor
    * @param labels  : y*
    * 
    */
-  arma::mat& Parameters() { return param_; }
+  arma::Mat<T>& Parameters() { return param_; }
 
 
   /**
@@ -83,8 +84,8 @@ class Taylor
   double h_;
   std::string type_;
 
-  arma::rowvec param_;
-  arma::mat x0_;
+  arma::Row<T> param_;
+  arma::Mat<T> x0_;
   
   
 }; 

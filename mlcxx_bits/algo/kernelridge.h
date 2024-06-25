@@ -18,7 +18,7 @@ namespace regression {
 // Kernel Ridge Regression
 ///////////////////////////////////////////////////////////////////////////////
 
-template<class T>
+template<class KERNEL, class T=DTYPE>
 class KernelRidge 
 {
   public:
@@ -30,29 +30,29 @@ class KernelRidge
    * @param args for the kernel
    */
   template<typename... Ts>
-  KernelRidge<T> ( const arma::mat& inputs,
-                   const arma::rowvec& labels,
-                   const double& lambda,
-                   const Ts&... args );
+  KernelRidge ( const arma::Mat<T>& inputs,
+                const arma::Row<T>& labels,
+                const double& lambda,
+                const Ts&... args );
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  KernelRidge<T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { }
+  KernelRidge ( const Ts&... args ) : cov_(args...), lambda_(0.0) { }
 
   /**
    * @param inputs X
    * @param labels y
    */
-  void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<T>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels ) const;
+  void Predict ( const arma::Mat<T>& inputs,
+                       arma::Row<T>& labels ) const;
 
   /**
    * Calculate the L2 squared error
@@ -60,12 +60,12 @@ class KernelRidge
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points,
-                        const arma::rowvec& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points,
+                        const arma::Row<T>& responses ) const;
 
-  const arma::vec& Parameters ( ) const { return parameters_; }
+  const arma::Row<T>& Parameters ( ) const { return parameters_; }
 
-  arma::vec& Parameters ( ) { return parameters_; }
+  arma::Row<T>& Parameters ( ) { return parameters_; }
 
   double Lambda ( ) const { return lambda_; }
 
@@ -84,20 +84,19 @@ class KernelRidge
   }
 
   private:
-  arma::mat cov_train_;   // for check 
-  arma::mat cov_predict_; // for check
+  arma::Mat<T> cov_train_;   // for check 
+  arma::Mat<T> cov_predict_; // for check
 
-  arma::mat train_inp_;   // for later usage
-  arma::vec parameters_;
-  utils::covmat<T> cov_;
-  double  lambda_;
+  arma::Mat<T> train_inp_;   // for later usage
+  arma::Row<T> parameters_;
+  utils::covmat<KERNEL> cov_;
+  double lambda_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Kernel Regression
 ///////////////////////////////////////////////////////////////////////////////
-
-template<class T>
+template<class KERNEL, class T=DTYPE>
 class Kernel
 {
   public:
@@ -108,30 +107,30 @@ class Kernel
    * @param args for the kernel
    */
   template<typename... Ts>
-  Kernel<T> ( const arma::mat& inputs,
-              const arma::rowvec& labels,
-              const Ts&... args );
+  Kernel ( const arma::Mat<T>& inputs,
+           const arma::Row<T>& labels,
+           const Ts&... args );
 
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  Kernel<T> ( const Ts&... args ) : cov_(args...){ }
+  Kernel ( const Ts&... args ) : cov_(args...){ }
 
   /**
    * @param inputs X
    * @param labels y
    * @param args for the kernel
    */
-  void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<T>& labels );
 
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels ) const;
+  void Predict ( const arma::Mat<T>& inputs,
+                       arma::Row<T>& labels ) const;
 
   /**
    * Calculate the L2 squared error
@@ -139,13 +138,8 @@ class Kernel
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points,
-                        const arma::rowvec& responses) const;
-
-  const arma::mat& Parameters ( ) const { return parameters_; }
-
-  arma::mat& Parameters ( ) { return parameters_; }
-
+  T ComputeError ( const arma::Mat<T>& points,
+                        const arma::Row<T>& responses) const;
 
   /**
    * Serialize the model.
@@ -153,23 +147,21 @@ class Kernel
   template<typename Archive>
   void serialize ( Archive& ar, const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
     ar & BOOST_SERIALIZATION_NVP(train_inp_);
     ar & BOOST_SERIALIZATION_NVP(train_lab_);
   }
 
   private:
-  arma::mat train_inp_;
-  arma::rowvec train_lab_;
-  arma::vec parameters_;
-  utils::covmat<T> cov_;
+  arma::Mat<T> train_inp_;
+  arma::Row<T> train_lab_;
+  utils::covmat<KERNEL> cov_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Semi-Parametric Kernel Regression with Mean addition
 ///////////////////////////////////////////////////////////////////////////////
 
-template<class T, class F>
+template<class KERNEL, class FUNC, class T=DTYPE>
 class SemiParamKernelRidge2
 {
   public:
@@ -182,51 +174,51 @@ class SemiParamKernelRidge2
    * @param args      : for the kernel hyper-parameters
    */
   template<class... Ts>
-  SemiParamKernelRidge2<T,F> ( const arma::mat& inputs,
-                               const arma::rowvec& labels,
-                               const double& lambda ,
-                               const size_t& num_funcs,
-                               const Ts&... args );
+  SemiParamKernelRidge2 ( const arma::Mat<T>& inputs,
+                          const arma::Row<T>& labels,
+                          const double& lambda ,
+                          const size_t& num_funcs,
+                          const Ts&... args );
   template<class... Ts>
-  SemiParamKernelRidge2<T,F> ( const arma::mat& inputs,
-                               const arma::rowvec& labels,
-                               const double& lambda ,
-                               const double& perc,
-                               const Ts&... args );
+  SemiParamKernelRidge2 ( const arma::Mat<T>& inputs,
+                          const arma::Row<T>& labels,
+                          const double& lambda ,
+                          const double& perc,
+                          const Ts&... args );
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  SemiParamKernelRidge2<T,F> ( const Ts&... args ) : cov_(args...),
-                                                     lambda_(0.0),
-                                                     M_(size_t(0)),
-                                                     perc_(double(0)),
-                                                     func_(size_t(0))  { }
+  SemiParamKernelRidge2 ( const Ts&... args ) : cov_(args...),
+                                                lambda_(0.0),
+                                                M_(size_t(0)),
+                                                perc_(double(0)),
+                                                func_(size_t(0))  { }
 
   /**
    * @param inputs X
    * @param labels y
    */
-  void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<T>& labels );
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels );// const;
+  void Predict ( const arma::Mat<T>& inputs,
+                       arma::Row<T>& labels );// const;
   /**
    * Calculate the L2 squared error 
    *
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points,
-                        const arma::rowvec& responses ); //const;
+  T ComputeError ( const arma::Mat<T>& points,
+                        const arma::Row<T>& responses ); //const;
 
-  const arma::vec& Parameters() const { return parameters_; }
+  const arma::Row<T>& Parameters() const { return parameters_; }
 
-  arma::vec& Parameters() { return parameters_; }
+  arma::Row<T>& Parameters() { return parameters_; }
 
   double Lambda() const { return lambda_; }
 
@@ -248,25 +240,25 @@ class SemiParamKernelRidge2
   }
 
   private:
-  arma::mat cov_train_;   // for check 
-  arma::mat cov_predict_; // for check
+  arma::Mat<T> cov_train_;   // for check 
+  arma::Mat<T> cov_predict_; // for check
 
-  arma::mat train_inp_;   // for later usage
-  arma::vec parameters_;
-  arma::mat psi_;
-  utils::covmat<T> cov_;
+  arma::Mat<T> train_inp_;   // for later usage
+  arma::Row<T> parameters_;
+  arma::Mat<T> psi_;
+  utils::covmat<KERNEL> cov_;
   double  lambda_;
   size_t M_;
   double perc_;
   size_t N_;
-  F func_;
+  FUNC func_;
 
 };
+
 ///////////////////////////////////////////////////////////////////////////////
 // Semi-Parametric Kernel Regression
 ///////////////////////////////////////////////////////////////////////////////
-
-template<class T, class F>
+template<class KERNEL, class FUNC, class T=DTYPE>
 class SemiParamKernelRidge 
 {
   public:
@@ -279,65 +271,51 @@ class SemiParamKernelRidge
    * @param args      : for the kernel hyper-parameters
    */
   template<class... Ts>
-  SemiParamKernelRidge<T,F> ( const arma::mat& inputs,
-                              const arma::rowvec& labels,
-                              const double& lambda ,
-                              const size_t& num_funcs,
-                              const Ts&... args );
+  SemiParamKernelRidge ( const arma::Mat<T>& inputs,
+                         const arma::Row<T>& labels,
+                         const double& lambda ,
+                         const size_t& num_funcs,
+                         const Ts&... args );
   template<class... Ts>
-  SemiParamKernelRidge<T,F> ( const arma::mat& inputs,
-                              const arma::rowvec& labels,
-                              const double& lambda ,
-                              const double& perc,
-                              const Ts&... args );
+  SemiParamKernelRidge ( const arma::Mat<T>& inputs,
+                         const arma::Row<T>& labels,
+                         const double& lambda ,
+                         const double& perc,
+                         const Ts&... args );
   /**
    * Non-working model 
    */
   template<typename... Ts>
-  SemiParamKernelRidge<T,F> ( const Ts&... args ) : cov_(args...),
-                                                    lambda_(0.0),
-                                                    M_(size_t(0)),
-                                                    perc_(double(0)),
-                                                    func_(size_t(0))  { }
+  SemiParamKernelRidge ( const Ts&... args ) : cov_(args...),
+                                               lambda_(0.0),
+                                               M_(size_t(0)),
+                                               perc_(double(0)),
+                                               func_(size_t(0))  { }
 
   /**
    * @param inputs X
    * @param labels y
    */
-  void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<T>& labels );
   /**
    * @param inputs X*
    * @param labels y*
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels );// const;
-  /**
-   * @param inputs X
-   * @param labels y
-   */
-  void _Train ( const arma::mat& inputs,
-                const arma::rowvec& labels );
-  /**
-   * @param inputs X*
-   * @param labels y*
-   */
-  void _Predict ( const arma::mat& inputs,
-                  arma::rowvec& labels );//const;
-
-
+  void Predict ( const arma::Mat<T>& inputs,
+                       arma::Row<T>& labels );// const;
   /**
    * Calculate the L2 squared error 
    *
    * @param inputs 
    * @param labels 
    */
-  double ComputeError ( const arma::mat& points,
-                        const arma::rowvec& responses ); //const;
+  T ComputeError ( const arma::Mat<T>& points,
+                        const arma::Row<T>& responses ); //const;
 
-  const arma::vec& Parameters() const { return parameters_; }
+  const arma::Row<T>& Parameters() const { return parameters_; }
 
-  arma::vec& Parameters() { return parameters_; }
+  arma::Row<T>& Parameters() { return parameters_; }
 
   double Lambda() const { return lambda_; }
 
@@ -359,18 +337,18 @@ class SemiParamKernelRidge
   }
 
   private:
-  arma::mat cov_train_;   // for check 
-  arma::mat cov_predict_; // for check
+  arma::Mat<T> cov_train_;   // for check 
+  arma::Mat<T> cov_predict_; // for check
 
-  arma::mat train_inp_;   // for later usage
-  arma::vec parameters_;
-  arma::mat psi_;
-  utils::covmat<T> cov_;
+  arma::Mat<T> train_inp_;   // for later usage
+  arma::Row<T> parameters_;
+  arma::Mat<T> psi_;
+  utils::covmat<KERNEL> cov_;
   double  lambda_;
   size_t M_;
   double perc_;
   size_t N_;
-  F func_;
+  FUNC func_;
 
 };
 } // namespace regression

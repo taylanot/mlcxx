@@ -17,7 +17,7 @@ namespace regression {
 // Gaussian Process Regression
 //=============================================================================
 
-template<class T>
+template<class K,class T=DTYPE>
 class GaussianProcess
 {
   public:
@@ -26,7 +26,7 @@ class GaussianProcess
    * @param args  : kernel parameters
    */
   template<typename... Ts>
-  GaussianProcess<T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
+  GaussianProcess<K,T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
 
   /**
    * @param X     : inputs 
@@ -34,38 +34,31 @@ class GaussianProcess
    * @param args  : kernel parameters 
    */
   template<typename... Ts>
-  GaussianProcess<T> ( const arma::mat& inputs,
-                       const arma::rowvec& labels,
-                       const double& lambda,
-                       const Ts&... args );
+  GaussianProcess<K,T> ( const arma::Mat<T>& inputs,
+                         const arma::Row<T>& labels,
+                         const double& lambda,
+                         const Ts&... args );
   
   /**
    * @param X     : inputs 
    * @param y     : labels 
    */
-  void Train ( const arma::mat& inputs,
-               const arma::rowvec& labels );
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<T>& labels );
 
   /**
    * @param X*     : inputs*
    * @param y*     : labels* 
    */
-  void Predict ( const arma::mat& inputs,
-                 arma::rowvec& labels ) const;
+  void Predict ( const arma::Mat<T>& inputs,
+                       arma::Row<T>& labels ) const;
 
   /**
    * @param X*     : inputs*
    * @param y*     : labels* 
    */
-  void PredictVariance ( const arma::mat& inputs,
-                         arma::rowvec& labels ) const;
-
-  /**
-   * @param X*     : inputs*
-   * @param y*     : labels* 
-   */
-  void PredictVariance ( const arma::mat& inputs,
-                         arma::mat& labels ) const;
+  void PredictVariance ( const arma::Mat<T>& inputs,
+                               arma::Mat<T>& labels );
 
   /**
    * Calculate the L2 squared error on the given predictors and responses using
@@ -74,16 +67,16 @@ class GaussianProcess
    * @param X*     : points*
    * @param y*     : responses* 
    */
-  double ComputeError ( const arma::mat& inputs,
-                        const arma::rowvec& labels ) const;
+  T ComputeError ( const arma::Mat<T>& inputs,
+                   const arma::Row<T>& labels ) const;
   /**
    * Calculate the Log Likelihood of the model given data
    *
    * @param X*     : points*
    * @param y*     : responses* 
    */
-  double LogLikelihood ( const arma::mat& inputs,
-                         const arma::rowvec& labels ) const;
+  T LogLikelihood ( const arma::Mat<T>& inputs,
+                    const arma::Row<T>& labels ) const;
   /**
    * Sample functions from the prior 
    *
@@ -91,8 +84,8 @@ class GaussianProcess
    * @param y      : labels
    */
   void  SamplePrior ( const size_t& k,
-                      const arma::mat& inputs,
-                      arma::mat& labels ) const;
+                      const arma::Mat<T>& inputs,
+                            arma::Mat<T>& labels ) const;
 
   /**
    * Sample functions from the prior 
@@ -101,15 +94,15 @@ class GaussianProcess
    * @param y      : labels
    */
   void  SamplePosterior ( const size_t& k,
-                          const arma::mat& inputs,
-                          arma::mat& labels ) const;
+                          const arma::Mat<T>& inputs,
+                                arma::Mat<T>& labels );
   /**
    * Get Parameters
    *
    */
-  const arma::vec& Parameters ( ) const { return parameters_; }
+  const arma::Col<T>& Parameters ( ) const { return parameters_; }
 
-  arma::vec& Parameters ( ) { return parameters_; }
+  arma::Col<T>& Parameters ( ) { return parameters_; }
 
   /**
    * Set Lambda
@@ -132,14 +125,14 @@ class GaussianProcess
   }
 
   private:
-  arma::mat cov_train_;   // for check 
-  arma::mat cov_predict_; // for check
-  arma::mat L_; // for check
+  arma::Mat<T> cov_train_;   // for check 
+  arma::Mat<T> cov_predict_; // for check
+  arma::Mat<T> L_; // for check
 
-  arma::mat train_inp_;   // for later usage
+  arma::Mat<T> train_inp_;   // for later usage
   size_t N_;   // for later usage
-  arma::vec parameters_;
-  utils::covmat<T> cov_;
+  arma::Col<T> parameters_;
+  utils::covmat<K,T> cov_;
   double  lambda_;
 };
 

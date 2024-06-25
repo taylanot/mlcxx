@@ -41,7 +41,7 @@ void real_class ( )
 
     arma::irowvec Ns = arma::regspace<arma::irowvec>(2,10,3900);
 
-    src::classification::LCurve<algo::classification::QDC,
+    src::classification::LCurve<algo::classification::QDC<>,
                                   mlpack::Accuracy> lcurve(Ns,conf::repeat);
 
     lcurve.Generate(trainset, testset,1.);

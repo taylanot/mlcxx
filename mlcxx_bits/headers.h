@@ -25,6 +25,12 @@ const unsigned int SEED = 8 ; // KOBEEEE
 
 //#define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << " / jem " << jem::JEM_VERSION <<'\n' << std::endl; 
 #define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << '\n' << std::endl; 
+
+// Define the precision for what is to come...
+#ifndef DTYPE
+#define DTYPE float
+#endif
+
 // standard
 #include <any>
 #include <list>
@@ -56,19 +62,16 @@ const unsigned int SEED = 8 ; // KOBEEEE
 
 //mlpack
 #include <mlpack.hpp>
-#include <mlpack/methods/linear_svm.hpp>
+/* #include <mlpack/methods/linear_svm.hpp> */
 // local
 #include "utils/utils.h"
-#include "algo/algo.h"
 #include "opt/opt.h"
-#include "src/src.h"
 #include "stats/stats.h"
-#include "stats/hypothesis.h"
+#include "algo/algo.h"
+#include "src/src.h"
 
-// tests
-
-#include "exp/exp.h"
+/* #include "exp/exp.h" */
 
 // main functions
-#include "funcs.h"
+/* #include "funcs.h" */
 

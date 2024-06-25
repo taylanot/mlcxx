@@ -37,6 +37,7 @@ void func_run( char* argv )
 
 
   m["llc-curvefit"] = experiments::llc::run_curve_fit;
+  m["llc-lastone"] = experiments::llc::run_lastone_fit;
   m["llc-curvefitat"] = experiments::llc::run_curve_fit_at;
   m["llc-curvefit-pred"] = experiments::llc::run_curve_fit_pred;
   m["llc-spkrfit2-before"] = experiments::llc::run_spkr2_fit_before;

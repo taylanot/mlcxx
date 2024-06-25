@@ -271,6 +271,49 @@ class WBL4
 };
 
 //=============================================================================
+// LastOneFit : Fits a given objective to the last observed point
+//=============================================================================
+class LastOneFit
+{
+  public:
+  LastOneFit ( size_t n_train ) : n_train_(n_train) { };
+
+
+  void Fit ( const arma::mat& X, const arma::rowvec& y )
+  {
+    param_ = y.col(n_train_-1).eval()(0,0);
+  }
+
+  double ComputeError ( const arma::mat& X,
+                        const arma::rowvec& y )
+  {
+    arma::rowvec res = Predict(X) - y;
+    return arma::dot(res,res)/res.n_elem;
+  }
+
+  double ComputeErrorAt ( const arma::mat& X,
+                          const arma::rowvec& y,
+                          const size_t& idx )
+  {
+    arma::mat X_test = X.col(idx);
+    arma::rowvec y_test = y.col(idx);
+
+    return ComputeError(X_test, y_test);
+  }
+
+  arma::rowvec Predict ( const arma::mat& Xp )
+  {
+    arma::rowvec res = arma::ones<arma::rowvec>(Xp.n_cols);
+    return res * param_;
+  }
+  
+  public:
+
+  double param_;
+  size_t n_train_;
+};
+
+//=============================================================================
 // MMF4 : Parametric Model Objective 
 //=============================================================================
 class MMF4
@@ -334,6 +377,66 @@ class MMF4
   arma::mat X_;
   arma::rowvec y_;
 };
+
+//-----------------------------------------------------------------------------
+// run_lastone_fit : Run Curve Fit 
+//-----------------------------------------------------------------------------
+void run_lastone_fit ( )
+{
+  std::filesystem::path last_path = "LAST";
+
+  //arma::mat data = utils::Load(conf::test_path/conf::test_file, true);
+  arma::field<std::string> header;
+  arma::mat data;
+  data.load(arma::csv_name(conf::test_path/conf::test_file, header));   
+  arma::inplace_trans(data);
+
+  arma::mat X = data.row(0);
+  arma::mat ys = data.rows(1,data.n_rows-1);
+
+  for ( size_t i=0; i<conf::Ntrns.n_cols; i++ )
+  {
+    std::filesystem::path addition = std::to_string(size_t(conf::Ntrns(i)));
+
+    LastOneFit last_fit(conf::Ntrns(i));
+
+    arma::mat last_error(1,ys.n_rows);
+    arma::mat last_error_at(1,ys.n_rows);
+    arma::mat last_pred(ys.n_cols,ys.n_rows);
+
+    arma::rowvec y;
+
+    bool check;
+
+    std::filesystem::path last_path_clean = 
+      utils::remove_path(conf::exp_id/last_path/addition/conf::test_path,
+                                    conf::test_root);
+
+    for ( size_t j=0; j<ys.n_rows; j++)
+    {
+      y = ys.row(j);
+      last_fit.Fit(X,y);
+      check = std::filesystem::exists(last_path_clean/conf::err_file);
+      if ( !check )
+      {
+        last_error.col(j) = last_fit.ComputeError(X,y);
+        last_error_at.col(j) = last_fit.ComputeErrorAt(X,y,conf::idx);
+        last_pred.col(j) = last_fit.Predict(X).t();
+      }
+    }
+    
+    std::filesystem::create_directories(last_path_clean);
+
+    last_error.save(arma::csv_name(last_path_clean/conf::err_file,
+                            header.cols(1,ys.n_rows)));
+
+    last_error_at.save(arma::csv_name(last_path_clean/conf::at_file,
+                               header.cols(1,ys.n_rows)));
+
+    last_pred.save(arma::csv_name(last_path_clean/conf::pred_file,
+                            header.cols(1,ys.n_rows)));
+  }
+}
 //-----------------------------------------------------------------------------
 // run_curve_fit : Run Curve Fit 
 //-----------------------------------------------------------------------------

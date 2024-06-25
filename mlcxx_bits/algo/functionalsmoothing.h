@@ -13,24 +13,24 @@
 namespace algo {
 namespace functional {
 
-template<class T>
-arma::mat kernelsmoothing ( const arma::mat& inputs,
-                            const arma::mat& labels,
-                            const arma::mat& pred_inputs,
+template<class KERNEL,class T=DTYPE>
+arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
+                            const arma::Mat<T>& labels,
+                            const arma::Mat<T>& pred_inputs,
                             const arma::vec& bandwidths,
                             const double valid)
 {
   size_t N = pred_inputs.n_cols;
   size_t M = labels.n_rows;
 
-  arma::mat predictions = arma::zeros(M, N);
+  arma::Mat<T> predictions = arma::zeros<arma::Mat<T>>(M, N);
 
   for(size_t i=0; i<M; i++)
   {
-    arma::rowvec label = labels.row(i);
-    arma::rowvec temp;
+    arma::Row<T> label = labels.row(i);
+    arma::Row<T> temp;
 
-    mlpack::HyperParameterTuner<algo::regression::Kernel<T>,
+    mlpack::HyperParameterTuner<algo::regression::Kernel<KERNEL>,
                                      mlpack::MSE,
                                      mlpack::SimpleCV>
                                      hpt(valid, inputs, label);
@@ -39,7 +39,7 @@ arma::mat kernelsmoothing ( const arma::mat& inputs,
     double bandwidth;
     std::tie(bandwidth) = hpt.Optimize(bandwidths);
 
-    algo::regression::Kernel<T> smoother(inputs,label,bandwidth);
+    algo::regression::Kernel<KERNEL> smoother(inputs,label,bandwidth);
 
     smoother.Predict(pred_inputs,temp);
     predictions.row(i) = temp;
@@ -47,23 +47,23 @@ arma::mat kernelsmoothing ( const arma::mat& inputs,
   return predictions;
 }
 
-template<class T>
-arma::mat kernelsmoothing ( const arma::mat& inputs,
-                            const arma::mat& labels,
-                            const arma::mat& pred_inputs,
-                            const double& bandwidth    )
+template<class KERNEL,class T=DTYPE>
+arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
+                               const arma::Mat<T>& labels,
+                               const arma::Mat<T>& pred_inputs,
+                               const double& bandwidth    )
 {
   size_t N = pred_inputs.n_cols;
   size_t M = labels.n_rows;
 
-  arma::mat predictions = arma::zeros(M, N);
+  arma::Mat<T> predictions = arma::zeros<arma::Mat<T>>(M, N);
 
   for(size_t i=0; i<M; i++)
   {
-    arma::rowvec label = labels.row(i);
-    arma::rowvec temp;
+    arma::Row<T> label = labels.row(i);
+    arma::Row<T> temp;
 
-    algo::regression::Kernel<T> smoother(inputs,label,bandwidth);
+    algo::regression::Kernel<KERNEL> smoother(inputs,label,bandwidth);
 
     smoother.Predict(pred_inputs,temp);
     predictions.row(i) = temp;
@@ -71,12 +71,13 @@ arma::mat kernelsmoothing ( const arma::mat& inputs,
   return predictions;
 }
 
-template<class T>
-arma::mat kernelsmoothing ( const arma::mat& inputs,
-                            const arma::mat& labels,
-                            const double& bandwidth    )
+template<class KERNEL,class T=double>
+arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
+                               const arma::Mat<T>& labels,
+                               const double& bandwidth    )
+
 {
-  return kernelsmoothing<T>( inputs,labels,inputs,bandwidth );
+  return kernelsmoothing<KERNEL>( inputs,labels,inputs,bandwidth );
 
 }
 

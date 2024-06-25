@@ -12,22 +12,23 @@
 namespace algo { 
 namespace approx {
 
-
+template<class T>
 template<class FUNC>
-void Taylor::Train (  FUNC& f, const arma::mat& x0 )
+void Taylor<T>::Train (  FUNC& f, const arma::Mat<T>& x0 )
 {
   param_.resize(order_+1);
   param_[0] = f.Evaluate(x0).eval()(0);
   for (size_t i=1; i <= order_; i++)
-    param_(i) = utils::fdiff(f, x0, type_, h_, order_).eval()(0);
+    param_(i) = opt::fdiff(f, x0, type_, h_, order_).eval()(0);
   x0_ = x0;
 }
 
-void Taylor::Predict ( const arma::mat& inputs,
-                             arma::rowvec& labels ) const
+template<class T>
+void Taylor<T>::Predict ( const arma::Mat<T>& inputs,
+                          arma::Row<T>& labels ) const
 {
-  arma::mat temp(order_+1,inputs.n_cols);
-  arma::mat ones = arma::ones(1,inputs.n_cols);
+  arma::Mat<T> temp(order_+1,inputs.n_cols);
+  arma::Mat<T> ones = arma::ones<arma::Mat<T>>(1,inputs.n_cols);
   temp.row(0) = ones*param_[0];
   for (size_t i=1; i <= order_; i++)
     temp.row(i) = param_[i] * arma::pow(inputs.each_col()-x0_,order_) 
@@ -35,12 +36,13 @@ void Taylor::Predict ( const arma::mat& inputs,
   labels = arma::sum(temp,0); 
 }
 
-double Taylor::ComputeError ( const arma::mat& points, 
-                              const arma::rowvec& responses ) const
+template<class T>
+T Taylor<T>::ComputeError ( const arma::Mat<T>& points, 
+                            const arma::Row<T>& responses ) const
 {
-  arma::rowvec predictions;
+  arma::Row<T> predictions;
   Predict(points,predictions);
-  arma::rowvec temp =  predictions - responses; 
+  arma::Row<T> temp =  predictions - responses; 
   return arma::dot(temp,temp) / responses.n_cols;
 }
 } // namespace approx

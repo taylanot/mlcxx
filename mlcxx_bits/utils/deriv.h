@@ -14,8 +14,8 @@
 
 namespace utils {
 
-template<class FUNC, class T=arma::vec>
-arma::mat fdiff(FUNC& f, const T& x,
+template<class FUNC, class T=arma::Col<DTYPE>>
+arma::Mat<DTYPE> fdiff(FUNC& f, const T& x,
                 const std::string& type="central",
                 const double& h = 1e-5, const size_t order = 1 ) 
 {
@@ -27,15 +27,15 @@ arma::mat fdiff(FUNC& f, const T& x,
     size_t n = x.n_elem;
 
     // Create matrices for forward and backward perturbed points
-    arma::mat E = arma::eye(n, n);
-    arma::mat xcp = arma::repmat(x, 1, n);
-    arma::mat x_ = xcp + h * E;
-    arma::mat x__ = xcp + 2 * h * E;
-    arma::mat _x = xcp - h * E;
-    arma::mat __x = xcp - 2 * h * E;
+    arma::Mat<DTYPE> E = arma::eye<arma::Mat<DTYPE>>(n, n);
+    arma::Mat<DTYPE> xcp = arma::repmat(x, 1, n);
+    arma::Mat<DTYPE> x_ = xcp + h * E;
+    arma::Mat<DTYPE> x__ = xcp + 2 * h * E;
+    arma::Mat<DTYPE> _x = xcp - h * E;
+    arma::Mat<DTYPE> __x = xcp - 2 * h * E;
 
     // Compute the gradient using central difference formula
-    arma::mat grad;
+    arma::Mat<DTYPE> grad;
     if (type == "central")
     {
       if (order == 1)

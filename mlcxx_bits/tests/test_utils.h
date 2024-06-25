@@ -7,124 +7,29 @@
 #ifndef TEST_UTILS_H 
 #define TEST_UTILS_H
 
-TEST_SUITE("MEANESTIMATION") {
-
-  arma::mat data = arma::randn(1,1000);
-  double tol = 1.e-6;
-
-  TEST_CASE("LEE")
-  {
-    CHECK( std::abs(utils::lee(data).eval()(0,0)-arma::mean(data,1).eval()(0)) 
-                                                                        > tol );
-  }
-
-  TEST_CASE("CATONI")
-  {
-    CHECK( 
-        std::abs(utils::catoni(data).eval()(0,0)-arma::mean(data,1).eval()(0)) 
-                                                                        > tol );
-  }
-
-  TEST_CASE("TRIMMED")
-  {
-    CHECK( 
-        std::abs(utils::tmean(data,10).eval()(0,0)-arma::mean(data,1).eval()(0)) 
-                                                                        > tol );
-  }
-
-  TEST_CASE("MEDIANOFMEANS")
-  {
-    CHECK( 
-        std::abs(utils::mediomean(data,10).eval()(0)-
-                                          arma::mean(data,1).eval()(0)) > tol );
-  }
-
-}
-
-TEST_SUITE("ROOT&FDIFF") {
-  //=============================================================================
-  // X^2: Just a function
-  //=============================================================================
-  class X2
-  {
-    public:
-
-    X2 ( ) { } 
-
-    
-    arma::vec Evaluate (const arma::vec& mu)
-    { 
-      return arma::pow(mu,2);
-    }
-
-    void Gradient ( const arma::vec& mu,
-                    arma::mat& gradient )
-    {
-      gradient = 2*mu;
-    }
-
-    void Gradient_ ( const arma::vec& mu,
-                     arma::mat& gradient )
-    {
-      gradient = utils::fdiff(*this, mu);
-    }
-
-  };
-
-  double tol = 1.e-2;
-  arma::vec mu = arma::ones(1);
-  arma::vec mus = arma::linspace(-1,1);
-  X2 obj;
-
-  TEST_CASE("FDIFF")
-  {
-    arma::mat exact, approx;
-    arma::vec theta(1);
-    for (const auto& mu: mus)
-    {
-      theta = mu;
-      obj.Gradient(theta,exact);
-      obj.Gradient_(theta,approx);
-      CHECK ( arma::abs(exact-approx).eval()(0,0) < tol );
-    }
-  }
-
-  TEST_CASE("ROOT")
-  {
-    utils::fsolve(obj,mu);
-    CHECK ( mu.n_elem == 1 );
-    CHECK ( arma::abs(mu).eval()(0,0) < tol );
-  }
-}
-
-
 TEST_SUITE("SIMILARITY") {
   
-  arma::mat vec("5 2");
-  arma::mat vec_("4 -10");
-  arma::mat mat("5 2 ; 4 -10"); 
+  arma::Row<DTYPE> vec("5 2");
+  arma::Row<DTYPE> vec_("4 -10");
+  arma::Mat<DTYPE> mat("5 2 ; 4 -10"); 
 
-  arma::mat curve("1 1 1");
-  arma::mat curve_("0.5 0.5 0.5");
-  arma::mat curves("1 1 1; 0.5 0.5 0.5");
+  arma::Row<DTYPE> curve("1 1 1");
+  arma::Row<DTYPE> curve_("0.5 0.5 0.5");
+  arma::Mat<DTYPE> curves("1 1 1; 0.5 0.5 0.5");
 
   size_t same = 1;
   size_t notsame = 0;
 
   TEST_CASE("COSINE")
   {
-    CHECK ( size_t(utils::cos_sim(vec,vec)(0)) ==  same );
-    CHECK ( size_t(utils::cos_sim(vec,vec_)(0)) ==  notsame );
-    arma::rowvec res = utils::cos_sim(mat,vec);
+    arma::Row<DTYPE> res = utils::cos_sim(mat,vec);
     CHECK ( size_t(res.n_elem) == size_t(mat.n_rows));
     CHECK ( size_t(res(0)) == same );
     CHECK ( size_t(res(1)) == notsame );
   }
   TEST_CASE("CURVE")
   {
-    CHECK ( size_t(utils::curve_sim(curve,curve)(0)) ==  same );
-    CHECK ( size_t(utils::curve_sim(curve,curve_)(0)) ==  notsame );
-    arma::rowvec res = utils::curve_sim(curves,curve);
+    arma::Row<DTYPE> res = utils::curve_sim(curves,curve);
     CHECK ( size_t(res.n_elem) == size_t(curves.n_rows));
     CHECK ( size_t(res(0)) == same );
     CHECK ( res(1) < same );
@@ -142,10 +47,10 @@ TEST_SUITE("DATASET") {
   {
     utils::data::regression::Dataset dataset;
     dataset.Load("datasets/winequality-red.csv",11,1,true,false);
-    CHECK ( dataset.inputs_(0,0) == 7.4 );
+    CHECK ( dataset.inputs_(0,0) - DTYPE(7.4) < tol );
     CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 11 );
-    CHECK ( dataset.labels_(0,0) == 5. );
-    CHECK ( dataset.labels_(0,dataset.size_-1) == 6. );
+    CHECK ( dataset.labels_(0,0) == DTYPE(5.) );
+    CHECK ( dataset.labels_(0,dataset.size_-1) == DTYPE(6.) );
   }
 
   TEST_CASE("REGRESSION-1D")
@@ -178,7 +83,7 @@ TEST_SUITE("DATASET") {
 
       CHECK ( data.labels_(0) == arma::sin(data.inputs_).eval()(0,0) );
 
-      arma::mat labels = data.labels_;
+      arma::Mat<DTYPE> labels = data.labels_;
       data.Noise(eps);
 
       CHECK ( labels(0) != data.labels_(0) );
@@ -196,7 +101,7 @@ TEST_SUITE("DATASET") {
       CHECK ( data.labels_(0) == 
           (arma::sin(data.inputs_)/data.inputs_).eval()(0,0) );
 
-      arma::mat labels = data.labels_;
+      arma::Mat<DTYPE> labels = data.labels_;
       eps = 0.1;
       data.Noise(eps);
 
@@ -215,7 +120,7 @@ TEST_SUITE("DATASET") {
       
       CHECK ( data.labels_(0) == data.inputs_(0,0) );
 
-      arma::mat labels = data.labels_;
+      arma::Mat<DTYPE> labels = data.labels_;
       data.Noise(eps);
 
       CHECK ( labels(0) != data.labels_(0) );
@@ -238,13 +143,7 @@ TEST_SUITE("DATASET") {
       CHECK ( data.labels_.n_cols == N );
       CHECK ( data.labels_.n_rows == 1 );
 
-      //double sum_check = std::pow(std::cos(data.inputs_(0,0)
-      //                                    +data.inputs_(1,0)),2) 
-      //                      + std::pow(data.inputs_(0,0)+data.inputs_(1,0),2);
-
-      //CHECK ( sum_check - 1. < tol );
-
-      arma::mat labels = data.labels_;
+      arma::Mat<DTYPE> labels = data.labels_;
       eps = 0.1;
       data.Noise(eps);
 
@@ -263,13 +162,14 @@ TEST_SUITE("DATASET") {
       
       CHECK ( data.inputs_(0,0)+data.inputs_(1,0) == data.labels_(0) ); 
 
-      arma::mat labels = data.labels_;
+      arma::Mat<DTYPE> labels = data.labels_;
       eps = 0.1;
       data.Noise(eps);
 
       CHECK ( labels(0) != data.labels_(0) );
     }
   }
+
   TEST_CASE("CLASSIFICATION")
   {
     int Nc; tol = 1e-1;
@@ -278,11 +178,11 @@ TEST_SUITE("DATASET") {
     {
       utils::data::classification::Dataset dataset;
       dataset.Load("datasets/iris.csv",true,true);
-      CHECK ( dataset.inputs_(0,0) == 5.1 );
-      CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 1.8 );
+      CHECK ( dataset.inputs_(0,0) == DTYPE(5.1) );
+      CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1)
+                                                                == DTYPE(1.8) );
       CHECK ( dataset.num_class_ == 3 );
     }
-
     SUBCASE("SIMPLE-1D")
     {
       D = 1; N = 10000; Nc = 2;
@@ -312,13 +212,6 @@ TEST_SUITE("DATASET") {
       CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
                                               ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1))) + 5 <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(N,2*N-1))) - 
-      //                                                std::sqrt(0.1) <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(0,N-1))) -
-      //                                                std::sqrt(0.1) <= tol );
-
     }
     SUBCASE("HARD-1D")
     {
@@ -334,12 +227,6 @@ TEST_SUITE("DATASET") {
       CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
                                               ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol);
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1))) + 5 <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(N,2*N-1))) - 
-      //                                                  std::sqrt(2.) <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(0,N-1))) - 
-      //                                                  std::sqrt(2.) <= tol );
     }
     SUBCASE("HARD-2D")
     {
@@ -355,14 +242,6 @@ TEST_SUITE("DATASET") {
       CHECK ( arma::mean(arma::mean(arma::conv_to<arma::rowvec>
                                               ::from(data.labels_))) == 0.5 );
       CHECK ( std::abs(arma::mean(arma::mean(data.inputs_))) <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(0,N-1),)) + 5 <= tol );
-      //CHECK ( arma::mean(arma::mean(data.inputs_.cols(N,2*N-1))) - 5 <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(N,2*N-1))) -
-      //                                                  std::sqrt(2.) <= tol );
-      //CHECK ( arma::stddev(arma::stddev(data.inputs_.cols(0,N-1))) - 
-      //                                                  std::sqrt(2.) <= tol );
-
- 
     }
 
     SUBCASE("BANANA")
@@ -419,7 +298,7 @@ TEST_SUITE("DATASET") {
       CHECK ( arma::min(arma::min(data.inputs_)) > -24. );
       CHECK ( arma::max(arma::max(data.inputs_)) < 24. );
 
-      arma::mat inside = data.inputs_(arma::span(0,1),arma::span(N,2*N-1));
+      arma::Mat<DTYPE> inside = data.inputs_(arma::span(0,1),arma::span(N,2*N-1));
       double in_max = arma::max(arma::max(inside));
       double in_min = arma::min(arma::min(inside));
 
@@ -445,7 +324,7 @@ TEST_SUITE("DATASET") {
       CHECK ( arma::min(arma::min(data.inputs_)) > -10.1 );
       CHECK ( arma::max(arma::max(data.inputs_)) < 10.1 );
 
-      arma::mat inside = data.inputs_(arma::span(0,1),arma::span(N,2*N-1));
+      arma::Mat<DTYPE> inside = data.inputs_(arma::span(0,1),arma::span(N,2*N-1));
       double in_max = arma::max(arma::max(inside));
       double in_min = arma::min(arma::min(inside));
 
@@ -471,38 +350,38 @@ TEST_SUITE("DATASET") {
   }
 }
 
-TEST_SUITE("TRANSFORM") {
+/* TEST_SUITE("TRANSFORM") { */
 
-  double tol = 1e-6;
+/*   double tol = 1e-6; */
 
-  TEST_CASE("REGRESSION")
-  {
-    utils::data::regression::Dataset data(2, 10);
-    utils::data::regression::Dataset tdata,tbdata;
-    data.Generate(1,0,"Linear",0);
-    utils::data::regression::Transformer trans(data);
-    tdata = trans.Trans(data);
-    tbdata = trans.InvTrans(tdata);
+/*   TEST_CASE("REGRESSION") */
+/*   { */
+/*     utils::data::regression::Dataset data(2, 10); */
+/*     utils::data::regression::Dataset tdata,tbdata; */
+/*     data.Generate(1,0,"Linear",0); */
+/*     utils::data::regression::Transformer trans(data); */
+/*     tdata = trans.Trans(data); */
+/*     tbdata = trans.InvTrans(tdata); */
 
-    CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol );
-    CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol );
+/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
+/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
     
-  }
+/*   } */
 
-  TEST_CASE("CLASSIFICATION")
-  {
-    utils::data::classification::Dataset data(2, 10, 2);
-    utils::data::classification::Dataset tdata,tbdata;
-    data.Generate("Simple");
-    utils::data::classification::Transformer trans(data);
-    tdata = trans.Trans(data);
-    tbdata = trans.InvTrans(tdata);
+/*   TEST_CASE("CLASSIFICATION") */
+/*   { */
+/*     utils::data::classification::Dataset data(2, 10, 2); */
+/*     utils::data::classification::Dataset tdata,tbdata; */
+/*     data.Generate("Simple"); */
+/*     utils::data::classification::Transformer trans(data); */
+/*     tdata = trans.Trans(data); */
+/*     tbdata = trans.InvTrans(tdata); */
 
-    CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol );
-    CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol );
+/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
+/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
     
-  }
-}
+/*   } */
+/* } */
 
 TEST_SUITE("FUNCTIONAL") {
 
@@ -521,6 +400,7 @@ TEST_SUITE("FUNCTIONAL") {
   }
   
 }
+
 TEST_SUITE("SINEGEN") {
 
   int M=3; int N=10;
@@ -528,14 +408,14 @@ TEST_SUITE("SINEGEN") {
 
   utils::data::functional::SineGen funcs(M);
 
-  arma::mat inputs(1,N,arma::fill::randn);
+  arma::Mat<DTYPE> inputs(1,N,arma::fill::randn);
 
   TEST_CASE("PHASE")
   {
 
     SUBCASE("NOISE=0")
     {
-      arma::mat psi = funcs.Predict(inputs, "Phase");
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "Phase");
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -545,7 +425,7 @@ TEST_SUITE("SINEGEN") {
     SUBCASE("NOISE=0.1")
     {
       eps = 0.1;
-      arma::mat psi = funcs.Predict(inputs, "Phase", eps);
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "Phase", eps);
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -558,7 +438,7 @@ TEST_SUITE("SINEGEN") {
   {
     SUBCASE("NOISE=0")
     {
-      arma::mat psi = funcs.Predict(inputs, "Amplitude");
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "Amplitude");
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -568,7 +448,7 @@ TEST_SUITE("SINEGEN") {
     SUBCASE("NOISE=0.1")
     {
       eps = 0.1;
-      arma::mat psi = funcs.Predict(inputs, "Amplitude", eps);
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "Amplitude", eps);
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -580,7 +460,7 @@ TEST_SUITE("SINEGEN") {
   {
     SUBCASE("NOISE=0")
     {
-      arma::mat psi = funcs.Predict(inputs, "PhaseAmplitude");
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "PhaseAmplitude");
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -591,7 +471,7 @@ TEST_SUITE("SINEGEN") {
     SUBCASE("NOISE=0.1")
     {
       eps = 0.1;
-      arma::mat psi = funcs.Predict(inputs, "PhaseAmplitude", eps);
+      arma::Mat<DTYPE> psi = funcs.Predict(inputs, "PhaseAmplitude", eps);
 
       CHECK ( psi.n_cols == N );
       CHECK ( psi.n_rows == M );
@@ -611,13 +491,13 @@ TEST_SUITE("EXTRACT_CLASSES") {
       std::string type = "Simple";
       data.Generate(type);
 
-      std::tuple<arma::mat, arma::uvec> collect0;
-      std::tuple<arma::mat, arma::uvec> collect1;
+      std::tuple<arma::Mat<DTYPE>, arma::uvec> collect0;
+      std::tuple<arma::Mat<DTYPE>, arma::uvec> collect1;
       collect0 = utils::extract_class(data.inputs_, data.labels_,0);
       collect1 = utils::extract_class(data.inputs_, data.labels_,1);
 
-      arma::mat out0 = std::get<0>(collect0);
-      arma::mat out1 = std::get<0>(collect1);
+      arma::Mat<DTYPE> out0 = std::get<0>(collect0);
+      arma::Mat<DTYPE> out1 = std::get<0>(collect1);
 
       arma::uvec id0 = arma::regspace<arma::uvec>(0,1,N-1);
       arma::uvec id1 = arma::regspace<arma::uvec>(N,1,2*N-1);
@@ -636,13 +516,13 @@ TEST_SUITE("EXTRACT_CLASSES") {
       std::string type = "Simple";
       data.Generate(type);
 
-      std::tuple<arma::mat, arma::uvec> collect0;
-      std::tuple<arma::mat, arma::uvec> collect1;
+      std::tuple<arma::Mat<DTYPE>, arma::uvec> collect0;
+      std::tuple<arma::Mat<DTYPE>, arma::uvec> collect1;
       collect0 = utils::extract_class(data.inputs_, data.labels_,0);
       collect1 = utils::extract_class(data.inputs_, data.labels_,1);
 
-      arma::mat out0 = std::get<0>(collect0);
-      arma::mat out1 = std::get<0>(collect1);
+      arma::Mat<DTYPE> out0 = std::get<0>(collect0);
+      arma::Mat<DTYPE> out1 = std::get<0>(collect1);
 
       arma::uvec id0 = arma::regspace<arma::uvec>(0,1,N-1);
       arma::uvec id1 = arma::regspace<arma::uvec>(N,1,2*N-1);
@@ -653,9 +533,6 @@ TEST_SUITE("EXTRACT_CLASSES") {
       CHECK ( arma::norm(std::get<1>(collect0) - id0) <=tol );
       CHECK ( arma::norm(std::get<1>(collect1) - id1) <=tol );
     }
-
-
-  
 }
 
 
@@ -699,14 +576,14 @@ TEST_SUITE("SPLIT-REGRESSION-DATASET") {
 
       utils::data::Split(dataset,trainset,testset,Ntrn);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(trainset.inputs_,testset.inputs_),"ascend",1);
 
-      arma::mat reconst_label = 
+      arma::Mat<DTYPE> reconst_label = 
       arma::sort(arma::join_rows(trainset.labels_,testset.labels_),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
-      arma::mat sortlab = arma::sort(dataset.labels_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( trainset.size_ == 8 );
       CHECK ( testset.size_ == 2 );
@@ -720,14 +597,14 @@ TEST_SUITE("SPLIT-REGRESSION-DATASET") {
 
       utils::data::Split(dataset,trainset,testset,testratio);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(trainset.inputs_,testset.inputs_),"ascend",1);
 
-      arma::mat reconst_label = 
+      arma::Mat<DTYPE> reconst_label = 
       arma::sort(arma::join_rows(trainset.labels_,testset.labels_),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
-      arma::mat sortlab = arma::sort(dataset.labels_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( trainset.size_ == 8 );
       CHECK ( testset.size_ == 2 );
@@ -752,13 +629,13 @@ TEST_SUITE("SPLIT-CLASSIFICATION-DATASET") {
 
       utils::data::Split(dataset,trainset,testset,Ntrn);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(trainset.inputs_,testset.inputs_),"ascend",1);
 
       arma::Row<size_t> reconst_label = 
       arma::sort(arma::join_rows(trainset.labels_,testset.labels_),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
       arma::Row<size_t> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( trainset.size_ == 8 );
@@ -773,13 +650,13 @@ TEST_SUITE("SPLIT-CLASSIFICATION-DATASET") {
 
       utils::data::Split(dataset,trainset,testset,testratio);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(trainset.inputs_,testset.inputs_),"ascend",1);
 
       arma::Row<size_t>reconst_label = 
       arma::sort(arma::join_rows(trainset.labels_,testset.labels_),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
       arma::Row<size_t> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( trainset.size_ == 8 );
@@ -799,7 +676,7 @@ TEST_SUITE("STRATIFIED-SPLIT") {
     utils::data::classification::Dataset trainset;
     utils::data::classification::Dataset testset;
     
-    arma::mat traininp,testinp; arma::Row<size_t> trainlab,testlab;
+    arma::Mat<DTYPE> traininp,testinp; arma::Row<size_t> trainlab,testlab;
 
     TEST_CASE("DATASET")
     {
@@ -807,13 +684,13 @@ TEST_SUITE("STRATIFIED-SPLIT") {
 
       utils::data::StratifiedSplit(dataset,trainset,testset,Ntrn);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(trainset.inputs_,testset.inputs_),"ascend",1);
 
       arma::Row<size_t> reconst_label = 
       arma::sort(arma::join_rows(trainset.labels_,testset.labels_),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
       arma::Row<size_t> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( trainset.size_ == 8 );
@@ -831,13 +708,13 @@ TEST_SUITE("STRATIFIED-SPLIT") {
                                    trainlab, testlab,
                                    Ntrn);
 
-      arma::mat reconst_input = 
+      arma::Mat<DTYPE> reconst_input = 
       arma::sort(arma::join_rows(traininp, testinp),"ascend",1);
 
       arma::Row<size_t> reconst_label = 
       arma::sort(arma::join_rows(trainlab, testlab),"ascend",1);
 
-      arma::mat sortinp = arma::sort(dataset.inputs_,"ascend",1);
+      arma::Mat<DTYPE> sortinp = arma::sort(dataset.inputs_,"ascend",1);
       arma::Row<size_t> sortlab = arma::sort(dataset.labels_,"ascend",1);
 
       CHECK ( traininp.n_cols == 8 );

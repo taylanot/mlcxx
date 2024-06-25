@@ -19,13 +19,14 @@ namespace functional {
 // @param inputs    : inputs (DxN)
 // @param labels    : labels (MxN) 
 //-----------------------------------------------------------------------------
-std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
-                                         const arma::mat& labels,
-                                         const bool mean_add = "false" )
+template<class T=DTYPE>
+std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
+                                               const arma::Mat<T>& labels,
+                                               const bool mean_add = "false" )
 {
 
-  arma::vec eigenvalues;
-  arma::mat eigenvectors, eigenfunctions;
+  arma::Col<T> eigenvalues;
+  arma::Mat<T> eigenvectors, eigenfunctions;
 
   size_t D = inputs.n_rows;
   size_t N = inputs.n_cols;
@@ -34,7 +35,7 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
   BOOST_ASSERT_MSG( D == 1, "FunctionalData input dim. != 1!");
 
 
-  arma::mat weights(1, N);
+  arma::Mat<T> weights(1, N);
 
   weights(0,0)    = inputs(0,1)-inputs(0,0);
   weights(0,N-1)  = inputs(0,inputs.n_cols-1)-inputs(0,inputs.n_cols-2);
@@ -43,19 +44,19 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
 
   weights *= 0.5;
 
-  arma::mat sqrt_W = arma::diagmat(arma::sqrt(weights));
-  arma::mat inv_sqrt_W = arma::diagmat(arma::sqrt(1./weights));
-  arma::mat mean = arma::mean(labels,0);
-  arma::mat adj_labels(M, N); 
+  arma::Mat<T> sqrt_W = arma::diagmat(arma::sqrt(weights));
+  arma::Mat<T> inv_sqrt_W = arma::diagmat(arma::sqrt(1./weights));
+  arma::Mat<T> mean = arma::mean(labels,0);
+  arma::Mat<T> adj_labels(M, N); 
 
   for(size_t i=0; i < M; i++)
     adj_labels.row(i) = labels.row(i) - mean;
 
-  arma::mat covariance = (adj_labels.t() * adj_labels)/(M-1);
+  arma::Mat<T> covariance = (adj_labels.t() * adj_labels)/(M-1);
 
   covariance += covariance.t();
   covariance *= 0.5;
-  arma::mat variance = sqrt_W * covariance * sqrt_W;
+  arma::Mat<T> variance = sqrt_W * covariance * sqrt_W;
   
   arma::eig_sym(eigenvalues, eigenvectors, variance);
   eigenvalues = eigenvalues.clamp(0., arma::datum::inf);
@@ -76,12 +77,13 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
 // @param labels    : labels (MxN) 
 // @param ppc       : percentage of principle component 
 //-----------------------------------------------------------------------------
-std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
-                                         const arma::mat& labels,
-                                         const double ppc )
+template<class T=DTYPE>
+std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
+                                               const arma::Mat<T>& labels,
+                                               const double ppc )
 {
-  arma::vec eigenvalues, eigvals;
-  arma::mat eigenfunctions, eigfuncs;
+  arma::Col<T> eigenvalues, eigvals;
+  arma::Mat<T> eigenfunctions, eigfuncs;
   int npc;
 
   size_t N = inputs.n_cols;
@@ -111,13 +113,14 @@ std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
 // @param labels    : labels (MxN) 
 // @param npc       : number of principle component 
 //-----------------------------------------------------------------------------
-std::tuple<arma::vec, arma::mat> ufpca ( const arma::mat& inputs,
-                                         const arma::mat& labels,
-                                         const size_t npc )
+template<class T=DTYPE>
+std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
+                                               const arma::Mat<T>& labels,
+                                               const size_t npc )
 {
 
-  arma::vec eigenvalues, eigvals;
-  arma::mat eigenfunctions, eigfuncs;
+  arma::Col<T> eigenvalues, eigvals;
+  arma::Mat<T> eigenfunctions, eigfuncs;
 
   size_t N = inputs.n_cols;
 

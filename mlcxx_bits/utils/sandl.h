@@ -34,9 +34,9 @@ std::string Extension ( const std::string& filename )
 //-----------------------------------------------------------------------------
 // Combine  : Combine two matricies
 //-----------------------------------------------------------------------------
-template<class T>
-arma::mat Combine ( const T& data1,
-                    const T& data2, bool column=true )
+template<class T, class O=DTYPE>
+arma::Mat<O> Combine ( const T& data1,
+                       const T& data2, bool column=true )
 {
   if (column)
   {
@@ -105,12 +105,12 @@ void Save ( const std::filesystem::path& filename,
 //-----------------------------------------------------------------------
 // Load
 //-----------------------------------------------------------------------
-template<class T>
-arma::mat Load ( const T& filename,
-                 const bool& transpose,
-                 const bool& count = false )
+template<class T, class O=DTYPE>
+arma::Mat<O> Load ( const T& filename,
+                    const bool& transpose,
+                    const bool& count = false )
 {
-  arma::mat matrix;
+  arma::Mat<O> matrix;
   mlpack::data::DatasetInfo info;
   if ( count )
   {
@@ -124,11 +124,11 @@ arma::mat Load ( const T& filename,
 //-----------------------------------------------------------------------
 // LoadwHeader
 //-----------------------------------------------------------------------
-template<class T>
-std::tuple<arma::mat,arma::field<std::string>> 
-                      LoadwHeader ( const T& filename )
+template<class T,class O=DTYPE>
+std::tuple<arma::Mat<O>,arma::field<std::string>> 
+                                              LoadwHeader ( const T& filename )
 {
-  arma::mat matrix;
+  arma::Mat<O> matrix;
   arma::field<std::string> header;
   matrix.load(arma::csv_name(filename, header));
   return std::make_tuple(matrix,header);
@@ -137,10 +137,11 @@ std::tuple<arma::mat,arma::field<std::string>>
 // bulk_load : Can be usefull for functional analysis 
 //  * Only for regression data
 //-----------------------------------------------------------------------
-arma::mat BulkLoad ( const std::filesystem::path& path,
-                     const bool& transpose )
+template<class T,class O=DTYPE>
+arma::Mat<O> BulkLoad ( const std::filesystem::path& path,
+                        const bool& transpose )
 {
-  arma::mat data, temp;
+  arma::Mat<O> data, temp;
   size_t counter = 0;
   for (const auto & entry : std::filesystem::recursive_directory_iterator(path))
   {
@@ -166,12 +167,13 @@ arma::mat BulkLoad ( const std::filesystem::path& path,
 // BulkLoadSplit: Can be usefull for functional analysis 
 //  * Only for regression data
 //-----------------------------------------------------------------------
-std::tuple<arma::mat,arma::mat> 
+template<class O=DTYPE>
+std::tuple<arma::Mat<O>,arma::Mat<O>> 
           BulkLoadSplit ( const std::filesystem::path& path,
                           const double& test_size,
                           const bool& transpose )
 {
-  arma::mat data, train_data, test_data, temp, inp, labs;
+  arma::Mat<O> data, train_data, test_data, temp, inp, labs;
   size_t num_files = 0;
   for (const auto & entry : std::filesystem::recursive_directory_iterator(path))
   {
@@ -227,12 +229,13 @@ std::tuple<arma::mat,arma::mat>
 //  for header included files.
 //  * Only for regression data
 //-----------------------------------------------------------------------
-std::tuple<arma::mat,arma::mat,
+template<class O=DTYPE>
+std::tuple<arma::Mat<O>,arma::Mat<O>,
            arma::field<std::string>,arma::field<std::string>>
           BulkLoadSplit ( const std::filesystem::path& path,
                           const double& test_size )
 {
-  arma::mat data, train_data, test_data, temp, inp, labs;
+  arma::Mat<O> data, train_data, test_data, temp, inp, labs;
   arma::field<std::string> temp_header;
   std::string first_header;
   size_t train_size_ = 0; 
@@ -255,8 +258,8 @@ std::tuple<arma::mat,arma::mat,
     {
       auto temp_load = LoadwHeader(entry.path());
       temp = std::get<0>(temp_load);
-      arma::mat x = temp.col(0);
-      arma::mat y = temp.cols(1,temp.n_cols-1);
+      arma::Mat<O> x = temp.col(0);
+      arma::Mat<O> y = temp.cols(1,temp.n_cols-1);
       temp_header = std::get<1>(temp_load);
       first_header = temp_header(0);
       temp_header = temp_header.cols(1,temp_header.n_cols-1);
@@ -339,7 +342,8 @@ std::tuple<arma::mat,arma::mat,
 //-----------------------------------------------------------------------------
 // loadCSV  : Legacy loader for previous versions
 //-----------------------------------------------------------------------------
-arma::mat loadCSV ( const std::string &filename, 
+template<class O=DTYPE>
+arma::Mat<O> loadCSV ( const std::string &filename, 
                     const std::string &delimeter = "," )
 {
   std::ifstream csv(filename);
@@ -361,38 +365,15 @@ arma::mat loadCSV ( const std::string &filename,
       datas.push_back(data);
   }
 
-  arma::mat data_mat = arma::zeros<arma::mat>(datas.size(), datas[0].size());
+  arma::Mat<O> data_mat = arma::zeros<arma::Mat<O>>(datas.size(), datas[0].size());
 
   for (size_t i=0; i<datas.size(); i++) {
-      arma::mat r(datas[i]);
+      arma::Mat<O> r(datas[i]);
       data_mat.row(i) = r.t();
   }
 
   return data_mat;
 }
-
-//-----------------------------------------------------------------------------
-// Load : Legacy Load
-//-----------------------------------------------------------------------------
-arma::mat Load( const std::string& filename,
-                  const bool transpose=false )
-{
-  std:: string ext = Extension(filename);
-  arma::mat data;
-
-  if (ext == "csv")
-  {
-    //data.load(filename,arma::csv_ascii);
-  }
-
-  if (transpose)
-  {
-    arma::inplace_trans(data);
-  }
-
-  return data;
-}
-
 
 } // namespace utils
 
