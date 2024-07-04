@@ -8,13 +8,15 @@
 #define ALGO_H
 
 
-#include "algo/gp.h"
-#include "algo/nn.h"
-#include "algo/paramclass.h"
-#include "algo/nonparamclass.h"
-#include "algo/kernelridge.h"
-#include "algo/functionalpca.h"
-#include "algo/functionalsmoothing.h"
-#include "algo/approx.h"
+#include "algo/regressors/gp.h"
+#include "algo/regressors/nn.h"
+#include "algo/dimred/functionalpca.h"
+#include "algo/regressors/kernelridge.h"
+#include "algo/regressors/functionalsmoothing.h"
+#include "algo/regressors/approx.h"
+#include "algo/classifiers/paramclass.h"
+#include "algo/classifiers/nonparamclass.h"
+#include "algo/classifiers/svm.h"
+
 
 #endif

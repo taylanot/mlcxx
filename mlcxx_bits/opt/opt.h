@@ -11,5 +11,7 @@
 #include "opt/diff.h"
 #include "opt/root.h"
 #include "opt/lm.h"
+#include "opt/quadprog.h"
+#include "opt/linprog.h"
 
 #endif

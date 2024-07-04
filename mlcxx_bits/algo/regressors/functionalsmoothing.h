@@ -15,10 +15,10 @@ namespace functional {
 
 template<class KERNEL,class T=DTYPE>
 arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
-                            const arma::Mat<T>& labels,
-                            const arma::Mat<T>& pred_inputs,
-                            const arma::vec& bandwidths,
-                            const double valid)
+                               const arma::Mat<T>& labels,
+                               const arma::Mat<T>& pred_inputs,
+                               const arma::vec& bandwidths,
+                               const double valid)
 {
   size_t N = pred_inputs.n_cols;
   size_t M = labels.n_rows;
@@ -71,7 +71,7 @@ arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
   return predictions;
 }
 
-template<class KERNEL,class T=double>
+template<class KERNEL,class T=DTYPE>
 arma::Mat<T> kernelsmoothing ( const arma::Mat<T>& inputs,
                                const arma::Mat<T>& labels,
                                const double& bandwidth    )

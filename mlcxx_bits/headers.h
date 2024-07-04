@@ -28,7 +28,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 
 // Define the precision for what is to come...
 #ifndef DTYPE
-#define DTYPE float
+#define DTYPE double
 #endif
 
 // standard
@@ -62,9 +62,12 @@ const unsigned int SEED = 8 ; // KOBEEEE
 
 //mlpack
 #include <mlpack.hpp>
+// HiGHS Linear Optimization package
+#include <highs/Highs.h>
 /* #include <mlpack/methods/linear_svm.hpp> */
 // local
 #include "utils/utils.h"
+
 #include "opt/opt.h"
 #include "stats/stats.h"
 #include "algo/algo.h"

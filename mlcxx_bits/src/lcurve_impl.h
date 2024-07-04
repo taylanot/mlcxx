@@ -172,9 +172,9 @@ void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
       arma::Row<O> ytrn = std::get<2>(res);
 
       MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = loss.Evaluate(model, testset.inputs_,
-                          arma::conv_to<arma::rowvec>::from(testset.labels_));
-      train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
+      test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_,
+                          arma::conv_to<arma::rowvec>::from(testset.labels_)));
+      train_errors_(j,i) = static_cast<O>(loss.Evaluate(model, Xtrn, ytrn));
       pb.Update();
     }
   }
@@ -185,7 +185,7 @@ void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
                                         arma::stddev(test_errors_));
 
     results_ = 
-      arma::join_cols(arma::conv_to<arma::rowvec>::from(Ns_), train, test);
+      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
 
     stats_ = std::make_tuple(std::move(train),
                              std::move(test)); 

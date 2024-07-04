@@ -38,7 +38,8 @@ struct covmat
 
     for (int i = 0; i < int(input1.n_rows); i++)
         for (int j = 0; j < int(input2.n_rows); j++)
-            matrix(i,j) = kernel_.Evaluate(input1.row(i),input2.row(j));
+            matrix(i,j) = kernel_.Evaluate(input1.row(i).eval(),
+                                           input2.row(j).eval());
 
     return matrix;
   }
@@ -50,9 +51,11 @@ struct covmat
                            const arma::Mat<T>& input2 ) const
   {
     arma::Mat<T> matrix(input1.n_cols, input2.n_cols);
+
     for (int i = 0; i < int(input1.n_cols); i++)
         for (int j = 0; j < int(input2.n_cols); j++)
-            matrix(i,j) = kernel_.Evaluate(input1.col(i),input2.col(j));
+            matrix(i,j) = kernel_.Evaluate(input1.col(i).eval(),
+                                           input2.col(j).eval());
 
     return matrix;
   }

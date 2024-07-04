@@ -32,6 +32,8 @@
 # # Rule for clearning
 # clean:
 # 	@rm -rfv $(BUILD_DIR)
+#
+################################################################################
 
 # compiler
 CXX := g++
@@ -40,14 +42,15 @@ CXX := g++
 BUILD_DIR := build
 
 # flags for the compiler
-CXXFLAGS := -std=c++17 -Wall -fopenmp -lstdc++fs -lopenblas
+CXXFLAGS := -std=c++17 -Wall -fopenmp -lstdc++fs -lhighs #-lopenblas
 
 # include our headers
 INCLFLAGS := -I .
+INCLFLAGS += -I /usr/local/include/highs/
 CXXFLAGS  += $(INCLFLAGS)
 
 # libraries needed for mlcxx library
-LIBS_NAME +=  armadillo boost_serialization boost_program_options #boost_iostreams
+LIBS_NAME +=  armadillo boost_serialization boost_program_options highs #lapack #boost_iostreams
 LIBS := $(addprefix -l,$(LIBS_NAME))
 
 # source files to be compiled (search recursively for .cpp files)
@@ -71,3 +74,5 @@ $(TARGETS): % : %.cpp
 # Rule for cleaning
 clean:
 	@rm -rfv $(BUILD_DIR)
+
+
