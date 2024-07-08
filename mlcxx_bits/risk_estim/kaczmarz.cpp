@@ -80,10 +80,10 @@ std::tuple<arma::Mat<T>,
            arma::Row<T>> extract_mnist (size_t N= 10000)
 {
   arma::fmat mnist, Xtrn,ytrn,Xtst,ytst; 
-  mlpack::data::Load("datasets/mnist-dataset/mnist_train.csv", mnist,true);
+  mlpack::data::Load(MLCXX_ROOT/"datasets/mnist-dataset/mnist_train.csv", mnist,true);
   ytrn = (mnist.row(0)).cols(0,N); Xtrn=(mnist.rows(1,mnist.n_rows-1)).cols(0,N) / 255;
   mnist.reset();
-  mlpack::data::Load("datasets/mnist-dataset/mnist_test.csv", mnist,true);
+  mlpack::data::Load(MLCXX_ROOT/"datasets/mnist-dataset/mnist_test.csv", mnist,true);
   ytst = mnist.row(0); Xtst=mnist.rows(1,mnist.n_rows-1) / 255;
   return std::make_tuple(Xtrn,ytrn,Xtst,ytst);  
 }
@@ -92,9 +92,9 @@ std::tuple<arma::Mat<T>,
 //-----------------------------------------------------------------------------
 int main ( int argc, char** argv )
 {
-  /* std::filesystem::path path = "build/risk_estim/outputs"; */
-  /* std::filesystem::create_directories(path); */
-  /* std::filesystem::current_path(path); */
+  std::filesystem::path path = "04_07_23/kaczmarz_pinv";
+  std::filesystem::create_directories(path);
+  std::filesystem::current_path(path);
 
   arma::wall_clock timer;
   timer.tic();
@@ -109,33 +109,57 @@ int main ( int argc, char** argv )
   size_t ndig = 10;
 
   arma::frowvec nfeat = {1,100,200,500,600,700,800,1000};
-  /* arma::frowvec nfeat = {50}; */
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,10,20);
+  /* arma::frowvec nfeat = {1,2}; */
 
-  for (size_t k=0;k<1;k++)
+  size_t rep = 50; 
+  arma::mat err (nfeat.n_elem,rep);
+  #pragma omp parallel for
+  for (size_t j=0;j<nfeat.n_elem;j++)
   {
-    for (size_t j=0;j<nfeat.n_elem;j++)
+  /* std::vector<LinearRegression<>> models(ndig); */
+    std::vector<mlpack::LinearRegression<arma::fmat>> models(ndig);
+    arma::frowvec y1(ytrn.n_elem);
+    arma::frowvec y2(ytst.n_elem);
+    for (size_t k=0;k<rep;k++)
     {
-      /* std::vector<LinearRegression<>> models(ndig); */
-      std::vector<mlpack::LinearRegression<arma::fmat>> models(ndig);
-      arma::frowvec y1(ytrn.n_elem);
-      arma::frowvec y2(ytst.n_elem);
-      arma::frowvec err(ndig);
-
+      arma::frowvec e(ndig);
       for (size_t i=0;i<ndig;i++)
       {
         y1.elem( find(ytrn == i) ).ones();
         models[i].Train(rff(Xtrn,nfeat[j]), y1);
         y2.elem( find(ytst == i) ).ones();
-        err[i] = models[i].ComputeError(rff(Xtst,nfeat[j]),y2);
+        e[i] = models[i].ComputeError(rff(Xtst,nfeat[j]),y2);
         y1.zeros();y2.zeros();
       }
-      PRINT(arma::mean(err))
+      err(j,k) = arma::mean(e);
     }
   }
-  /* mlpack::LinearRegression<arma::fmat> model(rff(Xtrn), ytrn); */
-  /* PRINT(model.ComputeError(rff(Xtst),ytst)); */
-   
+  err.save("pinv.csv",arma::csv_ascii);
+
+  /* arma::mat err2 (nfeat.n_elem,rep); */
+  /* #pragma omp parallel for */
+  /* for (size_t j=0;j<nfeat.n_elem;j++) */
+  /* { */
+  /*   std::vector<LinearRegression<>> models(ndig); */
+  /*   arma::frowvec y1(ytrn.n_elem); */
+  /*   arma::frowvec y2(ytst.n_elem); */
+  /*   for (size_t k=0;k<rep;k++) */
+  /*   { */
+  /*     arma::frowvec e(ndig); */
+  /*     for (size_t i=0;i<ndig;i++) */
+  /*     { */
+  /*       y1.elem( find(ytrn == i) ).ones(); */
+  /*       models[i].Train(rff(Xtrn,nfeat[j]), y1); */
+  /*       y2.elem( find(ytst == i) ).ones(); */
+  /*       e[i] = models[i].ComputeError(rff(Xtst,nfeat[j]),y2); */
+  /*       y1.zeros();y2.zeros(); */
+  /*     } */
+  /*     err2(j,k) = arma::mean(e); */
+  /*   } */
+  /* } */
+  /* err2.save("kaczmarz.csv",arma::csv_ascii); */
+
+
   PRINT_TIME(timer.toc());
 
   return 0;

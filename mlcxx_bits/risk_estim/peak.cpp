@@ -28,7 +28,7 @@ int main ( int argc, char** argv )
 
   arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,10);
 
-  src::LCurve<mlpack::LinearRegression, mlpack::MSE> LC(Ns,10000,true);
+  src::LCurve<mlpack::LinearRegression<>,mlpack::MSE> LC(Ns,10000,true);
 
 
   {

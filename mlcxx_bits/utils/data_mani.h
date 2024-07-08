@@ -13,7 +13,9 @@
 #define DATA_MANIP_H
 
 namespace utils {
+
 namespace data { 
+
 
 //=============================================================================
 // Add : Add N random data points between train and test sets
@@ -742,6 +744,47 @@ StratifiedSplit ( const arma::Mat<T>& input,
 }
 
 } // namespace data
+
+class Split
+{
+public:
+  template<class... Args>
+  auto operator()(Args... args)
+  {
+    return data::Split(args...);
+  }
+};
+
+class mlpackSplit
+{
+public:
+  template<class... Args>
+  auto operator()(Args... args)
+  {
+    return mlpack::data::Split(args...);
+  }
+};
+
+class mlpackStratifiedSplit
+{
+public:
+  template<class... Args>
+  auto operator()(Args... args)
+  {
+    return mlpack::data::StratifiedSplit(args...);
+  }
+};
+
+
+class StratifiedSplit
+{
+public:
+  template<class... Args>
+  auto operator()(Args... args)
+  {
+    return data::StratifiedSplit(args...);
+  }
+};
 } // namespace utils
 
 #endif

@@ -24,8 +24,8 @@
 /* #include "utils/mean_estim.h" */
 /* #include "utils/dists.h" */
 /* #include "utils/highmoments.h" */
-/* #include "utils/split_data.h" */
 /* #include "utils/parallel.h" */
+/* #include "utils/split_data.h" */
 
 #endif
 

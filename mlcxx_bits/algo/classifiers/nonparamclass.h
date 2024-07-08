@@ -117,7 +117,7 @@ class PARZENC
 // Nearest Neighbour Classifier 
 // * You can do this faster with search of mlpack maybe...
 //=============================================================================
-
+template<class T=DTYPE>
 class NNC
 {
   public:
@@ -137,7 +137,7 @@ class NNC
    * @param labels  : y
    * @param r       : radius
    */
-  NNC ( const arma::mat& inputs,
+  NNC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const size_t& k );
                                
@@ -146,21 +146,21 @@ class NNC
    * @param labels  : y
    */
 
-  NNC ( const arma::mat& inputs,
+  NNC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X
    * @param labels  : y
    */
-  void Train ( const arma::mat& inputs,
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**
    * @param inputs  : X*
    * @param labels  : y*
    */
-  void Classify ( const arma::mat& inputs,
+  void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
   /**
@@ -169,8 +169,8 @@ class NNC
    * @param inputs  : X*
    * @param labels  : y* 
    */
-  double ComputeError ( const arma::mat& points, 
-                        const arma::Row<size_t>& responses ) const;
+  T ComputeError ( const arma::Mat<T>& points, 
+                   const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
@@ -178,8 +178,8 @@ class NNC
    * @param labels  : y*
    * 
    */
-  double ComputeAccuracy ( const arma::mat& points, 
-                           const arma::Row<size_t>& responses ) const;
+  T ComputeAccuracy ( const arma::Mat<T>& points, 
+                      const arma::Row<size_t>& responses ) const;
 
   /**
    * Serialize the model.
@@ -207,7 +207,7 @@ class NNC
 
   size_t k_;
   
-  arma::mat inputs_;
+  arma::Mat<T> inputs_;
   arma::Row<size_t> labels_;
 
 };

@@ -78,3 +78,4 @@ const unsigned int SEED = 8 ; // KOBEEEE
 // main functions
 /* #include "funcs.h" */
 
+const std::filesystem::path MLCXX_ROOT = std::filesystem::current_path();

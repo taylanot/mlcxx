@@ -15,7 +15,7 @@ namespace src {
 // LCurve 
 //=============================================================================
 template<class MODEL,
-         class LOSS,class O=DTYPE>
+         class LOSS,class SPLIT=utils::Split, class O=DTYPE>
 class LCurve
 {
 public:
@@ -26,6 +26,7 @@ public:
    * @param repeat      : amount of times the training for single N takes place
    * @param parallel    : boolean for using parallel computations 
    * @param save        : boolean for saving the results
+   * @param prog        : boolean for showing the progrress bar
    * @param save_data   : boolean for saving the data used for train and test
    * @param name        : name of the experiment
    *
@@ -34,6 +35,7 @@ public:
           const double repeat,
           const bool parallel = false, 
           const bool save = false,
+          const bool prog = false,
           const std::string name = "lcurve",
           const bool save_data = false );
 
@@ -84,10 +86,12 @@ public:
   arma::mat GetResults (  ) {return results_;}
 
 private:
+  SPLIT split_;
   size_t repeat_;
   arma::irowvec Ns_;
   bool parallel_;
   bool save_;
+  bool prog_;
   bool save_data_;
   std::string name_;
   arma::Mat<O> results_;

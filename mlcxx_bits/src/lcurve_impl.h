@@ -21,15 +21,16 @@ namespace src {
 // LCurve
 //=============================================================================
 template<class MODEL,
-         class LOSS,class O>
-LCurve<MODEL,LOSS,O>::LCurve ( const arma::irowvec& Ns,
+         class LOSS,class SPLIT,class O>
+LCurve<MODEL,LOSS,SPLIT,O>::LCurve ( const arma::irowvec& Ns,
                                const double repeat,
                                const bool parallel, 
                                const bool save,
+                               const bool prog,
                                const std::string name,
                                const bool save_data ) :
 
-repeat_(repeat), Ns_(Ns), parallel_(parallel), save_(save),
+repeat_(repeat), Ns_(Ns), parallel_(parallel), save_(save), prog_(prog),
 save_data_(save_data), name_(name)
 {
   test_errors_.resize(repeat_,Ns_.n_elem);
@@ -40,9 +41,9 @@ save_data_(save_data), name_(name)
 // LCurve::Bootstrap
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
+         class LOSS,class SPLIT,class O>
 template<class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
+void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
                                        const T& labels,
                                        const Ts&... args )
 {
@@ -59,7 +60,7 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = utils::data::Split(inputs, labels, size_t(Ns_(i)));
+      const auto res = split_(inputs, labels, size_t(Ns_(i)));
       arma::Mat<O> Xtrn = std::get<0>(res);
       arma::Mat<O> Xtst = std::get<1>(res);
       T ytrn = std::get<2>(res);
@@ -68,7 +69,8 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = loss.Evaluate(model, Xtst, ytst);
       train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
-      pb.Update();
+      if (prog_)
+        pb.Update();
     }
   }
 
@@ -90,9 +92,9 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
 // LCurve::Additive
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
+         class LOSS,class SPLIT,class O>
 template<class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
+void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
                                       const T& labels,
                                       const Ts&... args )
 {
@@ -107,10 +109,10 @@ void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
   #pragma omp parallel for if(parallel_)
   for(size_t j=0; j < size_t(repeat_); j++)
   {
-    const auto res = utils::data::Split(inputs,labels,size_t(Ns_(0)));
+    const auto res = split_(inputs,labels,size_t(Ns_(0)));
 
-    arma::Mat Xtrn = std::get<0>(res);
-    arma::Mat Xrest = std::get<1>(res);
+    arma::Mat<O> Xtrn = std::get<0>(res);
+    arma::Mat<O> Xrest = std::get<1>(res);
 
     T ytrn = std::get<2>(res);
     T yrest = std::get<3>(res);
@@ -124,9 +126,11 @@ void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = loss.Evaluate(model,Xrest,yrest);
       train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
-      pb.Update();
+      if (prog_)
+        pb.Update();
     }
-    pb.Update();
+    if (prog_)
+      pb.Update();
   }
 
     arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
@@ -143,11 +147,11 @@ void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
 }
 
 template<class MODEL,
-         class LOSS,class O>
+         class LOSS,class SPLIT,class O>
 template<class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
-                                  const T& testset,
-                                  const Ts&... args )
+void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
+                                        const T& testset,
+                                        const Ts&... args )
 {
 
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(trainset.inputs_.n_cols), 
@@ -164,18 +168,17 @@ void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = utils::data::Split(trainset.inputs_,
-                                          trainset.labels_,
-                                          size_t(Ns_(i)));
+      const auto res = split_(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
 
       arma::Mat<O> Xtrn = std::get<0>(res);
-      arma::Row<O> ytrn = std::get<2>(res);
+      auto ytrn = std::get<2>(res);
 
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_,
-                          arma::conv_to<arma::rowvec>::from(testset.labels_)));
+                          testset.labels_));
       train_errors_(j,i) = static_cast<O>(loss.Evaluate(model, Xtrn, ytrn));
-      pb.Update();
+      if (prog_)
+        pb.Update();
     }
   }
 
