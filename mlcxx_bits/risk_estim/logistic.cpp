@@ -54,7 +54,7 @@
 
 int main ( int argc, char** argv )
 {
-  std::filesystem::path path = "08_07_23/comp_class_overlap_not_strat";
+  std::filesystem::path path = ".08_07_23/comp_class_overlap_log_loss";
   std::filesystem::create_directories(path);
   std::filesystem::current_path(path);
 
@@ -62,35 +62,17 @@ int main ( int argc, char** argv )
   timer.tic();
 
   utils::data::classification::Dataset dataset(2,10000,2);
-  dataset.Generate("Hard");
+  dataset.Generate("Harder");
 
   /* dataset.Save("data.csv"); */
 
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,10,11);
+  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,50);
   Ns.save("ns.csv",arma::csv_ascii);
-  size_t rep = 1;
+  size_t rep = 10000;
 
-  src::LCurve<mlpack::LogisticRegression<arma::mat>, utils::LogLoss, utils::Split> LC_log(Ns,rep,true);
-  src::LCurve<algo::classification::LDC<DTYPE>, utils::LogLoss,utils::Split> LC_ldc(Ns,rep,true);
-  src::LCurve<algo::classification::QDC<DTYPE>, utils::LogLoss,utils::Split> LC_qdc(Ns,rep,true);
-  src::LCurve<algo::classification::NNC<DTYPE>, utils::LogLoss,utils::Split> LC_nnc(Ns,rep,true);
-
-  /* src::LCurve<mlpack::LogisticRegression<arma::mat>, utils::ErrorRate, utils::Split> LC_log(Ns,rep,true); */
-  /* src::LCurve<algo::classification::LDC<DTYPE>, utils::ErrorRate,utils::Split> LC_ldc(Ns,rep,true); */
-  /* src::LCurve<algo::classification::QDC<DTYPE>, utils::ErrorRate,utils::Split> LC_qdc(Ns,rep,true); */
-  /* src::LCurve<algo::classification::NNC<DTYPE>, utils::ErrorRate,utils::Split> LC_nnc(Ns,rep,true); */
-
+  src::LCurve<mlpack::LogisticRegression<arma::mat>, utils::LogLoss, utils::Split> LC_log(Ns,rep,true,false,true);
   LC_log.Bootstrap(dataset.inputs_,dataset.labels_);
-  LC_log.test_errors_.save("logit.csv", arma::csv_ascii);
-
-  LC_ldc.Bootstrap(dataset.inputs_,dataset.labels_);
-  LC_ldc.test_errors_.save("ldc.csv", arma::csv_ascii);
-
-  LC_qdc.Bootstrap(dataset.inputs_,dataset.labels_);
-  LC_qdc.test_errors_.save("qdc.csv", arma::csv_ascii);
-
-  LC_nnc.Bootstrap(dataset.inputs_,dataset.labels_);
-  LC_nnc.test_errors_.save("nnc.csv", arma::csv_ascii);
+  LC_log.test_errors_.save("logit_harder.csv", arma::csv_ascii);
 
   PRINT_TIME(timer.toc());
 

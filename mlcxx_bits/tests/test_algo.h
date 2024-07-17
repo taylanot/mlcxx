@@ -74,70 +74,65 @@ TEST_SUITE("SEMIPARAMETRICKERNELRIDGE") {
 TEST_SUITE("ANN") {
   TEST_CASE("PROBLEMS")
   {
-    int D, N; double tol = 1e-6;
+    int D, N; DTYPE tol = 1e-3;
     double a, p, eps;
     std::string type;
+    typedef mlpack::FFN<mlpack::MeanSquaredError> NetworkType;
+    NetworkType network;
+    network.Add<mlpack::Linear>(1);
 
-    SUBCASE("1D-Sine")
+    algo::ANN<NetworkType> model(&network);
+
+    SUBCASE("1D-Linear")
     {
-      D = 1; N = 10; type = "Sine";
+      D = 1; N = 10; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
       utils::data::regression::Dataset dataset(D, N);
-
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
 
-      arma::Row<size_t> layers = {1, 10, 10, 1};
-      algo::regression::ANN<ens::Adam> model(inputs, labels, layers, 0 );
+      algo::ANN<NetworkType> model(dataset.inputs_,
+                                     dataset.labels_,&network);
 
-      DTYPE error = model.ComputeError(inputs, labels);
-      CHECK ( error <= tol*10e5 );
+      arma::mat preds;
+      model.Predict(inputs, preds);
+
+      CHECK ( model.ComputeError(inputs,labels) <= tol );
     }
-    SUBCASE("2D-Sine")
+
+    SUBCASE("2D-Linear")
     {
-      D = 2; N = 10; type = "Sine";
+      D = 2; N = 40; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
       utils::data::regression::Dataset dataset(D, N);
-
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
 
-      arma::Row<size_t> layers = {2, 10, 10, 10, 1};
-      algo::regression::ANN<ens::Adam> model(inputs, labels, layers, 0);
+      algo::ANN<NetworkType> model(dataset.inputs_,
+                                     dataset.labels_,&network);
 
-      DTYPE error = model.ComputeError(inputs, labels);
-      CHECK ( error <= tol*10e5 );
+
+      CHECK ( model.ComputeError(inputs,labels) <= tol );
     }
     SUBCASE("Optimizer")
     {
-      D = 1; N = 1000; type = "Sine";
+      D = 1; N = 10; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
       utils::data::regression::Dataset dataset(D, N);
-
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
 
-      arma::Row<size_t> layers = {1, 10, 10, 10, 1};
-      algo::regression::ANN<ens::Adam> model1(layers, 0 );
-      model1.MaxIterations(1);
-      model1.StepSize(0.0001);
+      algo::ANN<NetworkType,ens::Adam> model(dataset.inputs_,
+                                             dataset.labels_,&network, false,
+                                             0.001,32);
 
-      algo::regression::ANN<ens::Adam> model2(layers, 0);
-      model2.MaxIterations(1000000);
-      model2.StepSize(0.0001);
-
-      model1.Train(inputs, labels);
-      model2.Train(inputs, labels);
-      
-      DTYPE error1 = model1.ComputeError(inputs, labels);
-      DTYPE error2 = model2.ComputeError(inputs, labels);
-      CHECK ( error1 > error2 );
+      CHECK ( model.ComputeError(inputs,labels) <= tol );
     }
   }
 }
@@ -511,64 +506,64 @@ TEST_SUITE("QDC") {
   }
 }
 
-/* TEST_SUITE("NNC") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
+TEST_SUITE("NNC") {
+  TEST_CASE("PROBLEMS")
+  {
+    int D, N, Nc; //double tol = 1e-2;
+    std::string type;
 
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 10; Nc = 2; type = "Simple"; */
+    SUBCASE("1D-Simple")
+    {
+      D = 1; N = 10; Nc = 2; type = "Simple";
 
-/*       utils::data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
+      utils::data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::NNC model(data.inputs_, data.labels_);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
 
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 10; Nc = 2; type = "Simple"; */
+    SUBCASE("2D-Simple")
+    {
+      D = 2; N = 10; Nc = 2; type = "Simple";
 
-/*       utils::data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 10; Nc = 2; type = "Hard"; */
+      utils::data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::NNC model(data.inputs_, data.labels_);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+    SUBCASE("1D-Hard")
+    {
+      D = 1; N = 10; Nc = 2; type = "Hard";
 
-/*       utils::data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 10; Nc = 2; type = "Hard"; */
+      utils::data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::NNC model(data.inputs_, data.labels_);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+    SUBCASE("2D-Hard")
+    {
+      D = 2; N = 10; Nc = 2; type = "Hard";
 
-/*       utils::data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("BANANA") */
-/*     { */
-/*       D = 2; N = 10; Nc = 2; type = "Banana"; */
+      utils::data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::NNC model(data.inputs_, data.labels_);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+    SUBCASE("BANANA")
+    {
+      D = 2; N = 10; Nc = 2; type = "Banana";
 
-/*       utils::data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*   } */
-/* } */
+      utils::data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::NNC model(data.inputs_, data.labels_);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+  }
+}
 
 #endif

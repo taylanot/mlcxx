@@ -23,12 +23,12 @@ namespace src {
 template<class MODEL,
          class LOSS,class SPLIT,class O>
 LCurve<MODEL,LOSS,SPLIT,O>::LCurve ( const arma::irowvec& Ns,
-                               const double repeat,
-                               const bool parallel, 
-                               const bool save,
-                               const bool prog,
-                               const std::string name,
-                               const bool save_data ) :
+                                     const double repeat,
+                                     const bool parallel, 
+                                     const bool save,
+                                     const bool prog,
+                                     const std::string name,
+                                     const bool save_data ) :
 
 repeat_(repeat), Ns_(Ns), parallel_(parallel), save_(save), prog_(prog),
 save_data_(save_data), name_(name)
@@ -44,8 +44,8 @@ template<class MODEL,
          class LOSS,class SPLIT,class O>
 template<class T, class... Ts>
 void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
-                                       const T& labels,
-                                       const Ts&... args )
+                                             const T& labels,
+                                             const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -95,8 +95,8 @@ template<class MODEL,
          class LOSS,class SPLIT,class O>
 template<class T, class... Ts>
 void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
-                                      const T& labels,
-                                      const Ts&... args )
+                                            const T& labels,
+                                            const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -146,6 +146,9 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
 
 }
 
+//=============================================================================
+// LCurve::Split
+//=============================================================================     
 template<class MODEL,
          class LOSS,class SPLIT,class O>
 template<class T, class... Ts>

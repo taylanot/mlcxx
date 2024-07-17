@@ -9,7 +9,7 @@
 
 
 #include "algo/regressors/gp.h"
-#include "algo/regressors/nn.h"
+#include "algo/nn.h"
 #include "algo/dimred/functionalpca.h"
 #include "algo/regressors/kernelridge.h"
 #include "algo/regressors/functionalsmoothing.h"

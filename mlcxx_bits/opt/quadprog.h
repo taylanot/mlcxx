@@ -26,6 +26,7 @@ bool quadprog ( arma::Row<T>& x,
                 const arma::Row<T>& h, 
                 const arma::Mat<T>& A=arma::Mat<T>(),
                 const arma::Row<T>& b=arma::Row<T>(),
+                bool positive = true,
                 bool verbose = false,
                 const Ts&... args )
 
@@ -39,10 +40,15 @@ bool quadprog ( arma::Row<T>& x,
   model.lp_.num_col_ = x.n_elem;
   model.lp_.num_row_ = G.n_rows+A.n_rows;
   model.lp_.sense_ = ObjSense::kMinimize;
-  model.lp_.col_cost_ = arma::conv_to<std::vector<DTYPE>>::from(c);
+  model.lp_.col_cost_ = arma::conv_to<std::vector<T>>::from(c);
 
   // the uper and lower bounds of your x 
-  std::vector<T> col_lower(c.n_elem,0.);
+  std::vector<T> col_lower;
+  if (positive)
+    col_lower = std::vector<T>(c.n_elem,0.);
+  else
+    col_lower = std::vector<T>(c.n_elem,-1.e10);
+
   std::vector<T> col_upper(c.n_elem,1.e10);
   model.lp_.col_lower_ = col_lower;
   model.lp_.col_upper_ = col_upper;

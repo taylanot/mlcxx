@@ -354,8 +354,7 @@ class NMC
   /**
    * Non-working model 
    */
-  NMC ( );
-
+  NMC (  ) { } ;
   /**
    * @param inputs X
    * @param labels y

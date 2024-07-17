@@ -59,9 +59,21 @@ TEST_SUITE("DATASET") {
     utils::data::regression::Dataset data(D, N);
     a = 1.0; p = 0.; eps = 0.1;
 
-    SUBCASE("Outlier-1")
+    SUBCASE("OUTLIER-1")
     {
       data.Generate("Outlier-1");
+
+      CHECK ( data.inputs_.n_cols == N );
+      CHECK ( data.inputs_.n_rows == D );
+
+      CHECK ( data.labels_.n_cols == N );
+      CHECK ( data.labels_.n_rows == 1 );
+
+    }
+
+    SUBCASE("RANDOMLINEAR")
+    {
+      data.Generate("RandomLinear");
 
       CHECK ( data.inputs_.n_cols == N );
       CHECK ( data.inputs_.n_rows == D );

@@ -38,6 +38,15 @@ void Dataset<T>::Generate ( const double& scale,
 
   if (type == "Linear")
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()*inputs_+phase;
+  else if (type == "RandomLinear")
+  {
+    auto a=arma::randi<arma::Mat<T>>(dimension_,
+                                    arma::distr_param(1, 3));
+    labels_ = scale*a.t()*inputs_+phase;
+    /* PRINT_VAR(scale) */
+    /* PRINT_VAR(phase) */
+    /* PRINT(a); */
+  }
   else if (type == "Sine")
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()
                                                     * arma::sin(inputs_+phase);
@@ -60,7 +69,7 @@ void Dataset<T>::Generate ( const double& scale,
 
 template<class T>
 void Dataset<T>::Generate ( const std::string& type,
-                         const double& noise_std )
+                            const double& noise_std )
 {
   double scale = 1.; double phase = 0.;
   this -> Generate(scale, phase, type);
@@ -131,7 +140,8 @@ void Dataset<T>::Generate( const std::string& type )
   else if (type == "Outlier-10")
     Dataset::Outlier_(10);
 
-  else if (type == "Linear" || type == "Sine" || type == "Sinc" )
+  else if (type == "Linear" || type == "Sine" ||
+           type == "Sinc" || type == "RandomLinear" )
     Dataset::Generate(1,0,type);
 }
 
@@ -381,7 +391,7 @@ void Dataset<T>::Generate ( const std::string& type )
 
   }
 
-  else if ( type  == "Simple" || type == "Hard" )
+  else if ( type  == "Simple" || type == "Hard" || type == "Harder" )
   {
 
     BOOST_ASSERT_MSG( num_class_ == 2, "Class number should be 2!" );
@@ -402,6 +412,8 @@ void Dataset<T>::Generate ( const std::string& type )
     }
     if ( type == "Hard" )
       eps = 4.;
+    else if ( type == "Harder" )
+      eps = 5.;
     else
       eps = 0.1;
     _2classgauss(mean1, mean2, eps, 0.);

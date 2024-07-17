@@ -79,7 +79,7 @@ TEST_SUITE("LEARNINGCURVES") {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
       utils::data::classification::Dataset dataset(D, N, Nc);
-      std::string type = "Hard";
+      std::string type = "Simple";
       dataset.Generate(type);
 
       arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5);
@@ -100,7 +100,7 @@ TEST_SUITE("LEARNINGCURVES") {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
       utils::data::classification::Dataset dataset(D, N, Nc);
-      std::string type = "Hard";
+      std::string type = "Simple";
       dataset.Generate(type);
 
       arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5);
@@ -118,7 +118,7 @@ TEST_SUITE("LEARNINGCURVES") {
     SUBCASE("SPLIT")
     {
 
-      std::string type = "Hard";
+      std::string type = "Simple";
       int D, Ntrn, Ntst;  D=1; Ntrn=10; Ntst=10;
       utils::data::classification::Dataset trainset(D, Ntrn, 2);
       utils::data::classification::Dataset testset(D, Ntst, 2);
@@ -141,101 +141,175 @@ TEST_SUITE("LEARNINGCURVES") {
   }
 }
 
-/* TEST_SUITE("LEARNINGCURVES") { */
-/*   TEST_CASE("REGRESSION") */
-/*   { */
-/*     SUBCASE("NOHPT") */
-/*     { */
-/*       int D, Ntrn;  D=1; Ntrn=1000; */ 
-/*       double a, p, eps; a = 1.0; p = 0.; eps = 0.1; */
-/*       utils::data::regression::Dataset dataset(D, Ntrn); */
+TEST_SUITE("LEARNINGCURVESWITHHPT") {
+  TEST_CASE("REGRESSION")
+  {
+    SUBCASE("BOOT")
+    {
+      int D, Ntrn;  D=1; Ntrn=20; 
+      double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+      utils::data::regression::Dataset dataset(D, Ntrn);
 
-/*       dataset.Generate(a, p, "Linear", eps); */
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_); */
+      dataset.Generate(a, p, "Linear", eps);
+      auto inputs = dataset.inputs_;
+      auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_);
 
-/*       arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5); */
-/*       int repeat = 10; */ 
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
 
-/*       src::regression::LCurve<mlpack::LinearRegression<>, */
-/*              mlpack::MSE> lcurve(Ns,repeat); */
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      arma::Row<int> hps2 = {true,false};
+      src::LCurveHPT<mlpack::LinearRegression<arma::Mat<DTYPE>>,mlpack::MSE>
+                                                              lcurve(Ns,repeat);
       
-/*       lcurve.Generate(inputs, labels, 0., 1.); */
+      lcurve.Bootstrap(inputs, labels, hps, hps2);
 
-/*       CHECK ( arma::mean(arma::mean( */
-/*                       (lcurve.test_errors_ - lcurve.train_errors_))) > 0 ); */
-/*     } */
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) > 0 );
+    }
+    SUBCASE("BOOT-FIXED")
+    {
+      int D, Ntrn;  D=1; Ntrn=20; 
+      double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+      utils::data::regression::Dataset dataset(D, Ntrn);
 
-/*     SUBCASE("VARIABLE") */
-/*     { */
-/*       int D, Ntrn;  D=1; Ntrn=1000; */ 
-/*       double a, p, eps; a = 1.0; p = 0.; eps = 0.1; */
-/*       utils::data::regression::Dataset dataset(D, Ntrn); */
-/*       dataset.Generate(a, p, "Linear", eps); */
+      dataset.Generate(a, p, "Linear", eps);
+      auto inputs = dataset.inputs_;
+      auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_);
 
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_); */
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
 
-/*       arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5); */
-/*       arma::irowvec repeat = arma::regspace<arma::irowvec>(2,1,5); */
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      bool hps2 = true;
 
-/*       src::regression::VariableLCurve<mlpack::LinearRegression, */
-/*              mlpack::MSE> lcurve(Ns,repeat); */
+      src::LCurveHPT<mlpack::LinearRegression<arma::Mat<DTYPE>>,mlpack::MSE>
+                                                              lcurve(Ns,repeat);
       
-/*       lcurve.Generate(inputs, labels, 0., 1.); */
+      lcurve.Bootstrap(inputs, labels, hps, mlpack::Fixed(hps2));
 
-/*      // CHECK ( arma::mean(arma::mean( */
-/*      //                (lcurve.test_errors_[0] - lcurve.train_errors_[0]))) > 0 ); */
-/*     } */
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) > 0 );
+    }
 
-/*     SUBCASE("HPT") */
-/*     { */
-/*       int D, Ntrn;  D=1; Ntrn=1000; */ 
-/*       double a, p, eps; a = 1.0; p = 0.; eps = 0.1; */
-/*       utils::data::regression::Dataset dataset(D, Ntrn); */
+    SUBCASE("ADD")
+    {
+      int D, Ntrn;  D=1; Ntrn=100; 
+      double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
+      utils::data::regression::Dataset dataset(D, Ntrn);
 
-/*       dataset.Generate(a, p, "Linear", eps); */
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::rowvec>::from(dataset.labels_); */
+      dataset.Generate(a, p, "Linear", eps);
+      auto inputs = dataset.inputs_;
+      auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_);
 
-/*       arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,20); */
-/*       int repeat = 10; */ 
-/*       src::regression::LCurve_HPT<mlpack::LinearRegression, */
-/*                  mlpack::MSE, */
-/*                  mlpack::SimpleCV> lcurve(Ns,repeat,0.2); */
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
 
-/*       arma::rowvec lambdas = arma::linspace<arma::rowvec>(0.,1.,100); */
-/*       lcurve.Generate(inputs, labels, lambdas); */
-
-/*       CHECK ( arma::mean(arma::mean( */
-/*                      (lcurve.test_errors_ - lcurve.train_errors_))) > 0 ); */
-/*     } */
-/*   } */ 
-
-/*   TEST_CASE("CLASSIFICATION") */
-/*   { */
-/*     SUBCASE("NOHPT") */
-/*     { */
-/*       int D, N, Nc; */
-/*       D = 1; N = 1000; Nc = 2; */
-/*       utils::data::classification::Dataset dataset(D, N, Nc); */
-/*       std::string type = "Hard"; */
-/*       dataset.Generate(type); */
-
-/*       arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,5); */
-/*       int repeat = 10; */ 
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = dataset.labels_; */
-/*       src::classification::LCurve<algo::classification::NMC<>, */
-/*              mlpack::MSE> lcurve(Ns,repeat); */
+      src::LCurveHPT<mlpack::LinearRegression<arma::Mat<DTYPE>>,mlpack::MSE> lcurve(Ns,repeat);
       
-/*       lcurve.Generate(inputs, labels); */
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      arma::Row<int> hps2 = {true,false};
+      lcurve.Additive(inputs, labels, hps, hps2);
 
-/*       CHECK ( arma::mean(arma::mean( */
-/*                       (lcurve.test_errors_ - lcurve.train_errors_))) >= 0 ); */
-/*     } */
-/*   } */
-/* } */
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) > 0 );
+    }
+
+    SUBCASE("SPLIT")
+    {
+      int D, Ntrn, Ntst;  D=1; Ntrn=100; Ntst=100;
+      double a, p, eps; a = 1.0; p = 0.; eps = 0.5;
+      utils::data::regression::Dataset trainset(D, Ntrn);
+      utils::data::regression::Dataset testset(D, Ntst);
+
+      trainset.Generate(a, p, "Linear", eps);
+      testset.Generate(a, p, "Linear", eps);
+
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
+
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      arma::Row<int> hps2 = {true,false};
+      src::LCurveHPT<mlpack::LinearRegression<arma::Mat<DTYPE>>,mlpack::MSE> lcurve(Ns,repeat);
+
+      lcurve.Split(trainset, testset, hps, hps2);
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) > 0 );
+    }
+  } 
+
+  TEST_CASE("CLASSIFICATION")
+  {
+    SUBCASE("BOOT")
+    {
+      int D, N, Nc;
+      D = 1; N = 10; Nc = 2;
+      utils::data::classification::Dataset dataset(D, N, Nc);
+      std::string type = "Simple";
+      dataset.Generate(type);
+
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
+      auto inputs = dataset.inputs_;
+      auto labels = dataset.labels_;
+      src::LCurveHPT<algo::classification::NMC<>,mlpack::Accuracy,
+                  utils::StratifiedSplit> lcurve(Ns,repeat);
+      
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      lcurve.Bootstrap(inputs, labels,hps);
+
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) <= 0 );
+    }
+
+    SUBCASE("ADD")
+    {
+      int D, N, Nc;
+      D = 1; N = 10; Nc = 2;
+      utils::data::classification::Dataset dataset(D, N, Nc);
+      std::string type = "Simple";
+      dataset.Generate(type);
+
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
+      auto inputs = dataset.inputs_;
+      auto labels = dataset.labels_;
+      src::LCurveHPT<algo::classification::NMC<>,mlpack::Accuracy,
+                  utils::StratifiedSplit> lcurve(Ns,repeat);
+      
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      lcurve.Additive(inputs, labels,hps);
+
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) <= 0 );
+    }
+
+    SUBCASE("SPLIT")
+    {
+
+      std::string type = "Simple";
+      int D, Ntrn, Ntst;  D=1; Ntrn=20; Ntst=10;
+      utils::data::classification::Dataset trainset(D, Ntrn, 2);
+      utils::data::classification::Dataset testset(D, Ntst, 2);
+
+      trainset.Generate(type);
+      testset.Generate(type);
+
+      arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
+      int repeat = 10; 
+
+      src::LCurveHPT<algo::classification::NMC<>,
+                  mlpack::Accuracy,
+                  utils::StratifiedSplit> lcurve(Ns,repeat);
+      
+      auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
+      lcurve.Split(trainset, testset,hps);
+      CHECK ( arma::mean(arma::mean(
+                      (lcurve.test_errors_ - lcurve.train_errors_))) <= 0 );
+    }
+
+  }
+}
 
 #endif
 

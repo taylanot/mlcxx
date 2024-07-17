@@ -49,6 +49,8 @@ INCLFLAGS := -I .
 INCLFLAGS += -I /usr/local/include/highs/
 CXXFLAGS  += $(INCLFLAGS)
 
+# CXXFLAGS += -fsanitize=address
+
 # libraries needed for mlcxx library
 LIBS_NAME +=  armadillo boost_serialization boost_program_options highs #lapack #boost_iostreams
 LIBS := $(addprefix -l,$(LIBS_NAME))

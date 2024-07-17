@@ -1,8 +1,8 @@
 /**
- * @file logistic .cpp
+ * @file kaczmarz.cpp
  * @author Ozgur Taylan Turan
  *
- * Checking the mnist loading 
+ * Developing kaczmarz solver
  */
 
 #include <headers.h>

@@ -9,8 +9,8 @@
 
 namespace utils {
 
-template<class T>
-void CSC( const arma::Mat<T>& mat, std::vector<DTYPE>& values,
+template<class MatType,class T>
+void CSC( const MatType& mat, std::vector<T>& values,
           std::vector<int>& row_indices, std::vector<int>& col_start) 
 {
   int n_rows = mat.n_rows;
