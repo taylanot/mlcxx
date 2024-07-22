@@ -27,7 +27,7 @@ bool linprog ( arma::Row<T>& x,
                const arma::Mat<T>& A=arma::Mat<T>(),
                const arma::Row<T>& b=arma::Row<T>(),
                bool positive = true,
-               bool verbose=false,
+               bool verbose = true,
                const Ts&... args )
 
 {

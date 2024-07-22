@@ -40,12 +40,11 @@ void Dataset<T>::Generate ( const double& scale,
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()*inputs_+phase;
   else if (type == "RandomLinear")
   {
-    auto a=arma::randi<arma::Mat<T>>(dimension_,
-                                    arma::distr_param(1, 3));
+    /* auto a=arma::randi<arma::Mat<T>>(dimension_, */
+    /*                                 arma::distr_param(1, 3)); */
+    auto a=arma::randn<arma::Col<T>>(dimension_,
+                                    arma::distr_param(1., 1.));
     labels_ = scale*a.t()*inputs_+phase;
-    /* PRINT_VAR(scale) */
-    /* PRINT_VAR(phase) */
-    /* PRINT(a); */
   }
   else if (type == "Sine")
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()

@@ -23,6 +23,8 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #define PRINT_MLPACK_VERSION() std::cout << '\n' << "[INFO]: MLPACK_VERSION : " << mlpack::util::GetVersion() << '\n' << std::endl; 
 #define PRINT_ARMADILLO_VERSION() std::cout << '\n' << "[INFO]: ARMADi_VERSION : " << arma::arma_version::as_string() << '\n' << std::endl; 
 
+#define PRINT_ERR(...) std::cerr << '\n' <<  __VA_ARGS__ << '\n' << std::endl; 
+
 //#define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << " / jem " << jem::JEM_VERSION <<'\n' << std::endl; 
 #define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << '\n' << std::endl; 
 
@@ -49,6 +51,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <algorithm>
 #include <filesystem>
 #include <random>
+#include <cassert>
 
 // boost 
 #include <boost/assert.hpp>

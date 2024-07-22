@@ -1,5 +1,5 @@
 /**
- * @file p.cpp
+ * @file qp.cpp
  * @author Ozgur Taylan Turan
  *
  * Trying to create a quadratic programming routine using HiGHS

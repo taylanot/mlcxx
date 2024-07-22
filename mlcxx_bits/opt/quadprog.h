@@ -28,6 +28,7 @@ bool quadprog ( arma::Row<T>& x,
                 const arma::Row<T>& b=arma::Row<T>(),
                 bool positive = true,
                 bool verbose = false,
+                bool parallel = false,
                 const Ts&... args )
 
 {
@@ -95,6 +96,16 @@ bool quadprog ( arma::Row<T>& x,
 
   if (!verbose)
     highs.setOptionValue("output_flag", "false");
+
+  if (parallel)
+    highs.setOptionValue("parallel", "on");
+
+  highs.setOptionValue("qp_iteration_limit", 1000000);
+
+
+  HighsOptions options = highs.getOptions();
+
+  options.simplex_iteration_limit = 1000;
 
   //Pass the model 
   return_status = highs.passModel(model);

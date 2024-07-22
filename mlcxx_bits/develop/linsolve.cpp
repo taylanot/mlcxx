@@ -437,7 +437,7 @@ private:
 
 int main ( int argc, char** argv )
 {
-  std::filesystem::path path = ".09_07_23/solver_comparison_random_int2";
+  std::filesystem::path path = ".09_07_23/solver_comparison_random_norm2";
   std::filesystem::create_directories(path);
   std::filesystem::current_path(path);
 
