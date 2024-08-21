@@ -16,7 +16,7 @@ namespace src {
 //=============================================================================
 template<class MODEL,
          class LOSS,
-         class SPLIT=utils::Split,
+         class SPLIT=data::N_Split,
          template<typename, typename, typename, typename, typename> class CV
                                                              = mlpack::SimpleCV,
          class OPT = ens::GridSearch,

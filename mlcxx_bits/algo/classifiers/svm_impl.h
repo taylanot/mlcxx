@@ -17,7 +17,8 @@ template<class... Args>
 KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
                                  const arma::Row<size_t>& labels,
                                  const double& C,
-                                 const Args&... args) : C_(C), cov_(args...)
+                                 const Args&... args) : C_(C), cov_(args...),
+                                                        oneclass_(false)
 {
   Train(inputs,labels);
 }
@@ -26,7 +27,8 @@ template<class KERNEL,class T>
 template<class... Args>
 KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
                                  const arma::Row<size_t>& labels,
-                                 const Args&... args ): C_(1e-5), cov_(args...)
+                                 const Args&... args ): C_(1e-5), cov_(args...),
+                                                        oneclass_(false)
 {
   Train(inputs,labels);
 }
@@ -36,8 +38,14 @@ void KernelSVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
                                   const arma::Row<size_t>& y)
 {
   ulab_ = arma::unique(y);
+  BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0,
+                  "KernelSVM:Only binary labels, please!");
 
-  BOOST_ASSERT_MSG(ulab_.n_elem == 2, "KernelSVM:Only binary labels, please!");
+  if (ulab_.n_elem == 1)
+  {
+    oneclass_ = true;
+    return;
+  }
 
   X_ = &X;
 
@@ -65,28 +73,56 @@ void KernelSVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
   if (!success)
     PRINT_ERR("HiGHS did not terminate by itself!")
 
-  idx_ = arma::find(alphas_ > 1e-4); // Find the support vectors
+  idx_ = arma::find(alphas_ >= 1e-5 && alphas_<=C_); // Find the support vectors
   b_ = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
         - ((alphas_ % y_) * cov_.GetMatrix(X, X.cols(idx_))))/idx_.n_elem;
 }
 
 template<class KERNEL,class T>
 void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
-                                     arma::Row<size_t>& labels ) const
+                                     arma::Row<size_t>& preds ) const
 {
-  if (idx_.n_elem>0)
+  if (!oneclass_)
   {
-    labels.set_size(inputs.n_cols);
-    arma::Row<T> temp = alphas_.cols(idx_) % y_.cols(idx_) *
-                                    cov_.GetMatrix(X_->cols(idx_), inputs) + b_;
-    labels.elem( arma::find( temp <= 0.) ).fill(ulab_[0]);
-    labels.elem( arma::find( temp > 0.) ).fill(ulab_[1]);
+    arma::Row<T> temp;
+    Classify(inputs,preds,temp);
   }
-  else
-    PRINT_ERR("No support vectors->No prediction")
-      return;
+  else 
+  {
+    preds.resize(inputs.n_cols);
+    preds.fill(ulab_[0]);
+  }
 }
 
+template<class KERNEL,class T>
+void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
+                                     arma::Row<size_t>& preds,
+                                     arma::Mat<T>& dec_func ) const
+{
+  if (!oneclass_)
+  {
+    if (idx_.n_elem>0)
+    {
+      preds.set_size(inputs.n_cols);
+      dec_func = alphas_.cols(idx_) % y_.cols(idx_) *
+                                    cov_.GetMatrix(X_->cols(idx_), inputs) + b_;
+      preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
+      preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
+    }
+    else
+    {
+      PRINT_ERR("No support vectors->No prediction")
+        return;
+    }
+  }
+  else
+  {
+    dec_func.resize(inputs.n_cols);
+    dec_func.fill(arma::datum::nan);
+    preds.resize(inputs.n_cols);
+    preds.fill(ulab_[0]);
+  }
+}
 template<class KERNEL,class T>
 T KernelSVM<KERNEL,T>::ComputeError ( const arma::Mat<T>& points, 
                                       const arma::Row<size_t>& responses ) const

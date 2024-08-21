@@ -148,7 +148,7 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
 
     for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
     {
-      utils::data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
+      data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
 
       mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
                                                           hpt(cvp_, Xtrn, ytrn);

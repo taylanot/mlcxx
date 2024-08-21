@@ -11,8 +11,8 @@ TEST_SUITE("FUNCTIONALPCA") {
   {
     int D, Ntrn, Ntst, M, eps;
     D=1; Ntrn=100; Ntst=20; M=10; eps=0.;
-    utils::data::functional::Dataset funcset(D, Ntrn,M);
-    utils::data::functional::Dataset testfuncset(D, Ntst,M);
+    data::functional::Dataset funcset(D, Ntrn,M);
+    data::functional::Dataset testfuncset(D, Ntst,M);
 
     funcset.Generate("Sine", eps);
     testfuncset.Generate("Sine", eps);
@@ -55,7 +55,7 @@ TEST_SUITE("SEMIPARAMETRICKERNELRIDGE") {
     {
       D = 1; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -63,7 +63,7 @@ TEST_SUITE("SEMIPARAMETRICKERNELRIDGE") {
       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_);      
 
       algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel,
-                                             utils::data::functional::SineGen<>> 
+                                             data::functional::SineGen<>> 
                           model(inputs,labels, 0.5, size_t(5), 1.);
       DTYPE error = model.ComputeError(inputs, labels);
       CHECK ( error <= tol );
@@ -87,7 +87,7 @@ TEST_SUITE("ANN") {
     {
       D = 1; N = 10; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
@@ -106,7 +106,7 @@ TEST_SUITE("ANN") {
     {
       D = 2; N = 40; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
@@ -122,7 +122,7 @@ TEST_SUITE("ANN") {
     {
       D = 1; N = 10; type = "Linear";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
       dataset.Generate(a, p, type, eps);
 
       auto inputs = dataset.inputs_;
@@ -148,7 +148,7 @@ TEST_SUITE("KERNELRIDGE") {
     {
       D = 1; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -164,7 +164,7 @@ TEST_SUITE("KERNELRIDGE") {
     {
       D = 2; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -191,7 +191,7 @@ TEST_SUITE("GAUSSIANPROCESSREGRESSION") {
     {
       D = 1; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -208,7 +208,7 @@ TEST_SUITE("GAUSSIANPROCESSREGRESSION") {
     {
       D = 2; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -230,7 +230,7 @@ TEST_SUITE("GAUSSIANPROCESSREGRESSION") {
       D = 1; N = 4; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
       size_t k=2;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -253,7 +253,7 @@ TEST_SUITE("GAUSSIANPROCESSREGRESSION") {
       D = 2; N = 10; type = "Sine";
       a = 1.0; p = 0.; eps = 0.0;
       size_t k=2;
-      utils::data::regression::Dataset dataset(D, N);
+      data::regression::Dataset dataset(D, N);
 
       dataset.Generate(a, p, type, eps);
 
@@ -284,7 +284,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 1; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
@@ -294,7 +294,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 1; N = 5; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_,1000);
       algo::classification::NMC model_(data.inputs_, data.labels_);
@@ -307,7 +307,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 2; N = 5; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_,1000);
       algo::classification::NMC model_(data.inputs_, data.labels_);
@@ -320,7 +320,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 2; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
@@ -330,7 +330,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 1; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
@@ -340,7 +340,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
     {
       D = 2; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NMC model(data.inputs_, data.labels_);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
@@ -359,7 +359,7 @@ TEST_SUITE("FISHERSCLASSIFIER") {
     {
       D = 1; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::FDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -369,7 +369,7 @@ TEST_SUITE("FISHERSCLASSIFIER") {
     {
       D = 2; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::FDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -379,7 +379,7 @@ TEST_SUITE("FISHERSCLASSIFIER") {
     {
       D = 1; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::FDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -389,7 +389,7 @@ TEST_SUITE("FISHERSCLASSIFIER") {
     {
       D = 2; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::FDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -408,7 +408,7 @@ TEST_SUITE("LDC") {
     {
       D = 1; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::LDC model(data.inputs_, data.labels_);
       DTYPE error = model.ComputeError(data.inputs_, data.labels_);
@@ -418,7 +418,7 @@ TEST_SUITE("LDC") {
     {
       D = 2; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::LDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -428,7 +428,7 @@ TEST_SUITE("LDC") {
     {
       D = 1; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::LDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -438,7 +438,7 @@ TEST_SUITE("LDC") {
     {
       D = 2; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::LDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -457,7 +457,7 @@ TEST_SUITE("QDC") {
     {
       D = 1; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::QDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -467,7 +467,7 @@ TEST_SUITE("QDC") {
     {
       D = 2; N = 10000; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::QDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -477,7 +477,7 @@ TEST_SUITE("QDC") {
     {
       D = 1; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::QDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -487,7 +487,7 @@ TEST_SUITE("QDC") {
     {
       D = 2; N = 10000; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::QDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -497,7 +497,7 @@ TEST_SUITE("QDC") {
     {
       D = 2; N = 10000; Nc = 2; type = "Banana";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::QDC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -516,7 +516,7 @@ TEST_SUITE("NNC") {
     {
       D = 1; N = 10; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -527,7 +527,7 @@ TEST_SUITE("NNC") {
     {
       D = 2; N = 10; Nc = 2; type = "Simple";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -537,7 +537,7 @@ TEST_SUITE("NNC") {
     {
       D = 1; N = 10; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -547,7 +547,7 @@ TEST_SUITE("NNC") {
     {
       D = 2; N = 10; Nc = 2; type = "Hard";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);
@@ -557,7 +557,7 @@ TEST_SUITE("NNC") {
     {
       D = 2; N = 10; Nc = 2; type = "Banana";
 
-      utils::data::classification::Dataset data(D, N, Nc);
+      data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_);
       double error = model.ComputeError(data.inputs_, data.labels_);

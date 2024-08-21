@@ -23,14 +23,16 @@ class KernelSVM
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const Args&... args ) : C_(1.), cov_(args...) { };
+  KernelSVM ( const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
+  { };
 
   /**
    * @param C : regularization
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const double& C, const Args&... args ) : C_(C),cov_(args...) { } ;
+  KernelSVM ( const double& C, const Args&... args ) : C_(C),cov_(args...),
+                                                       oneclass_(false) { } ;
 
   /**
    * @param inputs  : X
@@ -68,6 +70,14 @@ class KernelSVM
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
+/**
+   * @param inputs    : X*
+   * @param labels    : y*
+   * @param dec_func  : f(x)
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& dec_func ) const;
   /**
    * Calculate the Error Rate
    *
@@ -101,6 +111,7 @@ class KernelSVM
     ar & BOOST_SERIALIZATION_NVP(idx_);
     ar & BOOST_SERIALIZATION_NVP(b_);
     ar & BOOST_SERIALIZATION_NVP(C_);
+    ar & BOOST_SERIALIZATION_NVP(oneclass_);
   }
 
 private:
@@ -112,6 +123,7 @@ private:
   arma::Row<T> alphas_;
   arma::uvec idx_;
   T b_;
+  bool oneclass_;
 
 
 };

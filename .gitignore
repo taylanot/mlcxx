@@ -3,6 +3,7 @@
 # SOME FILES
 *.csv
 *.bin
+*.arff
 # HIDDEN DIRS
 .*
 # Compiled Object files
@@ -34,3 +35,7 @@
 *.exe
 *.out
 *.app
+
+# Directories
+datasets/
+

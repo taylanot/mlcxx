@@ -14,7 +14,7 @@ TEST_SUITE("LEARNINGCURVES") {
     {
       int D, Ntrn;  D=1; Ntrn=10; 
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset dataset(D, Ntrn);
+      data::regression::Dataset dataset(D, Ntrn);
 
       dataset.Generate(a, p, "Linear", eps);
       auto inputs = dataset.inputs_;
@@ -35,7 +35,7 @@ TEST_SUITE("LEARNINGCURVES") {
     {
       int D, Ntrn;  D=1; Ntrn=10; 
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset dataset(D, Ntrn);
+      data::regression::Dataset dataset(D, Ntrn);
 
       dataset.Generate(a, p, "Linear", eps);
       auto inputs = dataset.inputs_;
@@ -55,8 +55,8 @@ TEST_SUITE("LEARNINGCURVES") {
     {
       int D, Ntrn, Ntst;  D=1; Ntrn=20; Ntst=10;
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset trainset(D, Ntrn);
-      utils::data::regression::Dataset testset(D, Ntst);
+      data::regression::Dataset trainset(D, Ntrn);
+      data::regression::Dataset testset(D, Ntst);
 
       trainset.Generate(a, p, "Linear", eps);
       testset.Generate(a, p, "Linear", eps);
@@ -78,7 +78,7 @@ TEST_SUITE("LEARNINGCURVES") {
     {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
-      utils::data::classification::Dataset dataset(D, N, Nc);
+      data::classification::Dataset dataset(D, N, Nc);
       std::string type = "Simple";
       dataset.Generate(type);
 
@@ -87,7 +87,7 @@ TEST_SUITE("LEARNINGCURVES") {
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
       src::LCurve<algo::classification::NMC<>,mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                  data::N_StratSplit> lcurve(Ns,repeat);
       
       lcurve.Bootstrap(inputs, labels);
 
@@ -99,7 +99,7 @@ TEST_SUITE("LEARNINGCURVES") {
     {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
-      utils::data::classification::Dataset dataset(D, N, Nc);
+      data::classification::Dataset dataset(D, N, Nc);
       std::string type = "Simple";
       dataset.Generate(type);
 
@@ -108,7 +108,7 @@ TEST_SUITE("LEARNINGCURVES") {
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
       src::LCurve<algo::classification::NMC<>,mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                  data::N_StratSplit> lcurve(Ns,repeat);
       
       lcurve.Additive(inputs, labels);
 
@@ -120,8 +120,8 @@ TEST_SUITE("LEARNINGCURVES") {
 
       std::string type = "Simple";
       int D, Ntrn, Ntst;  D=1; Ntrn=10; Ntst=10;
-      utils::data::classification::Dataset trainset(D, Ntrn, 2);
-      utils::data::classification::Dataset testset(D, Ntst, 2);
+      data::classification::Dataset trainset(D, Ntrn, 2);
+      data::classification::Dataset testset(D, Ntst, 2);
 
       trainset.Generate(type);
       testset.Generate(type);
@@ -131,7 +131,7 @@ TEST_SUITE("LEARNINGCURVES") {
 
       src::LCurve<algo::classification::NMC<>,
                   mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                  data::N_StratSplit> lcurve(Ns,repeat);
       
       lcurve.Split(trainset, testset);
       CHECK ( arma::mean(arma::mean(
@@ -148,7 +148,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, Ntrn;  D=1; Ntrn=20; 
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset dataset(D, Ntrn);
+      data::regression::Dataset dataset(D, Ntrn);
 
       dataset.Generate(a, p, "Linear", eps);
       auto inputs = dataset.inputs_;
@@ -171,7 +171,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, Ntrn;  D=1; Ntrn=20; 
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset dataset(D, Ntrn);
+      data::regression::Dataset dataset(D, Ntrn);
 
       dataset.Generate(a, p, "Linear", eps);
       auto inputs = dataset.inputs_;
@@ -196,7 +196,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, Ntrn;  D=1; Ntrn=100; 
       double a, p, eps; a = 1.0; p = 0.; eps = 0.1;
-      utils::data::regression::Dataset dataset(D, Ntrn);
+      data::regression::Dataset dataset(D, Ntrn);
 
       dataset.Generate(a, p, "Linear", eps);
       auto inputs = dataset.inputs_;
@@ -219,8 +219,8 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, Ntrn, Ntst;  D=1; Ntrn=100; Ntst=100;
       double a, p, eps; a = 1.0; p = 0.; eps = 0.5;
-      utils::data::regression::Dataset trainset(D, Ntrn);
-      utils::data::regression::Dataset testset(D, Ntst);
+      data::regression::Dataset trainset(D, Ntrn);
+      data::regression::Dataset testset(D, Ntst);
 
       trainset.Generate(a, p, "Linear", eps);
       testset.Generate(a, p, "Linear", eps);
@@ -244,7 +244,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
-      utils::data::classification::Dataset dataset(D, N, Nc);
+      data::classification::Dataset dataset(D, N, Nc);
       std::string type = "Simple";
       dataset.Generate(type);
 
@@ -253,7 +253,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
       src::LCurveHPT<algo::classification::NMC<>,mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                  data::N_StratSplit> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
       lcurve.Bootstrap(inputs, labels,hps);
@@ -266,7 +266,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
     {
       int D, N, Nc;
       D = 1; N = 10; Nc = 2;
-      utils::data::classification::Dataset dataset(D, N, Nc);
+      data::classification::Dataset dataset(D, N, Nc);
       std::string type = "Simple";
       dataset.Generate(type);
 
@@ -275,7 +275,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
       src::LCurveHPT<algo::classification::NMC<>,mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                    data::N_StratSplit> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
       lcurve.Additive(inputs, labels,hps);
@@ -289,8 +289,8 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
 
       std::string type = "Simple";
       int D, Ntrn, Ntst;  D=1; Ntrn=20; Ntst=10;
-      utils::data::classification::Dataset trainset(D, Ntrn, 2);
-      utils::data::classification::Dataset testset(D, Ntst, 2);
+      data::classification::Dataset trainset(D, Ntrn, 2);
+      data::classification::Dataset testset(D, Ntst, 2);
 
       trainset.Generate(type);
       testset.Generate(type);
@@ -300,7 +300,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
 
       src::LCurveHPT<algo::classification::NMC<>,
                   mlpack::Accuracy,
-                  utils::StratifiedSplit> lcurve(Ns,repeat);
+                  data::N_StratSplit> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
       lcurve.Split(trainset, testset,hps);

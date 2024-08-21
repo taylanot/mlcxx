@@ -6,14 +6,14 @@
  * and least squares solutions.
  *
  */
-#define DTYPE float
+#define DTYPE double
 #include <headers.h>
 
 struct gmres
 {
   template<class T=DTYPE>
   arma::Col<T> operator()(const arma::Mat<T>& A, const arma::Row<T>& b,
-                          T tol = 1e-10, size_t max_iter = 10000) 
+                          T tol = 1e-6, size_t max_iter = 10000) 
   {
     int n = A.n_rows;
     size_t m = A.n_cols;
@@ -84,7 +84,7 @@ struct  conjgrad
 {
   template<class T=DTYPE>
   arma::Col<T> operator()(const arma::Mat<T>& A, const arma::Row<T>& b,
-                          T tol = 1e-10, size_t max_iter = 1000) 
+                          T tol = 1e-6, size_t max_iter = 1000) 
   {
     arma::Row<T> x0(arma::size(b),arma::fill::ones);
     arma::Row<T> r = (b - x0*A) ;
@@ -111,7 +111,7 @@ struct cdescent
 {
   template<class T=DTYPE>
   arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b,
-                        size_t maxproj= 100000, T tol=1e-3)
+                        size_t maxproj= 100000, T tol=1e-6)
   {
     arma::Mat<T> x(arma::size(b),arma::fill::ones);
     size_t i;  
@@ -161,7 +161,7 @@ struct kaczmarz
 {
   template<class T=DTYPE>
   arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b,
-                        size_t maxproj= 10000000, T tol=1e-3)
+                        size_t maxproj= 10000000, T tol=1e-6)
   {
     arma::Mat<T> x(arma::size(b),arma::fill::ones);
     size_t i;  
@@ -185,6 +185,8 @@ struct pinv
   template<class T=DTYPE>
   arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b) 
   {
+    /* return (b*arma::pinv(A,1)).t() ; */
+    /* return arma::solve(A,b.t(),arma::solve_opts::allow_ugly); */
     return arma::solve(A,b.t());
   }
 };
@@ -194,39 +196,119 @@ struct basispurs
   template<class T=DTYPE>
   arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b) 
   {
+    if ( arma::rank(A) < A.n_rows )
+    {
+      arma::Row<T> x;
+      arma::Row<T> c(2*A.n_rows,arma::fill::ones);
+      arma::Mat<T> A_ = arma::join_vert(arma::join_horiz(A,-A),arma::join_horiz(-A,A));
+      arma::Row<T> b_ = arma::join_horiz(b,-b);
+
+      arma::Mat<T> G;
+      arma::Row<T> h;
+
+      opt::linprog(x,c,G,h,A_,b_,true,false);
+      return (x.cols(0,(x.n_elem/2)-1)-x.cols((x.n_elem/2),x.n_elem-1)).t();
+    }
+    else
+    {
+      return arma::solve(A,b.t());
+    }
+
+  }
+};
+
+struct basispurs2 
+{
+  template<class T=DTYPE>
+  arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b) 
+  {
+    size_t numcols = b.n_elem;
     arma::Row<T> x;
-    arma::Row<T> c(2*A.n_rows,arma::fill::ones);
-    c.cols(0,c.n_elem/2).zeros();
+    arma::Row<T> c(2*numcols,arma::fill::ones);
+    c.cols(c.n_elem/2,c.n_elem-1).fill(0.) ;
+    arma::Mat<T> eye = arma::eye<arma::Mat<T>>(numcols, numcols);    
+    arma::Mat<T> top = arma::join_horiz(eye,-eye);  
+    arma::Mat<T> bottom = arma::join_horiz(-eye,-eye); 
+
     arma::Mat<T> A_ = arma::join_horiz(A,arma::zeros<arma::Mat<T>>(arma::size(A)));
     arma::Row<T> b_ = b;
 
-    size_t numCols = A.n_cols;
-    arma::Mat<T> eyeMat = arma::eye<arma::Mat<T>>(numCols, numCols);    
-    arma::Mat<T> negEyeMat = -arma::eye<arma::Mat<T>>(numCols, numCols);
-    arma::Mat<T> top = arma::join_horiz(eyeMat, negEyeMat);  
-    arma::Mat<T> bottom = arma::join_horiz(negEyeMat, negEyeMat); 
-    // Join the top and bottom blocks vertically
     arma::Mat<T> G = arma::join_vert(top, bottom); 
-    arma::Row<T> h(2*numCols);
+    arma::Row<T> h(numcols*2);
+
 
     opt::linprog(x,c,G,h,A_,b_,false,false);
 
     return x.cols(0,(x.n_elem/2)-1).t();
+    
   }
 };
+
+struct norminf
+{
+  template<class T=DTYPE>
+  arma::Col<T> operator()(const arma::Mat<T> A, const arma::Row<T>b) 
+  {
+    if ( arma::rank(A) < A.n_rows )
+    {
+      size_t numcols = b.n_elem;
+      arma::Row<T> x;
+      arma::Row<T> c(numcols+1,arma::fill::zeros);
+      c.col(c.n_elem-1).fill(1.) ;
+
+
+      arma::Mat<T> A_ = arma::join_horiz(A,arma::zeros<arma::Mat<T>>(numcols,1));
+
+      A_ = arma::join_vert(A_,
+          arma::join_horiz(-arma::eye<arma::Mat<T>>(numcols,numcols),-arma::ones<arma::Mat<T>>(numcols,1)));
+      A_ = arma::join_vert(A_,
+          arma::join_horiz(arma::eye<arma::Mat<T>>(numcols,numcols),-arma::ones<arma::Mat<T>>(numcols,1)));
+      
+      arma::Row<T> b_ = arma::join_horiz(b,arma::zeros<arma::Mat<T>>(1,2*numcols));
+
+
+      /* arma::Mat<T> G_ = arma::join_horiz(-arma::eye<arma::Mat<T>>(numcols,numcols),-arma::ones<arma::Mat<T>>(numcols,1)); */
+      /* G_ = arma::join_vert(G_,arma::join_horiz(arma::eye<arma::Mat<T>>(numcols,numcols),-arma::ones<arma::Mat<T>>(numcols,1))); */
+      /* arma::Row<T> h_(G_.n_rows); */
+      arma::Mat<T> G_;
+      arma::Row<T> h_;
+
+      opt::linprog(x,c,G_,h_,A_,b_,false,false);
+
+      return x.cols(0,b.n_elem-1).t();
+    }
+    else
+    {
+      return arma::solve(A,b.t());
+    }
+
+  }
+};
+
+
 
 struct randomsols
 {
   template<class T=DTYPE>
   arma::Col<T> operator()(arma::Mat<T> A,arma::Row<T>b, size_t num=1) 
   {
+    if ( arma::rank(A) <= A.n_rows )
+    {
     arma::Col<T> x = arma::solve(A,b.t());
     arma::Mat<T> null = nullspace(A);
     arma::uword nullrank = null.n_cols;
 
+    auto add = arma::Mat<T>(nullrank, num,arma::fill::ones);
+
     arma::Col<T> sols = x + 
-      null * arma::randu<arma::Mat<T>>(nullrank, num);
+      /* null * arma::randn<arma::Mat<T>>(nullrank, num,arma::distr_param(20,1)); */
+      null * (add*1000);
     return sols;
+    }
+    else
+    {
+      return arma::solve(A,b.t());
+    }
   }
 
   template<class T=DTYPE>
@@ -282,6 +364,7 @@ public:
       X_ = X;
     preds = parameters_.t() * X_;
   }
+  arma::Mat<T> Parameters( ){return parameters_.t();}
 
   T ComputeError( const arma::Mat<T>& X, const arma::Mat<T>& preds)
   {
@@ -294,7 +377,7 @@ public:
 private:
   arma::Mat<T> parameters_;
   SOLVER solver_;
-  bool bias_;
+  bool bias_ = false;
 };
 
 /* int main ( int argc, char** argv ) */
@@ -307,7 +390,7 @@ private:
 /*   timer.tic(); */
 
 /*   size_t D = 10; */
-/*   utils::data::regression::Dataset dataset(D,2); */
+/*   data::regression::Dataset dataset(D,2); */
 /*   dataset.Generate("RandomLinear",0.); */
 
 /*   arma::fmat A = dataset.inputs_ * dataset.inputs_.t(); */
@@ -350,7 +433,7 @@ private:
 /*   timer.tic(); */
 
 /*   size_t D = 11; */
-/*   utils::data::regression::Dataset dataset(D,10); */
+/*   data::regression::Dataset dataset(D,10); */
 /*   dataset.Generate(2.,0,"Linear",1.0); */
 
 /*   arma::fmat A = dataset.inputs_ * dataset.inputs_.t(); */
@@ -398,7 +481,7 @@ private:
 /*   size_t rep = 100; */
 /*   for (size_t i=0;i<Ds.n_elem;i++) */
 /*   { */
-/*     utils::data::regression::Dataset dataset(Ds(i),10000); */
+/*     data::regression::Dataset dataset(Ds(i),10000); */
 /*     dataset.Generate("Linear",0.5); */
 
 /*     arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,50); */
@@ -435,9 +518,53 @@ private:
 /*   return 0; */
 /* } */
 
+/* int main ( int argc, char** argv ) */
+/* { */
+/*   std::filesystem::path path = ".09_07_23/solver_comparison_random_fixedtol"; */
+/*   std::filesystem::create_directories(path); */
+/*   std::filesystem::current_path(path); */
+
+/*   arma::wall_clock timer; */
+/*   timer.tic(); */
+
+
+/*   arma::irowvec Ds = {1,5,10,20}; */
+/*   size_t rep = 30; */
+
+/*   for (size_t i=0;i<Ds.n_elem;i++) */
+/*   { */
+/*     data::regression::Dataset dataset(Ds(i),10000); */
+/*     dataset.Generate("Linear",0.5); */
+
+/*     arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,30); */
+
+/*     src::LCurve<LinearRegression<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true); */
+/*     src::LCurve<LinearRegression<kaczmarz>,mlpack::MSE> lc_(Ns,rep,true,false,true); */
+/*     src::LCurve<LinearRegression<basispurs>,mlpack::MSE> lc____(Ns,rep,true,false,true); */
+/*     src::LCurve<LinearRegression<randomsols>,mlpack::MSE> lc_____(Ns,rep,true,false,true); */
+/*     lc.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+/*     lc_.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+/*     lc____.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+/*     lc_____.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+/*     arma::fmat error; */
+/*     error = lc.test_errors_; */
+/*     error.save("pinv_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+/*     error = lc_.test_errors_; */
+/*     error.save("kaczmarz_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+/*     error = lc____.test_errors_; */
+/*     error.save("basispurs_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+/*     error = lc_____.test_errors_; */
+/*     error.save("random_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+
+/*   } */
+/*   PRINT_TIME(timer.toc()); */
+
+/*   return 0; */
+/* } */
+
 int main ( int argc, char** argv )
 {
-  std::filesystem::path path = ".09_07_23/solver_comparison_random_norm2";
+  std::filesystem::path path = EXP_PATH/"27_07_23/pinv_biga";
   std::filesystem::create_directories(path);
   std::filesystem::current_path(path);
 
@@ -445,33 +572,51 @@ int main ( int argc, char** argv )
   timer.tic();
 
 
-  arma::irowvec Ds = {1,5,10,20};
-  size_t rep = 30;
+  arma::irowvec Ds = {5,10,20};
+  /* arma::irowvec Ds = {5}; */
+
+
+  size_t rep = 5000;
 
   for (size_t i=0;i<Ds.n_elem;i++)
   {
-    utils::data::regression::Dataset dataset(Ds(i),10000);
-    dataset.Generate("RandomLinear",0.5);
+    data::regression::Dataset dataset(Ds(i),1000);
+    dataset.inputs_*1000;
+    /* data::regression::Dataset dataset(Ds(i),3); */
+    arma::Row<DTYPE> a(Ds(i));
+    int n = Ds(i) * 0.6; // 20% of the weights should be one 
+    arma::uvec idx = arma::randperm(Ds(i),n);
+    a(idx).fill(1000);
+    dataset.Generate(a,.2);
+
+    /* dataset.Generate(std::string("RandomLinear"),.2); */
 
     arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,30);
 
-    src::LCurve<LinearRegression<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true);
-    src::LCurve<LinearRegression<kaczmarz>,mlpack::MSE> lc_(Ns,rep,true,false,true);
-    src::LCurve<LinearRegression<basispurs>,mlpack::MSE> lc____(Ns,rep,true,false,true);
-    src::LCurve<LinearRegression<randomsols>,mlpack::MSE> lc_____(Ns,rep,true,false,true);
-    lc.Bootstrap(dataset.inputs_,dataset.labels_,true);
-    lc_.Bootstrap(dataset.inputs_,dataset.labels_,true);
-    lc____.Bootstrap(dataset.inputs_,dataset.labels_,true);
-    lc_____.Bootstrap(dataset.inputs_,dataset.labels_,true);
-    arma::fmat error;
-    error = lc.test_errors_;
-    error.save("pinv_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
-    error = lc_.test_errors_;
-    error.save("kaczmarz_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
-    error = lc____.test_errors_;
-    error.save("basispurs_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
-    error = lc_____.test_errors_;
-    error.save("random_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
+    /* LinearRegression<pinv> model(dataset.inputs_,dataset.labels_); */
+    /* LinearRegression<norminf> model2(dataset.inputs_,dataset.labels_); */
+
+    /* PRINT_VAR(model.Parameters()); */
+    /* PRINT_VAR(model2.Parameters()); */
+
+    /* LinearRegression<pinv> model_(dataset.inputs_,dataset.labels_); */
+    /* PRINT_VAR(a); */
+    /* PRINT_VAR(model_.Parameters()); */
+
+    {
+      src::LCurve<LinearRegression<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true);
+      lc.Bootstrap(dataset.inputs_,dataset.labels_,true);
+      lc.test_errors_.save("pinv_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
+    }
+
+    /* { */
+    /*   /1* src::LCurve<LinearRegression<basispurs>,mlpack::MSE> lc____(Ns,rep,true,false,true); *1/ */
+    /*   src::LCurve<LinearRegression<norminf>,mlpack::MSE> lc____(Ns,rep,true,false,true); */
+    /*   lc____.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+    /*   /1* lc____.test_errors_.save("basispurs_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); *1/ */
+    /*   lc____.test_errors_.save("norminf_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+    /* } */
+
 
   }
   PRINT_TIME(timer.toc());

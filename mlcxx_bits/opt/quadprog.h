@@ -33,7 +33,7 @@ bool quadprog ( arma::Row<T>& x,
 
 {
   x.set_size(c.n_elem);
-  std::vector<T> values; 
+  std::vector<double> values; 
   std::vector<int> index, start;
   
 
@@ -41,22 +41,24 @@ bool quadprog ( arma::Row<T>& x,
   model.lp_.num_col_ = x.n_elem;
   model.lp_.num_row_ = G.n_rows+A.n_rows;
   model.lp_.sense_ = ObjSense::kMinimize;
-  model.lp_.col_cost_ = arma::conv_to<std::vector<T>>::from(c);
-
+  model.lp_.col_cost_ = arma::conv_to<std::vector<double>>::from(
+                                          arma::conv_to<arma::rowvec>::from(c));
   // the uper and lower bounds of your x 
-  std::vector<T> col_lower;
+  std::vector<double> col_lower;
   if (positive)
-    col_lower = std::vector<T>(c.n_elem,0.);
+    col_lower = std::vector<double>(c.n_elem,0.);
   else
-    col_lower = std::vector<T>(c.n_elem,-1.e10);
+    col_lower = std::vector<double>(c.n_elem,-1.e3);
 
-  std::vector<T> col_upper(c.n_elem,1.e10);
+  std::vector<double> col_upper(c.n_elem,1.e3);
   model.lp_.col_lower_ = col_lower;
   model.lp_.col_upper_ = col_upper;
 
   // upper and lower bounds of the constraints 
-  std::vector<T> row_lower(G.n_rows,-1e10);
-  std::vector<T> row_upper = arma::conv_to<std::vector<T>>::from(h);
+  std::vector<double> row_lower(G.n_rows,-1e3);
+  std::vector<double> row_upper = arma::conv_to<std::vector<double>>::from(
+      arma::conv_to<arma::rowvec>::from(h));
+
 
   if (A.n_elem != 0)
   {
@@ -120,6 +122,7 @@ bool quadprog ( arma::Row<T>& x,
   const HighsSolution& solution = highs.getSolution();
   for (int col=0; col < lp.num_col_; col++)
     x[col] = solution.col_value[col];
+
   return status;
 }
 }

@@ -17,6 +17,7 @@
 #include "algo/classifiers/paramclass.h"
 #include "algo/classifiers/nonparamclass.h"
 #include "algo/classifiers/svm.h"
+#include "algo/classifiers/multiclass.h"
 
 
 #endif

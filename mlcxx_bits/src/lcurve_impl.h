@@ -122,7 +122,7 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
     train_errors_(j,0) = loss.Evaluate(model, Xtrn, ytrn);
     for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
     {
-      utils::data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
+      data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = loss.Evaluate(model,Xrest,yrest);
       train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);

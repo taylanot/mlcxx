@@ -12,6 +12,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 //#define ARMA_USE_HDF5
 #define ARMA_WARN_LEVEL 1
 #define ARMA_USE_BLAS
+/* #define ARMA_USE_LAPACK */
 #define DOCTEST_CONFIG_IMPLEMENT
 #define PRINT(...) std::cout << '\n' <<  __VA_ARGS__ << '\n' << std::endl; 
 #define PRINT_INFO(...) std::cout << '\n' <<  "[INFO]:"  << __VA_ARGS__  << '\n' << std::endl; 
@@ -50,6 +51,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <stdexcept>
 #include <algorithm>
 #include <filesystem>
+#include <limits>
 #include <random>
 #include <cassert>
 
@@ -63,22 +65,24 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <boost/serialization/nvp.hpp>
 #include <boost/random.hpp>
 
-//mlpack
+// mlpack
 #include <mlpack.hpp>
 // HiGHS Linear Optimization package
 #include <highs/Highs.h>
+// curl  
+#include <curl/curl.h>
 /* #include <mlpack/methods/linear_svm.hpp> */
+
 // local
 #include "utils/utils.h"
+#include "data/data.h"
 
 #include "opt/opt.h"
 #include "stats/stats.h"
 #include "algo/algo.h"
 #include "src/src.h"
 
-/* #include "exp/exp.h" */
 
-// main functions
-/* #include "funcs.h" */
-
-const std::filesystem::path MLCXX_ROOT = std::filesystem::current_path();
+const std::filesystem::path MLCXX_PATH = std::filesystem::current_path();
+const std::filesystem::path DATASET_PATH = MLCXX_PATH.parent_path()/"datasets";
+const std::filesystem::path EXP_PATH = MLCXX_PATH.parent_path()/".exp";

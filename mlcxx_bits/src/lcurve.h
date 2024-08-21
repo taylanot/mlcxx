@@ -16,7 +16,7 @@ namespace src {
 //=============================================================================
 template<class MODEL,
          class LOSS,
-         class SPLIT=utils::Split, class O=DTYPE>
+         class SPLIT=data::N_Split, class O=DTYPE>
 class LCurve
 {
 public:

@@ -10,11 +10,9 @@
 #include "utils/system.h"
 #include "utils/sandl.h"
 #include "utils/classutils.h"
-#include "utils/datagen.h"
+
 #include "utils/covmat.h"
-#include "utils/data_mani.h"
 #include "utils/metrics.h"
-#include "utils/transform.h"
 #include "utils/similarity.h"
 #include "utils/progress.h"
 #include "utils/convert.h"
