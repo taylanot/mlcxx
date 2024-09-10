@@ -14,4 +14,4 @@ docker pull taylanot/cxx-dev:latest
 ```
 
 ## Documentation for various functionalities
-[Algorithms](documents/algo.md)
+[Algorithms](docs/algo.md)
