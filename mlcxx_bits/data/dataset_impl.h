@@ -20,18 +20,24 @@ namespace regression {
 // Dataset
 //=============================================================================
 template<class T>
-Dataset<T>::Dataset ( ) { }
+Dataset<T>::Dataset ( const size_t& D,
+                      const size_t& N ) : size_(N), dimension_(D) 
+{
+  mean_ = arma::zeros<arma::Col<T>>(dimension_);
+  cov_ = arma::eye<arma::Mat<T>>(dimension_,dimension_);
+}
 template<class T>
 Dataset<T>::Dataset ( const size_t& D,
-                      const size_t& N ) : size_(N), dimension_(D) { }
-
+                      const size_t& N,
+                      const arma::Col<T> mean,
+                      const arma::Mat<T> cov ) : size_(N), dimension_(D),
+                                          mean_(mean), cov_(cov)  { } 
 template<class T>
 void Dataset<T>::Generate ( const double& scale,
                             const double& phase,
                             const std::string& type )
 {
-  inputs_ = arma::mvnrnd(arma::zeros<arma::Col<T>>(dimension_),
-                          arma::eye<arma::Mat<T>>(dimension_,dimension_),size_);
+  inputs_ = arma::mvnrnd(mean_,cov_,size_);
   if (type == "Linear")
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()*inputs_+phase;
   else if (type == "RandomLinear")
@@ -175,9 +181,6 @@ namespace data {
 namespace functional {
 
 template<class T>
-Dataset<T>::Dataset ( ) { }
-
-template<class T>
 Dataset<T>::Dataset ( const size_t& D,
                       const size_t& N,
                       const size_t& M ) : size_(N), dimension_(D), nfuncs_(M)
@@ -266,10 +269,6 @@ void Dataset<T>::UnNormalize ( )
 //=============================================================================
 // SineGen
 //=============================================================================
-
-template<class T>
-SineGen<T>::SineGen ( ) { }
-
 template<class T>
 SineGen<T>::SineGen ( const size_t& M )
 {
@@ -347,10 +346,6 @@ namespace classification {
 //=============================================================================
 // Dataset
 //=============================================================================
-
-template<class T>
-Dataset<T>::Dataset ( ) { }
-
 template<class T>
 Dataset<T>::Dataset ( const size_t& D,
                       const size_t& N,
@@ -558,6 +553,279 @@ void Dataset<T>::Load ( const std::string& filename,
     labels_ = arma::conv_to<arma::Row<size_t>>::from(data.row(0));
   }
 }
+
+namespace oml
+{
+//=============================================================================
+// Dataset
+//=============================================================================
+template<class T>
+Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) : 
+  id_(id), path_(path)
+{
+  down_url_ = "https://www.openml.org/data/download/" 
+                          + std::to_string(id_);
+
+  meta_url_ = "https://www.openml.org/api/v1/data/" 
+                          + std::to_string(id);
+
+  metafile_ = metapath_/(std::to_string(id_)+".meta");
+
+  std::filesystem::create_directories(metapath_);
+  std::filesystem::create_directories(filepath_);
+
+  file_ = (std::to_string(id) + ".arff");
+
+  if (!std::filesystem::exists(file_))
+  {
+    this->_download();
+    this->_fetchmetadata();
+    this->_load();
+  }
+  else
+  {
+    WARNING("Dataset " << id_ << " is already present.");
+    this->_load();
+  }
+}
+
+template<class T>
+Dataset<T>::Dataset( const size_t& id ) : 
+  id_(id), path_(DATASET_PATH)
+{
+  std::filesystem::create_directories(filepath_);
+  std::filesystem::create_directories(metapath_);
+  
+ 
+
+  meta_url_ = "https://www.openml.org/api/v1/data/" 
+                          + std::to_string(id);
+
+  std::filesystem::create_directories(metapath_);
+
+  metafile_ = metapath_/(std::to_string(id)+".meta");
+  file_ = filepath_ / (std::to_string(id) + ".arff");
+
+
+  if (!std::filesystem::exists(metafile_))
+    this->_fetchmetadata();
+  
+  down_url_ = _getdownurl(_readmetadata());
+
+  if (!std::filesystem::exists(file_))
+  {
+    this->_download();
+    this->_load();
+  }
+  else
+  {
+    WARNING("Dataset " << id_ << " is already present.");
+    this->_load();
+  }
+}
+
+template<class T>
+bool Dataset<T>::_download( )
+{
+    CURL* curl;
+    CURLcode res;
+    // Initialize CURL
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
+
+    // Open file to write the downloaded data
+    FILE* fp = fopen(file_.c_str(), "wb");
+    if (!fp) 
+    {
+      ERR("Could not open file for writing: " << file_);
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      return false;
+    }
+
+    // Set CURL options
+    curl_easy_setopt(curl, CURLOPT_URL, down_url_.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+    // Perform the request
+    res = curl_easy_perform(curl);
+
+    // Check for errors
+    if(res != CURLE_OK)
+    {
+      ERR("curl_easy_perform() failed: "<< curl_easy_strerror(res));
+      fclose(fp);
+      curl_easy_cleanup(curl);
+      curl_global_cleanup();
+      return false;
+    }
+
+    // Cleanup
+    fclose(fp);
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+
+    LOG("Dataset " << id_ << " downloaded to " << file_ << ".");
+    return true;
+} 
+
+template<class T>
+std::string Dataset<T>::_fetchmetadata()
+{
+  
+  // Function to fetch metadata from OpenMLdd
+  CURL* curl;
+  CURLcode res;
+  std::string readBuffer;
+
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+  curl = curl_easy_init();
+  if(curl) 
+  {
+    curl_easy_setopt(curl, CURLOPT_URL, meta_url_.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, utils::WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) 
+      ERR("curl_easy_perform() failed: " << curl_easy_strerror(res)); 
+    curl_easy_cleanup(curl);
+  }
+  curl_global_cleanup();
+
+
+  if(res == CURLE_OK) 
+  {
+    // Save readBuffer to a text file
+    std::ofstream outFile(metafile_);
+    if (outFile.is_open())
+    {
+      outFile << readBuffer;
+      outFile.close();
+    }
+    else
+      ERR("Unable to open file for writing.");
+  }
+  else
+      ERR("Not Saving metadata.");
+  return readBuffer;
+}
+
+template<class T>
+std::string Dataset<T>::_readmetadata()
+{
+  std::ifstream infile(metafile_);
+  if (!infile.is_open())
+  {
+    ERR("Unable to open file for reading: " << metafile_ );
+    return "";
+  }
+  std::stringstream buffer;
+  buffer << infile.rdbuf();
+  infile.close();
+  return buffer.str();
+}
+
+template<class T>
+std::string Dataset<T>::_gettargetname( const std::string& metadata )
+{
+  // Define a regular expression to find the <default_target_value> element
+  std::regex re(R"(<oml:default_target_attribute>(.*?)</oml:default_target_attribute>)");
+  std::smatch match;
+
+  // Search for the pattern in the XML data
+  if (regex_search(metadata, match, re) && match.size() > 1)
+  {
+    return match.str(1); // Return the matched content
+  }
+  else
+  {
+    ERR("Probably something went wrong with meta data fetch!!!");
+    return "";
+  }
+}
+
+template<class T>
+std::string Dataset<T>::_getdownurl( const std::string& metadata )
+{
+  // Define a regular expression to find the <default_target_value> element
+  std::regex re(R"(<oml:url>(.*?)</oml:url>)");
+
+  std::smatch match;
+
+  // Search for the pattern in the XML data
+  if (regex_search(metadata, match, re) && match.size() > 1)
+  {
+    return match.str(1); // Return the matched content
+  }
+  else
+  {
+    ERR("Probably something went wrong with meta data fetch!!!");
+    return "";
+  }
+}
+
+template<class T>
+int Dataset<T>::_findlabel ( const std::string& targetname )
+{
+  std::ifstream file(file_);
+  std::string line;
+  int index = 0;
+
+  if (!file.is_open()) 
+  {
+    ERR("Error opening file: " << file_ );
+    return -1; // Error code for file opening failure
+  }
+
+  while (std::getline(file, line))
+  {
+    line.erase(0, line.find_first_not_of(" \t")); // Trim leading whitespace
+    if (line.find("@ATTRIBUTE") == 0 || line.find("@attribute") == 0) 
+    {
+      size_t start = line.find(' ') + 1; // Skip "@attribute"
+      // Find the first space/tab after the attribute name
+      size_t end = line.find_first_of(" \t", start); 
+      if (end == std::string::npos) 
+          end = line.length();
+
+     // Extract the attribute name
+      std::string name = line.substr(start, end - start);
+
+      if (name == targetname || name == "'"+targetname+"'") 
+        return index; // Attribute found, return its index
+
+      ++index; // Increment index for each attribute line
+    }
+  }
+  return -1; // Attribute not found
+}
+
+template<class T>
+void Dataset<T>::_load( )
+{
+  int idx = -1;
+  arma::Mat<DTYPE> data;
+  mlpack::data::DatasetInfo info;
+  mlpack::data::Load(file_.c_str(), data, info);
+  PRINT(_gettargetname(_readmetadata()));
+  idx =_findlabel(_gettargetname(_readmetadata()));
+
+  if (idx<0)
+  {
+    ERR("Cannot find the label...");
+    std::abort();
+  }  
+
+  labels_ = arma::conv_to<arma::Row<size_t>>::from(data.row(idx));
+  data.shed_row(idx);
+  inputs_ = data;
+  dimension_ = inputs_.n_rows;
+  size_ = inputs_.n_cols;
+  num_class_ = (arma::unique(labels_).eval()).n_elem;
+}
+
+
+} // namespace oml
 
 } // namespace classification
 } // namespace data

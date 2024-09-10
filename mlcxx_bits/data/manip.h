@@ -675,7 +675,8 @@ void StratifiedSplit ( const T& dataset,
                         T& testset,
                         const size_t trainNum )
 {
-  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>), 
+  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>) ||
+                   typeid(T) == typeid(classification::oml::Dataset<>) , 
       "StratifiedSplit can only be used for classification dataset type...");
 
   trainset = dataset; testset = dataset;
@@ -706,7 +707,8 @@ void StratifiedSplit ( const T& dataset,
              const double testRatio )
 {
 
-  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>), 
+  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>) ||
+                   typeid(T) == typeid(classification::oml::Dataset<>) , 
       "StratifiedSplit can only be used for classification dataset type...");
 
   trainset = dataset; testset = dataset;

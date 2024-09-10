@@ -16,6 +16,7 @@
 #include "utils/similarity.h"
 #include "utils/progress.h"
 #include "utils/convert.h"
+#include "utils/curl.h"
 
 /* #include "utils/root.h" */
 /* #include "utils/deriv.h" */

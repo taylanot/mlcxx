@@ -2,9 +2,6 @@
  * @file dataset.h
  * @author Ozgur Taylan Turan
  *
- * Dataset Interface
- * Code a Simple DataLoader Class 
- *
  */
 
 #ifndef DATASET_H
@@ -17,17 +14,23 @@ namespace regression {
 // Dataset
 //=============================================================================
 template<class T=DTYPE>
-struct Dataset 
+class Dataset 
 {
+public:
   size_t size_;
   size_t dimension_;
 
   arma::Mat<T> inputs_;
   arma::Mat<T> labels_;
 
-  Dataset ( );
+  Dataset ( ) { };
   Dataset ( const size_t& D,
             const size_t& N );
+
+  Dataset ( const size_t& D,
+            const size_t& N,
+            const arma::Col<T> mean,
+            const arma::Mat<T> cov );
 
   void Set ( const size_t& D,
              const size_t& N );
@@ -69,6 +72,9 @@ struct Dataset
               const bool count = false );
 
   arma::Row<T> GetLabels( const size_t id );
+private:
+  arma::Col<T> mean_;
+  arma::Mat<T> cov_;
 
 };
 
@@ -88,7 +94,7 @@ struct Dataset
   arma::Mat<T> inputs_;
   arma::Mat<T> labels_;
 
-  Dataset ( );
+  Dataset ( ) { };
   Dataset ( const size_t& D,
             const size_t& N,
             const size_t& M );
@@ -131,7 +137,7 @@ struct SineGen
   arma::Row<T> a_;
   arma::Row<T> p_;
 
-  SineGen ( );
+  SineGen ( ) { };
   SineGen ( const size_t& M );
 
   arma::Mat<T> Predict ( const arma::Mat<T>& inputs,
@@ -153,12 +159,12 @@ struct SineGen
 };
 
 } //functional
-namespace classification{
+
+namespace classification {
 
 //=============================================================================
 // Dataset
 //=============================================================================
-
 template<class T=DTYPE>
 struct Dataset 
 {
@@ -169,7 +175,7 @@ struct Dataset
   arma::Mat<T> inputs_;
   arma::Row<size_t> labels_;
 
-  Dataset ( );
+  Dataset ( ) { } ;
   Dataset ( const size_t& D,
             const size_t& N,
             const size_t& Nc );
@@ -198,9 +204,62 @@ struct Dataset
               const bool last = true,
               const bool transpose = true ,
               const bool count = false );
+};
+
+
+namespace oml {
+
+//=============================================================================
+// Dataset
+//=============================================================================
+template<class T=DTYPE>
+class Dataset 
+{
+public:
+  size_t id_;
+  size_t size_;
+  size_t dimension_;
+  size_t num_class_;
+  std::filesystem::path path_; 
+
+  std::filesystem::path filepath_ = path_ / "openml/datasets";
+  std::filesystem::path metapath_ = path_ / "openml/meta";
+
+  arma::Mat<T> inputs_;
+  arma::Row<size_t> labels_;
+
+  Dataset ( ) { } ;
+
+  Dataset ( const size_t& id, const std::filesystem::path& path );
+
+  Dataset ( const size_t& id );
+
+  /* Dataset ( const size_t& id, const std::filesystem::path& path ); */
+
+
+private:
+
+  bool _download (  ); 
+
+  void _load ( );
+
+  std::string _gettargetname (const std::string& metadata ); 
+  std::string _getdownurl (const std::string& metadata ); 
+
+  int _findlabel ( const std::string& targetname ); 
+
+  std::string _fetchmetadata( ); 
+  std::string _readmetadata( ); 
+
+  std::string meta_url_;
+  std::string down_url_;
+
+  std::string file_;
+  std::string metafile_;
 
 };
 
+} // namesapce oml
 
 } // namespace classification
 

@@ -336,6 +336,66 @@ private:
   T lambda_ ;
 };
 
+template<class SOLVER=pinv,class T=DTYPE>
+class LinearRegressionPCA
+{
+public:
+
+  LinearRegressionPCA (T lambda, bool bias) : 
+                                              bias_(bias), lambda_(lambda) { }
+
+  template<class... Args>
+  LinearRegressionPCA ( const arma::Mat<T>& X,const arma::Mat<T>& y,
+                     T lambda, bool bias)
+  : bias_(bias), lambda_(lambda)
+  {
+    arma::Mat<T> X_;
+    mean_ = arma::mean(X,1);
+    arma::Col<T> vals, tsqr;
+    arma::princomp(vecs_,X_,vals,tsqr,X.t());
+    Train(X_.t(),y);
+  }
+
+  void Train( const arma::Mat<T>& X, const arma::Mat<T>& y)
+  {
+    arma::Mat<T> X_;
+    if (bias_)
+      X_ = arma::join_vert(X,arma::ones<arma::Mat<T>>(1,X.n_cols));
+    else 
+      X_ = X;
+
+    auto b = arma::conv_to<arma::Row<T>>::from(X_ * y.t());
+
+    parameters_ = solver_(
+      ((X_*X_.t())+(arma::eye<arma::Mat<T>>(X_.n_rows,X_.n_rows)*lambda_)).eval(),b);
+  }
+
+  void Predict( const arma::Mat<T>& X, arma::Mat<T>& preds)
+  {
+    arma::Mat<T> X_ = vecs_*(X.each_col() - mean_);
+    if (bias_)
+      X_ = arma::join_vert(X,arma::ones<arma::Mat<T>>(1,X.n_cols));
+    preds = parameters_.t() * X_;
+  }
+
+  arma::Mat<T> Parameters( ){return parameters_.t();}
+
+  T ComputeError( const arma::Mat<T>& X, const arma::Mat<T>& preds)
+  {
+    arma::Mat<T> temp;
+    Predict(X,temp);
+    return arma::dot(temp,temp)/temp.n_elem;
+    
+  }
+  
+private:
+  arma::Mat<T> parameters_;
+  SOLVER solver_;
+  bool bias_;
+  T lambda_ ;
+  arma::Mat<T> vecs_;
+  arma::Mat<T> mean_;
+};
 template<class T=DTYPE>
 class EigVal
 {
@@ -358,10 +418,7 @@ public:
     int counter=0;
     for(size_t i=0; i < S.n_elem; ++i)
     {
-      /* s2[i] = (S[i] > (S.n_elem*S[0]*arma::datum::eps)) ? DTYPE(DTYPE(1.) / (S[i]*S[i])) : DTYPE(0); */
-      /* s2[i] = (S[i] > 1e-17) ? DTYPE(DTYPE(1.) / (S[i]*S[i])) : DTYPE(0); */
       s2[i] = (i < arma::rank(A)) ? DTYPE(DTYPE(1.) / (S[i]*S[i])) : DTYPE(0);
-      /* s2[i] = (S[i] > 1.e-17) ? DTYPE(DTYPE(1.) / (S[i]*S[i])) : DTYPE(0); */
       counter++;
     }
     parameters_ = s2;
@@ -386,7 +443,8 @@ int main ( int argc, char** argv )
 {
   /* std::filesystem::path path = EXP_PATH/"15_08_23/smart20D"; */
   /* std::filesystem::path path = EXP_PATH/"19_08_23/eigval2"; */
-  std::filesystem::path path = EXP_PATH/"19_08_23/comparison";
+  /* std::filesystem::path path = EXP_PATH/"19_08_23/comparison"; */
+  std::filesystem::path path = EXP_PATH/"30_08_23/dist2";
   std::filesystem::create_directories(path);
   std::filesystem::current_path(path);
 
@@ -397,7 +455,7 @@ int main ( int argc, char** argv )
   arma::irowvec Ds = {5};
   DTYPE stddev = 0.1;
 
-  size_t rep = 1000;
+  size_t rep = 100;
 
   /* arma::irowvec Ns = arma::regspace<arma::irowvec>(2,10,100); */
   arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,20);
@@ -407,7 +465,12 @@ int main ( int argc, char** argv )
   /* mlpack::RandomSeed(10); */
   for (size_t i=0;i<Ds.n_elem;i++)
   {
-    data::regression::Dataset dataset(Ds(i),10000);
+
+    arma::Col<DTYPE> mean = arma::zeros<arma::Col<DTYPE>>(Ds[i]);
+    arma::Mat<DTYPE> cov =  arma::eye(Ds[i],Ds[i]);
+    cov(1,1) = 100000;
+    /* data::regression::Dataset dataset(Ds(i),10000); */
+    data::regression::Dataset dataset(Ds(i),10000,mean,cov);
     /* data::regression::Dataset dataset(Ds(i),4); */
 
     dataset.Generate(std::string("Linear"),stddev);
@@ -554,12 +617,12 @@ int main ( int argc, char** argv )
     //  lc.test_errors_.save("svd_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
     //}
     
-    /* { */
-    /*   mlpack::RandomSeed(SEED); */
-    /*   src::LCurve<LinearRegression<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true); */
-    /*   lc.Bootstrap(dataset.inputs_,dataset.labels_,0.,false); */
-    /*   lc.test_errors_.save("def_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
-    /* } */
+    {
+      mlpack::RandomSeed(SEED);
+      src::LCurve<LinearRegression<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true);
+      lc.Bootstrap(dataset.inputs_,dataset.labels_,0.,false);
+      lc.test_errors_.save("def_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
+    }
 
     /* { */
     /*   mlpack::RandomSeed(SEED); */
@@ -583,12 +646,19 @@ int main ( int argc, char** argv )
     /*   lc.test_errors_.save("rankpinv_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
     /* } */
 
-    {
-      mlpack::RandomSeed(SEED);
-      src::LCurve<LinearRegression<smarttol>,mlpack::MSE> lc(Ns,rep,true,false,true);
-      lc.Bootstrap(dataset.inputs_,dataset.labels_,0.,false);
-      lc.test_errors_.save("smarttol_"+std::to_string(Ds(i))+".csv",arma::csv_ascii);
-    }
+    /* { */
+    /*   mlpack::RandomSeed(SEED); */
+    /*   src::LCurve<LinearRegression<smarttol>,mlpack::MSE> lc(Ns,rep,true,false,true); */
+    /*   lc.Bootstrap(dataset.inputs_,dataset.labels_,0.,false); */
+    /*   lc.test_errors_.save("smarttol_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+    /* } */
+
+    /* { */
+    /*   mlpack::RandomSeed(SEED); */
+    /*   src::LCurve<LinearRegressionPCA<pinv>,mlpack::MSE> lc(Ns,rep,true,false,true); */
+    /*   lc.Bootstrap(dataset.inputs_,dataset.labels_,0.,false); */
+    /*   lc.test_errors_.save("pca_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+    /* } */
 
     /* mlpack::RandomSeed(SEED); */
     /* { */

@@ -59,6 +59,10 @@ struct covmat
 
     return matrix;
   }
+  arma::Mat<T> GetMatrix ( const arma::Mat<T>& input1 ) const
+  {
+    return GetMatrix(input1, input1); 
+  }
 };
 
 } // namespace utils

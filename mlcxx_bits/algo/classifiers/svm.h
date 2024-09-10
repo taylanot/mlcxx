@@ -12,7 +12,7 @@
 namespace algo {
 namespace classification {
 
-template<class KERNEL=mlpack::GaussianKernel,
+template<class KERNEL=mlpack::LinearKernel,
          class T=DTYPE>
 class KernelSVM 
 {
@@ -27,13 +27,21 @@ class KernelSVM
   { };
 
   /**
-   * @param C : regularization
+   * @param C       : regularization
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const double& C, const Args&... args ) : C_(C),cov_(args...),
-                                                       oneclass_(false) { } ;
-
+  KernelSVM ( const double& C, const Args&... args ) : 
+                       solver_("QP"),C_(C),cov_(args...),oneclass_(false) { } ;
+  /**
+   * @param solver  : which optimization method QP or SMO
+   * @param C       : regularization
+   * @param args    : kernel parameters
+   */
+  template<class... Args>
+  KernelSVM ( const std::string solver, 
+              const double& C, const Args&... args ) :
+                        solver_(solver),C_(C),cov_(args...),oneclass_(false) { } ;
   /**
    * @param inputs  : X
    * @param labels  : y
@@ -68,7 +76,7 @@ class KernelSVM
    * @param labels  : y*
    */
   void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& labels ) const;
+                  arma::Row<size_t>& labels );
 
 /**
    * @param inputs    : X*
@@ -77,7 +85,7 @@ class KernelSVM
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels,
-                  arma::Mat<T>& dec_func ) const;
+                  arma::Mat<T>& dec_func );
   /**
    * Calculate the Error Rate
    *
@@ -85,7 +93,7 @@ class KernelSVM
    * @param labels  : y* 
    */
   T ComputeError ( const arma::Mat<T>& points, 
-                   const arma::Row<size_t>& responses ) const;
+                   const arma::Row<size_t>& responses );
   /**
    * Calculate the Accuracy
    *
@@ -94,7 +102,7 @@ class KernelSVM
    * 
    */
   T ComputeAccuracy ( const arma::Mat<T>& points, 
-                      const arma::Row<size_t>& responses ) const;
+                      const arma::Row<size_t>& responses );
 
   /**
    * Serialize the model.
@@ -112,20 +120,48 @@ class KernelSVM
     ar & BOOST_SERIALIZATION_NVP(b_);
     ar & BOOST_SERIALIZATION_NVP(C_);
     ar & BOOST_SERIALIZATION_NVP(oneclass_);
+    ar & BOOST_SERIALIZATION_NVP(solver_);
   }
 
 private:
+  std::string solver_ = "SMO";
   T C_;
   utils::covmat<KERNEL> cov_;
   const arma::Mat<T>* X_;
   arma::Row<int> y_;
   arma::Row<size_t> ulab_;
   arma::Row<T> alphas_;
+  arma::Row<T> old_alphas_;
   arma::uvec idx_;
-  T b_;
+  T b_ = 0;
   bool oneclass_;
+  const T eps_ = 1e-12;
+  const size_t max_iter_ = 10000;
+  size_t iter_ = 0;
+  size_t iterx_ = 0;
+  
 
+  /**
+   * @param inputs  : X
+   * @param labels  : y
+   */
 
+  void _QP ( const arma::Mat<T>& inputs,
+             const arma::Row<size_t>& labels );
+
+  void _SMO ( const arma::Mat<T>& inputs,
+              const arma::Row<size_t>& labels );
+
+  int _E ( size_t i );
+
+  arma::Row<T> _w ( );
+
+  T _b ( const arma::Row<T>& w );
+
+  arma::Row<T> _getLH ( size_t i, size_t j,
+                        const arma::Row<T>& alpha_update );
+
+  size_t _geti ( size_t j, size_t N );
 };
 } // namespace classification
 } // namespace algo

@@ -12,3 +12,6 @@ After installing these packages you should be able to use the makefile and run t
 ```
 docker pull taylanot/cxx-dev:latest
 ```
+
+## Documentation for various functionalities
+[Algorithms](documents/algo.md)

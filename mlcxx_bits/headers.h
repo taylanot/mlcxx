@@ -26,6 +26,24 @@ const unsigned int SEED = 8 ; // KOBEEEE
 
 #define PRINT_ERR(...) std::cerr << '\n' <<  __VA_ARGS__ << '\n' << std::endl; 
 
+#ifdef DISABLE_WARNINGS
+#define WARNING(msg) // Do nothing
+#else
+#define WARNING(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
+#endif
+
+#ifdef DISABLE_LOGS
+#define LOG(msg) // Do nothing
+#else
+#define LOG(msg) std::clog  << "\n" << "Log  : " << msg << std::endl << "\n"
+#endif
+
+#ifdef DISABLE_ERRORS
+#define ERR(msg) // Do nothing
+#else
+#define ERR(msg) std::clog <<  "\n" << "Error  : " << msg << std::endl << "\n" 
+#endif
+
 //#define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << " / jem " << jem::JEM_VERSION <<'\n' << std::endl; 
 #define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << '\n' << std::endl; 
 
@@ -33,6 +51,8 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #ifndef DTYPE
 #define DTYPE double
 #endif
+
+
 
 // standard
 #include <any>
@@ -54,6 +74,13 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <limits>
 #include <random>
 #include <cassert>
+#include <regex>
+
+
+// Define some of the constants paths
+const std::filesystem::path MLCXX_PATH = std::filesystem::current_path();
+const std::filesystem::path DATASET_PATH = MLCXX_PATH.parent_path()/"datasets";
+const std::filesystem::path EXP_PATH = MLCXX_PATH.parent_path()/".exp";
 
 // boost 
 #include <boost/assert.hpp>
@@ -83,6 +110,4 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include "src/src.h"
 
 
-const std::filesystem::path MLCXX_PATH = std::filesystem::current_path();
-const std::filesystem::path DATASET_PATH = MLCXX_PATH.parent_path()/"datasets";
-const std::filesystem::path EXP_PATH = MLCXX_PATH.parent_path()/".exp";
+

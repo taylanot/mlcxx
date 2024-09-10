@@ -22,7 +22,7 @@ namespace functional {
 template<class T=DTYPE>
 std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
                                                const arma::Mat<T>& labels,
-                                               const bool mean_add = "false" )
+                                               const bool mean_add = false )
 {
 
   arma::Col<T> eigenvalues;
