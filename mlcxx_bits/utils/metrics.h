@@ -24,7 +24,10 @@ public:
    * @param data Column-major data containing test items.
    * @param labels Ground truth (correct) labels for the test items.
    */
-  template<typename MLAlgorithm, typename DataType, typename LabelType, class O=DTYPE>
+  template<typename MLAlgorithm,
+           typename DataType,
+           typename LabelType,
+           class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
                      const LabelType& labels )
@@ -33,9 +36,11 @@ public:
     LabelType preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
-    probs.clamp(std::numeric_limits<O>::epsilon(),1.-std::numeric_limits<O>::epsilon());
+    probs.clamp(std::numeric_limits<O>::epsilon(),
+                1.-std::numeric_limits<O>::epsilon());
     LabelType labs = arma::clamp(labels,1.e-16,1.-1.e-16);
 
+    PRINT_VAR(arma::size(probs));
     return -arma::accu( labs % arma::log(arma::max(probs,0))
                       +(1.-labs)%arma::log(1.-arma::max(probs,0))
                       ) /preds.n_cols;
@@ -54,7 +59,10 @@ public:
    * @param data Column-major data containing test items.
    * @param labels Ground truth (correct) labels for the test items.
    */
-  template<typename MLAlgorithm, typename DataType, typename LabelType, class O=DTYPE>
+  template<typename MLAlgorithm,
+           typename DataType,
+           typename LabelType,
+           class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
                      const LabelType& labels )
@@ -76,7 +84,10 @@ public:
    * @param data Column-major data containing test items.
    * @param labels Ground truth (correct) labels for the test items.
    */
-  template<typename MLAlgorithm, typename DataType, typename LabelType, class O=DTYPE>
+  template<typename MLAlgorithm,
+           typename DataType,
+           typename LabelType,
+           class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
                      const LabelType& labels )
@@ -122,10 +133,13 @@ class MSEClass
    * @param data Column-major data containing test items.
    * @param labels Ground truth (correct) labels for the test items.
    */
-  template<typename MLAlgorithm, typename DataType, typename LabelType,class O=DTYPE>
+  template<typename MLAlgorithm,
+           typename DataType,
+           typename LabelType,
+           class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
-                     const arma::Row<size_t>& labels )
+                     const LabelType& labels )
   {
     mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
         "MSE::Evaluate()",
@@ -139,6 +153,55 @@ class MSEClass
 
   static const bool NeedsMinimization = true;
 };
+
+/*template<class O=DTYPE> */
+/*class ClassMetrics */
+/*{ */
+/*public: */
+/*  ClassMetrics ( size_t N, size_t rep ) */  
+/*  { */
+/*    res_["f1"] = arma::zeros<arma::Mat<O>>(N,rep); */
+/*    res_["f2"] = arma::zeros<arma::Mat<O>>(N,rep); */
+/*    res_["acc"] = arma::zeros<arma::Mat<O>>(N,rep); */
+/*    res_["hng"] = arma::zeros<arma::Mat<O>>(N,rep); */
+/*  } */
+/*  /1** */
+/*   * Run classification and calculate Mean Squared Error. */
+/*   * */
+/*   * @param model A classification model. */
+/*   * @param data Column-major data containing test items. */
+/*   * @param labels Ground truth (correct) labels for the test items. */
+/*   * @param i, j are the indeces to fill in the metric class */ 
+/*   *1/ */
+/*  template<typename MLAlgorithm, */
+/*           typename DataType, */
+/*           typename LabelType> */
+/*  void Evaluate( MLAlgorithm& model, */
+/*                 const DataType& data, */
+/*                 const LabelType& labels, */
+/*                 const size_t i, const size_t j ) */
+/*  { */
+/*    mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols, */
+/*                                 "MSE::Evaluate()", */
+/*                                 "responses"); */
+
+/*    LabelType predictedResponses; */
+/*    model.Classify(data, predictedResponses); */
+/*    res_["acc"](i,j) = acc_.Evaluate(model,data,labels); */
+/*  } */
+
+/*  /1* std::map<std::string, arma::Mat<O>>  GetField ( std::string ) *1/ */ 
+/*  /1* { *1/ */
+/*  /1*   return *1/ */ 
+/*  /1* } *1/ */
+
+/*private: */
+/*  std::map<std::string, arma::Mat<O>> rer_; */ 
+/*  mlpack::Accuracy acc_; */
+ 
+/*}; */
+
+
 
 } // namespace utils
 

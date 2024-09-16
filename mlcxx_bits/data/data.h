@@ -9,6 +9,7 @@
 
 
 #include "dataset.h"
+#include "collect.h"
 #include "manip.h"
 #include "transform.h"
 

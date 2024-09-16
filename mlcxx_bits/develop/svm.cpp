@@ -19,23 +19,24 @@ int main() {
   double l = 1.;
 
   // Create SVM object and train
-  /* algo::classification::KernelSVM svm(C); */
-  /* svm.Train(X, y); */
 
-  algo::classification::KernelSVM<mlpack::GaussianKernel> svm(X,y,C);
+  algo::classification::SVM<mlpack::GaussianKernel> svm(X,y,C);
   PRINT(svm.ComputeAccuracy(X, y));
 
-  /* data::classification::Dataset trainset(2,100,2); */
-  /* data::classification::Dataset testset(2,1000,2); */
-  /* trainset.Generate("Harder"); */
-  /* testset.Generate("Harder"); */
+  /* data::classification::Dataset trainset(2,10,2); */
+  /* data::classification::Dataset testset(2,3,2); */
+  /* trainset.Generate("Simple"); */
+  /* testset.Generate("Simple"); */
   
 
   /* algo::classification::KernelSVM<mlpack::GaussianKernel> */ 
   /*   svm2(trainset.inputs_,trainset.labels_,C); */
   /* PRINT(svm2.ComputeAccuracy(testset.inputs_, testset.labels_)); */
 
-  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,10); */
+  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,2); */
+  /* src::LCurve<algo::classification::LDC<>, */
+  /*             mlpack::Accuracy> */ 
+  /*   lcurve(Ns,100,true,false,true); */
   /* src::LCurve<algo::classification::KernelSVM<mlpack::GaussianKernel>, */
   /* /1* src::LCurve<algo::classification::KernelSVM<mlpack::LinearKernel>, *1/ */
   /*             mlpack::Accuracy, */
@@ -43,8 +44,8 @@ int main() {
   /*   lcurve(Ns,100,true,false,true); */
 
   /* /1* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,1.,1.); *1/ */
-  /* lcurve.Split(trainset,testset); */
-  /* lcurve.test_errors_.save("svc.csv",arma::csv_ascii); */
+  /* lcurve.Split(trainset,testset,2); */
+  /* lcurve.test_errors_.save("ldc.csv",arma::csv_ascii); */
 
 
 

@@ -222,9 +222,11 @@ public:
   size_t num_class_;
   std::filesystem::path path_; 
 
+private:
   std::filesystem::path filepath_ = path_ / "openml/datasets";
   std::filesystem::path metapath_ = path_ / "openml/meta";
 
+public:
   arma::Mat<T> inputs_;
   arma::Row<size_t> labels_;
 

@@ -84,7 +84,7 @@ public:
    *
    */
 
-  arma::mat GetResults (  ) {return results_;}
+  arma::Mat<O> GetResults (  ) const  {return results_;}
 
 private:
   SPLIT split_;
@@ -96,6 +96,8 @@ private:
   bool save_data_;
   std::string name_;
   arma::Mat<O> results_;
+
+  LOSS loss_;
 
 public:
   arma::Mat<O> test_errors_;

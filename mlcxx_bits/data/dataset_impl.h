@@ -807,7 +807,6 @@ void Dataset<T>::_load( )
   arma::Mat<DTYPE> data;
   mlpack::data::DatasetInfo info;
   mlpack::data::Load(file_.c_str(), data, info);
-  PRINT(_gettargetname(_readmetadata()));
   idx =_findlabel(_gettargetname(_readmetadata()));
 
   if (idx<0)

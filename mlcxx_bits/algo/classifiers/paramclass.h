@@ -23,40 +23,46 @@ class LDC
   /**
    * Non-working model 
    */
-  LDC ( ) : lambda_(1.e-5) { };
+  LDC ( ) : lambda_(0.) { };
 
   /**
    * @param lambda  : regularization
    */
-  LDC ( const double& lambda ) : lambda_(lambda) { } ;
+  LDC ( const size_t& num_class, const double& lambda ) : num_class_(num_class),
+                                                          lambda_(lambda) { } ;
 
   /**
    * @param inputs  : X
    * @param labels  : y
-   * @param lambda  : regularization
+   * @param num_class : number of classes
    */
   LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class );
+ 
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   * @param lambda    : regularization
+   */
+  LDC ( const arma::Mat<T>& inputs,
+        const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const double& lambda );
    /**
    * @param inputs  : X
    * @param labels  : y
+   * @param num_class : number of classes
    * @param lambda  : regularization
    * @param priors  : known priors
    */
   LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const double& lambda,
         const arma::Row<T>& priors );
                                
-  /**
-   * @param inputs  : X
-   * @param labels  : y
-   */
-
-  LDC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels );
-
   /**
    * @param inputs  : X
    * @param labels  : y
@@ -71,6 +77,14 @@ class LDC
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
+  /**
+   * @param inputs  : X*
+   * @param labels  : y*
+   * @param probs   : scores*
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& scores ) const;
   /**
    * Calculate the Error Rate
    *
@@ -115,8 +129,9 @@ class LDC
 
   double lambda_;
 
-  double jitter_ = 0.;
+  double jitter_ = 1.e-8;
   
+  // Using maps since it easier to deal with all combinations of labels
   std::map<size_t, arma::Row<T>> means_;
   std::map<size_t, arma::Mat<T>> covs_;
 
@@ -124,6 +139,7 @@ class LDC
   arma::Mat<T> mean_;
 
   arma::Row<size_t> unique_;
+  arma::Row<size_t> class_;
   arma::Row<T> priors_;
 
 };
@@ -139,38 +155,46 @@ class QDC
   /**
    * Non-working model 
    */
-  QDC ( ) : lambda_(1.e-5) { };
+  QDC ( ) : lambda_(0.) { };
 
   /**
+   * @param num_class : number of classes
    * @param lambda  : regularization
    */
-  QDC ( const double& lambda ) : lambda_(lambda) { } ;
+  QDC ( const size_t& num_class, const double& lambda ) : num_class_(num_class),
+                                                          lambda_(lambda) { } ;
 
   /**
    * @param inputs  : X
    * @param labels  : y
+   * @param num_class : number of classes
    * @param lambda  : regularization
    */
   QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const double& lambda );
    /**
    * @param inputs  : X
    * @param labels  : y
+   * @param num_class : number of classes
    * @param lambda  : regularization
    * @param priors  : known priors
    */
   QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const double& lambda,
         const arma::Row<T>& priors );
                                
   /**
    * @param inputs  : X
    * @param labels  : y
+   * @param num_class : number of classes
    */
   QDC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels );
+        const arma::Row<size_t>& labels,
+        const size_t& num_class);
 
   /**
    * @param inputs  : X
@@ -185,7 +209,14 @@ class QDC
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
-
+  /**
+   * @param inputs  : X*
+   * @param labels  : y*
+   * @param probs   : scores*
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& scores ) const;
   /**
    * Calculate the Error Rate
    *
@@ -231,13 +262,14 @@ class QDC
 
   double lambda_;
   
-  double jitter_ = 1.e-12;
+  double jitter_ = 1.e-8;
 
   std::map<size_t, arma::Row<T>> means_;
   std::map<size_t, arma::Mat<T>> covs_;
   std::map<size_t, arma::Mat<T>> icovs_;
 
   arma::Row<size_t> unique_;
+  arma::Row<size_t> class_;
   arma::Row<T> priors_;
 
 };
@@ -292,6 +324,14 @@ class FDC
                   arma::Row<size_t>& labels ) const;
 
   /**
+   * @param inputs  : X*
+   * @param labels  : y*
+   * @param probs   : scores*
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& scores ) const;
+  /**
    * Calculate the Error Rate
    *
    * @param inputs 
@@ -345,7 +385,6 @@ class FDC
 //=============================================================================
 // Nearest Mean Classifier 
 //=============================================================================
-//
 template<class T=DTYPE>
 class NMC
 {
@@ -438,6 +477,7 @@ class NMC
   mlpack::EuclideanDistance metric_;
 
 };
+
 } // namespace classification
 } // namespace algo
 

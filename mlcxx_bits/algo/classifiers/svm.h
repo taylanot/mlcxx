@@ -14,7 +14,7 @@ namespace classification {
 
 template<class KERNEL=mlpack::LinearKernel,
          class T=DTYPE>
-class KernelSVM 
+class SVM 
 {
   public:
 
@@ -23,7 +23,7 @@ class KernelSVM
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
+  SVM ( const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
   { };
 
   /**
@@ -31,7 +31,7 @@ class KernelSVM
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const double& C, const Args&... args ) : 
+  SVM ( const double& C, const Args&... args ) : 
                        solver_("QP"),C_(C),cov_(args...),oneclass_(false) { } ;
   /**
    * @param solver  : which optimization method QP or SMO
@@ -39,7 +39,7 @@ class KernelSVM
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const std::string solver, 
+  SVM ( const std::string solver, 
               const double& C, const Args&... args ) :
                         solver_(solver),C_(C),cov_(args...),oneclass_(false) { } ;
   /**
@@ -49,7 +49,7 @@ class KernelSVM
    * @param args    : kernel parameters
    */
   template<class... Args>
-  KernelSVM ( const arma::Mat<T>& inputs,
+  SVM ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
               const double& C,
               const Args&... args );
@@ -60,7 +60,7 @@ class KernelSVM
    */
 
   template<class... Args>
-  KernelSVM ( const arma::Mat<T>& inputs,
+  SVM ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
               const Args&... args );
 
@@ -135,10 +135,9 @@ private:
   arma::uvec idx_;
   T b_ = 0;
   bool oneclass_;
-  const T eps_ = 1e-12;
-  const size_t max_iter_ = 10000;
+  T eps_ = 1e-12;
+  size_t max_iter_ = 10000;
   size_t iter_ = 0;
-  size_t iterx_ = 0;
   
 
   /**

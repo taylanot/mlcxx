@@ -75,6 +75,8 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <random>
 #include <cassert>
 #include <regex>
+#include <type_traits>
+
 
 
 // Define some of the constants paths

@@ -18,8 +18,10 @@ namespace classification {
 
 template<class T>
 LDC<T>::LDC ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels ) : lambda_(0.)
+              const arma::Row<size_t>& labels,
+              const size_t& num_class ) :  num_class_(num_class), lambda_(0.)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -27,9 +29,12 @@ LDC<T>::LDC ( const arma::Mat<T>& inputs,
 template<class T>
 LDC<T>::LDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
+              const size_t& num_class,
               const double& lambda,
-              const arma::Row<T>& priors ) : lambda_(lambda), priors_(priors)
+              const arma::Row<T>& priors ) : num_class_(num_class),
+                                             lambda_(lambda), priors_(priors)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -37,8 +42,10 @@ LDC<T>::LDC ( const arma::Mat<T>& inputs,
 template<class T>
 LDC<T>::LDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
-              const double& lambda ) : lambda_(lambda)
+              const size_t& num_class,
+              const double& lambda ) : num_class_(num_class), lambda_(lambda)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -50,62 +57,73 @@ void LDC<T>::Train ( const arma::Mat<T>& inputs,
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
   unique_ = arma::unique(labels);
-  num_class_ = unique_.n_cols;
-  cov_.resize(dim_,dim_);
-  cov_.zeros();
-  
-  arma::Row<size_t>::iterator it = unique_.begin();
-  arma::Row<size_t>::iterator end = unique_.end();
-
-  arma::Mat<T> inx;
-
-  for(; it!=end; it++)
+  if (unique_.n_elem != 1)
   {
-    auto extract = utils::extract_class(inputs, labels, *it);
-
-    inx = std::get<0>(extract);
+    cov_.resize(dim_,dim_);
+    cov_.zeros();
     
-    means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
-    if ( inx.n_cols == 1 )
+    arma::Row<size_t>::iterator it = unique_.begin();
+    arma::Row<size_t>::iterator end = unique_.end();
+
+    arma::Mat<T> inx;
+
+    for(; it!=end; it++)
     {
-      covs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
+      auto extract = utils::extract_class(inputs, labels, *it);
+      inx = std::get<0>(extract);
+      means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
+      if ( inx.n_cols == 1 )
+      {
+        covs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
+      }
+      else
+      {
+        covs_[*it] = arma::cov(inx.t());
+        covs_[*it].diag() += jitter_+lambda_;
+      }
+      cov_ += covs_[*it];
     }
-    else
-    {
-      covs_[*it] = arma::cov(inx.t());
-      covs_[*it].diag() += jitter_+lambda_;
-    }
-    cov_ += covs_[*it];
+    cov_ = cov_.i() / num_class_;
   }
-  cov_ = cov_.i() / num_class_;
 }
 
 template<class T>
 void LDC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
 {
+  arma::Mat<T> temp;
+  Classify(inputs, labels, temp);
+}
+
+template<class T>
+void LDC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels,
+                        arma::Mat<T>& probs ) const
+{
   const size_t N = inputs.n_cols;
   labels.resize(N);
-
-  if ( num_class_ == 1 )
+  probs.resize(num_class_,N);
+  if ( unique_.n_elem == 1 )
+  {
     labels.fill(unique_(0));
+    probs.row(unique_(0)).fill(1.);
+  }
   else
   {
-    std::map<size_t, arma::Row<T>> scores;
-
-    arma::Row<T> class_scores;
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
-      class_scores.resize(num_class_);
-      for ( size_t c=0; c<num_class_; c++ )
+      for ( size_t c=0; c<unique_.n_elem; c++ )
       {
-        class_scores(c) = std::log(priors_(c)) 
-                  -  0.5*arma::dot(means_.at(unique_(c))*
+        probs(c,n) = std::log(priors_(c)) 
+                     -  0.5*arma::dot(means_.at(unique_(c))*
                       cov_, means_.at(unique_(c)))
                   + arma::dot(inputs.col(n).t()*cov_,means_.at(unique_(c)));
       }
-        labels(n) = unique_(class_scores.index_max());
+      labels(n) = class_(probs.col(n).index_max());
+      
     }
+    probs = arma::exp(probs.each_row() - arma::max(probs,0));
+    probs = probs.each_row()/arma::sum(probs,0);
   }
 }
 
@@ -132,8 +150,10 @@ T LDC<T>::ComputeAccuracy ( const arma::Mat<T>& points,
 
 template<class T>
 QDC<T>::QDC ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels ) : lambda_(0.)
+              const arma::Row<size_t>& labels,
+              const size_t& num_class ) : num_class_(num_class), lambda_(0.)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -141,9 +161,12 @@ QDC<T>::QDC ( const arma::Mat<T>& inputs,
 template<class T>
 QDC<T>::QDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
+              const size_t& num_class,
               const double& lambda,
-              const arma::Row<T>& priors ) : lambda_(lambda), priors_(priors)
+              const arma::Row<T>& priors ) : num_class_(num_class),
+                                             lambda_(lambda), priors_(priors)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -151,8 +174,10 @@ QDC<T>::QDC ( const arma::Mat<T>& inputs,
 template<class T>
 QDC<T>::QDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
-              const double& lambda ) : lambda_(lambda)
+              const size_t& num_class,
+              const double& lambda ) : num_class_(num_class), lambda_(lambda)
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
   priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
@@ -164,7 +189,6 @@ void QDC<T>::Train ( const arma::Mat<T>& inputs,
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
   unique_ = arma::unique(labels);
-  num_class_ = unique_.n_cols;
   
   arma::Row<size_t>::iterator it = unique_.begin();
   arma::Row<size_t>::iterator end = unique_.end();
@@ -196,31 +220,42 @@ template<class T>
 void QDC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
 {
+  arma::Mat<T> temp;
+  Classify(inputs, labels, temp);
+}
+
+template<class T>
+void QDC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels,
+                        arma::Mat<T>& probs ) const
+{
   const size_t N = inputs.n_cols;
   labels.resize(N);
-  arma::Row<T> temp_labels;
+  probs.resize(num_class_,N);
 
   if ( num_class_ == 1 )
+  {
     labels.fill(unique_(0));
+    probs.row(unique_(0)).fill(1.);
+  }
   else
   {
-    std::map<size_t, arma::Row<T>> scores;
-
-    arma::Row<T> class_scores;
     arma::Row<T> norm;
+
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
-      class_scores.resize(num_class_);
-      for ( size_t c=0; c<num_class_; c++ )
+      for ( size_t c=0; c<unique_.n_elem; c++ )
       {
         norm = inputs.col(n).t() - means_.at(unique_(c));
-        class_scores(c) = std::log(priors_(c)) 
+        probs(class_(unique_(c)),n) = std::log(priors_(c)) 
                   -  0.5*arma::det(covs_.at(unique_(c)))
                   - 0.5* arma::dot(norm*icovs_.at(unique_(c)),norm);
       }
-        labels(n) = unique_(class_scores.index_max());
+      labels(n) = class_(probs.col(n).index_max());
+      
     }
-   
+    probs = arma::exp(probs.each_row() - arma::max(probs,0));
+    probs = probs.each_row()/arma::sum(probs,0);
   }
 }
 

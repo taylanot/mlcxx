@@ -14,7 +14,7 @@ namespace classification {
  
 template<class KERNEL,class T>
 template<class... Args>
-KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
+SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
                                  const arma::Row<size_t>& labels,
                                  const double& C,
                                  const Args&... args) : C_(C), cov_(args...),
@@ -25,7 +25,7 @@ KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
 
 template<class KERNEL,class T>
 template<class... Args>
-KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
+SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
                                  const arma::Row<size_t>& labels,
                                  const Args&... args ): C_(1.0), cov_(args...),
                                                         oneclass_(false)
@@ -34,7 +34,7 @@ KernelSVM<KERNEL,T>::KernelSVM ( const arma::Mat<T>& inputs,
 }
 
 template<class KERNEL,class T>
-void KernelSVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
+void SVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
                                   const arma::Row<size_t>& y )
 {
   if (solver_ == "QP")
@@ -46,12 +46,12 @@ void KernelSVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
 }
 
 template<class KERNEL,class T>
-void KernelSVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
+void SVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
                                  const arma::Row<size_t>& y )
 {
   ulab_ = arma::unique(y);
   BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0,
-                  "KernelSVM:Only binary labels, please!");
+                  "SVM:Only binary labels, please!");
 
   if (ulab_.n_elem == 1)
   {
@@ -101,27 +101,27 @@ void KernelSVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
 }
 
 template<class KERNEL,class T>
-int KernelSVM<KERNEL,T>::_E ( size_t i )
+int SVM<KERNEL,T>::_E ( size_t i )
 {
   arma::Row<T> w = _w();
   return (arma::sign( w * X_->col(i) + _b(w) ).eval() - y_(i)).eval()(0,0);
 }
 
 template<class KERNEL,class T>
-arma::Row<T> KernelSVM<KERNEL,T>::_w ( )
+arma::Row<T> SVM<KERNEL,T>::_w ( )
 {
   return (alphas_ % y_) * X_->t() ;
 }
 
 template<class KERNEL,class T>
-T KernelSVM<KERNEL,T>::_b ( const arma::Row<T>& w )
+T SVM<KERNEL,T>::_b ( const arma::Row<T>& w )
 {
   b_ = arma::mean(y_ - (w * (*X_))); 
   return b_;
 }
 
 template<class KERNEL,class T>
-arma::Row<T> KernelSVM<KERNEL,T>::_getLH ( size_t i, size_t j,
+arma::Row<T> SVM<KERNEL,T>::_getLH ( size_t i, size_t j,
                                            const arma::Row<T>& updates )
 {
   arma::Row<T> LH(2);
@@ -139,7 +139,7 @@ arma::Row<T> KernelSVM<KERNEL,T>::_getLH ( size_t i, size_t j,
 }
 
 template<class KERNEL,class T>
-size_t KernelSVM<KERNEL,T>::_geti ( size_t j, size_t N )
+size_t SVM<KERNEL,T>::_geti ( size_t j, size_t N )
 {
   /* arma::Row<T> is = {1,2,0,1,0,3,4,0,1,2}; */
   /* return is(iterx_++); */
@@ -155,12 +155,12 @@ size_t KernelSVM<KERNEL,T>::_geti ( size_t j, size_t N )
 }
 
 template<class KERNEL,class T>
-void KernelSVM<KERNEL,T>::_QP ( const arma::Mat<T>& X,
+void SVM<KERNEL,T>::_QP ( const arma::Mat<T>& X,
                                 const arma::Row<size_t>& y )
 {
   ulab_ = arma::unique(y);
   BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0,
-                  "KernelSVM:Only binary labels, please!");
+                  "SVM:Only binary labels, please!");
 
   if (ulab_.n_elem == 1)
   {
@@ -200,8 +200,8 @@ void KernelSVM<KERNEL,T>::_QP ( const arma::Mat<T>& X,
 }
 
 template<class KERNEL,class T>
-void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
-                                     arma::Row<size_t>& preds ) 
+void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
+                               arma::Row<size_t>& preds ) 
 {
   if (!oneclass_)
   {
@@ -216,21 +216,21 @@ void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
 }
 
 template<class KERNEL,class T>
-void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
+void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
                                      arma::Row<size_t>& preds,
-                                     arma::Mat<T>& dec_func ) 
+                                     arma::Mat<T>& probs ) 
 {
+  arma::Mat<T> dec_func;
   if (!oneclass_)
   {
     if (idx_.n_elem>0)
     {
       preds.set_size(inputs.n_cols);
-      /* dec_func = alphas_.cols(idx_) % y_.cols(idx_) * */
-      /* cov_.GetMatrix(X_->cols(idx_), inputs) + b_; */
       arma::Row<T> w = _w();
-      dec_func = arma::sign( w * inputs + _b(w) );
+      dec_func =  w * inputs + _b(w) ;
       preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
       preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
+      probs = (dec_func - arma::min(dec_func,1).eval()(0,0))  / (arma::max(dec_func,1) - arma::min(dec_func,1)).eval()(0,0);
     }
     else
     {
@@ -246,9 +246,10 @@ void KernelSVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
     preds.fill(ulab_[0]);
   }
 }
+
 template<class KERNEL,class T>
-T KernelSVM<KERNEL,T>::ComputeError ( const arma::Mat<T>& points, 
-                                      const arma::Row<size_t>& responses ) 
+T SVM<KERNEL,T>::ComputeError ( const arma::Mat<T>& points, 
+                                const arma::Row<size_t>& responses ) 
 {
   arma::Row<size_t> predictions;
   Classify(points,predictions);
@@ -257,7 +258,7 @@ T KernelSVM<KERNEL,T>::ComputeError ( const arma::Mat<T>& points,
 }
 
 template<class KERNEL,class T>
-T KernelSVM<KERNEL,T>::ComputeAccuracy ( const arma::Mat<T>& points, 
+T SVM<KERNEL,T>::ComputeAccuracy ( const arma::Mat<T>& points, 
                                          const arma::Row<size_t>& responses )
 {
   return (1. - ComputeError(points, responses))*100;

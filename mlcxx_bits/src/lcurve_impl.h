@@ -51,7 +51,6 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
         "There are not enough data for test set creation!" );
   BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
         "Only 1D outputs are allowed!" );
-  LOSS loss;
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
 
@@ -67,8 +66,8 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
       T ytst = std::get<3>(res);
 
       MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = loss.Evaluate(model, Xtst, ytst);
-      train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
+      test_errors_(j,i) = loss_.Evaluate(model, Xtst, ytst);
+      train_errors_(j,i) = loss_.Evaluate(model, Xtrn, ytrn);
       if (prog_)
         pb.Update();
     }
@@ -102,7 +101,6 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
         "There are not enough data for test set creation!" );
   BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
         "Only 1D outputs are allowed!" );
-  LOSS loss;
 
   ProgressBar pb("LCurve.Additive", Ns_.n_elem*repeat_);
 
@@ -118,14 +116,14 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
     T yrest = std::get<3>(res);
 
     MODEL model(Xtrn, ytrn, args...);
-    test_errors_(j,0) = loss.Evaluate(model,Xrest,yrest);
-    train_errors_(j,0) = loss.Evaluate(model, Xtrn, ytrn);
+    test_errors_(j,0) = loss_.Evaluate(model,Xrest,yrest);
+    train_errors_(j,0) = loss_.Evaluate(model, Xtrn, ytrn);
     for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
     {
       data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
       MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = loss.Evaluate(model,Xrest,yrest);
-      train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
+      test_errors_(j,i) = loss_.Evaluate(model,Xrest,yrest);
+      train_errors_(j,i) = loss_.Evaluate(model, Xtrn, ytrn);
       if (prog_)
         pb.Update();
     }
@@ -162,7 +160,6 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
   BOOST_ASSERT_MSG( int(trainset.labels_.n_rows) == int(1) &&
                     int(testset.labels_.n_rows) == int(1), 
                     "Only 1D outputs are allowed!" );
-  LOSS loss;
 
   ProgressBar pb("LCurve.Split", Ns_.n_elem*repeat_);
 
@@ -177,9 +174,9 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
       auto ytrn = std::get<2>(res);
 
       MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_,
+      test_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, testset.inputs_,
                           testset.labels_));
-      train_errors_(j,i) = static_cast<O>(loss.Evaluate(model, Xtrn, ytrn));
+      train_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, Xtrn, ytrn));
       if (prog_)
         pb.Update();
     }
