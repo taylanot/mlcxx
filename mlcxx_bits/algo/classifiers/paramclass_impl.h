@@ -114,10 +114,10 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
       {
-        probs(c,n) = std::log(priors_(c)) 
-                     -  0.5*arma::dot(means_.at(unique_(c))*
-                      cov_, means_.at(unique_(c)))
-                  + arma::dot(inputs.col(n).t()*cov_,means_.at(unique_(c)));
+        probs(class_(unique_(c)),n) = std::log(priors_(c)) 
+                       -  0.5*arma::dot(means_.at(unique_(c))*
+                        cov_, means_.at(unique_(c)))
+                    + arma::dot(inputs.col(n).t()*cov_,means_.at(unique_(c)));
       }
       labels(n) = class_(probs.col(n).index_max());
       
