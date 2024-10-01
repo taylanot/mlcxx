@@ -14,10 +14,10 @@
 #include "algo/regressors/kernelridge.h"
 #include "algo/regressors/functionalsmoothing.h"
 #include "algo/regressors/approx.h"
+#include "algo/classifiers/multiclass.h"
 #include "algo/classifiers/paramclass.h"
 #include "algo/classifiers/nonparamclass.h"
 #include "algo/classifiers/svm.h"
-#include "algo/classifiers/multiclass.h"
 
 
 #endif

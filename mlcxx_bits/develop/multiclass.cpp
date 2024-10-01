@@ -13,7 +13,7 @@ int main()
 
   /* algo::classification::OnevAll<mlpack::LogisticRegression<arma::mat>> */ 
   algo::classification::OnevAll<algo::classification::SVM<mlpack::GaussianKernel>>
-    model(dataset.inputs_,dataset.labels_,1.);
+    model(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).n_elem,1.);
   /* algo::classification::MultiClass<algo::classification::KernelSVM<>> */ 
   /*   model(dataset.inputs_,dataset.labels_,1.,0.01); */
   arma::Row<size_t> preds;

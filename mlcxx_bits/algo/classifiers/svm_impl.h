@@ -15,27 +15,61 @@ namespace classification {
 template<class KERNEL,class T>
 template<class... Args>
 SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
-                                 const arma::Row<size_t>& labels,
-                                 const double& C,
-                                 const Args&... args) : C_(C), cov_(args...),
-                                                        oneclass_(false)
+                     const arma::Row<size_t>& labels,
+                     const size_t& num_class,
+                     const double& C,
+                     const Args&... args) : 
+                      nclass_(num_class), C_(C), cov_(args...)
+                                                        
 {
-  Train(inputs,labels);
+  ulab_ = arma::unique(labels);
+
+  if (ulab_.n_elem == 1)
+  {
+    oneclass_ = true;
+    return;
+  }
+
+  else
+  {
+    if (nclass_ == 2)
+    {
+      this->Train(inputs,labels);
+    }
+    else
+    {
+      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels, size_t(2), C, args...);
+    }
+  }
 }
 
 template<class KERNEL,class T>
 template<class... Args>
 SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
-                                 const arma::Row<size_t>& labels,
-                                 const Args&... args ): C_(1.0), cov_(args...),
-                                                        oneclass_(false)
+                     const arma::Row<size_t>& labels,
+                     const size_t& num_class,
+                     const Args&... args ) :
+                      nclass_(num_class), C_(1.0), cov_(args...)
 {
-  Train(inputs,labels);
+  ulab_ = arma::unique(labels);
+
+  if (ulab_.n_elem == 1)
+  {
+    oneclass_ = true;
+    return;
+  }
+  else
+  {
+    if (nclass_ == 2)
+      this->Train(inputs,labels);
+    else
+      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels, 2, C_, args...);
+  }
 }
 
 template<class KERNEL,class T>
 void SVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
-                                  const arma::Row<size_t>& y )
+                            const arma::Row<size_t>& y )
 {
   if (solver_ == "QP")
     _QP(X,y);
@@ -47,17 +81,9 @@ void SVM<KERNEL,T>::Train ( const arma::Mat<T>& X,
 
 template<class KERNEL,class T>
 void SVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
-                                 const arma::Row<size_t>& y )
+                           const arma::Row<size_t>& y )
 {
-  ulab_ = arma::unique(y);
-  BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0,
-                  "SVM:Only binary labels, please!");
-
-  if (ulab_.n_elem == 1)
-  {
-    oneclass_ = true;
-    return;
-  }
+  
 
   X_ = &X;
   y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
@@ -122,7 +148,7 @@ T SVM<KERNEL,T>::_b ( const arma::Row<T>& w )
 
 template<class KERNEL,class T>
 arma::Row<T> SVM<KERNEL,T>::_getLH ( size_t i, size_t j,
-                                           const arma::Row<T>& updates )
+                                     const arma::Row<T>& updates )
 {
   arma::Row<T> LH(2);
   if (y_(i) != y_(j))
@@ -156,17 +182,17 @@ size_t SVM<KERNEL,T>::_geti ( size_t j, size_t N )
 
 template<class KERNEL,class T>
 void SVM<KERNEL,T>::_QP ( const arma::Mat<T>& X,
-                                const arma::Row<size_t>& y )
+                          const arma::Row<size_t>& y )
 {
-  ulab_ = arma::unique(y);
-  BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0,
-                  "SVM:Only binary labels, please!");
+  /* ulab_ = arma::unique(y); */
+  /* BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0, */
+  /*                 "SVM:Only binary labels, please!"); */
 
-  if (ulab_.n_elem == 1)
-  {
-    oneclass_ = true;
-    return;
-  }
+  /* if (ulab_.n_elem == 1) */
+  /* { */
+  /*   oneclass_ = true; */
+  /*   return; */
+  /* } */
 
   X_ = &X;
 
@@ -206,7 +232,10 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
   if (!oneclass_)
   {
     arma::Row<T> temp;
-    Classify(inputs,preds,temp);
+    if (nclass_==2)
+      Classify(inputs,preds,temp);
+    else 
+      ova_.Classify(inputs,preds);
   }
   else 
   {
@@ -223,20 +252,26 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
   arma::Mat<T> dec_func;
   if (!oneclass_)
   {
-    if (idx_.n_elem>0)
-    {
-      preds.set_size(inputs.n_cols);
-      arma::Row<T> w = _w();
-      dec_func =  w * inputs + _b(w) ;
-      preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
-      preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
-      probs = (dec_func - arma::min(dec_func,1).eval()(0,0))  / (arma::max(dec_func,1) - arma::min(dec_func,1)).eval()(0,0);
+    if (nclass_==2)
+    { 
+      if (idx_.n_elem>0)
+      {
+        preds.set_size(inputs.n_cols);
+        arma::Row<T> w = _w();
+        dec_func =  w * inputs + _b(w) ;
+        preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
+        preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
+        probs = 1. / (1. + arma::exp(dec_func));
+        /* probs = (dec_func - arma::min(dec_func,1).eval()(0,0))  / (arma::max(dec_func,1) - arma::min(dec_func,1)).eval()(0,0); */
+      }
+      else
+      {
+          ERR("No support vectors->No prediction");
+          return;
+      }
     }
     else
-    {
-        ERR("No support vectors->No prediction");
-        return;
-    }
+      ova_.Classify(inputs, preds, probs);
   }
   else
   {

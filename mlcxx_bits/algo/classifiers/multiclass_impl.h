@@ -15,8 +15,8 @@ namespace classification {
 template<class MODEL, class T>
 template<class... Args>
 OnevAll<MODEL,T>::OnevAll( const arma::Mat<T>& inputs,
-                                   const arma::Row<size_t>& labels,
-                                   const Args&... args ) 
+                           const arma::Row<size_t>& labels,
+                           const Args&... args ) 
 { 
   unq_ = arma::unique(labels).eval();
   if (unq_.n_elem == 1)
@@ -28,8 +28,8 @@ OnevAll<MODEL,T>::OnevAll( const arma::Mat<T>& inputs,
 template<class MODEL, class T>
 template<class... Args>
 void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
-                                  const arma::Row<size_t>& labels,
-                                  const Args&... args ) 
+                               const arma::Row<size_t>& labels,
+                               const Args&... args ) 
 { 
   if (!oneclass_)
   {
@@ -46,20 +46,30 @@ void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
 
 template<class MODEL, class T>
 void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
-                                    arma::Row<size_t>& preds )
+                                 arma::Row<size_t>& preds )
+{
+  arma::Mat<T> probs;
+  Classify(inputs, preds, probs);
+}
+
+template<class MODEL, class T>
+void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
+                                 arma::Row<size_t>& preds,
+                                 arma::Mat<T>& probs )
 {
   if (!oneclass_)
   {
-    arma::Mat<T> collect(nclass_,inputs.n_cols);
+    probs.resize(nclass_,inputs.n_cols);
     #pragma omp parallel for
     for(size_t i=0;i<nclass_;i++)
     {
       arma::Row<size_t> temp;
-      arma::Mat<T> probs;
-      models_[i].Classify(inputs,temp,probs);
-      collect.row(i) = probs.row(0);
+      arma::Mat<T> tprobs;
+      models_[i].Classify(inputs,temp,tprobs);
+      probs.row(i) = tprobs.row(0);
     }
-    preds = unq_.cols(arma::index_max(arma::abs(collect),0));
+    preds = unq_.cols(arma::index_min(arma::abs(probs),0));
+    probs = probs.each_row() / arma::sum(probs,0);
   }
   else
   {
@@ -67,10 +77,9 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
     preds.fill(unq_[0]);
   }
 }
-
 template<class MODEL, class T>
 T OnevAll<MODEL,T>::ComputeError ( const arma::Mat<T>& inputs,
-                                      const arma::Row<size_t>& labels )
+                                   const arma::Row<size_t>& labels )
 {
   arma::Row<size_t> predictions;
   Classify(inputs, predictions);
@@ -80,7 +89,7 @@ T OnevAll<MODEL,T>::ComputeError ( const arma::Mat<T>& inputs,
 
 template<class MODEL, class T>
 T OnevAll<MODEL,T>::ComputeAccuracy ( const arma::Mat<T>& inputs,
-                                         const arma::Row<size_t>& labels )
+                                      const arma::Row<size_t>& labels )
 {
   return 1.-ComputeError(inputs,labels);
 }

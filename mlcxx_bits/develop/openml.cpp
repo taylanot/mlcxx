@@ -203,9 +203,9 @@ int main ( int argc, char** argv )
   /* testset.Generate("Simple"); */
   
 
-  size_t repeat = 10;
-  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(2,1,size_t(trainset.size_*0.3)); */
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(2,10,100);
+  size_t repeat = 100;
+  arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,size_t(trainset.size_*0.3));
+  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(2,10,100); */
   /* src::LCurve<mlpack::LinearSVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::KernelSVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::KernelSVM<mlpack::GaussianKernel>, */
@@ -219,20 +219,30 @@ int main ( int argc, char** argv )
   /* auto testset_ = trans.Trans(testset); */
   /* src::LCurve<algo::classification::OnevAll< */
   /*   algo::classification::SVM<mlpack::GaussianKernel>>,mlpack::Accuracy, */
-  /* src::LCurve<algo::classification::MultiClass<mlpack::NaiveBayesClassifier<>>,mlpack::Accuracy, */
-    /* data::N_StratSplit> lcurve(Ns,repeat,true,false,true); */
-  src::LCurve<algo::classification::QDC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,false,true);
-  /* src::LCurve<algo::classification::LDC<>,utils::LogLoss> lcurve(Ns,repeat,false,false,true); */
+  /* src::LCurve<algo::classification::OnevAll<mlpack::NaiveBayesClassifier<>>,mlpack::Accuracy, */
+  /*   data::N_StratSplit> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
+  src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true);
+  /* src::LCurve<algo::classification::QDC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,false,true); */
+  /* src::LCurve<algo::classification::LDC<>,utils::LogLoss> lcurve(Ns,repeat,false,false,true); */
+  /* src::LCurve<algo::classification::NNC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<mlpack::RandomForest<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::NMC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<mlpack::AdaBoost<>,mlpack::Accuracy> lcurve(Ns,repeat,false,false,true); */
+  /* lcurve.Split(trainset,testset,4); */
   /* lcurve.Split(trainset,testset,2,1.e-6); */
   /* lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem,1e-8); */
-  lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem,1e-8);
-  /* lcurve.Split(trainset_,testset_,2,10000); */
+  /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem,1e-8); */
+  /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem); */
+  /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
+  /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
+  /* PRINT(arma::unique(dataset.labels_).eval().n_elem); */
+
+  /* src::LCurveHPT<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,0.2,true,false,true); */
+  /* lcurve.Split(trainset,testset,mlpack::Fixed(3),arma::logspace(-2,2,10)); */
+  lcurve.Split(trainset,testset,3,1.);
   /* lcurve.Split(trainset_,testset_,1e-6); */
-  PRINT(lcurve.test_errors_.save("ldc.csv",arma::csv_ascii));
+  PRINT(lcurve.test_errors_.save("svm2.csv",arma::csv_ascii));
 
   PRINT_TIME(timer.toc());
 

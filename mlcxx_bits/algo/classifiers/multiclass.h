@@ -47,6 +47,14 @@ public:
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& preds );
   /**
+   * @param inputs  : X*
+   * @param preds   : y*
+   * @param probs   : p*
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& preds,
+                  arma::Mat<T>& probs );
+  /**
    * @param inputs  : X
    * @param labels  : y
    */

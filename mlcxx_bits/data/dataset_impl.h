@@ -88,7 +88,9 @@ template<class T>
 void Dataset<T>::Noise ( const double& noise_std )
 {
   arma::Row<T> noise = arma::randn<arma::Row<T>>(1,size_)*noise_std;
+  arma::Row<T> noise2 = arma::randn<arma::Row<T>>(1,size_)*noise_std;
   labels_.each_row() += noise;
+  labels_.each_row() -= noise2;
 }
 
 

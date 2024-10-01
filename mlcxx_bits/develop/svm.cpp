@@ -13,24 +13,32 @@ int main() {
   arma::mat X = {{0, 2}, {0, 0}, {2, 1}, {3, 4}, {4, 3}};
   arma::inplace_trans(X);
   /* arma::Row<int> y = {-1, -1, -1, 1, 1}; */
-  arma::Row<size_t> y = {0,0,0,1,1};
+  arma::Row<size_t> y = {2,0,0,1,1};
  
   double C = 1.;
   double l = 1.;
 
   // Create SVM object and train
 
-  algo::classification::SVM<mlpack::GaussianKernel> svm(X,y,C);
-  PRINT(svm.ComputeAccuracy(X, y));
+  algo::classification::SVM<mlpack::GaussianKernel> model(X,y,3,C,l);
+  /* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); */
+  arma::Mat<DTYPE> prob;
+  arma::Row<size_t> ypred;
+  model.Classify(X,ypred,prob);
+  PRINT(ypred);
+  PRINT(prob);
+  PRINT(model.ComputeAccuracy(X, y));
 
-  /* data::classification::Dataset trainset(2,10,2); */
+  /* PRINT(svm.ComputeAccuracy(X, y)); */
+
+  /* data::classification::Dataset trainset(2,4,2); */
   /* data::classification::Dataset testset(2,3,2); */
   /* trainset.Generate("Simple"); */
   /* testset.Generate("Simple"); */
   
 
-  /* algo::classification::KernelSVM<mlpack::GaussianKernel> */ 
-  /*   svm2(trainset.inputs_,trainset.labels_,C); */
+  /* algo::classification::SVM<mlpack::GaussianKernel> */ 
+  /*   svm2(trainset.inputs_,trainset.labels_,2,C); */
   /* PRINT(svm2.ComputeAccuracy(testset.inputs_, testset.labels_)); */
 
   /* arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,2); */

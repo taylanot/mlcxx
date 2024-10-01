@@ -18,51 +18,60 @@ class SVM
 {
   public:
 
+  SVM (  ) = default;
+
   /**
    * Non-working model 
-   * @param args    : kernel parameters
+   * @param num_class : number of classes
+   * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
+  SVM ( const size_t& num_class,
+        const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
   { };
 
   /**
-   * @param C       : regularization
-   * @param args    : kernel parameters
+   * @param num_class : number of classes
+   * @param C         : regularization
+   * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const double& C, const Args&... args ) : 
-                       solver_("QP"),C_(C),cov_(args...),oneclass_(false) { } ;
+  SVM ( const size_t& num_class, const double& C, const Args&... args ) : 
+                       solver_("QP"),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
-   * @param solver  : which optimization method QP or SMO
-   * @param C       : regularization
-   * @param args    : kernel parameters
+   * @param num_class : number of classes
+   * @param solver    : which optimization method QP or SMO
+   * @param C         : regularization
+   * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const std::string solver, 
-              const double& C, const Args&... args ) :
-                        solver_(solver),C_(C),cov_(args...),oneclass_(false) { } ;
+  SVM ( const size_t& num_class, const std::string solver, 
+        const double& C, const Args&... args ) :
+        solver_(solver),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
-   * @param inputs  : X
-   * @param labels  : y
-   * @param C       : regularization
-   * @param args    : kernel parameters
+   * @param num_class : number of classes
+   * @param inputs    : X
+   * @param labels    : y
+   * @param C         : regularization
+   * @param args      : kernel parameters
    */
   template<class... Args>
   SVM ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels,
-              const double& C,
-              const Args&... args );
+        const arma::Row<size_t>& labels,
+        const size_t& num_class,
+        const double& C,
+        const Args&... args );
  /**
-   * @param inputs  : X
-   * @param labels  : y
-   * @param args    : kernel parameters
+   * @param num_class : number of classes
+   * @param inputs    : X
+   * @param labels    : y
+   * @param args      : kernel parameters
    */
-
   template<class... Args>
   SVM ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels,
-              const Args&... args );
+        const arma::Row<size_t>& labels,
+        const size_t& num_class,
+        const Args&... args );
 
   /**
    * @param inputs  : X
@@ -125,6 +134,7 @@ class SVM
 
 private:
   std::string solver_ = "SMO";
+  size_t nclass_;
   T C_;
   utils::covmat<KERNEL> cov_;
   const arma::Mat<T>* X_;
@@ -134,11 +144,12 @@ private:
   arma::Row<T> old_alphas_;
   arma::uvec idx_;
   T b_ = 0;
-  bool oneclass_;
+  bool oneclass_ = false;
   T eps_ = 1e-12;
   size_t max_iter_ = 10000;
   size_t iter_ = 0;
   
+  OnevAll<SVM<KERNEL,T>> ova_;
 
   /**
    * @param inputs  : X
