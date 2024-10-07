@@ -349,54 +349,6 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
   }
 }
 
-TEST_SUITE("FISHERSCLASSIFIER") {
-  TEST_CASE("PROBLEMS")
-  {
-    int D, N, Nc; //double tol = 1e-2;
-    std::string type;
-
-    SUBCASE("1D-Simple")
-    {
-      D = 1; N = 10000; Nc = 2; type = "Simple";
-
-      data::classification::Dataset data(D, N, Nc);
-      data.Generate(type);
-      algo::classification::FDC model(data.inputs_, data.labels_);
-      double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0. );
-    }
-    SUBCASE("2D-Simple")
-    {
-      D = 2; N = 10000; Nc = 2; type = "Simple";
-
-      data::classification::Dataset data(D, N, Nc);
-      data.Generate(type);
-      algo::classification::FDC model(data.inputs_, data.labels_);
-      double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0. );
-    }
-    SUBCASE("1D-Hard")
-    {
-      D = 1; N = 10000; Nc = 2; type = "Hard";
-
-      data::classification::Dataset data(D, N, Nc);
-      data.Generate(type);
-      algo::classification::FDC model(data.inputs_, data.labels_);
-      double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0.1 );
-    }
-    SUBCASE("2D-Hard")
-    {
-      D = 2; N = 10000; Nc = 2; type = "Hard";
-
-      data::classification::Dataset data(D, N, Nc);
-      data.Generate(type);
-      algo::classification::FDC model(data.inputs_, data.labels_);
-      double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0.1 );
-    }
-  }
-}
 
 TEST_SUITE("LDC") {
   TEST_CASE("PROBLEMS")
@@ -410,7 +362,7 @@ TEST_SUITE("LDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::LDC model(data.inputs_, data.labels_);
+      algo::classification::LDC model(data.inputs_, data.labels_,Nc);
       DTYPE error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -420,7 +372,7 @@ TEST_SUITE("LDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::LDC model(data.inputs_, data.labels_);
+      algo::classification::LDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -430,7 +382,7 @@ TEST_SUITE("LDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::LDC model(data.inputs_, data.labels_);
+      algo::classification::LDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0.1 );
     }
@@ -440,7 +392,7 @@ TEST_SUITE("LDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::LDC model(data.inputs_, data.labels_);
+      algo::classification::LDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0.1 );
     }
@@ -459,7 +411,7 @@ TEST_SUITE("QDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::QDC model(data.inputs_, data.labels_);
+      algo::classification::QDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -469,7 +421,7 @@ TEST_SUITE("QDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::QDC model(data.inputs_, data.labels_);
+      algo::classification::QDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -479,7 +431,7 @@ TEST_SUITE("QDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::QDC model(data.inputs_, data.labels_);
+      algo::classification::QDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0.1 );
     }
@@ -489,7 +441,7 @@ TEST_SUITE("QDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::QDC model(data.inputs_, data.labels_);
+      algo::classification::QDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0.1 );
     }
@@ -499,7 +451,7 @@ TEST_SUITE("QDC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::QDC model(data.inputs_, data.labels_);
+      algo::classification::QDC model(data.inputs_, data.labels_,Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0.2 );
     }
@@ -518,7 +470,7 @@ TEST_SUITE("NNC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NNC model(data.inputs_, data.labels_);
+      algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -529,7 +481,7 @@ TEST_SUITE("NNC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NNC model(data.inputs_, data.labels_);
+      algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -539,7 +491,7 @@ TEST_SUITE("NNC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NNC model(data.inputs_, data.labels_);
+      algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -549,7 +501,7 @@ TEST_SUITE("NNC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NNC model(data.inputs_, data.labels_);
+      algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }
@@ -559,7 +511,7 @@ TEST_SUITE("NNC") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NNC model(data.inputs_, data.labels_);
+      algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
       CHECK ( error <= 0. );
     }

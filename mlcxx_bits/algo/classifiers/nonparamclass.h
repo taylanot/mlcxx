@@ -15,35 +15,39 @@ namespace classification {
 //=============================================================================
 // Parzen Classifier
 //=============================================================================
-
-class PARZENC
+template<class KERNEL=mlpack::GaussianKernel>
+class Parzen
 {
   public:
 
   /**
    * Non-working model 
    */
-  PARZENC ( ) : h_(1.e-5) { };
+  Parzen ( ) = default;
 
   /**
-   * @param h       : window
+   * @param h : window
    */
-  PARZENC ( const double& h) : h_(h) { } ;
+  Parzen ( const double& h ) : h_(h) { } ;
 
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   * @param h         : window
+   */
+  Parzen ( const arma::mat& inputs,
+           const arma::Row<size_t>& labels,
+           const size_t& num_class,
+           const double& h );
   /**
    * @param inputs  : X
    * @param labels  : y
-   * @param h       : window
+   * @param num_class : number of classes
    */
-  PARZENC ( const arma::mat& inputs,
-            const arma::Row<size_t>& labels,
-            const double& h );
-  /**
-   * @param inputs  : X
-   * @param labels  : y
-   */
-  PARZENC ( const arma::mat& inputs,
-            const arma::Row<size_t>& labels );
+  Parzen ( const arma::mat& inputs,
+           const arma::Row<size_t>& labels,
+           const size_t& num_class );
 
   /**
    * @param inputs  : X
@@ -105,12 +109,17 @@ class PARZENC
   size_t num_class_;
   size_t size_;
 
-  double h_;
+  double h_ = 1.e-5;
   
   arma::mat parameters_;
 
   arma::Row<size_t> unique_;
-
+  /**
+   * @param inputs  : X
+   * @param labels  : y
+   */
+  void Density ( const arma::mat& inputs,
+                 const arma::Row<size_t>& labels );
 };
 
 //=============================================================================
@@ -133,12 +142,14 @@ class NNC
   NNC ( const size_t& k ) : k_(k) { } ;
 
   /**
-   * @param inputs  : X
-   * @param labels  : y
-   * @param r       : radius
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   * @param r         : radius
    */
   NNC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const size_t& k );
                                
   /**
@@ -147,7 +158,8 @@ class NNC
    */
 
   NNC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels );
+        const arma::Row<size_t>& labels,
+        const size_t& num_class );
 
   /**
    * @param inputs  : X
@@ -162,7 +174,14 @@ class NNC
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
-
+  /**
+   * @param inputs  : X*
+   * @param labels  : y*
+   * @param probs   : probabilties per class
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& probs ) const;
   /**
    * Calculate the Error Rate
    *
@@ -189,7 +208,8 @@ class NNC
                    const unsigned int /* version */ )
   {
     ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
+    ar & BOOST_SERIALIZATION_NVP(nuclass_);
+    ar & BOOST_SERIALIZATION_NVP(nclass_);
     ar & BOOST_SERIALIZATION_NVP(size_);
     ar & BOOST_SERIALIZATION_NVP(k_);
     ar & BOOST_SERIALIZATION_NVP(inputs_);
@@ -199,13 +219,14 @@ class NNC
 
   private:
 
+  size_t k_;
   size_t dim_;
-  size_t num_class_;
   size_t size_;
+  size_t nclass_;
+  size_t nuclass_;
 
   arma::Row<size_t> unique_;
 
-  size_t k_;
   
   arma::Mat<T> inputs_;
   arma::Row<size_t> labels_;

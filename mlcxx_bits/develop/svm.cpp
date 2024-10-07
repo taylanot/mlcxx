@@ -13,21 +13,31 @@ int main() {
   arma::mat X = {{0, 2}, {0, 0}, {2, 1}, {3, 4}, {4, 3}};
   arma::inplace_trans(X);
   /* arma::Row<int> y = {-1, -1, -1, 1, 1}; */
-  arma::Row<size_t> y = {2,0,0,1,1};
- 
+  arma::Row<size_t> y = {1,1,1,1,1};
+
+  arma::mat X2 = {{3.1,4.0}, {4.1,3.1}};
+  arma::inplace_trans(X2);
+  arma::Row<size_t> y2 = {1,1};
+  /* arma::Row<int> y = {-1, -1, -1, 1, 1}; */
+
   double C = 1.;
   double l = 1.;
 
   // Create SVM object and train
 
-  algo::classification::SVM<mlpack::GaussianKernel> model(X,y,3,C,l);
+  algo::classification::SVM<mlpack::LinearKernel> model(X,y,2,C);
   /* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); */
-  arma::Mat<DTYPE> prob;
-  arma::Row<size_t> ypred;
-  model.Classify(X,ypred,prob);
-  PRINT(ypred);
-  PRINT(prob);
-  PRINT(model.ComputeAccuracy(X, y));
+  /* arma::Mat<DTYPE> prob; */
+  /* arma::Row<size_t> ypred; */
+  /* model.Classify(X,ypred,prob); */
+  /* arma::Mat<DTYPE> cmat; */
+  /* mlpack::data::ConfusionMatrix(y,ypred,cmat,3); */
+  /* LOG("FP"<<arma::accu(arma::trimatu(cmat))); */ 
+  /* LOG("TP"<<arma::accu(cmat.diag())); */ 
+  /* PRINT_VAR(cmat); */
+  /* PRINT_VAR(ypred); */
+  /* PRINT_VAR(prob); */
+  PRINT_VAR(model.ComputeAccuracy(X2, y2));
 
   /* PRINT(svm.ComputeAccuracy(X, y)); */
 

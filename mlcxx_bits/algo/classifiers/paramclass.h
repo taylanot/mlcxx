@@ -274,113 +274,6 @@ class QDC
 
 };
 
-//=============================================================================
-// Fisher's Linear Discriminant Classifier
-//=============================================================================
-
-template<class T=DTYPE>
-class FDC
-{
-  public:
-
-  /**
-   * Non-working model 
-   */
-  FDC ( ) : lambda_(1.e-5) { };
-
-  /**
-   * @param lambda
-   */
-  FDC ( const double& lambda ) : lambda_(lambda) { } ;
-
-  /**
-   * @param lambda
-   * @param inputs X
-   * @param labels y
-   */
-  FDC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels,
-        const double& lambda );
-                               
-  /**
-   * @param inputs X
-   * @param labels y
-   */
-
-  FDC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels );
-  /**
-   * @param inputs X
-   * @param labels y
-   */
-  void Train ( const arma::Mat<T>& inputs,
-               const arma::Row<size_t>& labels );
-
-  /**
-   * @param inputs X*
-   * @param labels y*
-   */
-  void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& labels ) const;
-
-  /**
-   * @param inputs  : X*
-   * @param labels  : y*
-   * @param probs   : scores*
-   */
-  void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& labels,
-                  arma::Mat<T>& scores ) const;
-  /**
-   * Calculate the Error Rate
-   *
-   * @param inputs 
-   * @param labels 
-   */
-  T ComputeError ( const arma::Mat<T>& points, 
-                   const arma::Row<size_t>& responses ) const;
-  /**
-   * Calculate the Accuracy
-   *
-   * @param inputs 
-   * @param labels 
-   */
-  T ComputeAccuracy ( const arma::Mat<T>& points, 
-                      const arma::Row<size_t>& responses ) const;
-
-  const arma::Mat<T>& Parameters() const { return parameters_; }
-
-  arma::Mat<T>& Parameters() { return parameters_; }
-
-
-  /**
-   * Serialize the model.
-   */
-  template<typename Archive>
-  void serialize ( Archive& ar,
-                   const unsigned int /* version */ )
-  {
-    ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(bias_);
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-
-  }
-
-  private:
-
-  size_t dim_;
-  size_t num_class_;
-
-  double lambda_;
-
-  arma::Mat<T> parameters_;
-  double bias_;
-
-  arma::Row<size_t> unique_;
-
-};
 
 //=============================================================================
 // Nearest Mean Classifier 
@@ -424,6 +317,14 @@ class NMC
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
 
+  /**
+   * @param inputs  : X*
+   * @param labels  : y*
+   * @param probs   : scores*
+   */
+  void Classify ( const arma::Mat<T>& inputs,
+                  arma::Row<size_t>& labels,
+                  arma::Mat<T>& scores ) const;
   /**
    * Calculate the Error Rate
    *

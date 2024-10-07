@@ -16,51 +16,58 @@ namespace classification {
 // Parzen Classifier
 //=============================================================================
 
-PARZENC::PARZENC ( const arma::mat& inputs,
-                   const arma::Row<size_t>& labels )
-{
-  Train(inputs, labels);
-}
+/* Parzen::Parzen ( const arma::mat& inputs, */
+/*                  const arma::Row<size_t>& labels ) */
+/* { */
+/*   Train(inputs, labels); */
+/* } */
 
-void PARZENC::Train ( const arma::mat& inputs,
-                      const arma::Row<size_t>& labels )
-{
+/* Parzen::Parzen ( const arma::mat& inputs, */
+/*                  const arma::Row<size_t>& labels ) */
+/* { */
+/*   Train(inputs, labels); */
+/* } */
 
-  dim_ = inputs.n_rows;
-  unique_ = arma::unique(labels);
-  num_class_ = unique_.n_cols;
-  size_ = inputs.n_cols;
-  parameters_ = inputs;
-}
+/* void Parzen::Train ( const arma::mat& inputs, */
+/*                      const arma::Row<size_t>& labels ) */
+/* { */
 
-void PARZENC::Classify ( const arma::mat& inputs,
-                         arma::Row<size_t>& labels ) const
-{
+/*   dim_ = inputs.n_rows; */
+/*   unique_ = arma::unique(labels); */
+/*   num_class_ = unique_.n_cols; */
+/*   size_ = inputs.n_cols; */
+/*   parameters_ = inputs; */
+/* } */
 
-}
+/* void Parzen::Classify ( const arma::mat& inputs, */
+/*                         arma::Row<size_t>& labels ) const */
+/* { */
 
-double PARZENC::ComputeError ( const arma::mat& points, 
-                               const arma::Row<size_t>& responses ) const
-{
-  arma::Row<size_t> predictions;
-  Classify(points,predictions);
-  arma::Row<size_t> temp =  predictions - responses; 
-  double total = responses.n_cols;
-  return (arma::accu(temp != 0))/total;
-}
+/* } */
 
-double PARZENC::ComputeAccuracy ( const arma::mat& points, 
-                                  const arma::Row<size_t>& responses ) const
-{
-  return (1. - ComputeError(points, responses))*100;
-}
+/* double Parzen::ComputeError ( const arma::mat& points, */ 
+/*                               const arma::Row<size_t>& responses ) const */
+/* { */
+/*   arma::Row<size_t> predictions; */
+/*   Classify(points,predictions); */
+/*   arma::Row<size_t> temp =  predictions - responses; */ 
+/*   double total = responses.n_cols; */
+/*   return (arma::accu(temp != 0))/total; */
+/* } */
+
+/* double Parzen::ComputeAccuracy ( const arma::mat& points, */ 
+/*                                  const arma::Row<size_t>& responses ) const */
+/* { */
+/*   return (1. - ComputeError(points, responses))*100; */
+/* } */
 
 //=============================================================================
 // Nearest Neighbour Classifier
 //=============================================================================
 template<class T>
 NNC<T>::NNC ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels ): k_(1)
+              const arma::Row<size_t>& labels,
+              const size_t& num_class ): k_(1), nclass_(num_class)
 {
   
   Train(inputs, labels);
@@ -69,7 +76,8 @@ NNC<T>::NNC ( const arma::Mat<T>& inputs,
 template<class T>
 NNC<T>::NNC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
-              const size_t& k ) : k_(k)
+              const size_t& num_class, 
+              const size_t& k ) : k_(k), nclass_(num_class)
 {
   Train(inputs, labels);
 }
@@ -79,8 +87,12 @@ void NNC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
 {
   dim_ = inputs.n_rows;
-  unique_ = arma::unique(labels);
-  num_class_ = unique_.n_cols;
+  nuclass_ = arma::unique(labels).eval().n_elem;
+  if (nuclass_ == 1)
+    unique_ = arma::unique(labels);
+  else
+    unique_ = arma::regspace<arma::Row<size_t>>(0,nclass_-1);
+
   size_ = inputs.n_cols;
   inputs_ = inputs;
   labels_ = labels;
@@ -92,10 +104,23 @@ template<class T>
 void NNC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
 {
- const size_t N =  inputs.n_cols;
+  arma::Mat<T> temp;
+  Classify(inputs, labels, temp);
+}
+
+template<class T>
+void NNC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels,
+                        arma::Mat<T>& probs ) const
+{
+  const size_t N =  inputs.n_cols;
+  probs.resize(nclass_,N);
   labels.resize(N);
-  if ( num_class_ == 1 )
+  if ( nuclass_ == 1 )
+  {
     labels.fill(unique_(0));
+    probs.row(unique_(0)).fill(1);
+  }
   else
   {
     // Potentially much faster implementation 
@@ -104,27 +129,27 @@ void NNC<T>::Classify ( const arma::Mat<T>& inputs,
     arma::Mat<T> dist;
     arma::Mat<size_t> neig;
     arma::Mat<size_t> select;
-
+    
+    // Find the nns to all the samples
     knn.Search(inputs, k_, neig, dist);
     arma::Col<size_t> unq;
     
-    //#pragma omp parallel for
+    
+    /* #pragma omp parallel for */
     for ( size_t j=0; j<N; j++ )
     {
+      // select the labels of the nns per sample
       select = labels_(arma::conv_to<arma::uvec>::from(neig.col(j)));
-      unq = arma::unique(select);
-      auto count =
-             arma::conv_to<arma::Col<size_t>>::from(arma::hist(select,unq));  
-      labels(j) = unq(count.index_max());
+      // count how many classes does one sample has per sample
+      auto count = arma::hist(select,unique_);
+      auto ps =
+             arma::conv_to<arma::Col<T>>::from(count); 
+      probs.col(j) = ps / arma::accu(ps);
+      // assign the maximum number of seen class
+      labels(j) = unique_(count.index_max());
     }
-    ///PRINT_VAR(neig_lab);
-    //auto count =
-    //         arma::conv_to<arma::Col<size_t>>::from(arma::hist(select,unq));
-    //arma::mat lab
-    //knn.search(inputs,k_,neigh,dist);
   }
 }
-
 template<class T>
 T NNC<T>::ComputeError ( const arma::Mat<T>& points, 
                          const arma::Row<size_t>& responses ) const

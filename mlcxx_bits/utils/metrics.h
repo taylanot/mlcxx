@@ -40,7 +40,6 @@ public:
                 1.-std::numeric_limits<O>::epsilon());
     LabelType labs = arma::clamp(labels,1.e-16,1.-1.e-16);
 
-    PRINT_VAR(arma::size(probs));
     return -arma::accu( labs % arma::log(arma::max(probs,0))
                       +(1.-labs)%arma::log(1.-arma::max(probs,0))
                       ) /preds.n_cols;
