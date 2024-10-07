@@ -13,7 +13,8 @@ int main() {
   arma::mat X = {{0, 2}, {0, 0}, {2, 1}, {3, 4}, {4, 3}};
   arma::inplace_trans(X);
   /* arma::Row<int> y = {-1, -1, -1, 1, 1}; */
-  arma::Row<size_t> y = {1,1,1,1,1};
+  /* arma::Row<size_t> y = {1,1,1,1,1}; */
+  arma::Row<size_t> y = {1,0,0,1,1};
 
   arma::mat X2 = {{3.1,4.0}, {4.1,3.1}};
   arma::inplace_trans(X2);
@@ -25,7 +26,10 @@ int main() {
 
   // Create SVM object and train
 
-  algo::classification::SVM<mlpack::LinearKernel> model(X,y,2,C);
+  /* algo::classification::SVM<mlpack::LinearKernel> model(X,y,2,C); */
+  /* mlpack::LogisticRegression<> model(X.n_rows,1.e-8); */
+  algo::classification::LogisticRegression<> model(2,0.);
+  model.Train(X,y);
   /* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); */
   /* arma::Mat<DTYPE> prob; */
   /* arma::Row<size_t> ypred; */
@@ -37,7 +41,8 @@ int main() {
   /* PRINT_VAR(cmat); */
   /* PRINT_VAR(ypred); */
   /* PRINT_VAR(prob); */
-  PRINT_VAR(model.ComputeAccuracy(X2, y2));
+  /* PRINT_VAR(model.ComputeAccuracy(X2, y2)); */
+  PRINT_VAR(model.ComputeAccuracy(X, y));
 
   /* PRINT(svm.ComputeAccuracy(X, y)); */
 

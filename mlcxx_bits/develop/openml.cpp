@@ -81,7 +81,8 @@ int main ( int argc, char** argv )
   /*   data::N_StratSplit> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
-  src::LCurve<algo::classification::NNC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true);
+  /* src::LCurve<algo::classification::NNC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
+  src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true);
   /* src::LCurve<algo::classification::SVM<>,utils::LogLoss> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::QDC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,false,true); */
   /* src::LCurve<algo::classification::LDC<>,utils::LogLoss> lcurve(Ns,repeat,false,false,true); */
@@ -92,7 +93,7 @@ int main ( int argc, char** argv )
   /* lcurve.Split(trainset,testset,4); */
   /* lcurve.Split(trainset,testset,2,1.e-6); */
   /* lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem,1e-8); */
-  /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem,1e-8); */
+  lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem,1e-8);
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,arma::unique(dataset.labels_).eval().n_elem); */
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
@@ -100,9 +101,9 @@ int main ( int argc, char** argv )
 
   /* src::LCurveHPT<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,0.2,true,false,true); */
   /* lcurve.Split(trainset,testset,mlpack::Fixed(3),arma::logspace(-2,2,10)); */
-  lcurve.Split(trainset,testset,3,1.);
+  /* lcurve.Split(trainset,testset,4,3); */
   /* lcurve.Split(trainset_,testset_,1e-6); */
-  PRINT(lcurve.test_errors_.save("nnc.csv",arma::csv_ascii));
+  PRINT(lcurve.test_errors_.save("lreg.csv",arma::csv_ascii));
 
   PRINT_TIME(timer.toc());
 
