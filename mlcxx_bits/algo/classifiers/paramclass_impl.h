@@ -283,14 +283,16 @@ T QDC<T>::ComputeAccuracy ( const arma::Mat<T>& points,
 template<class T>
 NMC<T>::NMC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
-              const double& shrink ) : shrink_(shrink)
+              const size_t& num_class,
+              const double& shrink ) : shrink_(shrink), num_class_(num_class)
 {
   Train(inputs, labels);
 }
 
 template<class T>
 NMC<T>::NMC ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels ) : shrink_(0.)
+              const arma::Row<size_t>& labels,
+              const size_t& num_class ) : shrink_(0.), num_class_(num_class)
 {
   Train(inputs, labels);
 }
@@ -302,7 +304,7 @@ void NMC<T>::Train ( const arma::Mat<T>& inputs,
 
   dim_ = inputs.n_rows;
   unique_ = arma::unique(labels);
-  num_class_ = unique_.n_cols;
+  /* num_class_ = unique_.n_cols; */
   size_ =  inputs.n_cols;
   arma::vec nk(num_class_);
   parameters_.resize(inputs.n_rows, num_class_);
@@ -316,7 +318,6 @@ void NMC<T>::Train ( const arma::Mat<T>& inputs,
   for ( ;it!=it_end; ++it)
   {
     auto extract = utils::extract_class(inputs, labels, *it);
-    //index = arma::find(labels == unique_(i));
     index = std::get<1>(extract);
     nk(counter) = index.n_rows;
     parameters_.col(counter) = arma::mean(inputs.cols(index),1);
@@ -348,29 +349,54 @@ template<class T>
 void NMC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
 {
+  arma::Mat<T> temp;
+  Classify(inputs,labels,temp);
+}
 
+// Still need to fix this one!
+template<class T>
+void NMC<T>::Classify ( const arma::Mat<T>& inputs,
+                        arma::Row<size_t>& labels,
+                        arma::Mat<T>& probs ) const
+{
   const size_t N =  inputs.n_cols;
+  probs.resize(num_class_, N);
   labels.resize(N);
-  if ( num_class_ == 1 )
+  if ( unique_.n_elem == 1 )
+  {
     labels.fill(unique_(0));
+    probs.row(unique_(0)).fill(1.);
+  }
   else
   {
     arma::Mat<T> distances(num_class_, N);
+    distances.fill(arma::datum::inf);
     arma::urowvec index(N);
     for ( size_t j=0; j<N; j++ )
     {
-      for ( size_t i=0; i<num_class_; i++ )
+      for ( size_t i=0; i<unique_.n_elem; i++ )
       { 
-        distances(i, j) = metric_.Evaluate(parameters_.col(i),inputs.col(j));
+        distances(unique_(i), j) = metric_.Evaluate(parameters_.col(i),inputs.col(j));
       }
         index(j) = arma::index_min(distances.col(j));
         labels(j) = unique_(index(j));
-
     }
+    if (unique_.n_elem == num_class_)
+      probs = distances.each_row() / arma::sum(distances,0);
+    else
+    {
+      for (arma::uword i = 0; i < distances.n_rows; ++i) 
+      {
+        // Check if the row contains any infinite values
+        if (arma::is_finite(distances.row(i))) 
+        // Perform the division for this row only if all values are finite
+          probs.row(i) = distances.row(i) / arma::sum(distances, 0);
+      }
+    }
+      
   }
  
 }
-
 template<class T>
 T NMC<T>::ComputeError ( const arma::Mat<T>& points, 
                          const arma::Row<size_t>& responses ) const

@@ -153,6 +153,9 @@ class MSEClass
   static const bool NeedsMinimization = true;
 };
 
+// Need to add hinge loss here! 
+
+
 /*template<class O=DTYPE> */
 /*class ClassMetrics */
 /*{ */

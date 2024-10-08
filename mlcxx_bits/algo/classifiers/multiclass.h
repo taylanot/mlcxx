@@ -22,14 +22,21 @@ public:
   OnevAll (  ) = default;
 
   /**
+   * @param args    : parameters for the model
+   */
+  template<class... Args>
+  OnevAll ( const size_t& num_class, const Args&... args );
+
+
+  /**
    * @param inputs  : X
    * @param labels  : y
    * @param args    : parameters for the model
    */
   template<class... Args>
   OnevAll ( const arma::Mat<T>& inputs,
-                const arma::Row<size_t>& labels,
-                const Args&... args );
+            const arma::Row<size_t>& labels,
+            const Args&... args );
 
   /**
    * @param inputs  : X
@@ -40,6 +47,15 @@ public:
   void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels,
                const Args&... args );
+
+  /**
+   * @param inputs  : X
+   * @param labels  : y
+   * @param args    : parameters for the model
+   */
+  template<class... Args>
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels );
   /**
    * @param inputs  : X*
    * @param preds   : y*
@@ -68,10 +84,9 @@ public:
   T ComputeAccuracy ( const arma::Mat<T>& inputs,
                       const arma::Row<size_t>& labels );
 
-private:
-
-
   std::vector<MODEL> models_;
+
+private:
   size_t nclass_;
   arma::Row<size_t> unq_;
   bool oneclass_ = false;

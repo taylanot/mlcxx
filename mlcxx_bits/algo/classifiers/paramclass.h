@@ -287,21 +287,31 @@ class NMC
    * Non-working model 
    */
   NMC (  ) { } ;
+
   /**
-   * @param inputs X
-   * @param labels y
+   * @param num_class : number of classes
+   */
+  NMC ( const size_t& num_classes );
+
+  /**
+   * @param inputs  : X
+   * @param labels  : y
+   * @param num_class : number of classes
    */
   NMC ( const arma::Mat<T>& inputs,
-        const arma::Row<size_t>& labels );
+        const arma::Row<size_t>& labels,
+        const size_t& num_class );
 
   // THINGS I DO FOR LOVE! (STUPID COMPILERS) //
   /**
    * @param inputs X
    * @param labels y
+   * @param num_class : number of classes
    * @param shrink s
    */
   NMC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
+        const size_t& num_class,
         const double& shrink );
   /**
    * @param inputs X
@@ -367,8 +377,8 @@ class NMC
 
   size_t dim_;
   size_t size_;
-  size_t num_class_;
   double shrink_;
+  size_t num_class_;
   
   arma::Mat<T> centroid_;
   arma::Mat<T> parameters_;

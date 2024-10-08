@@ -14,6 +14,16 @@ namespace classification {
 
 template<class MODEL, class T>
 template<class... Args>
+OnevAll<MODEL,T>::OnevAll( const size_t& num_class, const Args&... args ) 
+{ 
+  models_.resize(num_class);
+  for(size_t i=0;i<num_class;i++)
+  {
+    models_[i] = MODEL(args...);
+  }
+}
+template<class MODEL, class T>
+template<class... Args>
 OnevAll<MODEL,T>::OnevAll( const arma::Mat<T>& inputs,
                            const arma::Row<size_t>& labels,
                            const Args&... args ) 
@@ -24,6 +34,25 @@ OnevAll<MODEL,T>::OnevAll( const arma::Mat<T>& inputs,
   nclass_ = unq_.n_elem;
   Train(inputs, labels, args...);
 } 
+
+template<class MODEL, class T>
+template<class... Args>
+void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
+                               const arma::Row<size_t>& labels ) 
+{ 
+  unq_ = arma::unique(labels).eval();
+  if (unq_.n_elem == 1)
+    oneclass_ = true;
+  nclass_ = unq_.n_elem;
+  if (!oneclass_)
+  {
+    for(size_t i=0;i<nclass_;i++)
+    {
+      auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq_(i));
+      models_[i].Train(inputs, labels);
+    }
+  }
+}
 
 template<class MODEL, class T>
 template<class... Args>
