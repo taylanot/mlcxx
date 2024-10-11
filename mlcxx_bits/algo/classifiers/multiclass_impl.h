@@ -49,7 +49,7 @@ void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
     for(size_t i=0;i<nclass_;i++)
     {
       auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq_(i));
-      models_[i].Train(inputs, labels);
+      models_[i].Train(inputs, binlabels);
     }
   }
 }

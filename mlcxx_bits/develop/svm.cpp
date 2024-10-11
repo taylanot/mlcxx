@@ -6,7 +6,6 @@
  */
 
 #include <headers.h>
-// Define the RBF kernel function
 
 // Main function
 int main() {
@@ -14,7 +13,7 @@ int main() {
   arma::inplace_trans(X);
   /* arma::Row<int> y = {-1, -1, -1, 1, 1}; */
   /* arma::Row<size_t> y = {1,1,1,1,1}; */
-  arma::Row<size_t> y = {2,0,0,1,1};
+  arma::Row<size_t> y = {1,0,0,1,1};
 
   arma::mat X2 = {{3.1,4.0}, {4.1,3.1}};
   arma::inplace_trans(X2);
@@ -24,30 +23,34 @@ int main() {
   double C = 1.;
   double l = 1.;
 
-  
-  arma::mat X3 = {{arma::datum::inf,arma::datum::inf}, {4.1,3.1}};
-  PRINT(arma::find(X3 == arma::datum::inf));
   // Create SVM object and train
 
-  /* algo::classification::SVM<mlpack::LinearKernel> model(X,y,2,C); */
+  /* algo::classification::SVM<mlpack::LinearKernel> model(X,y,3,C); */
   /* mlpack::LogisticRegression<> model(X.n_rows,1.e-8); */
-  /* algo::classification::LogisticRegression<> model(3,2,0.); */
+  algo::classification::LogisticRegression<> model(X,y,3);
   /* model.Train(X,y); */
-  /* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); */
+  /* /1* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); *1/ */
   /* arma::Mat<DTYPE> prob; */
   /* arma::Row<size_t> ypred; */
   /* model.Classify(X,ypred,prob); */
   /* arma::Mat<DTYPE> cmat; */
   /* mlpack::data::ConfusionMatrix(y,ypred,cmat,3); */
-  /* LOG("FP"<<arma::accu(arma::trimatu(cmat))); */ 
-  /* LOG("TP"<<arma::accu(cmat.diag())); */ 
-  /* PRINT_VAR(cmat); */
-  /* PRINT_VAR(ypred); */
-  /* PRINT_VAR(prob); */
-  /* PRINT_VAR(model.ComputeAccuracy(X2, y2)); */
-  /* PRINT_VAR(model.ComputeAccuracy(X, y)); */
+  /* PRINT_VAR(cmat) */
+  /* /1* LOG("FP"<<arma::accu(arma::trimatu(cmat))); *1/ */ 
+  /* /1* LOG("TP"<<arma::accu(cmat.diag())); *1/ */ 
+  /* /1* PRINT_VAR(cmat); *1/ */
+  /* /1* PRINT_VAR(ypred); *1/ */
+  /* /1* PRINT_VAR(prob); *1/ */
+  /* /1* PRINT_VAR(model.ComputeAccuracy(X2, y2)); *1/ */
+  /* /1* PRINT_VAR(model.ComputeAccuracy(X, y)); *1/ */
+  /* arma::Mat<DTYPE> encoded; */
+  /* mlpack::data::OneHotEncoding(y,encoded); */
+  /* PRINT_VAR(encoded); */
+  /* PRINT_VAR(prob); */ 
+  /* /1* PRINT_VAR(encoded); *1/ */ 
+  /* PRINT_VAR(-arma::accu(encoded%arma::log(prob))/double(prob.n_cols)); */ 
 
-  /* PRINT(svm.ComputeAccuracy(X, y)); */
+  PRINT(model.ComputeAccuracy(X, y));
 
   /* data::classification::Dataset trainset(2,4,2); */
   /* data::classification::Dataset testset(2,3,2); */

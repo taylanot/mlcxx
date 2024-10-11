@@ -31,7 +31,7 @@ int boot_(  size_t id,
                                               (1,1,size_t(dataset.size_*0.9));
 
   src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,false,false,true);
-  lcurve.Additive(dataset.inputs_,dataset.labels_,
+  lcurve.Bootstrap(dataset.inputs_,dataset.labels_,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.test_errors_.save(path/(loss+".csv"),arma::csv_ascii);
  

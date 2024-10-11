@@ -35,6 +35,8 @@ arma::Row<T> GetPrior ( const arma::Row<size_t>& labels )
   return  prior / labels.n_cols;
   
 }
+
+
 } // namespace utils
 
 #endif

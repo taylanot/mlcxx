@@ -25,16 +25,11 @@ template<class MODEL,
 LCurve<MODEL,LOSS,SPLIT,O>::LCurve ( const arma::irowvec& Ns,
                                      const double repeat,
                                      const bool parallel, 
-                                     const bool save,
-                                     const bool prog,
-                                     const std::string name,
-                                     const bool save_data ) :
+                                     const bool prog ) :
 
-repeat_(repeat), Ns_(Ns), parallel_(parallel), save_(save), prog_(prog),
-save_data_(save_data), name_(name)
+repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog)
 {
   test_errors_.resize(repeat_,Ns_.n_elem);
-  train_errors_.resize(repeat_,Ns_.n_elem);
 }
 
 //=============================================================================
@@ -67,23 +62,10 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = loss_.Evaluate(model, Xtst, ytst);
-      train_errors_(j,i) = loss_.Evaluate(model, Xtrn, ytrn);
       if (prog_)
         pb.Update();
     }
   }
-
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                         arma::stddev(train_errors_));
-
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                        arma::stddev(test_errors_));
-
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test));
 
 }
 
@@ -117,30 +99,17 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
 
     MODEL model(Xtrn, ytrn, args...);
     test_errors_(j,0) = loss_.Evaluate(model,Xrest,yrest);
-    train_errors_(j,0) = loss_.Evaluate(model, Xtrn, ytrn);
     for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
     {
       data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = loss_.Evaluate(model,Xrest,yrest);
-      train_errors_(j,i) = loss_.Evaluate(model, Xtrn, ytrn);
       if (prog_)
         pb.Update();
     }
     if (prog_)
       pb.Update();
   }
-
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                      arma::stddev(train_errors_));
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                     arma::stddev(test_errors_));
-
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test)); 
 
 }
 
@@ -176,22 +145,11 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
       MODEL model(Xtrn, ytrn, args...);
       test_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, testset.inputs_,
                           testset.labels_));
-      train_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, Xtrn, ytrn));
       if (prog_)
         pb.Update();
     }
   }
 
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                         arma::stddev(train_errors_));
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                        arma::stddev(test_errors_));
-
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test)); 
 }
 
 } // namespace src

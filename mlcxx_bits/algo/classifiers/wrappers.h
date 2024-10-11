@@ -99,23 +99,28 @@ class LogisticRegression
   /**
    * @param inputs  : X*
    * @param labels  : y*
-   * @param probs   : scores*
+   * @param scores  : probabilities for the labels
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels,
                   arma::Mat<T>& scores ) 
   {
+    scores.resize(num_class_,inputs.n_cols);
     if (ulab_.n_elem != 1 && ulab_.n_elem < 3)
+    {
       model_.Classify(inputs, labels, scores);
+      scores.resize(num_class_,scores.n_cols);
+    }
     else if (ulab_.n_elem == 1)
     {
-      scores.resize(num_class_,inputs.n_cols);
       scores.row(ulab_[0]).fill(1.);
       labels.resize(inputs.n_cols);
       labels.fill(ulab_[0]);
     }
     else
+    {
       ova_.Classify(inputs,labels,scores);
+    }
   }
 
   /**
@@ -142,7 +147,7 @@ class LogisticRegression
   T ComputeAccuracy ( const arma::Mat<T>& points, 
                       const arma::Row<size_t>& responses ) 
   {
-    return (1. - ComputeError(points, responses))*100;
+    return (1. - ComputeError(points, responses));
   }
 
   /**

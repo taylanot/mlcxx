@@ -26,19 +26,13 @@ public:
    * @param Ns          : row vector of training points 
    * @param repeat      : amount of times the training for single N takes place
    * @param parallel    : boolean for using parallel computations 
-   * @param save        : boolean for saving the results
    * @param prog        : boolean for showing the progrress bar
-   * @param save_data   : boolean for saving the data used for train and test
-   * @param name        : name of the experiment
    *
    */
-  LCurve( const arma::irowvec& Ns,
-          const double repeat,
-          const bool parallel = false, 
-          const bool save = false,
-          const bool prog = false,
-          const std::string name = "lcurve",
-          const bool save_data = false );
+  LCurve ( const arma::irowvec& Ns,
+           const double repeat,
+           const bool parallel = false, 
+           const bool prog = false );
 
   /* Generate Learning Curves with Bootstrap
    *
@@ -84,25 +78,20 @@ public:
    *
    */
 
-  arma::Mat<O> GetResults (  ) const  {return results_;}
+  arma::Mat<O> GetResults (  ) const  {return test_errors_;}
 
 private:
   SPLIT split_;
   size_t repeat_;
   arma::irowvec Ns_;
   bool parallel_;
-  bool save_;
   bool prog_;
-  bool save_data_;
-  std::string name_;
   arma::Mat<O> results_;
 
   LOSS loss_;
 
 public:
   arma::Mat<O> test_errors_;
-  arma::Mat<O> train_errors_;
-  std::tuple<arma::Mat<O>, arma::Mat<O>>  stats_;
 
 };
 

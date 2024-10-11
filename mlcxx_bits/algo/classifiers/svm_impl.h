@@ -246,8 +246,8 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
 
 template<class KERNEL,class T>
 void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
-                                     arma::Row<size_t>& preds,
-                                     arma::Mat<T>& probs ) 
+                               arma::Row<size_t>& preds,
+                               arma::Mat<T>& probs ) 
 {
   arma::Mat<T> dec_func;
   if (!oneclass_)
@@ -256,12 +256,14 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
     { 
       if (idx_.n_elem>0)
       {
+        probs.set_size(nclass_,inputs.n_cols);
         preds.set_size(inputs.n_cols);
         arma::Row<T> w = _w();
         dec_func =  w * inputs + _b(w) ;
         preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
         preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
-        probs = 1. / (1. + arma::exp(dec_func));
+        probs.row(0) = 1. / (1. + arma::exp(dec_func));
+        probs.row(1) = 1 - probs.row(0);
         /* probs = (dec_func - arma::min(dec_func,1).eval()(0,0))  / (arma::max(dec_func,1) - arma::min(dec_func,1)).eval()(0,0); */
       }
       else
