@@ -158,13 +158,14 @@ public:
     mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
         "MSE::Evaluate()",
         "responses");
-    arma::Mat<DTYPE> encoded;
+    arma::Mat<O> encoded;
     mlpack::data::OneHotEncoding(labels,encoded);
     LabelType preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
-    PRINT(arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows));
+    /* PRINT_VAR(arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows)) */
     return arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows);
+    /* return O(probs.n_elem); */
   }
 
   static const bool NeedsMinimization = true;

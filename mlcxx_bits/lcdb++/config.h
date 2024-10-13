@@ -20,10 +20,16 @@ namespace lcdb
   using LSVC  = algo::classification::SVM<mlpack::LinearKernel>;
   using GSVC  = algo::classification::SVM<mlpack::GaussianKernel>;
   using ESVC  = algo::classification::SVM<mlpack::EpanechnikovKernel>;
+  using ADAB  = mlpack::AdaBoost<>;
+  using RFOR  = mlpack::RandomForest<>;
+  using DecisionTree = mlpack::DecisionTree<>;
 
   // Losses
   using Acc = mlpack::Accuracy;
-  using Log = utils::LogLoss;
+  using Crs = utils::CrossEntropy;
+  using Auc = utils::AUC;
+  using Auc = utils::BrierLoss;
+
 }
 
 

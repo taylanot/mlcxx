@@ -90,7 +90,6 @@ private:
 
   LOSS loss_;
 
-public:
   arma::Mat<O> test_errors_;
 
 };

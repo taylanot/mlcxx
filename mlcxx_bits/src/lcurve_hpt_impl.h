@@ -31,16 +31,10 @@ LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::LCurveHPT ( const arma::irowvec& Ns,
                                                   const double repeat,
                                                   const double cvp,
                                                   const bool parallel, 
-                                                  const bool save,
-                                                  const bool prog,
-                                                  const std::string name,
-                                                  const bool save_data ) :
-
-repeat_(repeat), Ns_(Ns), parallel_(parallel), save_(save), prog_(prog),
-save_data_(save_data), name_(name), cvp_(cvp)
+                                                  const bool prog ) :
+repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog), cvp_(cvp)
 {
   test_errors_.resize(repeat_,Ns_.n_elem);
-  train_errors_.resize(repeat_,Ns_.n_elem);
 }
 //=============================================================================
 // LCurve::Bootstrap
@@ -83,24 +77,12 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const arma::Mat<O>& input
       model.Train(Xtrn, ytrn);
 
       test_errors_(j,i) = loss.Evaluate(model,Xtst,ytst);
-      train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn);
       
       if (prog_)
         pb.Update();
     }
   }
 
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                         arma::stddev(train_errors_));
-
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                        arma::stddev(test_errors_));
-
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test));
 
 }
 
@@ -144,7 +126,6 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
     MODEL model = hpt.BestModel();
     model.Train(Xtrn, ytrn);
     test_errors_(j,0) = loss.Evaluate(model,Xrest,yrest);
-    train_errors_(j,0) = loss.Evaluate(model, Xtrn, ytrn);
 
     for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
     {
@@ -156,7 +137,6 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
       MODEL model = std::move(hpt.BestModel());
       model.Train(Xtrn, ytrn);
       test_errors_(j,i) = loss.Evaluate(model,Xrest,yrest);
-      train_errors_(j,i) = loss.Evaluate(model, Xtrn, ytrn); 
 
       if (prog_)
         pb.Update();
@@ -164,17 +144,6 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
     if (prog_)
       pb.Update();
   }
-
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                      arma::stddev(train_errors_));
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                     arma::stddev(test_errors_));
-
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test)); 
 
 }
 //=============================================================================
@@ -220,23 +189,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Split( const T& trainset,
 
       test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_,
                             testset.labels_));
-      train_errors_(j,i) = static_cast<O>(loss.Evaluate(model, Xtrn, ytrn));
 
       if (prog_)
         pb.Update();
     }
   }
 
-    arma::Mat<O> train = arma::join_cols(arma::mean(train_errors_),
-                                         arma::stddev(train_errors_));
-    arma::Mat<O> test = arma::join_cols(arma::mean(test_errors_),
-                                        arma::stddev(test_errors_));
 
-    results_ = 
-      arma::join_cols(arma::conv_to<arma::Row<O>>::from(Ns_), train, test);
-
-    stats_ = std::make_tuple(std::move(train),
-                             std::move(test)); 
 }
 
 } // namespace src

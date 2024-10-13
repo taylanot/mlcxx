@@ -21,8 +21,6 @@ LDC<T>::LDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
               const size_t& num_class ) :  num_class_(num_class), lambda_(0.)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
@@ -34,8 +32,6 @@ LDC<T>::LDC ( const arma::Mat<T>& inputs,
               const arma::Row<T>& priors ) : num_class_(num_class),
                                              lambda_(lambda), priors_(priors)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
@@ -45,8 +41,7 @@ LDC<T>::LDC ( const arma::Mat<T>& inputs,
               const size_t& num_class,
               const double& lambda ) : num_class_(num_class), lambda_(lambda)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
+
   Train(inputs, labels);
 }
 
@@ -54,6 +49,9 @@ template<class T>
 void LDC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
 {
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
+  priors_ = utils::GetPrior(labels, num_class_);
+
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
   unique_ = arma::unique(labels);
@@ -114,6 +112,7 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
       {
+  
         probs(class_(unique_(c)),n) = std::log(priors_(c)) 
                        -  0.5*arma::dot(means_.at(unique_(c))*
                         cov_, means_.at(unique_(c)))
@@ -125,6 +124,7 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
     probs = arma::exp(probs.each_row() - arma::max(probs,0));
     probs = probs.each_row()/arma::sum(probs,0);
   }
+
 }
 
 template<class T>
@@ -153,8 +153,6 @@ QDC<T>::QDC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
               const size_t& num_class ) : num_class_(num_class), lambda_(0.)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
@@ -166,8 +164,6 @@ QDC<T>::QDC ( const arma::Mat<T>& inputs,
               const arma::Row<T>& priors ) : num_class_(num_class),
                                              lambda_(lambda), priors_(priors)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
   Train(inputs, labels);
 }
 
@@ -177,8 +173,7 @@ QDC<T>::QDC ( const arma::Mat<T>& inputs,
               const size_t& num_class,
               const double& lambda ) : num_class_(num_class), lambda_(lambda)
 {
-  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels);
+
   Train(inputs, labels);
 }
 
@@ -186,9 +181,13 @@ template<class T>
 void QDC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
 {
+
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
   unique_ = arma::unique(labels);
+
+  class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
+  priors_ = utils::GetPrior(labels,num_class_);
   
   arma::Row<size_t>::iterator it = unique_.begin();
   arma::Row<size_t>::iterator end = unique_.end();

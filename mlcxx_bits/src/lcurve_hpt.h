@@ -32,20 +32,15 @@ public:
    * @param repeat      : amount of times the training for single N takes place
    * @param cvp         : parameter for cross-validation used
    * @param parallel    : boolean for using parallel computations 
-   * @param save        : boolean for saving the results
    * @param prog        : boolean for showing the progrress bar
-   * @param save_data   : boolean for saving the data used for train and test
-   * @param name        : name of the experiment
    *
    */
   LCurveHPT( const arma::irowvec& Ns,
              const double repeat,
              const double cvp = 0.2,
              const bool parallel = false, 
-             const bool save = false,
-             const bool prog = false,
-             const std::string name = "lcurve",
-             const bool save_data = false );
+             const bool prog = false );
+
   /* Generate Learning Curves with Bootstrap
    *
    * @param inputs    : whole large dataset inputs
@@ -90,7 +85,7 @@ public:
    *
    */
 
-  arma::mat GetResults (  ) {return results_;}
+  arma::mat GetResults (  ) {return test_errors_;}
 
 private:
   SPLIT split_;
@@ -103,11 +98,7 @@ private:
   std::string name_;
   arma::Mat<O> results_;
   double cvp_;
-
-public:
   arma::Mat<O> test_errors_;
-  arma::Mat<O> train_errors_;
-  std::tuple<arma::Mat<O>, arma::Mat<O>>  stats_;
 
 };
 

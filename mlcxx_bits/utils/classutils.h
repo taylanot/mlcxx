@@ -28,9 +28,10 @@ std::tuple< arma::Mat<T>,
 // GetPrior : Estimates prior from given labels
 //-----------------------------------------------------------------------------
 template<class T=DTYPE>
-arma::Row<T> GetPrior ( const arma::Row<size_t>& labels )
+arma::Row<T> GetPrior ( const arma::Row<size_t>& labels,
+                        const size_t& num_class )
 {
-  arma::Row<size_t> unq = arma::unique(labels);
+  auto unq = arma::regspace<arma::Row<size_t>>(0,1,num_class);
   auto prior = arma::conv_to<arma::Row<T>>::from(arma::hist(labels, unq));
   return  prior / labels.n_cols;
   
