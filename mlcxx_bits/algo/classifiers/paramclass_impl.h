@@ -300,7 +300,6 @@ template<class T>
 void NMC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
 {
-
   dim_ = inputs.n_rows;
   unique_ = arma::unique(labels);
   /* num_class_ = unique_.n_cols; */
@@ -370,15 +369,14 @@ void NMC<T>::Classify ( const arma::Mat<T>& inputs,
   {
     arma::Mat<T> distances(num_class_, N);
     distances.fill(arma::datum::inf);
-    arma::urowvec index(N);
     for ( size_t j=0; j<N; j++ )
     {
       for ( size_t i=0; i<unique_.n_elem; i++ )
       { 
-        distances(unique_(i), j) = metric_.Evaluate(parameters_.col(i),inputs.col(j));
+        distances(unique_(i), j) = metric_.Evaluate(parameters_.col(unique_(i))
+                                                    ,inputs.col(j));
       }
-        index(j) = arma::index_min(distances.col(j));
-        labels(j) = unique_(index(j));
+        labels(j) = arma::index_min(distances.col(j));
     }
     if (unique_.n_elem == num_class_)
       probs = distances.each_row() / arma::sum(distances,0);
@@ -392,7 +390,6 @@ void NMC<T>::Classify ( const arma::Mat<T>& inputs,
           probs.row(i) = distances.row(i) / arma::sum(distances, 0);
       }
     }
-      
   }
  
 }

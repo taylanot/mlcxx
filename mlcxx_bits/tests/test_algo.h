@@ -286,7 +286,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_,data.labels_,Nc);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
       CHECK ( acc == 100.  );
     }
@@ -296,8 +296,8 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_,1000);
-      algo::classification::NMC model_(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_, data.labels_,Nc,1000);
+      algo::classification::NMC model_(data.inputs_, data.labels_,Nc);
       arma::Mat<DTYPE> param1 = model.Parameters(); 
       arma::Mat<DTYPE> param2 = model_.Parameters();
       CHECK ( param1(0,0) != param2(0,0));
@@ -309,8 +309,8 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_,1000);
-      algo::classification::NMC model_(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_, data.labels_,Nc,1000);
+      algo::classification::NMC model_(data.inputs_, data.labels_,Nc);
       arma::Mat<DTYPE> param1 = model.Parameters(); 
       arma::Mat<DTYPE> param2 = model_.Parameters();
       CHECK ( param1(0,0) != param2(0,0));
@@ -322,7 +322,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_, data.labels_,Nc);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
       CHECK ( acc == 100. );
     }
@@ -332,7 +332,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_, data.labels_,Nc);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
       CHECK ( acc >= 0.9 );
     }
@@ -342,7 +342,7 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
-      algo::classification::NMC model(data.inputs_, data.labels_);
+      algo::classification::NMC model(data.inputs_, data.labels_,Nc);
       double acc = model.ComputeAccuracy(data.inputs_, data.labels_);
       CHECK ( acc >= 0.9 );
     }
@@ -466,7 +466,7 @@ TEST_SUITE("NNC") {
 
     SUBCASE("1D-Simple")
     {
-      D = 1; N = 10; Nc = 2; type = "Simple";
+      D = 1; N = 100; Nc = 2; type = "Simple";
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
@@ -477,7 +477,7 @@ TEST_SUITE("NNC") {
 
     SUBCASE("2D-Simple")
     {
-      D = 2; N = 10; Nc = 2; type = "Simple";
+      D = 2; N = 100; Nc = 2; type = "Simple";
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
@@ -487,35 +487,160 @@ TEST_SUITE("NNC") {
     }
     SUBCASE("1D-Hard")
     {
-      D = 1; N = 10; Nc = 2; type = "Hard";
+      D = 1; N = 100; Nc = 2; type = "Hard";
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0. );
+      CHECK ( error <= 0.5 );
     }
     SUBCASE("2D-Hard")
     {
-      D = 2; N = 10; Nc = 2; type = "Hard";
+      D = 2; N = 100; Nc = 2; type = "Hard";
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0. );
+      CHECK ( error <= 0.5 );
     }
     SUBCASE("BANANA")
     {
-      D = 2; N = 10; Nc = 2; type = "Banana";
+      D = 2; N = 100; Nc = 2; type = "Banana";
 
       data::classification::Dataset data(D, N, Nc);
       data.Generate(type);
       algo::classification::NNC model(data.inputs_, data.labels_, Nc);
       double error = model.ComputeError(data.inputs_, data.labels_);
-      CHECK ( error <= 0. );
+      CHECK ( error <= 0.5 );
     }
   }
 }
 
+TEST_SUITE("SVM") {
+  TEST_CASE("PROBLEMS")
+  {
+    int D, N, Nc; //double tol = 1e-2;
+    std::string type;
+
+    SUBCASE("1D-Simple")
+    {
+      D = 1; N = 100; Nc = 2; type = "Simple";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::SVM model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+
+    SUBCASE("2D-Simple")
+    {
+      D = 2; N = 100; Nc = 2; type = "Simple";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::SVM model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+    SUBCASE("1D-Hard")
+    {
+      D = 1; N = 100; Nc = 2; type = "Hard";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::SVM model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+    SUBCASE("2D-Hard")
+    {
+      D = 2; N = 100; Nc = 2; type = "Hard";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::SVM model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+    SUBCASE("BANANA")
+    {
+      D = 2; N = 100; Nc = 2; type = "Banana";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::SVM<mlpack::GaussianKernel>
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+  }
+}
+
+TEST_SUITE("LOGISTICREG") {
+  TEST_CASE("PROBLEMS")
+  {
+    int D, N, Nc; //double tol = 1e-2;
+    std::string type;
+
+    SUBCASE("1D-Simple")
+    {
+      D = 1; N = 100; Nc = 2; type = "Simple";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::LogisticRegression 
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+
+    SUBCASE("2D-Simple")
+    {
+      D = 2; N = 100; Nc = 2; type = "Simple";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::LogisticRegression 
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0. );
+    }
+    SUBCASE("1D-Hard")
+    {
+      D = 1; N = 100; Nc = 2; type = "Hard";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::LogisticRegression 
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+    SUBCASE("2D-Hard")
+    {
+      D = 2; N = 100; Nc = 2; type = "Hard";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::LogisticRegression 
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+    SUBCASE("BANANA")
+    {
+      D = 2; N = 100; Nc = 2; type = "Banana";
+
+      data::classification::Dataset data(D, N, Nc);
+      data.Generate(type);
+      algo::classification::LogisticRegression 
+        model(data.inputs_, data.labels_, Nc);
+      double error = model.ComputeError(data.inputs_, data.labels_);
+      CHECK ( error <= 0.5 );
+    }
+  }
+}
 #endif

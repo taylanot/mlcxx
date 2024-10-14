@@ -7,7 +7,18 @@
 #ifndef TEST_DATA_H 
 #define TEST_DATA_H
 
+TEST_SUITE("OPENML") {
 
+
+  TEST_CASE("Dataset")
+  {
+    data::classification::oml::Dataset dataset(61);
+    CHECK ( dataset.inputs_.n_cols == 150 );
+    CHECK ( dataset.inputs_.n_rows == 4 );
+    CHECK ( dataset.labels_.n_elem == 150 );
+    CHECK ( arma::unique(dataset.labels_).eval().n_elem == 3 );
+  }
+}
 
 TEST_SUITE("DATASET") {
 
@@ -335,38 +346,38 @@ TEST_SUITE("DATASET") {
   }
 }
 
-/* TEST_SUITE("TRANSFORM") { */
+TEST_SUITE("TRANSFORM") {
 
-/*   double tol = 1e-6; */
+  double tol = 1e-6;
 
-/*   TEST_CASE("REGRESSION") */
-/*   { */
-/*     data::regression::Dataset data(2, 10); */
-/*     data::regression::Dataset tdata,tbdata; */
-/*     data.Generate(1,0,"Linear",0); */
-/*     data::regression::Transformer trans(data); */
-/*     tdata = trans.Trans(data); */
-/*     tbdata = trans.InvTrans(tdata); */
+  TEST_CASE("REGRESSION")
+  {
+    data::regression::Dataset data(2, 10);
+    data::regression::Dataset tdata,tbdata;
+    data.Generate(1,0,"Linear",0);
+    data::regression::Transformer trans(data);
+    tdata = trans.Trans(data);
+    tbdata = trans.InvTrans(tdata);
 
-/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
-/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
+    CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol );
+    CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol );
     
-/*   } */
+  }
 
-/*   TEST_CASE("CLASSIFICATION") */
-/*   { */
-/*     data::classification::Dataset data(2, 10, 2); */
-/*     data::classification::Dataset tdata,tbdata; */
-/*     data.Generate("Simple"); */
-/*     data::classification::Transformer trans(data); */
-/*     tdata = trans.Trans(data); */
-/*     tbdata = trans.InvTrans(tdata); */
+  TEST_CASE("CLASSIFICATION")
+  {
+    data::classification::Dataset data(2, 10, 2);
+    data::classification::Dataset tdata,tbdata;
+    data.Generate("Simple");
+    data::classification::Transformer trans(data);
+    tdata = trans.Trans(data);
+    tbdata = trans.InvTrans(tdata);
 
-/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
-/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
+    CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol );
+    CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol );
     
-/*   } */
-/* } */
+  }
+}
 
 TEST_SUITE("FUNCTIONAL") {
 

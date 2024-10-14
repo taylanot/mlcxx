@@ -7,47 +7,69 @@
  */
 
 #define DTYPE double  
+
 #include <headers.h>
 #include "lcdb++/config.h"
 
 template<class MODEL,class LOSS>
-int boot_(  size_t id,
-            const std::string& algo, const std::string& loss,
-            size_t seed, size_t nreps, bool hpt ) 
+int boot_( const size_t id,
+           const std::string& algo, const std::string& loss,
+           const size_t seed, const size_t nreps,
+           const std::filesystem::path& path ) 
 {
-  std::filesystem::path path;
-  if (!hpt)
-    path = EXP_PATH/"lcdb++"/"boot"/"ntune";
-  else
-    path = EXP_PATH/"lcdb++"/"boot"/"tune";
-    
-  path = path/std::to_string(id)/algo/std::to_string(seed);
-  std::filesystem::create_directories(path);
-  
   data::classification::oml::Dataset dataset(id);
 
   mlpack::RandomSeed(seed);
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
                                               (1,1,size_t(dataset.size_*0.9));
 
-  src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,false,false,true);
+  src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true);
   lcurve.Bootstrap(dataset.inputs_,dataset.labels_,
                    arma::unique(dataset.labels_).eval().n_elem);
-  lcurve.test_errors_.save(path/(loss+".csv"),arma::csv_ascii);
+  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
  
   return 0;
 }
 
+template<class MODEL,class LOSS,class... Args>
+int hptboot_( const size_t id,
+              const std::string& algo, const std::string& loss,
+              const size_t seed, const size_t nreps,
+              const std::filesystem::path& path, Args... args ) 
+{
+ 
+  data::classification::oml::Dataset dataset(id);
+
+  mlpack::RandomSeed(seed);
+  const arma::irowvec Ns = arma::regspace<arma::irowvec>
+                                              (1,1,size_t(dataset.size_*0.9));
+
+  src::LCurveHPT<MODEL,LOSS> lcurve(Ns,nreps,lcdb::vsize, true,true);
+  lcurve.Bootstrap(dataset.inputs_,dataset.labels_,
+                   arma::unique(dataset.labels_).eval().n_elem, args...);
+  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+ 
+  return 0;
+}
 void boot( size_t id,
            const std::string& algo, const std::string& loss,
            size_t seed, size_t nreps, bool hpt ) 
 {
+  std::filesystem::path path;
+  if (!hpt)
+    path = EXP_PATH/"lcdb++"/"boot"/"ntune";
+  else
+    path = EXP_PATH/"lcdb++"/"boot"/"tune";
+
+  path = path/std::to_string(id)/algo/std::to_string(seed);
+  std::filesystem::create_directories(path);
+ 
   if (!algo.compare("lreg"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::LREG,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::LREG,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::LREG,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::LREG,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   }
@@ -55,9 +77,9 @@ void boot( size_t id,
   else if (!algo.compare("nmc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::NMC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::NMC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::NMC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::NMC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   
@@ -66,9 +88,9 @@ void boot( size_t id,
   else if (!algo.compare("ldc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::LDC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::LDC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::LDC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::LDC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   
@@ -77,9 +99,9 @@ void boot( size_t id,
   else if (!algo.compare("qdc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::QDC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::QDC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::QDC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::QDC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   
@@ -88,9 +110,9 @@ void boot( size_t id,
   else if (!algo.compare("nb"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::NB,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::NB,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::NB,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::NB,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   
@@ -99,9 +121,9 @@ void boot( size_t id,
   else if (!algo.compare("lsvc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::LSVC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::LSVC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::LSVC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::LSVC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   }
@@ -109,29 +131,19 @@ void boot( size_t id,
   else if (!algo.compare("gsvc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::GSVC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::GSVC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::GSVC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::GSVC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   }
 
-  /* else if (algo.compare("csvc")) */
-  /* { */
-  /*   if (loss.compare("acc")) */
-  /*     boot_<lcdb::CSVC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt); */
-  /*   else if (loss.compare("log")) */
-  /*     boot_<lcdb::CSVC,lcdb::Log> (id,algo,loss,seed,nreps,hpt); */
-  /*   else */
-  /*     ERR("Not defined loss argument!"); */
-  /* } */
-
   else if (!algo.compare("esvc"))
   {
     if (!loss.compare("acc"))
-      boot_<lcdb::ESVC,lcdb::Acc> (id,algo,loss,seed,nreps,hpt);
-    else if (!loss.compare("log"))
-      boot_<lcdb::ESVC,lcdb::Log> (id,algo,loss,seed,nreps,hpt);
+      boot_<lcdb::ESVC,lcdb::Acc> (id,algo,loss,seed,nreps,path);
+    else if (!loss.compare("crs"))
+      boot_<lcdb::ESVC,lcdb::Crs> (id,algo,loss,seed,nreps,path);
     else
       ERR("Not defined loss argument!");
   }
@@ -199,7 +211,7 @@ int add_( size_t id,
     (100,1,size_t(trainset.size_*0.9));
 
   src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,false,true);
-  lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
+  lcurve.Additive(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
   lcurve.test_errors_.save(path/(loss+".csv"),arma::csv_ascii);
  
   return 0;

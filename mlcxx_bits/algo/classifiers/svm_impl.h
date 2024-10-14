@@ -231,7 +231,7 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
 {
   if (!oneclass_)
   {
-    arma::Row<T> temp;
+    arma::Mat<T> temp;
     if (nclass_==2)
       Classify(inputs,preds,temp);
     else 
@@ -298,7 +298,7 @@ template<class KERNEL,class T>
 T SVM<KERNEL,T>::ComputeAccuracy ( const arma::Mat<T>& points, 
                                          const arma::Row<size_t>& responses )
 {
-  return (1. - ComputeError(points, responses))*100;
+  return (1. - ComputeError(points, responses));
 }
 
 } // namespace classification
