@@ -76,6 +76,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <cassert>
 #include <regex>
 #include <type_traits>
+#include <unordered_map>
 
 
 

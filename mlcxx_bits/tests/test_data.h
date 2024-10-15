@@ -9,7 +9,6 @@
 
 TEST_SUITE("OPENML") {
 
-
   TEST_CASE("Dataset")
   {
     data::classification::oml::Dataset dataset(61);

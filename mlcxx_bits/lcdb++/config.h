@@ -33,19 +33,23 @@ namespace lcdb
 
   // validation size for the Hyper-parameter optimization
   DTYPE vsize = 0.2;
+  // train-test split size if you are not using bootstrap
+  DTYPE splitsize = 0.2;
 
-  // lambdas: for the QDC, LDC, LREG
-  auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,3);
-  // Cs: GSVC,LSVC,ESVC
-  auto Cs = arma::logspace<arma::Row<DTYPE>>(-2,1,2);
-  // ns: NNC
-  auto ns = arma::regspace<arma::Row<DTYPE>>(1,1,10);
-  // maxiters : ADAB
-  auto maxiters = arma::regspace<arma::Row<DTYPE>>(1,10,100);
-  // numtrees : RFOR
-  auto numtrees = arma::regspace<arma::Row<DTYPE>>(1,10,100);
-  // leafsizes: DT
-  auto numtrees = arma::regspace<arma::Row<DTYPE>>(1,10,100);
+  // lambdas: for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
+  auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,4);
+
+  /* auto Cs = arma::logspace<arma::Row<DTYPE>>(-8,1,3); */
+
+  /* // ns: NNC */
+  /* auto ns = arma::regspace<arma::Row<DTYPE>>(1,1,10); */
+  /* // maxiters : ADAB */
+  /* auto maxiters = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
+  /* // numtrees : RFOR */
+  /* auto numtrees = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
+  /* // leafsizes: DT */
+  /* auto leafs = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
+
 
 
 }
