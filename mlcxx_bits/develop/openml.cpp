@@ -81,13 +81,13 @@ int main ( int argc, char** argv )
   /*   data::N_StratSplit> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
-  src::LCurve<algo::classification::NMC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true);
+  /* src::LCurve<algo::classification::NMC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::NNC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::OnevAll<mlpack::LogisticRegression<>>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
-  /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,false,false); */
+  src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true);
   /* src::LCurve<mlpack::RandomForest<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<mlpack::RandomForest<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::SVM<>,utils::LogLoss> lcurve(Ns,repeat,true,false,true); */

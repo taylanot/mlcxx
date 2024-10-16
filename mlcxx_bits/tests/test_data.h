@@ -9,13 +9,28 @@
 
 TEST_SUITE("OPENML") {
 
+  using Dataset = data::classification::oml::Dataset<>;
+  using Collect = data::classification::oml::Collect<>;
+
   TEST_CASE("Dataset")
   {
-    data::classification::oml::Dataset dataset(61);
+    Dataset dataset(61);
     CHECK ( dataset.inputs_.n_cols == 150 );
     CHECK ( dataset.inputs_.n_rows == 4 );
     CHECK ( dataset.labels_.n_elem == 150 );
     CHECK ( arma::unique(dataset.labels_).eval().n_elem == 3 );
+  }
+  TEST_CASE("Collect")
+  {
+    Collect collect(283);
+    CHECK ( collect.GetSize() == 53 );
+    CHECK ( collect.GetKeys().n_elem == 53 );
+    Dataset dataset = collect.GetNext();
+    CHECK ( dataset.inputs_.n_cols == 345 );
+    CHECK ( dataset.inputs_.n_rows == 6 );
+    CHECK ( dataset.labels_.n_elem == 345);
+    CHECK ( arma::unique(dataset.labels_).eval().n_elem == 16 );
+
   }
 }
 

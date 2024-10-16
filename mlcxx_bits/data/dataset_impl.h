@@ -576,7 +576,7 @@ Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) :
   std::filesystem::create_directories(metapath_);
   std::filesystem::create_directories(filepath_);
 
-  file_ = (std::to_string(id) + ".arff");
+  file_ = filepath_ / (std::to_string(id) + ".arff");
 
   if (!std::filesystem::exists(file_))
   {
@@ -593,7 +593,7 @@ Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) :
 
 template<class T>
 Dataset<T>::Dataset( const size_t& id ) : 
-  id_(id), path_(DATASET_PATH)
+  id_(id), path_(DATASET_PATH/"openml")
 {
   std::filesystem::create_directories(filepath_);
   std::filesystem::create_directories(metapath_);
@@ -803,6 +803,72 @@ int Dataset<T>::_findlabel ( const std::string& targetname )
 }
 
 template<class T>
+bool Dataset<T>::_iscateg(const arma::Row<T>& row)
+{
+  std::set<int> distinctValues;
+  
+  // Iterate over the array
+  for (size_t i = 0; i < row.n_elem; ++i) 
+  {
+    T value = row(i);
+    
+    // Check if the value is a whole number
+    if (value == static_cast<int>(value)) 
+        distinctValues.insert(static_cast<int>(value));
+    else 
+        // If any value is not a whole number, it's not categorical
+        return false;
+  }
+
+  // If we have only a few distinct values, consider it categorical
+  return distinctValues.size() < row.n_elem;
+}
+
+template<class T>
+arma::Row<size_t> Dataset<T>::_convcateg(const arma::Row<T>& row)
+{
+  std::unordered_map<T, size_t> valueToIndex;
+  size_t categoryIndex = 0;
+
+  // Create a mapping of unique values to integer indices
+  for (size_t i = 0; i < row.n_elem; ++i) 
+  {
+      T value = row(i);
+      // If the value has not been seen before, assign a new category
+      if (valueToIndex.find(value) == valueToIndex.end()) 
+          valueToIndex[value] = categoryIndex++;
+  }
+
+  // Create a new Row<size_t> to store the mapped categorical values
+  arma::Row<size_t> categoricalRow(row.n_elem);
+
+  // Map each original value to its corresponding categorical index
+  for (size_t i = 0; i < row.n_elem; ++i) 
+      categoricalRow(i) = valueToIndex[row(i)];
+
+  return categoricalRow;
+}
+
+template<class T>
+arma::Row<size_t> Dataset<T>::_procrow(const arma::Row<T>& row)
+{
+  if (_iscateg(row)) 
+  {
+    // Return the row as is if it's already categorical
+    // Convert it to a size_t type (though it might not be necessary 
+    // if it's already integers)
+    arma::Row<size_t> categoricalRow(row.n_elem);
+    for (size_t i = 0; i < row.n_elem; ++i) 
+        categoricalRow(i) = static_cast<size_t>(row(i));
+    return categoricalRow;
+  } 
+  else 
+    // Convert real values into categorical values
+    return _convcateg(row);
+}
+
+
+template<class T>
 void Dataset<T>::_load( )
 {
   int idx = -1;
@@ -816,8 +882,7 @@ void Dataset<T>::_load( )
     ERR("Cannot find the label...");
     std::abort();
   }  
-
-  labels_ = arma::conv_to<arma::Row<size_t>>::from(data.row(idx));
+  labels_ = _procrow(data.row(idx));
   data.shed_row(idx);
   inputs_ = data;
   dimension_ = inputs_.n_rows;

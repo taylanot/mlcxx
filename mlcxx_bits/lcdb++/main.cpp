@@ -2,7 +2,7 @@
  * @file main.cpp
  * @author Ozgur Taylan Turan
  *
- * This file is for lcdb++ experiments
+ * This file is for lcdb++ generation
  *
  */
 
@@ -17,7 +17,7 @@ int boot_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
@@ -38,7 +38,7 @@ int hptboot_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
@@ -59,7 +59,7 @@ int add_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
 
@@ -81,7 +81,7 @@ int hptadd_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
 
@@ -104,7 +104,7 @@ int split_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   data::classification::oml::Dataset trainset,testset;
@@ -128,7 +128,7 @@ int hptsplit_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id);
+  data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   data::classification::oml::Dataset trainset,testset;
@@ -152,9 +152,9 @@ void boot( size_t id, const std::string& algo, const std::string& loss,
 {
     std::filesystem::path path;
     if (!hpt)
-      path = EXP_PATH/"lcdb++"/"boot"/"ntune";
+      path = lcdb::path/"boot"/"ntune";
     else
-      path = EXP_PATH/"lcdb++"/"boot"/"tune";
+      path = lcdb::path/"boot"/"tune";
 
     path = path/std::to_string(id)/algo/std::to_string(seed);
     std::filesystem::create_directories(path);
@@ -297,9 +297,9 @@ void split ( size_t id, const std::string& algo, const std::string& loss,
 {
     std::filesystem::path path;
     if (!hpt)
-      path = EXP_PATH/"lcdb++"/"split"/"ntune";
+      path = lcdb::path/"split"/"ntune";
     else
-      path = EXP_PATH/"lcdb++"/"split"/"tune";
+      path = lcdb::path/"split"/"tune";
 
     path = path/std::to_string(id)/algo/std::to_string(seed);
     std::filesystem::create_directories(path);
@@ -442,9 +442,9 @@ void add ( size_t id, const std::string& algo, const std::string& loss,
 {
     std::filesystem::path path;
     if (!hpt)
-      path = EXP_PATH/"lcdb++"/"add"/"ntune";
+      path = lcdb::path/"add"/"ntune";
     else
-      path = EXP_PATH/"lcdb++"/"add"/"tune";
+      path = lcdb::path/"add"/"tune";
 
     path = path/std::to_string(id)/algo/std::to_string(seed);
     std::filesystem::create_directories(path);
@@ -581,68 +581,194 @@ void add ( size_t id, const std::string& algo, const std::string& loss,
     else 
         ERR("Not defined algo argument!");
 }
+
+/* int main(int argc, char* argv[]) */ 
+/* { */
+
+/*     // Define default values */
+/*     size_t default_id = 11; */
+/*     std::string default_algo = "nmc"; */
+/*     std::string default_loss = "acc"; */
+/*     std::string default_type = "boot"; */
+/*     size_t default_seed = SEED ; */
+/*     size_t default_nreps = 1; */
+/*     bool default_hpt = false; */
+
+/*     // Initialize parameters with default values */
+/*     size_t id = default_id; */
+/*     std::string algo = default_algo; */
+/*     std::string loss = default_loss; */
+/*     std::string type = default_type; */
+/*     size_t seed = default_seed; */
+/*     size_t nreps = default_nreps; */
+/*     bool hpt = default_hpt; */
+
+/*   arma::wall_clock timer; */
+/*   timer.tic(); */
+
+/*   int args_to_process = std::min(argc - 1, 7); */
+
+/*   try */ 
+/*   { */
+/*       if (args_to_process >= 1) */ 
+/*           id = std::strtoul(argv[1], nullptr, 10); */  
+/*       if (args_to_process >= 2) */ 
+/*           algo = argv[2]; */ 
+/*       if (args_to_process >= 3) */ 
+/*           loss = argv[3]; */ 
+/*       if (args_to_process >= 4) */ 
+/*           type = argv[4]; */ 
+/*       if (args_to_process >= 5) */ 
+/*           seed = std::strtoul(argv[5], nullptr, 10); */ 
+/*       if (args_to_process >= 6) */ 
+/*           nreps = std::strtoul(argv[6], nullptr, 10); */ 
+/*       if (args_to_process >= 7) */ 
+/*       { */
+/*         std::string hpt_str = argv[7]; */
+/*         // Convert to lower case for case-insensitive comparison */
+/*         std::transform(hpt_str.begin(), hpt_str.end(), */
+/*                                         hpt_str.begin(), ::tolower); */
+/*         if (hpt_str == "true" || hpt_str == "1") */ 
+/*           hpt = true; */
+/*         else if (hpt_str == "false" || hpt_str == "0") */ 
+/*           hpt = false; */
+/*         else */ 
+/*           throw std::invalid_argument( */
+/*               "Invalid value for hpt. Use 'true', 'false', '1', or '0'."); */
+/*       } */
+
+/*       // Optionally, you can notify the user about using default values */
+/*       if (argc - 1 < 7) */ 
+/*       { */
+/*         LOG("Some arguments were not provided." */
+/*             << "Using default values where applicable.\n"); */
+/*       } */
+
+/*       LOG("Configuration used for the run...\n"); */
+/*       LOG("OpenML dataset id  -> " << id << "\n"); */
+/*       LOG("Algorithm          -> " << algo << "\n"); */
+/*       LOG("Loss               -> " << loss << "\n"); */
+/*       LOG("Type of curve gen  -> " << type << "\n"); */
+/*       LOG("Seed               -> " << seed << "\n"); */
+/*       LOG("Number of reps     -> " << nreps << "\n"); */
+/*       LOG("HPT enabled        -> " << (hpt ? "Yes" : "No")<< "\n"); */
+      
+      
+/*       // Call the function to run the experiment */
+
+/*       if (type == "boot") */
+/*         boot(id,algo,loss,seed,nreps,hpt); */
+/*       else if (type == "add") */
+/*         add(id,algo,loss,seed,nreps,hpt); */
+/*       else if (type == "split") */
+/*         split(id,algo,loss,seed,nreps,hpt); */
+/*       else */ 
+/*         ERR("Invalid type for the experiment."); */
+
+/*       PnRINT_TIME(timer.toc()); */
+/*       return 0; */
+/*   } */ 
+
+/*   catch (const std::invalid_argument& e) */
+/*   { */
+/*     std::cerr << "Error: Invalid argument provided. " << e.what() << "\n"; */
+/*     std::cerr << "Usage: " << argv[0] */ 
+/*                           << " [<id>] [<algo>] [<seed>] [<nreps>] [<hpt>]\n"; */
+/*     std::cerr << "Default values will be used" */
+/*               << " for any missing or invalid arguments.\n"; */
+/*     PRINT_TIME(timer.toc()); */
+/*     return 1; */
+/*   } */ 
+/*   catch (const std::out_of_range& e) */ 
+/*   { */
+/*     std::cerr << "Error: Number out of range. " << e.what() << "\n"; */
+/*     PRINT_TIME(timer.toc()); */
+/*     return 1; */
+/*   } */ 
+/*   catch (...) */ 
+/*   { */
+/*     std::cerr << "An unexpected error occurred while parsing arguments.\n"; */
+/*     PRINT_TIME(timer.toc()); */
+/*     return 1; */
+/*   } */
+
+/* } */
+
 int main(int argc, char* argv[]) 
 {
+  // Define default values
+  const size_t DEFAULT_ID = 11;
+  const std::string DEFAULT_ALGO = "nmc";
+  const std::string DEFAULT_LOSS = "acc";
+  const std::string DEFAULT_TYPE = "boot";
+  const size_t DEFAULT_SEED = 24; // Kobeeee
+  const size_t DEFAULT_NREPS = 1;
+  const bool DEFAULT_HPT = false;
 
-    // Define default values
-    size_t default_id = 11;
-    std::string default_algo = "nmc";
-    std::string default_loss = "acc";
-    std::string default_type = "boot";
-    size_t default_seed = SEED ;
-    size_t default_nreps = 1;
-    bool default_hpt = false;
-
-    // Initialize parameters with default values
-    size_t id = default_id;
-    std::string algo = default_algo;
-    std::string loss = default_loss;
-    std::string type = default_type;
-    size_t seed = default_seed;
-    size_t nreps = default_nreps;
-    bool hpt = default_hpt;
+  // Initialize parameters with default values
+  size_t id = DEFAULT_ID;
+  std::string algo = DEFAULT_ALGO;
+  std::string loss = DEFAULT_LOSS;
+  std::string type = DEFAULT_TYPE;
+  size_t seed = DEFAULT_SEED;
+  size_t nreps = DEFAULT_NREPS;
+  bool hpt = DEFAULT_HPT;
 
   arma::wall_clock timer;
   timer.tic();
 
-  int args_to_process = std::min(argc - 1, 7);
-
+  int i=1;
   try 
   {
-      if (args_to_process >= 1) 
-          id = std::strtoul(argv[1], nullptr, 10);  
-      if (args_to_process >= 2) 
-          algo = argv[2]; 
-      if (args_to_process >= 3) 
-          loss = argv[3]; 
-      if (args_to_process >= 4) 
-          type = argv[4]; 
-      if (args_to_process >= 5) 
-          seed = std::strtoul(argv[5], nullptr, 10); 
-      if (args_to_process >= 6) 
-          nreps = std::strtoul(argv[6], nullptr, 10); 
-      if (args_to_process >= 7) 
+      // Map to associate flags with actions
+      std::map<std::string, std::function<void()>> flag_map = 
       {
-        std::string hpt_str = argv[7];
-        // Convert to lower case for case-insensitive comparison
-        std::transform(hpt_str.begin(), hpt_str.end(),
-                                        hpt_str.begin(), ::tolower);
-        if (hpt_str == "true" || hpt_str == "1") 
-          hpt = true;
-        else if (hpt_str == "false" || hpt_str == "0") 
-          hpt = false;
+        {"-id",    [&]() { id = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-i",     [&]() { id = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-algo",  [&]() { algo = argv[++i]; }},
+        {"-a",     [&]() { algo = argv[++i]; }},
+        {"-loss",  [&]() { loss = argv[++i]; }},
+        {"-l",     [&]() { loss = argv[++i]; }},
+        {"-type",  [&]() { type = argv[++i]; }},
+        {"-t",     [&]() { type = argv[++i]; }},
+        {"-seed",  [&]() { seed = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-s",     [&]() { seed = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-nreps", [&]() { nreps = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-n",     [&]() { nreps = std::strtoul(argv[++i], nullptr, 10); }},
+        {"-hpt",   [&]() { 
+            std::string hpt_str = argv[++i];
+            std::transform(hpt_str.begin(), hpt_str.end(),
+                           hpt_str.begin(),::tolower);
+
+            if (hpt_str == "true" || hpt_str == "1") hpt = true;
+            else if (hpt_str == "false" || hpt_str == "0") hpt = false;
+            else 
+              ERR("Invalid value for -hpt. Use 'true', 'false', '1', or '0'.");
+        }},
+        {"-h",   [&]() { 
+            std::string hpt_str = argv[++i];
+            std::transform(hpt_str.begin(), hpt_str.end(),
+                           hpt_str.begin(), ::tolower);
+            if (hpt_str == "true" || hpt_str == "1") hpt = true;
+            else if (hpt_str == "false" || hpt_str == "0") hpt = false;
+            else 
+              ERR("Invalid value for -hpt. Use 'true', 'false', '1', or '0'.");
+        }},
+    };
+
+      // Process arguments
+      for (i = 1; i < argc; ++i) 
+      {
+        std::string arg = argv[i];
+        if (flag_map.find(arg) != flag_map.end()) 
+        {
+          flag_map[arg]();  // Call the associated action for the flag
+        } 
         else 
-          throw std::invalid_argument(
-              "Invalid value for hpt. Use 'true', 'false', '1', or '0'.");
+          ERR("Unknown flag: " + arg);
       }
 
-      // Optionally, you can notify the user about using default values
-      if (argc - 1 < 7) 
-      {
-        LOG("Some arguments were not provided."
-            << "Using default values where applicable.\n");
-      }
-
+      // Output configuration used
       LOG("Configuration used for the run...\n");
       LOG("OpenML dataset id  -> " << id << "\n");
       LOG("Algorithm          -> " << algo << "\n");
@@ -650,46 +776,54 @@ int main(int argc, char* argv[])
       LOG("Type of curve gen  -> " << type << "\n");
       LOG("Seed               -> " << seed << "\n");
       LOG("Number of reps     -> " << nreps << "\n");
-      LOG("HPT enabled        -> " << (hpt ? "Yes" : "No")<< "\n");
-      
-      
-      // Call the function to run the experiment
+      LOG("HPT enabled        -> " << (hpt ? "Yes" : "No") << "\n");
 
+      // Call the function to run the experiment
       if (type == "boot")
-        boot(id,algo,loss,seed,nreps,hpt);
+          boot(id, algo, loss, seed, nreps, hpt);
       else if (type == "add")
-        add(id,algo,loss,seed,nreps,hpt);
+          add(id, algo, loss, seed, nreps, hpt);
       else if (type == "split")
-        split(id,algo,loss,seed,nreps,hpt);
+          split(id, algo, loss, seed, nreps, hpt);
       else 
-        ERR("Invalid type for the experiment.");
+          ERR("Invalid type for the experiment.\n");
 
       PRINT_TIME(timer.toc());
       return 0;
   } 
-
   catch (const std::invalid_argument& e)
   {
-    std::cerr << "Error: Invalid argument provided. " << e.what() << "\n";
-    std::cerr << "Usage: " << argv[0] 
-                          << " [<id>] [<algo>] [<seed>] [<nreps>] [<hpt>]\n";
-    std::cerr << "Default values will be used"
-              << " for any missing or invalid arguments.\n";
-    PRINT_TIME(timer.toc());
-    return 1;
+      ERR( "Error: " << e.what() );
+      PRINT( "Usage: " << argv[0] << " [flags]\n");
+      PRINT( "Available flags:");
+      PRINT( "  -id <number>, -i <number>     : OpenML dataset ID (default: " 
+            << DEFAULT_ID << ")");
+      PRINT( "  -algo <string>, -a <string>   : Algorithm name (default: " 
+          << DEFAULT_ALGO << ")");
+      PRINT( "  -loss <string>, -l <string>   : Loss function (default: " 
+          << DEFAULT_LOSS << ")");
+      PRINT( "  -type <string>, -t <string>   : Type of curve generation" 
+          << "(boot/add/split) (default: " << DEFAULT_TYPE << ")");
+      PRINT("  -seed <number>, -s <number>   : Seed value (default: " 
+          << DEFAULT_SEED << ")");
+      PRINT("  -nreps <number>, -n <number>  : Number of repetitions (default: "
+          << DEFAULT_NREPS << ")");
+      PRINT("  -hpt <bool>                   : Enable hyperparameter tuning" 
+          << "(true/false) (default: " << (DEFAULT_HPT ? "true" : "false") 
+          << ")");
+      PRINT_TIME(timer.toc());
+      return 1;
   } 
   catch (const std::out_of_range& e) 
   {
-    std::cerr << "Error: Number out of range. " << e.what() << "\n";
-    PRINT_TIME(timer.toc());
-    return 1;
+      ERR("Error: Number out of range. " << e.what());
+      PRINT_TIME(timer.toc());
+      return 1;
   } 
   catch (...) 
   {
-    std::cerr << "An unexpected error occurred while parsing arguments.\n";
-    PRINT_TIME(timer.toc());
-    return 1;
+      ERR("An unexpected error occurred while parsing arguments.");
+      PRINT_TIME(timer.toc());
+      return 1;
   }
-
 }
-

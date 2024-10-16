@@ -11,6 +11,8 @@
 
 namespace lcdb
 {
+  // SuitID 
+  
   // Models 
   using LREG  = algo::classification::LogisticRegression<>;  // x
   using NMC   = algo::classification::NMC<>; 
@@ -50,7 +52,7 @@ namespace lcdb
   /* // leafsizes: DT */
   /* auto leafs = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
 
-
+  std::filesystem::path path = EXP_PATH/"lcdb++";
 
 }
 

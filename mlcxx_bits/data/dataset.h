@@ -223,8 +223,8 @@ public:
   std::filesystem::path path_; 
 
 private:
-  std::filesystem::path filepath_ = path_ / "openml/datasets";
-  std::filesystem::path metapath_ = path_ / "openml/meta";
+  std::filesystem::path filepath_ = path_ / "datasets";
+  std::filesystem::path metapath_ = path_ / "meta";
 
 public:
   arma::Mat<T> inputs_;
@@ -244,6 +244,10 @@ private:
   bool _download (  ); 
 
   void _load ( );
+
+  bool _iscateg(const arma::Row<T>& row); 
+  arma::Row<size_t> _convcateg(const arma::Row<T>& row);
+  arma::Row<size_t> _procrow(const arma::Row<T>& row);
 
   std::string _gettargetname (const std::string& metadata ); 
   std::string _getdownurl (const std::string& metadata ); 

@@ -41,7 +41,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #ifdef DISABLE_ERRORS
 #define ERR(msg) // Do nothing
 #else
-#define ERR(msg) std::clog <<  "\n" << "Error  : " << msg << std::endl << "\n" 
+#define ERR(msg) std::cerr <<  "\n" << "Error  : " << msg << std::endl << "\n" 
 #endif
 
 //#define PRINT_REQ() std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " << "armadillo " <<arma::arma_version::as_string() << " / " << mlpack::util::GetVersion() << " / ensmallen " << ens::version::as_string() << "/ boost " << BOOST_LIB_VERSION << " / jem " << jem::JEM_VERSION <<'\n' << std::endl; 
@@ -68,6 +68,8 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <numeric>
 #include <typeinfo>
 #include <iostream>
+/* #include <sstream> */
+/* #include <fstream> */
 #include <stdexcept>
 #include <algorithm>
 #include <filesystem>

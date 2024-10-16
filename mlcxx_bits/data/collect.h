@@ -39,11 +39,11 @@ public:
 
   Dataset<T> GetID ( const size_t& id ); 
 
-  /* size_t GetSize (  ) const {return size_;} */
-  /* size_t GetCounter (  ) const {return counter_;} */
-  /* arma::Row<size_t> GetKeys ( ) const {return keys_;} */
+  size_t GetSize (  ) const {return size_;}
+  size_t GetCounter (  ) const {return counter_;}
+  arma::Row<size_t> GetKeys ( ) const {return keys_;}
 
-/* private: */
+private:
   size_t id_;
   size_t size_;
   size_t counter_ = 0;
@@ -55,8 +55,9 @@ public:
   arma::Row<size_t> keys_;
 
   std::filesystem::path path_; 
-  std::filesystem::path filepath_ = path_ / "openml/collect";
-  std::filesystem::path metafile_ = filepath_ / (std::to_string(id_)+".arff");
+  std::filesystem::path filespath_ = path_ / "collect";
+  std::filesystem::path metapath_ = path_ / "collect";
+  std::filesystem::path metafile_ = metapath_ / (std::to_string(id_)+".meta");
 
 };
 

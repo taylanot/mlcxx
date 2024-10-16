@@ -26,7 +26,8 @@ template<class T>
 Collect<T>::Collect( const size_t& id, const std::filesystem::path& path ) : 
   id_(id), path_(path)
 {
-  std::filesystem::create_directories(filepath_);
+  std::filesystem::create_directories(metapath_);
+  std::filesystem::create_directories(filespath_);
   url_ = "https://www.openml.org/api/v1/json/study/" + std::to_string(id);
   keys_ = _getkeys();
   size_ = keys_.n_elem;
@@ -35,7 +36,7 @@ Collect<T>::Collect( const size_t& id, const std::filesystem::path& path ) :
 template<class T>
 Dataset<T> Collect<T>::GetNext ( )
 {
-  return Dataset<T>(keys_[counter_++]);
+  return Dataset<T>(keys_[counter_++],filespath_);
 }
 
 template<class T>
