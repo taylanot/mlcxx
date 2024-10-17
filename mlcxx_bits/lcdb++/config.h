@@ -39,7 +39,7 @@ namespace lcdb
   DTYPE splitsize = 0.2;
 
   // lambdas: for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
-  auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,4);
+  auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,2);
 
   /* auto Cs = arma::logspace<arma::Row<DTYPE>>(-8,1,3); */
 
@@ -52,7 +52,12 @@ namespace lcdb
   /* // leafsizes: DT */
   /* auto leafs = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
 
+  // Where to save the experiments
   std::filesystem::path path = EXP_PATH/"lcdb++";
+  // Number of instance limit 
+  size_t nlim = 2000;
+  // Number of features limit 
+  size_t flim = 50;
 
 }
 

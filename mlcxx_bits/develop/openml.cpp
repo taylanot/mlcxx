@@ -38,7 +38,7 @@ int main ( int argc, char** argv )
   /* PRINT(extractDefaultTargetValue(fetchMetadata(id))); */
   /* mlpack::data::LoadARFF<DTYPE>(file,mat); */
 
-  data::classification::oml::Dataset dataset(11);
+  data::classification::oml::Dataset dataset(2);
   /* data::classification::oml::Dataset dataset(99); */
   /* data::classification::oml::Dataset dataset(3); */
   /* data::classification::oml::Collect study(99); */

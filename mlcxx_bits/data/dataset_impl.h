@@ -565,18 +565,21 @@ template<class T>
 Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) : 
   id_(id), path_(path)
 {
-  down_url_ = "https://www.openml.org/data/download/" 
-                          + std::to_string(id_);
-
+  std::filesystem::create_directories(filepath_);
+  std::filesystem::create_directories(metapath_);
+  
   meta_url_ = "https://www.openml.org/api/v1/data/" 
                           + std::to_string(id);
 
-  metafile_ = metapath_/(std::to_string(id_)+".meta");
-
   std::filesystem::create_directories(metapath_);
-  std::filesystem::create_directories(filepath_);
 
+  metafile_ = metapath_/(std::to_string(id)+".meta");
   file_ = filepath_ / (std::to_string(id) + ".arff");
+
+  if (!std::filesystem::exists(metafile_))
+    this->_fetchmetadata();
+  
+  down_url_ = _getdownurl(_readmetadata());
 
   if (!std::filesystem::exists(file_))
   {
@@ -598,8 +601,6 @@ Dataset<T>::Dataset( const size_t& id ) :
   std::filesystem::create_directories(filepath_);
   std::filesystem::create_directories(metapath_);
   
- 
-
   meta_url_ = "https://www.openml.org/api/v1/data/" 
                           + std::to_string(id);
 
@@ -646,6 +647,7 @@ bool Dataset<T>::_download( )
     }
 
     // Set CURL options
+    LOG(down_url_.c_str());
     curl_easy_setopt(curl, CURLOPT_URL, down_url_.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
@@ -878,10 +880,8 @@ void Dataset<T>::_load( )
   idx =_findlabel(_gettargetname(_readmetadata()));
 
   if (idx<0)
-  {
-    ERR("Cannot find the label...");
-    std::abort();
-  }  
+    throw std::runtime_error("Cannot find the label!");
+
   labels_ = _procrow(data.row(idx));
   data.shed_row(idx);
   inputs_ = data;
