@@ -18,21 +18,28 @@ OnevAll<MODEL,T>::OnevAll( const size_t& num_class, const Args&... args )
 { 
   models_.resize(num_class);
   for(size_t i=0;i<num_class;i++)
-  {
     models_[i] = MODEL(args...);
-  }
 }
+
 template<class MODEL, class T>
 template<class... Args>
 OnevAll<MODEL,T>::OnevAll( const arma::Mat<T>& inputs,
                            const arma::Row<size_t>& labels,
-                           const Args&... args ) 
+                           const size_t& num_class,
+                           const Args&... args ) : nclass_(num_class)
 { 
   unq_ = arma::unique(labels).eval();
   if (unq_.n_elem == 1)
     oneclass_ = true;
-  nclass_ = unq_.n_elem;
+
+  unclass_ = unq_.n_elem;
+  models_.resize(unclass_);
+
+  for(size_t i=0;i<unclass_;i++)
+    models_[i] = MODEL(args...);
+
   Train(inputs, labels, args...);
+  
 } 
 
 template<class MODEL, class T>
@@ -40,18 +47,16 @@ template<class... Args>
 void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
                                const arma::Row<size_t>& labels ) 
 { 
-  unq_ = arma::unique(labels).eval();
-  if (unq_.n_elem == 1)
-    oneclass_ = true;
-  nclass_ = unq_.n_elem;
   if (!oneclass_)
   {
-    for(size_t i=0;i<nclass_;i++)
+    for(size_t i=0;i<unclass_;i++)
     {
       auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq_(i));
       models_[i].Train(inputs, binlabels);
     }
   }
+  else
+    return;
 }
 
 template<class MODEL, class T>
@@ -63,8 +68,7 @@ void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
   if (!oneclass_)
   {
     models_.resize(unq_.n_elem);
-    #pragma omp parallel for
-    for(size_t i=0;i<nclass_;i++)
+    for(size_t i=0;i<unclass_;i++)
     {
       auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq_(i));
       MODEL model(inputs,binlabels,args...);
@@ -89,13 +93,12 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
   if (!oneclass_)
   {
     probs.resize(nclass_,inputs.n_cols);
-    #pragma omp parallel for
-    for(size_t i=0;i<nclass_;i++)
+    for(size_t i=0;i<unclass_;i++)
     {
       arma::Row<size_t> temp;
       arma::Mat<T> tprobs;
       models_[i].Classify(inputs,temp,tprobs);
-      probs.row(i) = tprobs.row(0);
+      probs.row(unq_(i)) = tprobs.row(0);
     }
     preds = unq_.cols(arma::index_min(arma::abs(probs),0));
     probs = probs.each_row() / arma::sum(probs,0);

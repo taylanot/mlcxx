@@ -44,7 +44,7 @@ int hptboot_( const size_t id,
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
                                               (10,1,size_t(dataset.size_*0.9));
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(Ns,nreps,lcdb::vsize, true,true);
+  src::LCurveHPT<MODEL,LOSS> lcurve(Ns,nreps,lcdb::vsize,true,true);
   lcurve.Bootstrap(dataset.inputs_,dataset.labels_,
                    mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
                    args...);

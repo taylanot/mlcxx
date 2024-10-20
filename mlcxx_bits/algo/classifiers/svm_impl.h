@@ -84,7 +84,7 @@ void SVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
                            const arma::Row<size_t>& y )
 {
   
-
+  PRINT("IN");
   X_ = &X;
   y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
 
@@ -273,12 +273,14 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
       }
     }
     else
+    {
       ova_.Classify(inputs, preds, probs);
+    }
   }
   else
   {
-    dec_func.resize(inputs.n_cols);
-    dec_func.fill(arma::datum::nan);
+    probs.resize(nclass_,inputs.n_cols);
+    probs.row(ulab_[0]).fill(1.);
     preds.resize(inputs.n_cols);
     preds.fill(ulab_[0]);
   }
@@ -296,7 +298,7 @@ T SVM<KERNEL,T>::ComputeError ( const arma::Mat<T>& points,
 
 template<class KERNEL,class T>
 T SVM<KERNEL,T>::ComputeAccuracy ( const arma::Mat<T>& points, 
-                                         const arma::Row<size_t>& responses )
+                                   const arma::Row<size_t>& responses )
 {
   return (1. - ComputeError(points, responses));
 }

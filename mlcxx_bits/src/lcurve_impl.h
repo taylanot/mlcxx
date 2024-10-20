@@ -49,7 +49,7 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
 
-  #pragma omp parallel for collapse(2) if(parallel_)
+  /* #pragma omp parallel for collapse(2) if(parallel_) */
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
     for(size_t j=0; j < size_t(repeat_); j++)

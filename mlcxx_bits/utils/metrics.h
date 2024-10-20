@@ -123,8 +123,12 @@ public:
     arma::Row<size_t> unq = arma::unique(labels);
     mlpack::ROCAUCScore<1> auc;
     arma::rowvec aucscores(unq.n_elem);
+    PRINT_VAR(labels);
+    PRINT_VAR(arma::size(probs));
+    PRINT_VAR(unq);
     for (size_t i=0;i<unq.n_elem;i++)
     {
+      PRINT_VAR(unq(i))
       auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq(i));
       aucscores(i) = auc.Evaluate(binlabels,probs.row(unq(i)));
     }
