@@ -11,9 +11,9 @@ int main()
 {
   data::classification::oml::Dataset dataset(11);
 
-  /* algo::classification::OnevAll<mlpack::LogisticRegression<arma::mat>> */ 
-  algo::classification::OnevAll<algo::classification::SVM<>>
-    model(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).eval().n_elem,2);
+  algo::classification::OnevAll<mlpack::LogisticRegression<arma::mat>> 
+  /* algo::classification::OnevAll<algo::classification::SVM<>> */
+    model(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).eval().n_elem,2.);
   /* algo::classification::MultiClass<algo::classification::KernelSVM<>> */ 
   /*   model(dataset.inputs_,dataset.labels_,1.,0.01); */
   arma::Row<size_t> preds;

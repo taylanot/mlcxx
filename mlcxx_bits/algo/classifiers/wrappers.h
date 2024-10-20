@@ -66,9 +66,7 @@ class LogisticRegression
   {
     ulab_ = arma::unique(labels);
     if (ulab_.n_elem == 1)
-    {
       return;
-    }
     else
     {
       if (ulab_.n_elem == 2)
@@ -79,7 +77,7 @@ class LogisticRegression
       else
       {
         ova_ = OnevAll<mlpack::LogisticRegression<arma::Mat<T>>> 
-                                          (ulab_.n_elem,inputs.n_rows,lambda_);
+                                (num_class_,inputs.n_rows,lambda_);
         ova_.Train(inputs, labels);
       }
     }

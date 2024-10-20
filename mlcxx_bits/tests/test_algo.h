@@ -349,6 +349,20 @@ TEST_SUITE("NEARESTMEANCLASSIFIER") {
   }
 }
 
+/* TEST_SUITE("MULTICLASS") { */
+/*   TEST_CASE("PROBLEMS") */
+/*   { */
+/*     SUBCASE("SVM") */
+/*     { */
+      
+/*     } */
+
+/*     SUBCASE("LREG") */
+/*     { */
+      
+/*     } */
+/*   } */
+/* } */
 
 TEST_SUITE("LDC") {
   TEST_CASE("PROBLEMS")

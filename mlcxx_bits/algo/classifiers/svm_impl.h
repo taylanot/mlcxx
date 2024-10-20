@@ -38,7 +38,8 @@ SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
     }
     else
     {
-      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels, size_t(2), C, args...);
+      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels,
+                                    nclass_, size_t(2), C, args...);
     }
   }
 }
@@ -63,7 +64,8 @@ SVM<KERNEL,T>::SVM ( const arma::Mat<T>& inputs,
     if (nclass_ == 2)
       this->Train(inputs,labels);
     else
-      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels, 2, C_, args...);
+      ova_ = OnevAll<SVM<KERNEL,T>>(inputs, labels,
+                                    nclass_, size_t(2),C_,args...);
   }
 }
 
@@ -84,7 +86,6 @@ void SVM<KERNEL,T>::_SMO ( const arma::Mat<T>& X,
                            const arma::Row<size_t>& y )
 {
   
-  PRINT("IN");
   X_ = &X;
   y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
 
@@ -235,7 +236,9 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
     if (nclass_==2)
       Classify(inputs,preds,temp);
     else 
-      ova_.Classify(inputs,preds);
+    {
+      ova_.Classify(inputs,preds,temp);
+    }
   }
   else 
   {
@@ -273,9 +276,7 @@ void SVM<KERNEL,T>::Classify ( const arma::Mat<T>& inputs,
       }
     }
     else
-    {
       ova_.Classify(inputs, preds, probs);
-    }
   }
   else
   {

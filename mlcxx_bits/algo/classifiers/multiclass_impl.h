@@ -14,7 +14,8 @@ namespace classification {
 
 template<class MODEL, class T>
 template<class... Args>
-OnevAll<MODEL,T>::OnevAll( const size_t& num_class, const Args&... args ) 
+OnevAll<MODEL,T>::OnevAll( const size_t& num_class, const Args&... args ) :
+  nclass_(num_class)
 { 
   models_.resize(num_class);
   for(size_t i=0;i<num_class;i++)
@@ -47,6 +48,11 @@ template<class... Args>
 void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
                                const arma::Row<size_t>& labels ) 
 { 
+  unq_ = arma::unique(labels).eval();
+  if (unq_.n_elem == 1)
+    oneclass_ = true;
+
+  unclass_ = unq_.n_elem;
   if (!oneclass_)
   {
     for(size_t i=0;i<unclass_;i++)
@@ -90,24 +96,23 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
                                  arma::Row<size_t>& preds,
                                  arma::Mat<T>& probs )
 {
+  probs.resize(nclass_,inputs.n_cols);
+  preds.resize(inputs.n_cols);
   if (!oneclass_)
   {
-    probs.resize(nclass_,inputs.n_cols);
     for(size_t i=0;i<unclass_;i++)
     {
       arma::Row<size_t> temp;
       arma::Mat<T> tprobs;
       models_[i].Classify(inputs,temp,tprobs);
-      probs.row(unq_(i)) = tprobs.row(0);
+      probs.row(unq_(i)) = tprobs.row(1);
     }
-    preds = unq_.cols(arma::index_min(arma::abs(probs),0));
+    preds = arma::conv_to<arma::Row<size_t>>::from(arma::index_max(arma::abs(probs),0));
     probs = probs.each_row() / arma::sum(probs,0);
+
   }
   else
-  {
-    preds.resize(inputs.n_cols);
     preds.fill(unq_[0]);
-  }
 }
 template<class MODEL, class T>
 T OnevAll<MODEL,T>::ComputeError ( const arma::Mat<T>& inputs,

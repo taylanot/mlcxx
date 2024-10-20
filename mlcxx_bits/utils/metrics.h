@@ -42,6 +42,8 @@ public:
     model.Classify(data, preds, probs);
     probs.clamp(std::numeric_limits<O>::epsilon(),
                 1.-std::numeric_limits<O>::epsilon());
+    arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
+    probs = probs.rows(unq);
     BOOST_ASSERT_MSG((size_t) probs.n_rows == 2, 
                       "LogLoss : Not binary classification." );
     /* LabelType labs = arma::clamp(labels,1.e-16,1.-1.e-16); */
@@ -83,6 +85,8 @@ public:
     LabelType preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
+    arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
+    probs = probs.rows(unq);
     // For numerical stability with the probability
     probs.clamp(std::numeric_limits<O>::epsilon(),
                 1.-std::numeric_limits<O>::epsilon());
@@ -121,20 +125,20 @@ public:
     arma::Row<size_t> preds;
     model.Classify(data, preds, probs);
     arma::Row<size_t> unq = arma::unique(labels);
-    mlpack::ROCAUCScore<1> auc;
-    arma::rowvec aucscores(unq.n_elem);
-    PRINT_VAR(labels);
-    PRINT_VAR(arma::size(probs));
-    PRINT_VAR(unq);
-    for (size_t i=0;i<unq.n_elem;i++)
+    if (unq.n_elem == 1)
+      return 1.;
+    else
     {
-      PRINT_VAR(unq(i))
-      auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq(i));
-      aucscores(i) = auc.Evaluate(binlabels,probs.row(unq(i)));
+      mlpack::ROCAUCScore<1> auc;
+      arma::rowvec aucscores(unq.n_elem);
+      for (size_t i=0;i<unq.n_elem;i++)
+      {
+        auto binlabels = arma::conv_to<arma::Row<size_t>>::from(labels==unq(i));
+        aucscores(i) = auc.Evaluate(binlabels,probs.row(unq(i)));
+      }
+      return arma::mean(aucscores); 
     }
-    return arma::mean(aucscores); 
   }
-
   static const bool NeedsMinimization = false;
 };
 
@@ -167,6 +171,8 @@ public:
     LabelType preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
+    arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
+    probs = probs.rows(unq);
     /* PRINT_VAR(arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows)) */
     return arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows);
     /* return O(probs.n_elem); */

@@ -52,11 +52,10 @@ int main ( int argc, char** argv )
 
   data::classification::oml::Dataset trainset,testset;
   data::StratifiedSplit(dataset,trainset,testset,0.2);
-  PRINT_VAR(arma::unique(dataset.labels_).eval().n_elem);
 
   size_t repeat = 1;
-  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,size_t(trainset.size_*0.3)); */
-  arma::irowvec Ns = {1};
+  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,size_t(trainset.size_*0.3));
+  /* arma::irowvec Ns = {1}; */
   /* arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,10); */
 
   /* algo::classification::LogisticRegression<> model(trainset.inputs_,trainset.labels_,3); */
@@ -82,14 +81,17 @@ int main ( int argc, char** argv )
   /* src::LCurve<algo::classification::OnevAll<mlpack::NaiveBayesClassifier<>>,mlpack::Accuracy, */
   /*   data::N_StratSplit> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
-  /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
+  /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
+  /* src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::NMC<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::NNC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,true,false,true); */
-  src::LCurve<algo::classification::LogisticRegression<>,utils::CrossEntropy> lcurve(Ns,repeat,false,true);
+  /* src::LCurve<algo::classification::LogisticRegression<>,utils::CrossEntropy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::OnevAll<mlpack::LogisticRegression<>>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::SVM<>,utils::CrossEntropy> lcurve(Ns,repeat,false,true); */
+  /* src::LCurve<algo::classification::LogisticRegression<>,utils::CrossEntropy> lcurve(Ns,repeat,false,true); */
+  src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true);
   /* src::LCurve<mlpack::RandomForest<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<mlpack::RandomForest<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::SVM<>,utils::LogLoss> lcurve(Ns,repeat,true,false,true); */
@@ -108,7 +110,7 @@ int main ( int argc, char** argv )
   /* src::LCurveHPT<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,0.2,false,true); */
   /* auto lambdas = arma::logspace<arma::Row<DTYPE>>(-2,1,10); */
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),lambdas); */
-  lcurve.Bootstrap(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).eval().n_elem);
+  lcurve.Bootstrap(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).eval().n_elem,1.);
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
   /* lcurve.Bootstrap(trainset.inputs_,trainset.labels_,size_t(3),0.1); */
   /* PRINT(arma::unique(dataset.labels_).eval().n_elem); */
