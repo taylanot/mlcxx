@@ -23,15 +23,14 @@ namespace src {
 //=============================================================================
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::LCurveHPT ( const arma::irowvec& Ns,
-                                                  const double repeat,
-                                                  const double cvp,
-                                                  const bool parallel, 
-                                                  const bool prog ) :
+LCurveHPT<MODEL,LOSS,CV,OPT,O>::LCurveHPT ( const arma::irowvec& Ns,
+                                            const double repeat,
+                                            const double cvp,
+                                            const bool parallel, 
+                                            const bool prog ) :
 repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog), cvp_(cvp)
 {
   test_errors_.resize(repeat_,Ns_.n_elem);
@@ -42,13 +41,12 @@ repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog), cvp_(cvp)
 //=============================================================================     
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
 template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const T& dataset,
-                                                       const Ts&... args )
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Bootstrap ( const T& dataset,
+                                                 const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(dataset.inputs_.n_cols), 
         "There are not enough data for test set creation!" );
@@ -86,14 +84,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const T& dataset,
 //=============================================================================     
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const arma::Mat<O>& inputs,
-                                                       const T& labels,
-                                                       const Ts&... args )
+template<class SPLIT, class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::RandomSet ( const arma::Mat<O>& inputs,
+                                                 const T& labels,
+                                                 const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -103,12 +100,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const arma::Mat<O>& input
 
   ProgressBar pb("LCurveHPT.RandomSet", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = split_(inputs, labels, size_t(Ns_(i)));
+      const auto res = split(inputs, labels, size_t(Ns_(i)));
       arma::Mat<O> Xtrn = std::get<0>(res);
       arma::Mat<O> Xtst = std::get<1>(res);
       T ytrn = std::get<2>(res);
@@ -130,13 +128,12 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const arma::Mat<O>& input
 }
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const T& dataset,
-                                                       const Ts&... args )
+template<class SPLIT, class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::RandomSet ( const T& dataset,
+                                                 const Ts&... args )
 {
   RandomSet(dataset.inputs_,dataset.labels_,args...);
 }
@@ -146,14 +143,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const T& dataset,
 //=============================================================================     
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs,
-                                                      const T& labels,
-                                                      const Ts&... args )
+template<class SPLIT, class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs,
+                                                const T& labels,
+                                                const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -163,10 +159,11 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
 
   ProgressBar pb("LCurveHPT.Additive", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for if(parallel_)
   for(size_t j=0; j < size_t(repeat_); j++)
   {
-    const auto res = split_(inputs,labels,size_t(Ns_(0)));
+    const auto res = split(inputs,labels,size_t(Ns_(0)));
 
     arma::Mat<O> Xtrn = std::get<0>(res);
     arma::Mat<O> Xrest = std::get<1>(res);
@@ -203,13 +200,12 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
 }
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const T& dataset,
-                                                      const Ts&... args )
+template<class SPLIT, class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Additive ( const T& dataset,
+                                                const Ts&... args )
 {
   Additive(dataset.inputs_, dataset.labels_, args...);
 }
@@ -218,14 +214,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const T& dataset,
 //=============================================================================     
 template<class MODEL,
          class LOSS,
-         class SPLIT,
          template<typename, typename, typename, typename, typename> class CV,
          class OPT,
          class O>
-template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Split( const T& trainset,
-                                                  const T& testset,
-                                                  const Ts&... args )
+template<class SPLIT, class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
+                                            const T& testset,
+                                            const Ts&... args )
 {
 
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(trainset.inputs_.n_cols), 
@@ -237,12 +232,13 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Split( const T& trainset,
 
   ProgressBar pb("LCurveHPT.Split", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = split_(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
+      const auto res = split(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
 
       arma::Mat<O> Xtrn = std::get<0>(res);
       auto ytrn = std::get<2>(res);
