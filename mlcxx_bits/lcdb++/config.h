@@ -22,7 +22,7 @@ namespace lcdb
   using LSVC  = algo::classification::SVM<mlpack::LinearKernel>; 
   using GSVC  = algo::classification::SVM<mlpack::GaussianKernel>; 
   using ESVC  = algo::classification::SVM<mlpack::EpanechnikovKernel>; 
-  using ADAB  = mlpack::AdaBoost<>; 
+  using ADAB  = mlpack::AdaBoost<mlpack::ID3DecisionStump>; 
   using RFOR  = mlpack::RandomForest<>; 
   using DT    = mlpack::DecisionTree<>; 
   using NB    = mlpack::NaiveBayesClassifier<>;
@@ -34,12 +34,12 @@ namespace lcdb
   using Bri = utils::BrierLoss;
 
   // validation size for the Hyper-parameter optimization
-  DTYPE vsize = 0.2;
+  static const DTYPE vsize = 0.2;
   // train-test split size if you are not using bootstrap
-  DTYPE splitsize = 0.2;
+  static const DTYPE splitsize = 0.2;
 
   // lambdas: for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
-  auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,2);
+  static const auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,2);
 
   /* auto Cs = arma::logspace<arma::Row<DTYPE>>(-8,1,3); */
 
@@ -53,11 +53,17 @@ namespace lcdb
   /* auto leafs = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
 
   // Where to save the experiments
-  std::filesystem::path path = EXP_PATH/"lcdb++";
+  static const std::filesystem::path path = EXP_PATH/"lcdb++";
+  /* std::filesystem::path path = "lcdb++"; */
   // Number of instance limit 
-  size_t nlim = 2000;
+  static const size_t nlim = 2000;
   // Number of features limit 
-  size_t flim = 50;
+  static const size_t flim = 50;
+  // Ns that we want to investigate
+  static const arma::irowvec Ns = arma::regspace<arma::irowvec>
+                                              (1,1,100);
+  static const arma::irowvec hptNs = arma::regspace<arma::irowvec>
+                                              (1,1,100);
 
 }
 

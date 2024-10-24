@@ -1,0 +1,54 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>470</oml:id>
+  <oml:name>profb</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Hal Stern, Robin Lock  
+**Source**: [StatLib](http://lib.stat.cmu.edu/datasets/profb)   
+**Please cite**:   
+
+PRO FOOTBALL SCORES  (raw data appears after the description below)
+
+How well do the oddsmakers of Las Vegas predict the outcome of
+professional football games?  Is there really a home field advantage - if
+so how large is it?  Are teams that play the Monday Night game at a
+disadvantage when they play again the following Sunday?  Do teams benefit
+from having a &quot;bye&quot; week off in the current schedule?  These questions and
+a host of others can be investigated using this data set.
+
+Hal Stern from the Statistics Department at Harvard University has
+made available his compilation of scores for all National Football League
+games from the 1989, 1990, and 1991 seasons.  Dr. Stern used these data as
+part of his presentation &quot;Who's Number One?&quot; in the special &quot;Best of
+Boston&quot; session at the 1992 Joint Statistics Meetings.
+
+Several variables in the data are keyed to the oddsmakers &quot;point
+spread&quot; for each game.  The point spread is a value assigned before each
+game to serve as a handicap for whichever is perceived to be the better
+team.  Thus, to win against the point spread, the &quot;favorite&quot; team must beat
+the &quot;underdog&quot; team by more points than the spread.  The underdog &quot;wins&quot;
+against the spread if it wins the game outright or manages to lose by fewer
+points than the spread.  In theory, the point spread should represent the
+&quot;expert&quot; prediction as to the game's outcome.  In practice, it more usually
+denotes a point at which an equal amount of money will be wagered both for
+and against the favored team.
+
+Raw data below contains 672 cases (all 224 regular season games in
+each season and informatino on the following 9 varialbes:     .
+
+Home/Away       = Favored team is at home (1) or away (0)
+Favorite Points = Points scored by the favored team
+Underdog Points = Points scored by the underdog team
+Pointspread     = Oddsmaker's points to handicap the favored team
+Favorite Name   = Code for favored team's name
+Underdog name   = Code for underdog's name
+Year            = 89, 90, or 91
+Week            = 1, 2, ... 17
+Special         = Mon.night (M), Sat. (S), Thur. (H), Sun. night (N)
+ot - denotes an overtime game</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Hal Stern</oml:creator><oml:creator> Robin Lock</oml:creator>     <oml:collection_date>1989-1991</oml:collection_date>  <oml:upload_date>2014-09-28T23:51:27</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/52582/profb.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0470/dataset_470.pq</oml:parquet_url>  <oml:file_id>52582</oml:file_id>  <oml:default_target_attribute>Home/Away</oml:default_target_attribute>          <oml:tag>mythbusting_1</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>unspecified_target_feature</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://lib.stat.cmu.edu/datasets/profb</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0470/dataset_470.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:26:01</oml:processing_date>      <oml:md5_checksum>87e2345053544e0dc4352ee91add043c</oml:md5_checksum>
+</oml:data_set_description>

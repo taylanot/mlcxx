@@ -108,6 +108,13 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
       probs.row(unq_(i)) = tprobs.row(1);
     }
     preds = arma::conv_to<arma::Row<size_t>>::from(arma::index_max(arma::abs(probs),0));
+
+    // Need to find where a point we cannot decide and randomly assign a class
+  
+    arma::uvec cantdecide = arma::find(arma::sum(probs,0) == 0);
+    arma::uvec randomsel = arma::randi<arma::uvec>(cantdecide.n_elem,
+                            arma::distr_param(0,nclass_-1));
+    probs.elem(randomsel+ cantdecide*nclass_).ones();
     probs = probs.each_row() / arma::sum(probs,0);
 
   }

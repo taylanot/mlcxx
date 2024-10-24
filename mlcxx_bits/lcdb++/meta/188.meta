@@ -1,0 +1,60 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>188</oml:id>
+  <oml:name>eucalyptus</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Bruce Bulloch    
+**Source**: [WEKA Dataset Collection](http://www.cs.waikato.ac.nz/ml/weka/datasets.html) - part of the agridatasets archive. [This is the true source](http://tunedit.org/repo/Data/Agricultural/eucalyptus.arff)  
+**Please cite**: None  
+
+**Eucalyptus Soil Conservation**  
+The objective was to determine which seedlots in a species are best for soil conservation in seasonally dry hill country. Determination is found by measurement of height, diameter by height, survival, and other contributing factors. 
+ 
+It is important to note that eucalypt trial methods changed over time; earlier trials included mostly 15 - 30cm tall seedling grown in peat plots and the later trials have included mostly three replications of eight trees grown. This change may contribute to less significant results.
+
+Experimental data recording procedures which require noting include:
+ - instances with no data recorded due to experimental recording procedures
+   require that the absence of a species from one replicate at a site was
+   treated as a missing value, but if absent from two or more replicates at a
+   site the species was excluded from the site's analyses.
+ - missing data for survival, vigour, insect resistance, stem form, crown form
+   and utility especially for the data recorded at the Morea Station; this 
+   could indicate the death of species in these areas or a lack in collection
+   of data.  
+
+### Attribute Information  
+ 
+  1.  Abbrev - site abbreviation - enumerated
+  2.  Rep - site rep - integer
+  3.  Locality - site locality in the North Island - enumerated
+  4.  Map_Ref - map location in the North Island - enumerated
+  5.  Latitude - latitude approximation - enumerated
+  6.  Altitude - altitude approximation - integer
+  7.  Rainfall - rainfall (mm pa) - integer
+  8.  Frosts - frosts (deg. c) - integer
+  9.  Year - year of planting - integer
+  10. Sp - species code - enumerated
+  11. PMCno - seedlot number - integer
+  12. DBH - best diameter base height (cm) - real
+  13. Ht - height (m) - real
+  14. Surv - survival - integer
+  15. Vig - vigour - real
+  16. Ins_res - insect resistance - real
+  17. Stem_Fm - stem form - real
+  18. Crown_Fm - crown form - real
+  19. Brnch_Fm - branch form - real
+  Class:
+  20. Utility - utility rating - enumerated
+
+### Relevant papers
+
+Bulluch B. T., (1992) Eucalyptus Species Selection for Soil Conservation in Seasonally Dry Hill Country - Twelfth Year Assessment  New Zealand Journal of Forestry Science 21(1): 10 - 31 (1991)  
+
+Kirsten Thomson and Robert J. McQueen (1996) Machine Learning Applied to Fourteen Agricultural Datasets. University of Waikato Research Report  
+https://www.cs.waikato.ac.nz/ml/publications/1996/Thomson-McQueen-96.pdf + the original publication: </oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>B. Bulloch</oml:creator>      <oml:upload_date>2014-04-23T13:15:28</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/3625/eucalyptus.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0188/dataset_188.pq</oml:parquet_url>  <oml:file_id>3625</oml:file_id>  <oml:default_target_attribute>Utility</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>    <oml:tag>Agriculture</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_37</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_70</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://www.cs.waikato.ac.nz/ml/weka/datasets.html</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0188/dataset_188.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 18:44:00</oml:processing_date>      <oml:md5_checksum>adaf2938bd76922c010d3d32592bdb80</oml:md5_checksum>
+</oml:data_set_description>

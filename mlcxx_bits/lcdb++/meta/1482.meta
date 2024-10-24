@@ -1,0 +1,53 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1482</oml:id>
+  <oml:name>leaf</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Pedro F.B. Silva, Andre R.S. Marcal, Rubim M. Almeida da Silva    
+
+**Source**: UCI 
+
+**Please cite**: 'Evaluation of Features for Leaf Discrimination', Pedro F.B. Silva, Andre R.S. Marcal, Rubim M. Almeida da Silva (2013). Springer Lecture Notes in Computer Science, Vol. 7950, 197-204.
+ 
+
+Abstract: 
+
+This dataset consists in a collection of shape and texture features extracted from digital images of leaf specimens originating from a total of 40 different plant species.
+
+Source:
+
+This dataset was created by Pedro F. B. Silva and Andre R. S. Marcal using leaf specimens collected by Rubim Almeida da Silva at the Faculty of Science, University of Porto, Portugal.
+
+
+Data Set Information:
+
+For further details on this dataset and/or its attributes, please read the 'ReadMe.pdf' file included and/or consult the Master's Thesis 'Development of a System for Automatic Plant Species Recognition' available at [Web Link].
+
+
+Attribute Information:
+
+1. Class (Species) 
+2. Specimen Number 
+3. Eccentricity 
+4. Aspect Ratio 
+5. Elongation 
+6. Solidity 
+7. Stochastic Convexity 
+8. Isoperimetric Factor 
+9. Maximal Indentation Depth 
+10. Lobedness 
+11. Average Intensity 
+12. Average Contrast 
+13. Smoothness 
+14. Third moment 
+15. Uniformity 
+16. Entropy
+
+
+</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2015-05-22T23:01:38</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1590827/leaf.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1482/dataset_1482.pq</oml:parquet_url>  <oml:file_id>1590827</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>mf_less_than_80</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_88</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1482/dataset_1482.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-03 21:35:01</oml:processing_date>      <oml:md5_checksum>ec78ee775811d0f5ac5431f231af7d30</oml:md5_checksum>
+</oml:data_set_description>

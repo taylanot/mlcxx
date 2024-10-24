@@ -36,6 +36,7 @@ repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog), cvp_(cvp)
 {
   test_errors_.resize(repeat_,Ns_.n_elem);
 }
+
 //=============================================================================
 // LCurve::Bootstrap
 //=============================================================================     
@@ -46,7 +47,51 @@ template<class MODEL,
          class OPT,
          class O>
 template<class T, class... Ts>
-void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const arma::Mat<O>& inputs,
+void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const T& dataset,
+                                                       const Ts&... args )
+{
+  BOOST_ASSERT_MSG( int(Ns_.max()) < int(dataset.inputs_.n_cols), 
+        "There are not enough data for test set creation!" );
+  BOOST_ASSERT_MSG( int(dataset.labels_.n_rows) == int(1), 
+        "Only 1D outputs are allowed!" );
+  LOSS loss;
+
+  ProgressBar pb("LCurveHPT.Bootstrap", Ns_.n_elem*repeat_);
+
+  #pragma omp parallel for collapse(2) if(parallel_)
+  for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
+  {
+    for(size_t j=0; j < size_t(repeat_); j++)
+    {
+      const auto idx = arma::randi<arma::uvec>(Ns_[i],
+                                arma::distr_param(0,dataset.labels_.n_elem-1));
+
+      mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> hpt(cvp_,
+          dataset.inputs_.cols(idx).eval(), dataset.labels_.cols(idx).eval());
+
+      hpt.Optimize(args...);
+      MODEL model = std::move(hpt.BestModel());
+      model.Train(dataset.inputs_.cols(idx).eval(),
+                  dataset.labels_.cols(idx).eval());
+
+      test_errors_(j,i) = loss.Evaluate(model,dataset.inputs_,dataset.labels_);
+      
+      if (prog_)
+        pb.Update();
+    }
+  }
+}
+//=============================================================================
+// LCurve::RandomSet
+//=============================================================================     
+template<class MODEL,
+         class LOSS,
+         class SPLIT,
+         template<typename, typename, typename, typename, typename> class CV,
+         class OPT,
+         class O>
+template<class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const arma::Mat<O>& inputs,
                                                        const T& labels,
                                                        const Ts&... args )
 {
@@ -56,7 +101,7 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const arma::Mat<O>& input
         "Only 1D outputs are allowed!" );
   LOSS loss;
 
-  ProgressBar pb("LCurveHPT.Bootstrap", Ns_.n_elem*repeat_);
+  ProgressBar pb("LCurveHPT.RandomSet", Ns_.n_elem*repeat_);
 
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
@@ -82,8 +127,18 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Bootstrap ( const arma::Mat<O>& input
         pb.Update();
     }
   }
-
-
+}
+template<class MODEL,
+         class LOSS,
+         class SPLIT,
+         template<typename, typename, typename, typename, typename> class CV,
+         class OPT,
+         class O>
+template<class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::RandomSet ( const T& dataset,
+                                                       const Ts&... args )
+{
+  RandomSet(dataset.inputs_,dataset.labels_,args...);
 }
 
 //=============================================================================
@@ -145,6 +200,18 @@ void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs
       pb.Update();
   }
 
+}
+template<class MODEL,
+         class LOSS,
+         class SPLIT,
+         template<typename, typename, typename, typename, typename> class CV,
+         class OPT,
+         class O>
+template<class T, class... Ts>
+void LCurveHPT<MODEL,LOSS,SPLIT,CV,OPT,O>::Additive ( const T& dataset,
+                                                      const Ts&... args )
+{
+  Additive(dataset.inputs_, dataset.labels_, args...);
 }
 //=============================================================================
 // LCurve::Split

@@ -1,0 +1,47 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>15</oml:id>
+  <oml:name>breast-w</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Dr. William H. Wolberg, University of Wisconsin  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+(original)), [University of Wisconsin](http://pages.cs.wisc.edu/~olvi/uwmp/cancer.html) - 1995  
+**Please cite**: See below, plus [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+
+**Breast Cancer Wisconsin (Original) Data Set.** Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass. They describe characteristics of the cell nuclei present in the image. The target feature records the prognosis (malignant or benign). [Original data available here](ftp://ftp.cs.wisc.edu/math-prog/cpo-dataset/machine-learn/cancer/)  
+
+Current dataset was adapted to ARFF format from the UCI version. Sample code ID's were removed.  
+
+! Note that there is also a related Breast Cancer Wisconsin (Diagnosis) Data Set with a different set of features, better known as [wdbc](https://www.openml.org/d/1510).
+
+### Relevant Papers  
+
+W.N. Street, W.H. Wolberg and O.L. Mangasarian. Nuclear feature extraction for breast tumor diagnosis. IS&amp;T/SPIE 1993 International Symposium on Electronic Imaging: Science and Technology, volume 1905, pages 861-870, San Jose, CA, 1993. 
+
+O.L. Mangasarian, W.N. Street and W.H. Wolberg. Breast cancer diagnosis and prognosis via linear programming. Operations Research, 43(4), pages 570-577, July-August 1995.  
+
+### Citation request  
+
+This breast cancer database was obtained from the University of Wisconsin Hospitals, Madison from Dr. William H. Wolberg.  If you publish results when using this database, then please include this information in your acknowledgments.  Also, please cite one or more of:
+
+   1. O. L. Mangasarian and W. H. Wolberg: &quot;Cancer diagnosis via linear 
+      programming&quot;, SIAM News, Volume 23, Number 5, September 1990, pp 1 &amp; 18.
+
+   2. William H. Wolberg and O.L. Mangasarian: &quot;Multisurface method of 
+      pattern separation for medical diagnosis applied to breast cytology&quot;, 
+      Proceedings of the National Academy of Sciences, U.S.A., Volume 87, 
+      December 1990, pp 9193-9196.
+
+   3. O. L. Mangasarian, R. Setiono, and W.H. Wolberg: &quot;Pattern recognition 
+      via linear programming: Theory and application to medical diagnosis&quot;, 
+      in: &quot;Large-scale numerical optimization&quot;, Thomas F. Coleman and Yuying
+      Li, editors, SIAM Publications, Philadelphia 1990, pp 22-30.
+
+   4. K. P. Bennett &amp; O. L. Mangasarian: &quot;Robust linear programming 
+      discrimination of two linearly inseparable sets&quot;, Optimization Methods
+      and Software 1, 1992, 23-34 (Gordon &amp; Breach Science Publishers).</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Dr. William H. Wolberg</oml:creator>  <oml:contributor>Olvi Mangasarian</oml:contributor>   <oml:collection_date>1992-07-15</oml:collection_date>  <oml:upload_date>2014-04-06T23:20:20</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/52350/breast-w.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0015/dataset_15.pq</oml:parquet_url>  <oml:file_id>52350</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>Dr. William H. Wolberg, University of Wisconsin Hospitals, Madison.</oml:citation>  <oml:tag>cancer</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>medical</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_37</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_70</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+(original)</oml:original_data_url>  <oml:paper_url>http://pages.cs.wisc.edu/~olvi/uwmp/cancer.html</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0015/dataset_15.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:16:22</oml:processing_date>      <oml:md5_checksum>88633c065209e7a57323d3d7f2d00546</oml:md5_checksum>
+</oml:data_set_description>

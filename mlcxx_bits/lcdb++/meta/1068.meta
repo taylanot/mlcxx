@@ -1,0 +1,54 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1068</oml:id>
+  <oml:name>pc1</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Mike Chapman, NASA  
+**Source**: [tera-PROMISE](http://openscience.us/repo/defect/mccabehalsted/pc1.html) - 2004  
+**Please cite**: Sayyad Shirabad, J. and Menzies, T.J. (2005) The PROMISE Repository of Software Engineering Databases. School of Information Technology and Engineering, University of Ottawa, Canada.  
+  
+
+**PC1 Software defect prediction**  
+One of the NASA Metrics Data Program defect data sets. Data from flight software for earth orbiting satellite. Data comes from McCabe and Halstead features extractors of source code.  These features were defined in the 70s in an attempt to objectively characterize code features that are associated with software quality.
+
+### Attribute Information  
+
+1. loc             : numeric % McCabe's line count of code
+2. v(g)            : numeric % McCabe &quot;cyclomatic complexity&quot;
+3. ev(g)           : numeric % McCabe &quot;essential complexity&quot;
+4. iv(g)           : numeric % McCabe &quot;design complexity&quot;
+5. n               : numeric % Halstead total operators + operands
+6. v               : numeric % Halstead &quot;volume&quot;
+7. l               : numeric % Halstead &quot;program length&quot;
+8. d               : numeric % Halstead &quot;difficulty&quot;
+9. i               : numeric % Halstead &quot;intelligence&quot;
+10. e               : numeric % Halstead &quot;effort&quot;
+11. b               : numeric % Halstead 
+12. t               : numeric % Halstead's time estimator
+13. lOCode          : numeric % Halstead's line count
+14. lOComment       : numeric % Halstead's count of lines of comments
+15. lOBlank         : numeric % Halstead's count of blank lines
+16. lOCodeAndComment: numeric
+17. uniq_Op         : numeric % unique operators
+18. uniq_Opnd       : numeric % unique operands
+19. total_Op        : numeric % total operators
+20. total_Opnd      : numeric % total operands
+21. branchCount     : numeric % of the flow graph
+22. branchCount     : numeric % of the flow graph
+23. defects         : {false,true} % module has/has not one or more reported defects
+
+### Relevant papers  
+
+- Shepperd, M. and Qinbao Song and Zhongbin Sun and Mair, C. (2013)
+Data Quality: Some Comments on the NASA Software Defect Datasets, IEEE Transactions on Software Engineering, 39.
+
+- Tim Menzies and Justin S. Di Stefano (2004) How Good is Your Blind Spot Sampling Policy? 2004 IEEE Conference on High Assurance
+Software Engineering.
+
+- T. Menzies and J. DiStefano and A. Orrego and R. Chapman (2004) Assessing Predictors of Software Defects&quot;, Workshop on Predictive Software Models, Chicago</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Mike Chapman</oml:creator>     <oml:collection_date>2004</oml:collection_date>  <oml:upload_date>2014-10-06T23:57:45</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/53951/pc1.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1068/dataset_1068.pq</oml:parquet_url>  <oml:file_id>53951</oml:file_id>  <oml:default_target_attribute>defects</oml:default_target_attribute>        <oml:citation>Sayyad Shirabad, J. and Menzies, T.J. (2005) The PROMISE Repository of Software Engineering Databases. School of Information Technology and Engineering, University of Ottawa, Canada.  </oml:citation>  <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>PROMISE</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://openscience.us/repo/defect/mccabehalsted/pc1.html</oml:original_data_url>  <oml:paper_url>https://ieeexplore.ieee.org/abstract/document/6464273</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1068/dataset_1068.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:59:43</oml:processing_date>      <oml:md5_checksum>32f17b71c893473d8e0645d268796794</oml:md5_checksum>
+</oml:data_set_description>

@@ -1,0 +1,24 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40496</oml:id>
+  <oml:name>LED-display-domain-7digit</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Breiman,L., Friedman,J.H., Olshen,R.A., and Stone,C.J.  
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/LED+Display+Domain), [KEEL](http://sci2s.ugr.es/keel/dataset.php?cod=63, https://archive.ics.uci.edu/ml/datasets/LED+Display+Domain) - 1988  
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+
+**LED display data set**  
+This simple domain contains 7 Boolean attributes and 10 classes, the set of decimal digits. Recall that LED displays contain 7 light-emitting diodes -- hence the reason for 7 attributes. The class attribute is an integer ranging between 0 and 9 inclusive, representing the possible digits show on the display.
+
+The problem would be easy if not for the introduction of noise.  In this case, each attribute value has the 10% probability of having its value inverted.  
+
+It's valuable to know the optimal Bayes rate for these databases. In this case, the misclassification rate is 26% (74% classification accuracy).
+        
+### Attribute Information  
+* V1-V7 represent each of the 7 LEDs, with values either 0 or 1, according to whether the corresponding light is on or not for the decimal digit. Each has a 10% percent chance of being inverted.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2016-07-29T20:36:10</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/4535757/LED-display-domain-7digit.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40496/dataset_40496.pq</oml:parquet_url>  <oml:file_id>4535757</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>    <oml:tag>artificial</oml:tag><oml:tag>keel</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>Meteorology</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_76</oml:tag><oml:tag>study_88</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://sci2s.ugr.es/keel/dataset.php?cod=63, https://archive.ics.uci.edu/ml/datasets/LED+Display+Domain</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40496/dataset_40496.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:08:11</oml:processing_date>      <oml:md5_checksum>4509a210be57d02a8e468ad8c95ea277</oml:md5_checksum>
+</oml:data_set_description>

@@ -1,0 +1,50 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1552</oml:id>
+  <oml:name>autoUniv-au7-1100</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Ray. J. Hickey   
+**Source**: UCI  
+**Please cite**:   
+
+* Dataset Title:  
+
+AutoUniv Dataset  
+data problem: autoUniv-au7-300-drift-au7-cpd1-800 
+
+* Abstract:   
+
+AutoUniv is an advanced data generator for classifications tasks. The aim is to reflect the nuances and heterogeneity of real data. Data can be generated in .csv, ARFF or C4.5 formats.
+
+* Source:  
+
+AutoUniv was developed by Ray. J. Hickey. Email: ray.j.hickey '@' gmail.com 
+AutoUniv web-site: http://sites.google.com/site/autouniv/.
+
+
+* Data Set Information:
+
+The user first creates a classification model and then generates classified examples from it. To create a model, the following are specified: the number of attributes (up to 1000) and their type (discrete or continuous), the number of classes (up to 10), the complexity of the underlying rules and the noise level. AutoUniv then produces a model through a process of constrained randomised search to satisfy the user's requirements. A model can have up to 3000 rules. Rare class models can be designed. A sequence of models can be designed to reflect concept and/or population drift. 
+
+AutoUniv creates three text files for a model: a Prolog specification of the model used to generate examples (.aupl); a user-friendly statement of the classification rules in an 'if ... then' format (.aurules); a statistical summary of the main properties of the model, including its Bayes rate (.auprops).
+
+
+* Attribute Information: 
+
+Attributes may be discrete with up to 10 values or continuous. A discrete attribute can be nominal with values v1, v2, v3 ... or integer with values 0, 1, 2 , ... .
+
+
+* Relevant Papers:
+
+Marrs, G, Hickey, RJ and Black, MM (2010) Modeling the example life-cycle in an online classification learner. In Proceedings of HaCDAIS 2010: International Workshop on Handling Concept Drift in Adaptive Information Systems. 
+[Web Link]#proc . 
+
+Marrs, G, Hickey, RJ and Black, MM (2010) The Impact of Latency on Online Classification Learning with Concept Drift. In Y. Bi and M.A. Williams (Eds.): KSEM 2010, LNAI 6291, Springer-Verlag, Berlin, pp. 459â€“469. 
+
+Hickey, RJ (2007) Structure and Majority Classes in Decision Tree Learning. Journal of Machine Learning Research, 8, pp. 1747-1768.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2015-06-01T19:52:43</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1593748/autoUniv-au7-1100.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1552/dataset_1552.pq</oml:parquet_url>  <oml:file_id>1593748</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>artificial</oml:tag><oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1552/dataset_1552.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-03 21:38:14</oml:processing_date>      <oml:md5_checksum>2d14d83c68325513f0700a43dc195ddd</oml:md5_checksum>
+</oml:data_set_description>

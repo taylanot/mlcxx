@@ -1,0 +1,24 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1462</oml:id>
+  <oml:name>banknote-authentication</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>Author: Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe)  
+Source: [UCI](https://archive.ics.uci.edu/ml/datasets/banknote+authentication) - 2012  
+Please cite: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html) 
+
+Dataset about distinguishing genuine and forged banknotes. Data were extracted from images that were taken from genuine and forged banknote-like specimens. For digitization, an industrial camera usually used for print inspection was used. The final images have 400x 400 pixels. Due to the object lens and distance to the investigated object gray-scale pictures with a resolution of about 660 dpi were gained. A Wavelet Transform tool was used to extract features from these images.
+
+### Attribute Information  
+
+V1. variance of Wavelet Transformed image (continuous)  
+V2. skewness of Wavelet Transformed image (continuous)  
+
+
+Class (target). Presumably 1 for genuine and 2 for forged</oml:description>
+  <oml:description_version>10</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Volker Lohweg</oml:creator>      <oml:upload_date>2015-05-21T22:40:57</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1586223/banknote-authentication.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1462/dataset_1462.pq</oml:parquet_url>  <oml:file_id>1586223</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1462/dataset_1462.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 21:51:22</oml:processing_date>      <oml:md5_checksum>baa2dc5b745775a943ebeb9c276401f8</oml:md5_checksum>
+</oml:data_set_description>

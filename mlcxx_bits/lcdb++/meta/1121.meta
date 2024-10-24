@@ -1,0 +1,16 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1121</oml:id>
+  <oml:name>badges2</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**:   
+**Source**: Unknown - Date unknown  
+**Please cite**:   
+
+Dataset from the MLRR repository: http://axon.cs.byu.edu:5000/</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2014-10-07T00:42:03</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/54004/badges2.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1121/dataset_1121.pq</oml:parquet_url>  <oml:file_id>54004</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>  <oml:row_id_attribute>ID</oml:row_id_attribute>        <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_88</oml:tag><oml:tag>trivial</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1121/dataset_1121.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:27:52</oml:processing_date>      <oml:md5_checksum>f10c6b6b7e7f582214073afe4f317b9f</oml:md5_checksum>
+</oml:data_set_description>

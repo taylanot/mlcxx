@@ -1,0 +1,55 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1071</oml:id>
+  <oml:name>mw1</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**:   
+**Source**: Unknown - Date unknown  
+**Please cite**:   
+
+%-*- text -*-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This is a PROMISE data set made publicly available in order to encourage
+repeatable, verifiable, refutable, and/or improvable predictive models
+of software engineering.
+
+If you publish material based on PROMISE data sets then, please
+follow the acknowledgment guidelines posted on the PROMISE repository
+web page http://promise.site.uottawa.ca/SERepository .
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1. Title/Topic: MW1/software defect prediction
+
+(c) 2007 : Tim Menzies  : tim@menzies.us
+This data set is distributed under the
+Creative Commons Attribution-Share Alike 3.0 License
+http://creativecommons.org/licenses/by-sa/3.0/
+
+You are free:
+
+* to Share -- copy, distribute and transmit the work
+* to Remix -- to adapt the work
+
+Under the following conditions:
+
+Attribution. You must attribute the work in the manner specified by
+the author or licensor (but not in any way that suggests that they endorse
+you or your use of the work).
+
+Share Alike. If you alter, transform, or build upon this work, you
+may distribute the resulting work only under the same, similar or a
+compatible license.
+
+* For any reuse or distribution, you must make clear to others the
+license terms of this work.
+* Any of the above conditions can be waived if you get permission from
+the copyright holder.
+* Apart from the remix rights granted under this license, nothing in
+this license impairs or restricts the author's moral rights.
+For more deatils on this data set, see
+http://promisedata.org/repository/data/kc2/kc2.arff</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Mike Chapman</oml:creator>     <oml:collection_date>2004</oml:collection_date>  <oml:upload_date>2014-10-06T23:57:50</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/53954/mw1.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1071/dataset_1071.pq</oml:parquet_url>  <oml:file_id>53954</oml:file_id>  <oml:default_target_attribute>c</oml:default_target_attribute>        <oml:citation>Sayyad Shirabad, J. and Menzies, T.J. (2005) The PROMISE Repository of Software Engineering Databases. School of Information Technology and Engineering, University of Ottawa, Canada.  </oml:citation>  <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>PROMISE</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_88</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://openscience.us/repo/defect/mccabehalsted/pc3.html</oml:original_data_url>  <oml:paper_url>https://ieeexplore.ieee.org/abstract/document/6464273</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1071/dataset_1071.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:42:51</oml:processing_date>      <oml:md5_checksum>2c269007151fe2d533540848a8fc2e8a</oml:md5_checksum>
+</oml:data_set_description>

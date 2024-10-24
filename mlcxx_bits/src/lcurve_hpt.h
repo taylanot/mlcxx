@@ -21,7 +21,6 @@ template<class MODEL,
                                                              = mlpack::SimpleCV,
          class OPT = ens::GridSearch,
          class O=DTYPE>
-
 class LCurveHPT
 {
 public:
@@ -40,8 +39,27 @@ public:
              const double cvp = 0.2,
              const bool parallel = false, 
              const bool prog = false );
+  /* Generate Learning Curves with bootstrapping
+   *
+   * @param dataset   : whole large dataset 
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void Bootstrap ( const T& dataset,
+                   const Ts&... args );
 
-  /* Generate Learning Curves with Bootstrap
+  /* Generate Learning Curves with random set selection
+   *
+   * @param dataset   : whole large dataset 
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void RandomSet ( const T& dataset,
+                   const Ts&... args );
+
+  /* Generate Learning Curves with random set selection
    *
    * @param inputs    : whole large dataset inputs
    * @param labels    : whole large dataset labels
@@ -49,9 +67,20 @@ public:
    *
    */
   template<class T, class... Ts>
-  void Bootstrap ( const arma::Mat<O>& inputs,
+  void RandomSet ( const arma::Mat<O>& inputs,
                    const T& labels,
                    const Ts&... args );
+
+  /* Generate Learning Curves with data point addition
+   *
+   * @param dataset   : whole large dataset 
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void Additive ( const T& dataset,
+                  const Ts&... args );
+
 
   /* Generate Learning Curves with data point addition
    *

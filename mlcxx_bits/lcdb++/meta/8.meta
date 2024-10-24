@@ -1,0 +1,31 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>8</oml:id>
+  <oml:name>liver-disorders</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: BUPA Medical Research Ltd. Donor: Richard S. Forsyth   
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Liver+Disorders) - 5/15/1990  
+**Please cite**: 
+
+**BUPA liver disorders**
+ 
+The first 5 variables are all blood tests which are thought to be sensitive to liver disorders that might arise from excessive alcohol consumption.  Each line in the dataset constitutes the record of a single male individual. 
+
+**Important note:** The 7th field (selector) has been widely misinterpreted in the past as a dependent variable representing presence or absence of a liver disorder. This is incorrect [1]. The 7th field was created by BUPA researchers as a train/test selector. It is not suitable as a dependent variable for classification. The dataset does not contain any variable representing presence or absence of a liver disorder. Researchers who wish to use this dataset as a classification benchmark should follow the method used in experiments by the donor (Forsyth &amp; Rada, 1986, Machine learning: applications in expert systems and information retrieval) and others (e.g. Turney, 1995, Cost-sensitive classification: Empirical evaluation of a hybrid genetic decision tree induction algorithm), who used the 6th field (drinks), after dichotomising, as a dependent variable for classification. Because of widespread misinterpretation in the past, researchers should take care to state their method clearly.
+ 
+**Attribute information**  
+    1. mcv mean corpuscular volume  
+    2. alkphos alkaline phosphotase  
+    3. sgpt alanine aminotransferase  
+    4. sgot  aspartate aminotransferase  
+    5. gammagt gamma-glutamyl transpeptidase  
+    6. drinks number of half-pint equivalents of alcoholic beverages drunk per day  
+    7. selector field created by the BUPA researchers to split the data into train/test sets  
+
+[1] McDermott &amp; Forsyth 2016, Diagnosing a disorder in a classification benchmark, Pattern Recognition Letters, Volume 73. Note Forsyth is named on the UCI page as the original donor of the dataset.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>BUPA Medical Research Ltd</oml:creator>  <oml:contributor>Richard S. Forsyth</oml:contributor>   <oml:collection_date>1990-05-15</oml:collection_date>  <oml:upload_date>2014-04-06T23:19:46</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/8/liver-disorders.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0008/dataset_8.pq</oml:parquet_url>  <oml:file_id>8</oml:file_id>  <oml:default_target_attribute>drinks</oml:default_target_attribute>    <oml:ignore_attribute>selector</oml:ignore_attribute>  <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>Health</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>study_127</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_88</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Liver+Disorders</oml:original_data_url>  <oml:paper_url>https://www.sciencedirect.com/science/article/pii/S0167865516000088?casa_token=V_00WKobQo4AAAAA:vksCWgiDdjbISFvgBuV8LfRTDarVcsyo-L88EKG8sBN9WqlbSTyAMcdljmjRZsiRGJZHoJOiO4Y</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0008/dataset_8.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:39:58</oml:processing_date>      <oml:md5_checksum>e4905a8be9c1eeedb0d41304239155a8</oml:md5_checksum>
+</oml:data_set_description>

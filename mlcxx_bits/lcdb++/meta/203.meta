@@ -1,0 +1,106 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>203</oml:id>
+  <oml:name>lowbwt</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**:   
+**Source**: Unknown -   
+**Please cite**:   
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ Identification code deleted. 
+
+ As used by Kilpatrick, D. &amp; Cameron-Jones, M. (1998). Numeric prediction
+ using instance-based learning with encoding length selection. In Progress
+ in Connectionist-Based Information Systems. Singapore: Springer-Verlag.
+
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ NAME:  LOW BIRTH WEIGHT DATA
+ KEYWORDS:  Logistic Regression
+ SIZE:  189 observations, 11 variables
+ 
+ NOTE:
+         These data come from Appendix 1 of Hosmer and Lemeshow (1989).
+ These data are copyrighted and must be acknowledged and used accordingly.
+ 
+ DESCRIPTIVE ABSTRACT:
+         The goal of this study was to identify risk factors associated with
+ giving birth to a low birth weight baby (weighing less than 2500 grams).
+ Data were collected on 189 women, 59 of which had low birth weight babies
+ and 130 of which had normal birth weight babies.  Four variables which were
+ thought to be of importance were age, weight of the subject at her last
+ menstrual period, race, and the number of physician visits during the first
+ trimester of pregnancy.
+ 
+ 
+ SOURCE:
+          Data were collected at Baystate Medical Center, Springfield,
+ Massachusetts, during 1986.
+ 
+ 
+ NOTE:
+           This data set consists of the complete data.  A paired data set
+ created from this low birth weight data may be found in plowbwt.dat and
+ a 3 to 1 matched data set created from the low birth weight data may be
+ found in mlowbwt.dat.
+ 
+ 
+ 
+ Table:  Code Sheet for the Variables in the Low Birth Weight Data Set.
+ 
+ Columns   Variable                                              Abbreviation
+ -----------------------------------------------------------------------------
+ 2-4     Identification Code                                     ID
+    
+ 10      Low Birth Weight (0 = Birth Weight ge 2500g,            LOW
+                           l = Birth Weight &lt; 2500g)
+   
+ 17-18   Age of the Mother in Years                              AGE
+      
+ 23-25   Weight in Pounds at the Last Menstrual Period           LWT
+      
+ 32      Race (1 = White, 2 = Black, 3 = Other)                  RACE
+      
+ 40      Smoking Status During Pregnancy (1 = Yes, 0 = No)       SMOKE
+      
+ 48      History of Premature Labor (0 = None, 1 = One, etc.)    PTL
+      
+ 55      History of Hypertension (1 = Yes, 0 = No)               HT
+      
+ 61      Presence of Uterine Irritability (1 = Yes, 0 = No)      UI
+      
+ 67      Number of Physician Visits During the First Trimester   FTV
+                 (0 = None, 1 = One, 2 = Two, etc.)
+      
+ 73-76   Birth Weight in Grams                                   BWT
+ -----------------------------------------------------------------------------
+ 
+ PEDAGOGICAL NOTES:
+         These data have been used as an example of fitting a multiple
+ logistic regression model.
+ 
+ STORY BEHIND THE DATA:
+         Low birth weight is an outcome that has been of concern to physicians
+ for years. This is due to the fact that infant mortality rates and birth
+ defect rates are very high for low birth weight babies. A woman's behavior
+ during pregnancy (including diet, smoking habits, and receiving prenatal care)
+ can greatly alter the chances of carrying the baby to term and, consequently,
+ of delivering a baby of normal birth weight.
+         The variables identified in the code sheet given in the table have been
+ shown to be associated with low birth weight in the obstetrical literature. The
+ goal of the current study was to ascertain if these variables were important
+ in the population being served by the medical center where the data were
+ collected.
+ 
+ 
+ References:
+ 
+ 1. Hosmer and Lemeshow, Applied Logistic Regression, Wiley, (1989).</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Baystate Medical Center</oml:creator><oml:creator>Springfield</oml:creator><oml:creator>Massachusetts</oml:creator>  <oml:contributor>David W. Aha</oml:contributor>   <oml:collection_date>1986</oml:collection_date>  <oml:upload_date>2014-04-23T13:17:07</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/3640/lowbwt.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0203/dataset_203.pq</oml:parquet_url>  <oml:file_id>3640</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>Baystate Medical Center, Springfield,Massachusetts</oml:citation>  <oml:tag>Health</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>OpenML-Reg19</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0203/dataset_203.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:08:07</oml:processing_date>      <oml:md5_checksum>f4a1a8578d9ac3ce0d003b4ed50dc9d2</oml:md5_checksum>
+</oml:data_set_description>

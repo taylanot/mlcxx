@@ -1,0 +1,66 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>53</oml:id>
+  <oml:name>heart-statlog</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**:   
+**Source**: Unknown -   
+**Please cite**:   
+
+This database contains 13 attributes (which have been extracted from
+ a larger set of 75)       
+   
+ 
+ 
+ Attribute Information:
+ ------------------------
+       -- 1. age       
+       -- 2. sex       
+       -- 3. chest pain type  (4 values)       
+       -- 4. resting blood pressure  
+       -- 5. serum cholestoral in mg/dl      
+       -- 6. fasting blood sugar &gt; 120 mg/dl       
+       -- 7. resting electrocardiographic results  (values 0,1,2) 
+       -- 8. maximum heart rate achieved  
+       -- 9. exercise induced angina    
+       -- 10. oldpeak = ST depression induced by exercise relative to rest   
+       -- 11. the slope of the peak exercise ST segment     
+       -- 12. number of major vessels (0-3) colored by flourosopy        
+       -- 13.  thal: 3 = normal; 6 = fixed defect; 7 = reversable defect     
+ 
+ Attributes types
+ -----------------
+ 
+ Real: 1,4,5,8,10,12
+ Ordered:11,
+ Binary: 2,6,9
+ Nominal:7,3,13
+ 
+ Variable to be predicted
+ ------------------------
+ Absence (1) or presence (2) of heart disease
+ 
+ Cost Matrix
+ 
+          abse  pres
+ absence   0     1
+ presence  5     0
+ 
+ where the rows represent the true values and the columns the predicted.
+ 
+ No missing values.
+ 
+ 270 observations
+
+
+
+
+ Relabeled values in attribute class
+    From: 1                       To: absent              
+    From: 2                       To: present</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2014-04-06T23:23:06</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/53/heart-statlog.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0053/dataset_53.pq</oml:parquet_url>  <oml:file_id>53</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>Health</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_29</oml:tag><oml:tag>study_30</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_88</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://archive.ics.uci.edu/ml/datasets/statlog+(heart)</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0053/dataset_53.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:41:46</oml:processing_date>      <oml:md5_checksum>65dd57335c2c0e458cf83b22af8db16b</oml:md5_checksum>
+</oml:data_set_description>

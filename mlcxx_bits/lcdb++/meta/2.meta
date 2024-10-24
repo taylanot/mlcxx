@@ -1,0 +1,110 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>2</oml:id>
+  <oml:name>anneal</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Unknown. Donated by David Sterling and Wray Buntine  
+
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Annealing) - 1990  
+
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+
+
+
+The original Annealing dataset from UCI. The exact meaning of the features and classes is largely unknown. Annealing, in metallurgy and materials science, is a heat treatment that alters the physical and sometimes chemical properties of a material to increase its ductility and reduce its hardness, making it more workable. It involves heating a material to above its recrystallization temperature, maintaining a suitable temperature, and then cooling. (Wikipedia)
+
+
+
+### Attribute Information:
+
+     1. family:          --,GB,GK,GS,TN,ZA,ZF,ZH,ZM,ZS
+
+     2. product-type:    C, H, G
+
+     3. steel:           -,R,A,U,K,M,S,W,V
+
+     4. carbon:          continuous
+
+     5. hardness:        continuous
+
+     6. temper_rolling:  -,T
+
+     7. condition:       -,S,A,X
+
+     8. formability:     -,1,2,3,4,5
+
+     9. strength:        continuous
+
+    10. non-ageing:      -,N
+
+    11. surface-finish:  P,M,-
+
+    12. surface-quality: -,D,E,F,G
+
+    13. enamelability:   -,1,2,3,4,5
+
+    14. bc:              Y,-
+
+    15. bf:              Y,-
+
+    16. bt:              Y,-
+
+    17. bw/me:           B,M,-
+
+    18. bl:              Y,-
+
+    19. m:               Y,-
+
+    20. chrom:           C,-
+
+    21. phos:            P,-
+
+    22. cbond:           Y,-
+
+    23. marvi:           Y,-
+
+    24. exptl:           Y,-
+
+    25. ferro:           Y,-
+
+    26. corr:            Y,-
+
+    27. blue/bright/varn/clean:          B,R,V,C,-
+
+    28. lustre:          Y,-
+
+    29. jurofm:          Y,-
+
+    30. s:               Y,-
+
+    31. p:               Y,-
+
+    32. shape:           COIL, SHEET
+
+    33. thick:           continuous
+
+    34. width:           continuous
+
+    35. len:             continuous
+
+    36. oil:             -,Y,N
+
+    37. bore:            0000,0500,0600,0760
+
+    38. packing: -,1,2,3
+
+    classes:        1,2,3,4,5,U
+
+  
+
+    -- The '-' values are actually 'not_applicable' values rather than
+
+       'missing_values' (and so can be treated as legal discrete
+
+       values rather than as showing the absence of a discrete value).</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>David Sterling</oml:creator><oml:creator> Wray Buntine</oml:creator>  <oml:contributor>David Sterling and Wray Buntine</oml:contributor>   <oml:collection_date>1990  </oml:collection_date>  <oml:upload_date>2014-04-06T23:19:24</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1666876/anneal.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0002/dataset_2.pq</oml:parquet_url>  <oml:file_id>1666876</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>Manufacturing</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_37</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_70</oml:tag><oml:tag>study_76</oml:tag><oml:tag>test</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Annealing</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0002/dataset_2.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2019-07-09 15:22:03</oml:processing_date>      <oml:md5_checksum>4eaed8b6ec9d8211024b6c089b064761</oml:md5_checksum>
+</oml:data_set_description>

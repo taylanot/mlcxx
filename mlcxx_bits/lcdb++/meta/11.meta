@@ -1,0 +1,23 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>11</oml:id>
+  <oml:name>balance-scale</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Siegler, R. S. (donated by Tim Hume)  
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/balance+scale) - 1994  
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)   
+
+**Balance Scale Weight &amp; Distance Database**  
+This data set was generated to model psychological experimental results.  Each example is classified as having the balance scale tip to the right, tip to the left, or be balanced. The attributes are the left weight, the left distance, the right weight, and the right distance. The correct way to find the class is the greater of (left-distance * left-weight) and (right-distance * right-weight). If they are equal, it is balanced.
+
+### Attribute description  
+The attributes are the left weight, the left distance, the right weight, and the right distance.
+
+### Relevant papers  
+Shultz, T., Mareschal, D., &amp; Schmidt, W. (1994). Modeling Cognitive Development on Balance Scale Phenomena. Machine Learning, Vol. 16, pp. 59-88. </oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Robert. S. Siegler</oml:creator>  <oml:contributor>Tim Hume</oml:contributor>   <oml:collection_date>1994-04-22</oml:collection_date>  <oml:upload_date>2014-04-06T23:19:55</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/11/balance-scale.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0011/dataset_11.pq</oml:parquet_url>  <oml:file_id>11</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>artificial</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>shark-tutorial-demo-tag</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_37</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_70</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://archive.ics.uci.edu/ml/datasets/balance+scale</oml:original_data_url>  <oml:paper_url>https://www.sciencedirect.com/science/article/pii/S0065240708600361</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0011/dataset_11.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 18:49:41</oml:processing_date>      <oml:md5_checksum>76938608d472f620c170cef9c8c1fa65</oml:md5_checksum>
+</oml:data_set_description>

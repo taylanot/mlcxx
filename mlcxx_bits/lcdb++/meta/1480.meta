@@ -1,0 +1,35 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1480</oml:id>
+  <oml:name>ilpd</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Bendi Venkata Ramana, M. Surendra Prasad Babu, N. B. Venkateswarlu  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/ILPD+(Indian+Liver+Patient+Dataset)) - 2012  
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+
+**Indian Liver Patient Dataset**  
+This data set contains 416 liver patient records and 167 non liver patient records.The data set was collected from north east of Andhra Pradesh, India. The class label divides the patients into 2 groups (liver patient or not). This data set contains 441 male patient records and 142 female patient records. 
+
+### Attribute Information  
+V1. Age of the patient. Any patient whose age exceeded 89 is listed as being of age &quot;90&quot;.  
+V2. Gender of the patient  
+V3. Total Bilirubin  
+V4. Direct Bilirubin  
+V5. Alkphos Alkaline Phosphatase  
+V6. Sgpt Alanine Aminotransferase  
+V7. Sgot Aspartate Aminotransferase   
+V8. Total Proteins  
+V9. Albumin  
+V10. A/G Ratio Albumin and Globulin Ratio  
+
+A feature indicating a train-test split has been removed.  
+
+### Relevant Papers  
+1. Bendi Venkata Ramana, Prof. M. S. Prasad Babu and Prof. N. B. Venkateswarlu, A Critical Comparative Study of Liver Patients from USA and INDIA: An Exploratory Analysis, International Journal of Computer Science Issues, ISSN:1694-0784, May 2012. 
+2. Bendi Venkata Ramana, Prof. M. S. Prasad Babu and Prof. N. B. Venkateswarlu, A Critical Study of Selected Classification Algorithms for Liver Disease Diagnosis, International Journal of Database Management Systems (IJDMS), Vol.3, No.2, ISSN : 0975-5705, PP 101-114, May 2011.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2015-05-22T22:40:56</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1590565/ilpd.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1480/dataset_1480.pq</oml:parquet_url>  <oml:file_id>1590565</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>Chemistry</oml:tag><oml:tag>health</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1480/dataset_1480.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 22:02:15</oml:processing_date>      <oml:md5_checksum>155295549a459387fb71312caf1b8360</oml:md5_checksum>
+</oml:data_set_description>

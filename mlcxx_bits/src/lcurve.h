@@ -34,7 +34,17 @@ public:
            const bool parallel = false, 
            const bool prog = false );
 
-  /* Generate Learning Curves with Bootstrap
+  /* Generate Learning Curves with RandomSet Selection
+   *
+   * @param dataset   : whole large dataset inputs
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void Bootstrap ( const T& dataset,
+                   const Ts&... args );
+
+  /* Generate Learning Curves with RandomSet Selection
    *
    * @param inputs    : whole large dataset inputs
    * @param labels    : whole large dataset labels
@@ -42,14 +52,34 @@ public:
    *
    */
   template<class T, class... Ts>
-  void Bootstrap ( const arma::Mat<O>& inputs,
+  void RandomSet ( const arma::Mat<O>& inputs,
                    const T& labels,
+                   const Ts&... args );
+
+  /* Generate Learning Curves with RandomSet Selection
+   *
+   * @param dataset   : whole large dataset
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void RandomSet ( const T& dataset,
                    const Ts&... args );
 
   /* Generate Learning Curves with data point addition
    *
    * @param inputs    : whole large dataset inputs
    * @param labels    : whole large dataset labels
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void Additive ( const T& dataset,
+                  const Ts&... args );
+
+  /* Generate Learning Curves with data point addition
+   *
+   * @param dataset   : whole large dataset 
    * @param args      : possible arguments for the model initialization
    *
    */
@@ -71,10 +101,6 @@ public:
                const Ts&... args );
 
   /* Get the results of the learning curve generation
-   *
-   * @param trainset  : dataset used for training 
-   * @param testset   : dataset used for testing 
-   * @param args      : possible arguments for the model initialization
    *
    */
 
