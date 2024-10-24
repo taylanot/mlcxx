@@ -21,11 +21,11 @@ namespace src {
 // LCurve
 //=============================================================================
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-LCurve<MODEL,LOSS,SPLIT,O>::LCurve ( const arma::irowvec& Ns,
-                                     const double repeat,
-                                     const bool parallel, 
-                                     const bool prog ) :
+         class LOSS,class O>
+LCurve<MODEL,LOSS,O>::LCurve ( const arma::irowvec& Ns,
+                               const double repeat,
+                               const bool parallel, 
+                               const bool prog ) :
 
 repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog)
 {
@@ -36,10 +36,10 @@ repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog)
 // LCurve::Bootstrap
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
+         class LOSS,class O>
 template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const T& dataset,
-                                             const Ts&... args )
+void LCurve<MODEL,LOSS,O>::Bootstrap ( const T& dataset,
+                                       const Ts&... args )
 {
   // With this version you cannot use the split version, fyi....
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(dataset.inputs_.n_cols), 
@@ -69,11 +69,11 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Bootstrap ( const T& dataset,
 // LCurve::RandomSet
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::RandomSet ( const arma::Mat<O>& inputs,
-                                             const T& labels,
-                                             const Ts&... args )
+         class LOSS,class O>
+template<class SPLIT,class T, class... Ts>
+void LCurve<MODEL,LOSS,O>::RandomSet ( const arma::Mat<O>& inputs,
+                                       const T& labels,
+                                       const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
@@ -82,12 +82,13 @@ void LCurve<MODEL,LOSS,SPLIT,O>::RandomSet ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.RandomSet", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = split_(inputs, labels, size_t(Ns_(i)));
+      const auto res = split(inputs, labels, size_t(Ns_(i)));
       arma::Mat<O> Xtrn = std::get<0>(res);
       arma::Mat<O> Xtst = std::get<1>(res);
       T ytrn = std::get<2>(res);
@@ -103,10 +104,10 @@ void LCurve<MODEL,LOSS,SPLIT,O>::RandomSet ( const arma::Mat<O>& inputs,
 }
 
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::RandomSet( const T& dataset,
-                                            const Ts&... args )
+         class LOSS,class O>
+template<class SPLIT,class T,class... Ts>
+void LCurve<MODEL,LOSS,O>::RandomSet( const T& dataset,
+                                      const Ts&... args )
 {
   RandomSet(dataset.inputs_,dataset.labels_,args...);
 }
@@ -115,9 +116,9 @@ void LCurve<MODEL,LOSS,SPLIT,O>::RandomSet( const T& dataset,
 // LCurve::Additive
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
+         class LOSS,class O>
+template<class SPLIT,class T,class... Ts>
+void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
                                             const T& labels,
                                             const Ts&... args )
 {
@@ -128,10 +129,11 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.Additive", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for if(parallel_)
   for(size_t j=0; j < size_t(repeat_); j++)
   {
-    const auto res = split_(inputs,labels,size_t(Ns_(0)));
+    const auto res = split(inputs,labels,size_t(Ns_(0)));
 
     arma::Mat<O> Xtrn = std::get<0>(res);
     arma::Mat<O> Xrest = std::get<1>(res);
@@ -156,10 +158,10 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const arma::Mat<O>& inputs,
 }
 
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const T& dataset,
-                                            const Ts&... args )
+         class LOSS,class O>
+template<class SPLIT,class T,class... Ts>
+void LCurve<MODEL,LOSS,O>::Additive ( const T& dataset,
+                                      const Ts&... args )
 {
   Additive(dataset.inputs_, dataset.labels_,args...);
 }
@@ -168,11 +170,11 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Additive ( const T& dataset,
 // LCurve::Split
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class SPLIT,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
-                                        const T& testset,
-                                        const Ts&... args )
+         class LOSS,class O>
+template<class SPLIT,class T,class... Ts>
+void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
+                                  const T& testset,
+                                  const Ts&... args )
 {
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(trainset.inputs_.n_cols), 
         "There are not enough data for learning curve generation!" );
@@ -181,12 +183,13 @@ void LCurve<MODEL,LOSS,SPLIT,O>::Split( const T& trainset,
                     "Only 1D outputs are allowed!" );
   ProgressBar pb("LCurve.Split", Ns_.n_elem*repeat_);
 
+  SPLIT split;
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
   {
     for(size_t j=0; j < size_t(repeat_); j++)
     {
-      const auto res = split_(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
+      const auto res = split(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
 
       arma::Mat<O> Xtrn = std::get<0>(res);
       auto ytrn = std::get<2>(res);

@@ -16,7 +16,7 @@ namespace src {
 //=============================================================================
 template<class MODEL,
          class LOSS,
-         class SPLIT=data::N_Split, class O=DTYPE>
+         class O=DTYPE>
 class LCurve
 {
 public:
@@ -51,7 +51,7 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
+  template<class SPLIT=data::N_Split, class T, class... Ts>
   void RandomSet ( const arma::Mat<O>& inputs,
                    const T& labels,
                    const Ts&... args );
@@ -62,7 +62,7 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
+  template<class SPLIT=data::N_Split, class T, class... Ts>
   void RandomSet ( const T& dataset,
                    const Ts&... args );
 
@@ -73,7 +73,7 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
+  template<class SPLIT=data::N_Split, class T, class... Ts>
   void Additive ( const T& dataset,
                   const Ts&... args );
 
@@ -83,7 +83,7 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
+  template<class SPLIT=data::N_Split, class T, class... Ts>
   void Additive ( const arma::Mat<O>& inputs,
                   const T& labels,
                   const Ts&... args );
@@ -95,7 +95,7 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
+  template<class SPLIT=data::N_Split, class T, class... Ts>
   void Split ( const T& trainset,
                const T& testset,
                const Ts&... args );
@@ -107,7 +107,7 @@ public:
   arma::Mat<O> GetResults (  ) const  {return test_errors_;}
 
 private:
-  SPLIT split_;
+  /* SPLIT split_; */
   size_t repeat_;
   arma::irowvec Ns_;
   bool parallel_;
