@@ -13,6 +13,7 @@ namespace algo {
 namespace classification {
 
 template<class KERNEL=mlpack::LinearKernel,
+         size_t SOLVER= 0,
          class T=DTYPE>
 class SVM 
 {
@@ -27,7 +28,7 @@ class SVM
    */
   template<class... Args>
   SVM ( const size_t& num_class,
-        const Args&... args ) : C_(1.), cov_(args...), oneclass_(false)
+        const Args&... args ) : C_(T(1.)), cov_(args...), oneclass_(false)
   { };
 
   /**
@@ -36,7 +37,7 @@ class SVM
    * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const size_t& num_class, const double& C, const Args&... args ) : 
+  SVM ( const size_t& num_class, const T& C, const Args&... args ) : 
                        solver_("QP"),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
    * @param num_class : number of classes
@@ -46,7 +47,7 @@ class SVM
    */
   template<class... Args>
   SVM ( const size_t& num_class, const std::string solver, 
-        const double& C, const Args&... args ) :
+        const T& C, const Args&... args ) :
         solver_(solver),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
    * @param num_class : number of classes
@@ -59,7 +60,7 @@ class SVM
   SVM ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const size_t& num_class,
-        const double& C,
+        const T& C,
         const Args&... args );
  /**
    * @param num_class : number of classes
@@ -133,7 +134,8 @@ class SVM
   }
 
 private:
-  std::string solver_ = "SMO";
+  std::map<int,std::string> solvers_ = {{0,"randSMO"},{1,"fanSMO"},{2,"QP"}};
+  std::string solver_ = solvers_[SOLVER];
   size_t nclass_;
   T C_;
   utils::covmat<KERNEL> cov_;
@@ -145,11 +147,12 @@ private:
   arma::uvec idx_;
   T b_ = 0;
   bool oneclass_ = false;
-  T eps_ = 1e-12;
+  T eps_ = 1e-3;
+  T tau_ = 1e-8;
   size_t max_iter_ = 10000;
   size_t iter_ = 0;
   
-  OnevAll<SVM<KERNEL,T>> ova_;
+  OnevAll<SVM<KERNEL,SOLVER,T>> ova_;
 
   /**
    * @param inputs  : X
@@ -159,8 +162,17 @@ private:
   void _QP ( const arma::Mat<T>& inputs,
              const arma::Row<size_t>& labels );
 
-  void _SMO ( const arma::Mat<T>& inputs,
-              const arma::Row<size_t>& labels );
+  void _randSMO ( const arma::Mat<T>& inputs,
+                  const arma::Row<size_t>& labels );
+
+  void _fanSMO ( const arma::Mat<T>& inputs,
+                 const arma::Row<size_t>& labels );
+
+  /**
+   * @param G : Vector containing the Gradients
+   * @param Q : Matrix with the Kernel x y
+   */
+  std::pair<int, int> _selectset ( arma::Row<T> G, arma::Mat<T> Q );
 
   int _E ( size_t i );
 

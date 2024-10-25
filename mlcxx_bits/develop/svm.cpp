@@ -5,34 +5,37 @@
  * Trying to create kernelized svm
  */
 
+#define DTYPE float
+
 #include <headers.h>
 
 // Main function
 int main() {
-  data::classification::oml::Dataset dataset(8);
-  arma::Mat<DTYPE> X = dataset.inputs_.cols(0,20);
-  arma::Row<size_t> y = dataset.labels_.cols(0,20);
-  PRINT_VAR(y);
+  /* data::classification::oml::Dataset dataset(8); */
+  /* arma::Mat<DTYPE> X = dataset.inputs_.cols(0,20); */
+  /* arma::Row<size_t> y = dataset.labels_.cols(0,20); */
+  /* PRINT_VAR(y); */
   /* arma::mat X = {{0, 2}, {0, 0}, {2, 1}, {3, 4}, {4, 3}}; */
-  /* arma::inplace_trans(X); */
-  /* /1* arma::Row<int> y = {-1, -1, -1, 1, 1}; *1/ */
+  arma::Mat<DTYPE> X = {{-1, -1}, {-1, 1}, {1, 1}, {3, -1}};
+  arma::inplace_trans(X);
+  /* arma::Row<> y = {-1, -1, -1, 1, 1}; */
   /* /1* arma::Row<size_t> y = {1,1,1,1,1}; *1/ */
-  /* arma::Row<size_t> y = {1,0,0,1,1}; */
+  arma::Row<size_t> y = {1,1,0,0};
 
   /* arma::mat X2 = {{3.1,4.0}, {4.1,3.1}}; */
   /* arma::inplace_trans(X2); */
   /* arma::Row<size_t> y2 = {1,1}; */
   /* /1* arma::Row<int> y = {-1, -1, -1, 1, 1}; *1/ */
 
-  /* double C = 1.; */
+  DTYPE C = 1.;
   /* double l = 1.; */
 
   // Create SVM object and train
 
-  /* algo::classification::SVM<mlpack::LinearKernel> model(X,y,3,C); */
+  algo::classification::SVM<mlpack::LinearKernel> model(X,y,2,C);
   /* mlpack::LogisticRegression<> model(X.n_rows,1.e-8); */
   /* algo::classification::SVM<> model(X,y,arma::unique(dataset.labels_).eval().n_elem); */
-  algo::classification::LogisticRegression<> model(X,y,arma::unique(dataset.labels_).eval().n_elem);
+  /* algo::classification::LogisticRegression<> model(X,y,arma::unique(dataset.labels_).eval().n_elem); */
   /* model.Train(X,y); */
   /* /1* algo::classification::OnevAll<mlpack::LogisticRegression<>> model(X,y); *1/ */
   /* arma::Mat<DTYPE> prob; */

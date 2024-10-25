@@ -5,7 +5,7 @@
  * This file is for showing double descent mitigation via excluisoin of principle components.
  *
  */
-#define DTYPE double  
+#define DTYPE float 
 
 #include <headers.h>
 
@@ -55,8 +55,8 @@ int main ( int argc, char** argv )
   data::StratifiedSplit(dataset,trainset,testset,0.2);
   PRINT(dataset.size_);
   PRINT(dataset.dimension_);
-  size_t repeat = 1;
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,100,trainset.size_);
+  size_t repeat = 100;
+  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,100);
 
   /* arma::irowvec Ns = {1}; */
   /* arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,10); */
@@ -96,8 +96,8 @@ int main ( int argc, char** argv )
   /* src::LCurve<algo::classification::OnevAll<mlpack::LogisticRegression<>>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<algo::classification::SVM<>,utils::CrossEntropy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::SVM<mlpack::EpanechnikovKernel>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
-  /* src::LCurve<algo::classification::SVM<mlpack::GaussianKernel>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
-  src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true);
+  src::LCurve<algo::classification::SVM<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true);
+  /* src::LCurve<algo::classification::LDC<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<algo::classification::LogisticRegression<>,mlpack::Accuracy> lcurve(Ns,repeat,false,true); */
   /* src::LCurve<mlpack::RandomForest<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<mlpack::RandomForest<>,mlpack::Accuracy> lcurve(Ns,repeat,true,true); */
@@ -111,7 +111,7 @@ int main ( int argc, char** argv )
   /* src::LCurve<mlpack::NaiveBayesClassifier<>,utils::CrossEntropy> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<mlpack::RandomForest<>,utils::BrierLoss> lcurve(Ns,repeat,true,true); */
   /* src::LCurve<mlpack::RandomForest<>,utils::CrossEntropy> lcurve(Ns,repeat,true,true); */
-  lcurve.Split<data::N_StratSplit>(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
+  lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
   PRINT(lcurve.GetResults());
   /* lcurve.Bootstrap(dataset.inputs_,dataset.labels_,arma::unique(dataset.labels_).eval().n_elem); */
   /* lcurve.Split(trainset,testset,2,1.e-6); */
