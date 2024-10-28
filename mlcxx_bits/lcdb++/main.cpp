@@ -54,9 +54,51 @@ int hptrand_( const size_t id,
 }
 
 template<class MODEL,class LOSS>
-int add_( const size_t id,
+int boot_( const size_t id,
            const std::string& algo, const std::string& loss,
            const size_t seed, const size_t nreps,
+           const std::filesystem::path& path ) 
+{
+  data::classification::oml::Dataset dataset(id,lcdb::path);
+
+  mlpack::RandomSeed(seed);
+  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
+  /*                                             (1,1,size_t(dataset.size_*0.9)); */
+
+  src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+  lcurve.Bootstrap(dataset,
+                   arma::unique(dataset.labels_).eval().n_elem);
+  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+ 
+  return 0;
+}
+
+template<class MODEL,class LOSS,class... Args>
+int hptboot_( const size_t id,
+              const std::string& algo, const std::string& loss,
+              const size_t seed, const size_t nreps,
+              const std::filesystem::path& path, Args... args ) 
+{
+ 
+  data::classification::oml::Dataset dataset(id,lcdb::path);
+
+  mlpack::RandomSeed(seed);
+  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
+  /*                                             (10,1,size_t(dataset.size_*0.9)); */
+
+  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true);
+  lcurve.Bootstrap(dataset,
+                   mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
+                   args...);
+  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+ 
+  return 0;
+}
+
+template<class MODEL,class LOSS>
+int add_( const size_t id,
+          const std::string& algo, const std::string& loss,
+          const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
   data::classification::oml::Dataset dataset(id,lcdb::path);
@@ -258,6 +300,143 @@ void rands( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", hptrand_<lcdb::GSVC, lcdb::Crs,cont>},
                 {"bri", hptrand_<lcdb::GSVC, lcdb::Bri,cont>},
                 {"auc", hptrand_<lcdb::GSVC, lcdb::Auc,cont>}}}
+    };
+
+
+    // Check if algo exists in the map
+    if (run.find(algo) != run.end() && !hpt) 
+    {
+      auto loss_map = run[algo];
+      if (loss_map.find(loss) != loss_map.end()) 
+          // Call the corresponding function
+          loss_map[loss](id, algo, loss, seed, nreps, path);
+      else 
+          ERR("Not defined loss argument!");
+    }
+    else if (contrun.find(algo) != contrun.end() && hpt)
+    {
+      auto loss_map = contrun[algo];
+      if (loss_map.find(loss) != loss_map.end()) 
+          loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+      else 
+          ERR("Not defined loss argument!");
+    }
+    else 
+        ERR("Not defined algo argument!");
+}
+
+void boot( size_t id, const std::string& algo, const std::string& loss,
+           size_t seed, size_t nreps,  bool hpt )
+{
+    std::filesystem::path path;
+    if (!hpt)
+      path = lcdb::path/"boot"/"ntune";
+    else
+      path = lcdb::path/"boot"/"tune";
+
+    path = path/std::to_string(id)/algo/std::to_string(seed);
+    std::filesystem::create_directories(path);
+
+    using cont = arma::Row<DTYPE>;
+    /* using disc = arma::Row<size_t>; */
+
+    using Func = std::function<void(const size_t id,
+                                    const std::string&,
+                                    const std::string&,
+                                    const size_t,
+                                    const size_t,
+                                    const std::filesystem::path&)>;
+
+    using contFunc = std::function<void(const size_t id,
+                                        const std::string&,
+                                        const std::string&,
+                                        const size_t,
+                                        const size_t,
+                                        const std::filesystem::path&, 
+                                        const cont&)>;
+
+    // Mapping of algo and loss types
+    std::unordered_map<std::string,
+                       std::unordered_map<std::string,Func>> run = 
+    {
+      {"lreg", {{"acc", boot_<lcdb::LREG, lcdb::Acc>},
+                {"crs", boot_<lcdb::LREG, lcdb::Crs>},
+                {"bri", boot_<lcdb::LREG, lcdb::Bri>},
+                {"auc", boot_<lcdb::LREG, lcdb::Auc>}}},
+      {"nmc",  {{"acc", boot_<lcdb::NMC, lcdb::Acc>},
+                {"crs", boot_<lcdb::NMC, lcdb::Crs>},
+                {"bri", boot_<lcdb::NMC, lcdb::Bri>},
+                {"auc", boot_<lcdb::NMC, lcdb::Auc>}}},
+      {"nnc",  {{"acc", boot_<lcdb::NNC, lcdb::Acc>},
+                {"crs", boot_<lcdb::NNC, lcdb::Crs>},
+                {"bri", boot_<lcdb::NNC, lcdb::Bri>},
+                {"auc", boot_<lcdb::NNC, lcdb::Auc>}}},
+      {"ldc",  {{"acc", boot_<lcdb::LDC, lcdb::Acc>},
+                {"crs", boot_<lcdb::LDC, lcdb::Crs>},
+                {"bri", boot_<lcdb::LDC, lcdb::Bri>},
+                {"auc", boot_<lcdb::LDC, lcdb::Auc>}}},
+      {"qdc",  {{"acc", boot_<lcdb::QDC, lcdb::Acc>},
+                {"crs", boot_<lcdb::QDC, lcdb::Crs>},
+                {"bri", boot_<lcdb::QDC, lcdb::Bri>},
+                {"auc", boot_<lcdb::QDC, lcdb::Auc>}}},
+      {"lsvc", {{"acc", boot_<lcdb::LSVC, lcdb::Acc>},
+                {"crs", boot_<lcdb::LSVC, lcdb::Crs>},
+                {"bri", boot_<lcdb::LSVC, lcdb::Bri>},
+                {"auc", boot_<lcdb::LSVC, lcdb::Auc>}}},
+      {"esvc", {{"acc", boot_<lcdb::ESVC, lcdb::Acc>},
+                {"crs", boot_<lcdb::ESVC, lcdb::Crs>},
+                {"bri", boot_<lcdb::ESVC, lcdb::Bri>},
+                {"auc", boot_<lcdb::ESVC, lcdb::Auc>}}},
+      {"gsvc", {{"acc", boot_<lcdb::GSVC, lcdb::Acc>},
+                {"crs", boot_<lcdb::GSVC, lcdb::Crs>},
+                {"bri", boot_<lcdb::GSVC, lcdb::Bri>},
+                {"auc", boot_<lcdb::GSVC, lcdb::Auc>}}},
+      {"adab", {{"acc", boot_<lcdb::ADAB, lcdb::Acc>},
+                {"crs", boot_<lcdb::ADAB, lcdb::Crs>},
+                {"bri", boot_<lcdb::ADAB, lcdb::Bri>},
+                {"auc", boot_<lcdb::ADAB, lcdb::Auc>}}},
+      {"rfor", {{"acc", boot_<lcdb::RFOR, lcdb::Acc>},
+                {"crs", boot_<lcdb::RFOR, lcdb::Crs>},
+                {"bri", boot_<lcdb::RFOR, lcdb::Bri>},
+                {"auc", boot_<lcdb::RFOR, lcdb::Auc>}}},
+      {"dt",   {{"acc", boot_<lcdb::DT, lcdb::Acc>},
+                {"crs", boot_<lcdb::DT, lcdb::Crs>},
+                {"bri", boot_<lcdb::DT, lcdb::Bri>},
+                {"auc", boot_<lcdb::DT, lcdb::Auc>}}},
+      {"nb",   {{"acc", boot_<lcdb::NB, lcdb::Acc>},
+                {"crs", boot_<lcdb::NB, lcdb::Crs>},
+                {"bri", boot_<lcdb::NB, lcdb::Bri>},
+                {"auc", boot_<lcdb::NB, lcdb::Auc>}}}
+    };
+
+       std::unordered_map<std::string,
+                       std::unordered_map<std::string,contFunc>> contrun =
+
+    {
+      {"lreg", {{"acc", hptboot_<lcdb::LREG, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::LREG, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::LREG, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::LREG, lcdb::Auc,cont>}}},
+      {"ldc",  {{"acc", hptboot_<lcdb::LDC, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::LDC, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::LDC, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::LDC, lcdb::Auc,cont>}}},
+      {"qdc",  {{"acc", hptboot_<lcdb::QDC, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::QDC, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::QDC, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::QDC, lcdb::Auc,cont>}}},
+      {"lsvc", {{"acc", hptboot_<lcdb::LSVC, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::LSVC, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::LSVC, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::LSVC, lcdb::Auc,cont>}}},
+      {"esvc", {{"acc", hptboot_<lcdb::ESVC, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::ESVC, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::ESVC, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::ESVC, lcdb::Auc,cont>}}},
+      {"gsvc", {{"acc", hptboot_<lcdb::GSVC, lcdb::Acc,cont>},
+                {"crs", hptboot_<lcdb::GSVC, lcdb::Crs,cont>},
+                {"bri", hptboot_<lcdb::GSVC, lcdb::Bri,cont>},
+                {"auc", hptboot_<lcdb::GSVC, lcdb::Auc,cont>}}}
     };
 
 
@@ -649,6 +828,8 @@ int main(int argc, char* argv[])
           add(id, algo, loss, seed, nreps, hpt);
       else if (type == "split")
           split(id, algo, loss, seed, nreps, hpt);
+      else if (type == "boot")
+          boot(id, algo, loss, seed, nreps, hpt);
       else 
           ERR("Invalid type for the experiment.\n");
 

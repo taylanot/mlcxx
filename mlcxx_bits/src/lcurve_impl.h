@@ -41,10 +41,23 @@ template<class T, class... Ts>
 void LCurve<MODEL,LOSS,O>::Bootstrap ( const T& dataset,
                                        const Ts&... args )
 {
+  Bootstrap(dataset.inputs_,dataset.labels_,args...);
+}
+
+//=============================================================================
+// LCurve::Bootstrap
+//=============================================================================     
+template<class MODEL,
+         class LOSS,class O>
+template<class T, class... Ts>
+void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs, 
+                                       const T& labels,
+                                       const Ts&... args )
+{
   // With this version you cannot use the split version, fyi....
-  BOOST_ASSERT_MSG( int(Ns_.max()) < int(dataset.inputs_.n_cols), 
+  BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
         "There are not enough data for test set creation!" );
-  BOOST_ASSERT_MSG( int(dataset.labels_.n_rows) == int(1), 
+  BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
         "Only 1D outputs are allowed!" );
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
@@ -54,12 +67,13 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const T& dataset,
     for(size_t j=0; j < size_t(repeat_); j++)
     {
       const auto idx = arma::randi<arma::uvec>(Ns_[i],
-                                arma::distr_param(0,dataset.labels_.n_elem-1));
-      MODEL model(dataset.inputs_.cols(idx).eval(),
-                  dataset.labels_.cols(idx).eval(),args...);
+                                arma::distr_param(0,labels.n_elem-1));
+      const arma::Mat<O> inps = inputs.cols(idx); 
+      const T labs = labels.cols(idx); 
+      MODEL model(inps,labs,args...);
 
-      test_errors_(j,i) = loss_.Evaluate(model,dataset.inputs_.eval(),
-                                               dataset.labels_.eval());
+      test_errors_(j,i) = loss_.Evaluate(model,inputs,
+                                               labels);
       if (prog_)
         pb.Update();
     }

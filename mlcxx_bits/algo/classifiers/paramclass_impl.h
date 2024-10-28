@@ -81,7 +81,7 @@ void LDC<T>::Train ( const arma::Mat<T>& inputs,
       }
       cov_ += covs_[*it];
     }
-    cov_ = cov_.i() / num_class_;
+    cov_ = arma::pinv(cov_) / num_class_;
   }
 }
 
@@ -209,9 +209,9 @@ void QDC<T>::Train ( const arma::Mat<T>& inputs,
     {
       covs_[*it] = arma::cov(inx.t());
       covs_[*it].diag() += jitter_+lambda_;
-      icovs_[*it] = covs_[*it].i();
+      icovs_[*it] = arma::pinv(covs_[*it]);
     }
-    icovs_[*it] = covs_[*it].i();
+    icovs_[*it] = arma::pinv(covs_[*it]);
   }
 }
 

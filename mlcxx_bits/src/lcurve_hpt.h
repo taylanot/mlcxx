@@ -51,6 +51,17 @@ public:
 
   /* Generate Learning Curves with random set selection
    *
+   * @param inputs    : whole large dataset inputs
+   * @param labels    : whole large dataset labels
+   * @param args      : possible arguments for the model initialization
+   *
+   */
+  template<class T, class... Ts>
+  void Bootstrap ( const arma::Mat<O>& inputs,
+                   const T& labels,
+                   const Ts&... args );
+  /* Generate Learning Curves with random set selection
+   *
    * @param dataset   : whole large dataset 
    * @param args      : possible arguments for the model initialization
    *

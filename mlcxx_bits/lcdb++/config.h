@@ -53,8 +53,8 @@ namespace lcdb
   /* auto leafs = arma::regspace<arma::Row<DTYPE>>(1,10,100); */
 
   // Where to save the experiments
-  static const std::filesystem::path path = EXP_PATH/"lcdb++";
-  /* std::filesystem::path path = "lcdb++"; */
+  /* static const std::filesystem::path path = EXP_PATH/"lcdb++"; */
+  static const std::filesystem::path path = "lcdb++";
   // Number of instance limit 
   static const size_t nlim = 2000;
   // Number of features limit 
