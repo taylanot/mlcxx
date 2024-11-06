@@ -241,6 +241,7 @@ void QDC<T>::Classify ( const arma::Mat<T>& inputs,
   {
     arma::Row<T> norm;
 
+    #pragma omp parallel for
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
@@ -386,10 +387,12 @@ void NMC<T>::Classify ( const arma::Mat<T>& inputs,
       {
         // Check if the row contains any infinite values
         if (arma::is_finite(distances.row(i))) 
-        // Perform the division for this row only if all values are finite
+        // Perform the division for this row only if all values are finite 
+        // and sum is nonzero
           probs.row(i) = distances.row(i) / arma::sum(distances, 0);
       }
     }
+    probs.elem(arma::find_nonfinite(probs)).fill(1/num_class_);
   }
  
 }

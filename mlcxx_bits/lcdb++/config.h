@@ -35,7 +35,7 @@ namespace lcdb
 
   // validation size for the Hyper-parameter optimization
   static const DTYPE vsize = 0.2;
-  // train-test split size if you are not using bootstrap
+  // train-test split size if you are not using bootstrap or randomset
   static const DTYPE splitsize = 0.2;
 
   // lambdas: for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
@@ -63,7 +63,7 @@ namespace lcdb
   static const arma::irowvec Ns = arma::regspace<arma::irowvec>
                                               (1,1,100);
   static const arma::irowvec hptNs = arma::regspace<arma::irowvec>
-                                              (1,1,100);
+                                              (10,1,100);
 
 }
 

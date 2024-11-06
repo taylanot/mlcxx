@@ -208,6 +208,8 @@ void SVM<KERNEL,SOLVER,T>::_randSMO ( const arma::Mat<T>& X,
     old_alphas_ = alphas_;
     size_t i;
     arma::Row<T> updates(2);
+
+    #pragma omp parallel for
     for ( size_t j=0; j<N; j++)
     {
       i = _geti(j,N);
