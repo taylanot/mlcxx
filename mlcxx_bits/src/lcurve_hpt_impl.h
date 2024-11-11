@@ -264,9 +264,9 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
       model.Train(Xtrn, ytrn);
 
 
-      test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_,
-                            testset.labels_));
-
+      /* test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_, */
+      /*                       testset.labels_)); */
+      test_errors_(j,i) = loss.Evaluate(model, testset.inputs_,testset.labels_);
       if (prog_)
         pb.Update();
     }

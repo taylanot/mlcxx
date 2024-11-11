@@ -13,7 +13,7 @@ namespace algo {
 namespace classification {
 
 template<class KERNEL=mlpack::LinearKernel,
-         size_t SOLVER= 0,
+         size_t SOLVER= 1,
          class T=DTYPE>
 class SVM 
 {
@@ -149,7 +149,7 @@ private:
   bool oneclass_ = false;
   T eps_ = 1e-3;
   T tau_ = 1e-8;
-  size_t max_iter_ = 10000;
+  size_t max_iter_ = 5000;
   size_t iter_ = 0;
   
   OnevAll<SVM<KERNEL,SOLVER,T>> ova_;

@@ -1,0 +1,48 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40984</oml:id>
+  <oml:name>segment</oml:name>
+  <oml:version>3</oml:version>
+  <oml:description>**Author**: University of Massachusetts Vision Group, Carla Brodley  
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/image+segmentation) - 1990  
+**Please cite**: [UCI](http://archive.ics.uci.edu/ml/citation_policy.html)  
+
+**Image Segmentation Data Set**
+The instances were drawn randomly from a database of 7 outdoor images. The images were hand-segmented to create a classification for every pixel. Each instance is a 3x3 region.
+ 
+__Major changes w.r.t. version 2: ignored first two variables as they do not fit the classification task (they reflect the location of the sample in the original image). The 3rd is constant, so should also be ignored.__
+
+
+### Attribute Information  
+
+4.  short-line-density-5:  the results of a line extractoin algorithm that 
+          counts how many lines of length 5 (any orientation) with
+          low contrast, less than or equal to 5, go through the region.
+5.  short-line-density-2:  same as short-line-density-5 but counts lines
+          of high contrast, greater than 5.
+6.  vedge-mean:  measure the contrast of horizontally
+          adjacent pixels in the region.  There are 6, the mean and 
+          standard deviation are given.  This attribute is used as
+         a vertical edge detector.
+7.  vegde-sd:  (see 6)
+8.  hedge-mean:  measures the contrast of vertically adjacent
+           pixels. Used for horizontal line detection. 
+9.  hedge-sd: (see 8).
+10. intensity-mean:  the average over the region of (R + G + B)/3
+11. rawred-mean: the average over the region of the R value.
+12. rawblue-mean: the average over the region of the B value.
+13. rawgreen-mean: the average over the region of the G value.
+14. exred-mean: measure the excess red:  (2R - (G + B))
+15. exblue-mean: measure the excess blue:  (2B - (G + R))
+16. exgreen-mean: measure the excess green:  (2G - (R + B))
+17. value-mean:  3-d nonlinear transformation
+          of RGB. (Algorithm can be found in Foley and VanDam, Fundamentals
+          of Interactive Computer Graphics)
+18. saturatoin-mean:  (see 17)
+19. hue-mean:  (see 17)</oml:description>
+  <oml:description_version>2</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2017-12-04T23:05:24</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/18151937/segment.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40984/dataset_40984.pq</oml:parquet_url>  <oml:file_id>18151937</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>    <oml:ignore_attribute>region.centroid.col</oml:ignore_attribute><oml:ignore_attribute> region.centroid.row</oml:ignore_attribute><oml:ignore_attribute> region.pixel.count</oml:ignore_attribute>  <oml:version_label>2</oml:version_label>    <oml:tag>Life Science</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_218</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>http://archive.ics.uci.edu/ml/datasets/image+segmentation</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40984/dataset_40984.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:20:05</oml:processing_date>      <oml:md5_checksum>dc39e654f66a5a4007012e74ef3f1435</oml:md5_checksum>
+</oml:data_set_description>

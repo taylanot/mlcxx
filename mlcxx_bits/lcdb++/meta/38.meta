@@ -1,0 +1,92 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>38</oml:id>
+  <oml:name>sick</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Ross Quinlan
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/thyroid+disease)   
+**Please cite**: Thyroid disease records supplied by the Garavan Institute and J. Ross Quinlan, New South Wales Institute, Syndney, Australia. 1987.
+
+Attribute information:
+
+```
+sick, negative.   |  classes
+
+age:    continuous.
+sex:    M, F.
+on thyroxine:   f, t.
+query on thyroxine:  f, t.
+on antithyroid medication: f, t.
+sick:    f, t.
+pregnant:   f, t.
+thyroid surgery:  f, t.
+I131 treatment:   f, t.
+query hypothyroid:  f, t.
+query hyperthyroid:  f, t.
+lithium:   f, t.
+goitre:    f, t.
+tumor:    f, t.
+hypopituitary:   f, t.
+psych:    f, t.
+TSH measured:   f, t.
+TSH:    continuous.
+T3 measured:   f, t.
+T3:    continuous.
+TT4 measured:   f, t.
+TT4:    continuous.
+T4U measured:   f, t.
+T4U:    continuous.
+FTI measured:   f, t.
+FTI:    continuous.
+TBG measured:   f, t.
+TBG:    continuous.
+referral source:  WEST, STMW, SVHC, SVI, SVHD, other.
+```
+
+``` 
+ Num Instances:     3772
+ Num Attributes:    30
+ Num Continuous:    7 (Int 1 / Real 6)
+ Num Discrete:      23
+ Missing values:    6064 /  5.4%
+```
+
+```
+     name                      type enum ints real     missing    distinct  (1)
+   1 'age'                     Int    0% 100%   0%     1 /  0%    93 /  2%   0% 
+   2 'sex'                     Enum  96%   0%   0%   150 /  4%     2 /  0%   0% 
+   3 'on thyroxine'            Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   4 'query on thyroxine'      Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   5 'on antithyroid medicati  Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   6 'sick'                    Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   7 'pregnant'                Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   8 'thyroid surgery'         Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+   9 'I131 treatment'          Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  10 'query hypothyroid'       Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  11 'query hyperthyroid'      Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  12 'lithium'                 Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  13 'goitre'                  Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  14 'tumor'                   Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  15 'hypopituitary'           Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  16 'psych'                   Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  17 'TSH measured'            Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  18 'TSH'                     Real   0%  11%  79%   369 / 10%   287 /  8%   2% 
+  19 'T3 measured'             Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  20 'T3'                      Real   0%   9%  71%   769 / 20%    69 /  2%   0% 
+  21 'TT4 measured'            Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  22 'TT4'                     Real   0%  94%   0%   231 /  6%   241 /  6%   1% 
+  23 'T4U measured'            Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  24 'T4U'                     Real   0%   2%  87%   387 / 10%   146 /  4%   1% 
+  25 'FTI measured'            Enum 100%   0%   0%     0 /  0%     2 /  0%   0% 
+  26 'FTI'                     Real   0%  90%   0%   385 / 10%   234 /  6%   2% 
+  27 'TBG measured'            Enum 100%   0%   0%     0 /  0%     1 /  0%   0% 
+  28 'TBG'                     Real   0%   0%   0%  3772 /100%     0 /  0%   0% 
+  29 'referral source'         Enum 100%   0%   0%     0 /  0%     5 /  0%   0% 
+  30 'Class'                   Enum 100%   0%   0%     0 /  0%     2 /  0%   0%
+```</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Ross Quinlan</oml:creator>     <oml:collection_date>1987-01-01</oml:collection_date>  <oml:upload_date>2014-04-06T23:22:19</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/38/sick.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0038/dataset_38.pq</oml:parquet_url>  <oml:file_id>38</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>Thyroid disease records supplied by the Garavan Institute and J. Ross Quinlan, New South Wales Institute, Syndney, Australia. 1987.</oml:citation>  <oml:tag>Health</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/thyroid+disease</oml:original_data_url>  <oml:paper_url>https://dl.acm.org/doi/abs/10.5555/33429.33438</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0038/dataset_38.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 20:17:58</oml:processing_date>      <oml:md5_checksum>ee5cb4b7f41a5f44b0cd234f675ab492</oml:md5_checksum>
+</oml:data_set_description>

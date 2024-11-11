@@ -39,7 +39,8 @@ namespace lcdb
   static const DTYPE splitsize = 0.2;
 
   // lambdas: for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
-  static const auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,1,2);
+  static const auto lambdas = arma::logspace<arma::Row<DTYPE>>(-8,2,11);
+  static const auto Cs = arma::logspace<arma::Row<DTYPE>>(-8,2,11);
 
   /* auto Cs = arma::logspace<arma::Row<DTYPE>>(-8,1,3); */
 

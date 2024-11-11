@@ -1,0 +1,36 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40927</oml:id>
+  <oml:name>CIFAR_10</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Alex Krizhevsky, Vinod Nair, and Geoffrey Hinton    
+**Source**: [University of Toronto](https://www.cs.toronto.edu/~kriz/cifar.html) - 2009  
+**Please cite**: Alex Krizhevsky (2009) Learning Multiple Layers of Features from Tiny Images, Tech Report.
+
+**CIFAR-10** is a labeled subset of the [80 million tiny images dataset](http://groups.csail.mit.edu/vision/TinyImages/). It (originally) consists 32x32 color images representing 10 classes of objects:  
+0. airplane  
+1. automobile          
+2. bird          
+3. cat          
+4. deer          
+5. dog          
+6. frog          
+7. horse          
+8. ship          
+9. truck          
+
+CIFAR-10 contains 6000 images per class. The original train-test split randomly divided these into 5000 train and 1000 test images per class.
+
+The classes are completely mutually exclusive. There is no overlap between automobiles and trucks. &quot;Automobile&quot; includes sedans, SUVs, things of that sort. &quot;Truck&quot; includes only big trucks. Neither includes pickup trucks.
+
+### Attribute description  
+
+Each instance represents a 32x32 colour image as a 3072-value array. The first 1024 entries contain the red channel values, the next 1024 the green, and the final 1024 the blue. The image is stored in row-major order, so that the first 32 entries of the array are the red channel values of the first row of the image.
+
+The labels are encoded as integers in the range 0-9, corresponding to the numbered classes listed above.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2017-09-26T23:46:15</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/16797613/CIFAR_10.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40927/dataset_40927.pq</oml:parquet_url>  <oml:file_id>16797613</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>          <oml:tag>AzurePilot</oml:tag><oml:tag>Economics</oml:tag><oml:tag>Geography</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>study_99</oml:tag><oml:tag>vision</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40927/dataset_40927.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:22:57</oml:processing_date>      <oml:md5_checksum>556e01684912de400da7557c57155b97</oml:md5_checksum>
+</oml:data_set_description>

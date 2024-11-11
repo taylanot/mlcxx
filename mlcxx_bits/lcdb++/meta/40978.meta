@@ -1,0 +1,42 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40978</oml:id>
+  <oml:name>Internet-Advertisements</oml:name>
+  <oml:version>2</oml:version>
+  <oml:description>**Author**: Nicholas Kushmerick  
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/Internet+Advertisements) - 1998  
+**Please cite**:   
+
+### Description
+
+__Changes to version 1:__ all categorical features transformed as such. 
+
+This dataset represents a set of possible advertisements on Internet pages. 
+
+### Sources
+
+(a) Creator and donor:
+
+Nicholas Kushmerick - nick@ucd.ie
+
+### Dataset Information
+
+The features encode the geometry of the image (if available) as well as phrases occurring in the URL, the image's URL and alt text, the anchor text, and words occurring near the anchor text. The task is to predict whether an image is an advertisement (&quot;ad&quot;) or not (&quot;nonad&quot;).
+
+### Atributtes Information
+
+There are : 3 continuous attributes. The others are binary.
+This is the &quot;STANDARD encoding&quot; mentioned in the [Kushmerick, 99] (see below). 
+One or more of the three continuous features are missing in 28% of the instances.
+Missing values should be interpreted as &quot;unknown&quot;.
+
+### Relevant Papers  
+
+N. Kushmerick (1999). &quot;Learning to remove Internet advertisements&quot;, 3rd Int Conf Autonomous Agents.  
+Available at: http://rexa.info/paper/2fdc1cee89b7f4f2c9227d6f5d9b05d22c5ab3e9</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2017-12-03T16:28:03</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/18140371/Internet-Advertisements.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40978/dataset_40978.pq</oml:parquet_url>  <oml:file_id>18140371</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>2</oml:version_label>    <oml:tag>Health</oml:tag><oml:tag>Medicine</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40978/dataset_40978.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:24:59</oml:processing_date>      <oml:md5_checksum>4f8829d20c886c86de4bc06c4eeb5cc6</oml:md5_checksum>
+</oml:data_set_description>

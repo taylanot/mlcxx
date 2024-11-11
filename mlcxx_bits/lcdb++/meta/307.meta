@@ -1,0 +1,118 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>307</oml:id>
+  <oml:name>vowel</oml:name>
+  <oml:version>2</oml:version>
+  <oml:description>**Author**: Peter Turney (peter@ai.iit.nrc.ca)   
+**Source**: [UCI](https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/vowel/) - date unknown  
+**Please cite**: [UCI citation policy](https://archive.ics.uci.edu/ml/citation_policy.html)
+
+**Vowel Recognition (Deterding data)**
+Speaker independent recognition of the eleven steady state vowels of British English using a specified training set of lpc derived log area ratios.
+Collected by David Deterding (data and non-connectionist analysis), Mahesan Niranjan (first connectionist analysis), Tony Robinson (description, program, data, and results)
+
+A very comprehensive description including comments by the authors can be found [here](https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/vowel/vowel.names)
+
+The problem is specified by the accompanying data file, &quot;vowel.data&quot;.  This
+consists of a three dimensional array: voweldata [speaker, vowel, input].
+The speakers are indexed by integers 0-89.  (Actually, there are fifteen
+individual speakers, each saying each vowel six times.)  The vowels are
+indexed by integers 0-10.  For each utterance, there are ten floating-point
+input values, with array indices 0-9.
+
+The problem is to train the network as well as possible using only on data
+from &quot;speakers&quot; 0-47, and then to test the network on speakers 48-89,
+reporting the number of correct classifications in the test set.
+
+For a more detailed explanation of the problem, see the excerpt from Tony
+Robinson's Ph.D. thesis in the COMMENTS section.  In Robinson's opinion,
+connectionist problems fall into two classes, the possible and the
+impossible.  He is interested in the latter, by which he means problems
+that have no exact solution.  Thus the problem here is not to see how fast
+a network can be trained (although this is important), but to maximise a
+less than perfect performance.
+
+#### METHODOLOGY
+
+Report the number of test vowels classified correctly, (i.e. the number of
+occurences when distance of the correct output to the actual output was the
+smallest of the set of distances from the actual output to all possible
+target outputs).
+
+Though this is not the focus of Robinson's study, it would also be useful
+to report how long the training took (measured in pattern presentations or
+with a rough count of floating-point operations required) and what level of
+success was achieved on the training and testing data after various amounts
+of training.  Of course, the network topology and algorithm used should be
+precisely described as well.
+
+#### VARIATIONS
+
+This benchmark is proposed to encourage the exploration of different node
+types.  Please theorise/experiment/hack.  The author (Robinson) will try to
+correspond by email if requested.  In particular there has been some
+discussion recently on the use of a cross-entropy distance measure, and it
+would be interesting to see results for that.
+
+#### Notes
+
+1. Each of these numbers is based on a single trial with random starting
+weights.  More trials would of course be preferable, but the computational
+facilities available to Robinson were limited.
+
+2. Graphs are given in Robinson's thesis showing test-set performance vs.
+epoch count for some of the training runs.  In most cases, performance
+peaks at around 250 correct, after which performance decays to different
+degrees.  The numbers given above are final performance figures after about
+3000 trials, not the peak performance obtained during the run.
+
+#### REFERENCES
+
+[Deterding89] D. H. Deterding, 1989, University of Cambridge, &quot;Speaker
+ Normalisation for Automatic Speech Recognition&quot;, submitted for PhD.
+
+[NiranjanFallside88] M. Niranjan and F. Fallside, 1988, Cambridge University
+ Engineering Department, &quot;Neural Networks and Radial Basis Functions in
+ Classifying Static Speech Patterns&quot;, CUED/F-INFENG/TR.22.
+
+[RenalsRohwer89-ijcnn] Steve Renals and Richard Rohwer, &quot;Phoneme
+ Classification Experiments Using Radial Basis Functions&quot;, Submitted to
+ the International Joint Conference on Neural Networks, Washington,
+ 1989.
+
+[RabinerSchafer78] L. R. Rabiner and R. W. Schafer, Englewood Cliffs, New
+ Jersey, 1978, Prentice Hall, &quot;Digital Processing of Speech Signals&quot;.
+
+[PragerFallside88] R. W. Prager and F. Fallside, 1988, Cambridge University
+ Engineering Department, &quot;The Modified Kanerva Model for Automatic
+ Speech Recognition&quot;, CUED/F-INFENG/TR.6.
+
+[BroomheadLowe88] D. Broomhead and D. Lowe, 1988, Royal Signals and Radar
+ Establishment, Malvern, &quot;Multi-variable Interpolation and Adaptive
+ Networks&quot;, RSRE memo, #4148.
+
+[RobinsonNiranjanFallside88-tr] A. J. Robinson and M. Niranjan and F. 
+   Fallside, 1988, Cambridge University Engineering Department,
+ &quot;Generalising the Nodes of the Error Propagation Network&quot;,
+ CUED/F-INFENG/TR.25.
+
+[Robinson89] A. J. Robinson, 1989, Cambridge University Engineering
+ Department, &quot;Dynamic Error Propagation Networks&quot;.
+
+[McCullochAinsworth88] N. McCulloch and W. A. Ainsworth, Proceedings of
+ Speech'88, Edinburgh, 1988, &quot;Speaker Independent Vowel Recognition
+ using a Multi-Layer Perceptron&quot;.
+
+[RobinsonFallside88-neuro] A. J. Robinson and F. Fallside, 1988, Proceedings
+ of nEuro'88, Paris, June, &quot;A Dynamic Connectionist Model for Phoneme
+ Recognition.
+
+
+#### Notes
+* This is version 2. Version 1 is hidden because it includes a feature dividing the data in train and test set. In OpenML this information is explicitly available in the corresponding task.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Peter Turney</oml:creator>  <oml:contributor></oml:contributor>    <oml:upload_date>2014-08-22T16:57:30</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/52210/vowel.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0307/dataset_307.pq</oml:parquet_url>  <oml:file_id>52210</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>      <oml:version_label>2</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>Language</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_76</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+(Vowel+Recognition+-+Deterding+Data)</oml:original_data_url>  <oml:paper_url>https://ethos.bl.uk/OrderDetails.do?uin=uk.bl.ethos.359822</oml:paper_url>  <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0307/dataset_307.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2021-08-20 00:41:03</oml:processing_date>      <oml:md5_checksum>9c82432df30166fc62353fe4f8bb237a</oml:md5_checksum>
+</oml:data_set_description>

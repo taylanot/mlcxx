@@ -1,0 +1,41 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40994</oml:id>
+  <oml:name>climate-model-simulation-crashes</oml:name>
+  <oml:version>4</oml:version>
+  <oml:description>**Author**: D. Lucas, R. Klein, J. Tannahill, D. Ivanova, S. Brandon, D. Domyancic, Y. Zhang.  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/climate+model+simulation+crashes)  
+**Please Cite**: Lucas, D. D., Klein, R., Tannahill, J., Ivanova, D., Brandon, S., Domyancic, D., and Zhang, Y.: Failure analysis of parameter-induced simulation crashes in climate models, Geosci. Model Dev. Discuss., 6, 585-623, [Web Link](http://www.geosci-model-dev-discuss.net/6/585/2013/gmdd-6-585-2013.html), 2013.  
+
+__Major changes w.r.t. version 1: deactivated first two variables as they describe the batch of the experiments and should not be used for prediction. Also transformed the target from numeric to factor type.__
+
+
+### Source
+
+D. Lucas (ddlucas .at. alum.mit.edu), Lawrence Livermore National Laboratory; R. Klein (rklein .at. astron.berkeley.edu), Lawrence Livermore National Laboratory &amp; U.C. Berkeley; J. Tannahill (tannahill1 .at. llnl.gov), Lawrence Livermore National Laboratory; D. Ivanova (ivanova2 .at. llnl.gov), Lawrence Livermore National Laboratory; S. Brandon (brandon1 .at. llnl.gov), Lawrence Livermore National Laboratory; D. Domyancic (domyancic1 .at. llnl.gov), Lawrence Livermore National Laboratory; Y. Zhang (zhang24 .at. llnl.gov), Lawrence Livermore National Laboratory .
+
+This data was constructed using LLNL's UQ Pipeline, was created under the auspices of the US Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344, was funded by LLNL's Uncertainty Quantification Strategic Initiative Laboratory Directed Research and Development Project under tracking code 10-SI-013, and is released under UCRL number LLNL-MISC-633994.
+
+
+### Data Set Information
+
+This dataset contains records of simulation crashes encountered during climate model uncertainty quantification (UQ) ensembles. Ensemble members were constructed using a Latin hypercube method in LLNL's UQ Pipeline software system to sample the uncertainties of 18 model parameters within the Parallel Ocean Program (POP2) component of the Community Climate System Model (CCSM4). Three separate Latin hypercube ensembles were conducted, each containing 180 ensemble members. 46 out of the 540 simulations failed for numerical reasons at combinations of parameter values. The goal is to use classification to predict simulation outcomes (fail or succeed) from input parameter values, and to use sensitivity analysis and feature selection to determine the causes of simulation crashes. Further details about the data and methods are given in the publication 'Failure Analysis of Parameter-Induced Simulation Crashes in Climate Models,' Geoscientific Model Development [(Web Link)](doi:10.5194/gmdd-6-585-2013).
+
+
+### Attribute Information
+
+The goal is to predict climate model simulation outcomes (column 19, fail or succeed) given scaled values of climate model input parameters (columns 1-18). 
+
+- Columns 3-20: values of 18 climate model parameters scaled in the interval [0, 1] 
+
+- Column 21: simulation outcome (0 = failure, 1 = success)
+
+Relevant Papers:
+
+Lucas, D. D., Klein, R., Tannahill, J., Ivanova, D., Brandon, S., Domyancic, D., and Zhang, Y.: Failure analysis of parameter-induced simulation crashes in climate models, Geosci. Model Dev. Discuss., 6, 585-623, [Web Link](http://www.geosci-model-dev-discuss.net/6/585/2013/gmdd-6-585-2013.html), 2013.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2017-12-19T11:23:55</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/18237248/climate-model-simulation-crashes.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40994/dataset_40994.pq</oml:parquet_url>  <oml:file_id>18237248</oml:file_id>  <oml:default_target_attribute>outcome</oml:default_target_attribute>    <oml:ignore_attribute>Study</oml:ignore_attribute><oml:ignore_attribute>Run</oml:ignore_attribute>  <oml:version_label>4</oml:version_label>    <oml:tag>Computer Systems</oml:tag><oml:tag>Economics</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40994/dataset_40994.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:27:29</oml:processing_date>      <oml:md5_checksum>f7c55d9a11782a5ff980cee371787edd</oml:md5_checksum>
+</oml:data_set_description>

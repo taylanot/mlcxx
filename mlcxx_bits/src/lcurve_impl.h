@@ -209,8 +209,10 @@ void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
       auto ytrn = std::get<2>(res);
 
       MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, testset.inputs_,
-                          testset.labels_));
+      /* test_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, testset.inputs_, */
+      /*                     testset.labels_)); */
+
+      test_errors_(j,i) = loss_.Evaluate(model, testset.inputs_,testset.labels_);
       if (prog_)
         pb.Update();
     }

@@ -1,0 +1,44 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>44</oml:id>
+  <oml:name>spambase</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Mark Hopkins, Erik Reeber, George Forman, Jaap Suermondt    
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/spambase)   
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)
+
+SPAM E-mail Database  
+The &quot;spam&quot; concept is diverse: advertisements for products/websites, make money fast schemes, chain letters, pornography... Our collection of spam e-mails came from our postmaster and individuals who had filed spam.  Our collection of non-spam e-mails came from filed work and personal e-mails, and hence the word 'george' and the area code '650' are indicators of non-spam.  These are useful when constructing a personalized spam filter.  One would either have to blind such non-spam indicators or get a very wide collection of non-spam to generate a general purpose spam filter.
+ 
+For background on spam:  
+Cranor, Lorrie F., LaMacchia, Brian A.  Spam! Communications of the ACM, 41(8):74-83, 1998.  
+
+### Attribute Information:  
+The last column denotes whether the e-mail was considered spam (1) or not (0), i.e. unsolicited commercial e-mail. Most of the attributes indicate whether a particular word or character was frequently occurring in the e-mail. The run-length attributes (55-57) measure the length of sequences of consecutive capital letters.  
+
+For the statistical measures of each attribute, see the end of this file. Here are the definitions of the attributes:  
+
+48 continuous real [0,100] attributes of type  
+word_freq_WORD = percentage of words in the e-mail that match WORD,  i.e. 100 * (number of times the WORD appears in the e-mail) / total number of words in e-mail.  A &quot;word&quot; in this case is any string of alphanumeric characters bounded by non-alphanumeric characters or end-of-string.
+ 
+6 continuous real [0,100] attributes of type char_freq_CHAR = percentage of characters in the e-mail that match CHAR, i.e. 100 * (number of CHAR occurences) / total characters in e-mail
+ 
+1 continuous real [1,...] attribute of type capital_run_length_average
+ = average length of uninterrupted sequences of capital letters
+ 
+1 continuous integer [1,...] attribute of type capital_run_length_longest
+ = length of longest uninterrupted sequence of capital letters
+ 
+1 continuous integer [1,...] attribute of type capital_run_length_total
+ = sum of length of uninterrupted sequences of capital letters
+ = total number of capital letters in the e-mail
+ 
+1 nominal {0,1} class attribute of type spam
+ = denotes whether the e-mail was considered spam (1) or not (0), 
+ i.e. unsolicited commercial e-mail.</oml:description>
+  <oml:description_version>3</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>Mark Hopkins</oml:creator><oml:creator> Erik Reeber</oml:creator><oml:creator> George Forman</oml:creator><oml:creator> Jaap Suermondt</oml:creator><oml:creator> Hewlett-Packard Labs</oml:creator>     <oml:collection_date>1999-07-01</oml:collection_date>  <oml:upload_date>2014-04-06T23:22:41</oml:upload_date>
+  <oml:language>English</oml:language>  <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/44/spambase.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/0044/dataset_44.pq</oml:parquet_url>  <oml:file_id>44</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>      <oml:version_label>1</oml:version_label>  <oml:citation>https://archive.ics.uci.edu/ml/citation_policy.html</oml:citation>  <oml:tag>Machine Learning</oml:tag><oml:tag>mythbusting_1</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_1</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_15</oml:tag><oml:tag>study_20</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_37</oml:tag><oml:tag>study_41</oml:tag><oml:tag>study_52</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_70</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>Text &amp; Literature</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/spambase</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/0044/dataset_44.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 19:28:05</oml:processing_date>      <oml:md5_checksum>d9ace01aeac3461e326a8e1b2d53fd84</oml:md5_checksum>
+</oml:data_set_description>

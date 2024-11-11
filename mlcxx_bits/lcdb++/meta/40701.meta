@@ -1,0 +1,16 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40701</oml:id>
+  <oml:name>churn</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Unknown  
+**Source**: [PMLB](https://github.com/EpistasisLab/penn-ml-benchmarks/tree/master/datasets/classification), [BigML](https://bigml.com/user/francisco/gallery/dataset/5163ad540c0b5e5b22000383), Supposedly from UCI but I can't find it there.  
+**Please cite**:   
+
+A dataset relating characteristics of telephony account features and usage and whether or not the customer churned. Originally used in [Discovering Knowledge in Data: An Introduction to Data Mining](http://secs.ac.in/wp-content/CSE_PORTAL/DataMining_Daniel.pdf).</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2017-04-06T12:37:40</oml:upload_date>
+    <oml:licence>public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/4965302/churn.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40701/dataset_40701.pq</oml:parquet_url>  <oml:file_id>4965302</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>          <oml:tag>Computer Systems</oml:tag><oml:tag>Machine Learning</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_144</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40701/dataset_40701.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2018-10-04 07:33:41</oml:processing_date>      <oml:md5_checksum>607c0c779ce118bcd68b7668b01582c2</oml:md5_checksum>
+</oml:data_set_description>

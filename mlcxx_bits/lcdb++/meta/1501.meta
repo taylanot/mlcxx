@@ -1,0 +1,44 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>1501</oml:id>
+  <oml:name>semeion</oml:name>
+  <oml:version>1</oml:version>
+  <oml:description>**Author**: Semeion Research Center of Sciences of Communication     
+**Source**: [UCI](http://archive.ics.uci.edu/ml/datasets/semeion+handwritten+digit)     
+**Please cite**: Semeion Research Center of Sciences of Communication, via Sersale 117, 00128 Rome, Italy 
+Tattile Via Gaetano Donizetti, 1-3-5,25030 Mairano (Brescia), Italy.    
+
+### Dataset Description
+
+Semeion Handwritten Digit Data Set, where 1593 handwritten digits from around 80 persons were scanned and documented. The each of the 256 variables V1 - V256 describe one of the pixels and their corresponding values. 
+
+### Sources
+
+The dataset was created by Tactile Srl, Brescia, Italy (http://www.tattile.it) and donated in 1994 to Semeion Research Center of Sciences of Communication, Rome, Italy (http://www.semeion.it), for machine learning research. 
+
+For any questions, e-mail Massimo Buscema (m.buscema '@' semeion.it) or Stefano Terzi (s.terzi '@' semeion.it)
+
+### DataSet Information
+
+A total of 1593 handwritten digits from around 80 persons were scanned, stretched in a rectangular box 16x16 in a gray scale of 256 values. Then each pixel of each image was scaled into a boolean (1/0) value using a fixed threshold. 
+
+Each person wrote in a paper all the digits from 0 to 9, twice. The commitment was to write the digit the first time in the normal way (trying to write each digit accurately) and the second time in a fast way (with no accuracy). 
+
+The best validation protocol for this dataset seems to be a 5x2CV, 50% Tune (Train +Test) and completely blind 50% Validation
+
+### Attribute Information
+
+This dataset consists of 1593 records (rows) and 256 attributes (columns). 
+Each record represents a handwritten digit, originally scanned with a resolution of 256 grays scale (28). 
+Each pixel of the each original scanned image was first stretched, and after scaled between 0 and 1 (setting to 0 every pixel whose value was under the value 127 of the grey scale (127 included) and setting to 1 each pixel whose original value in the grey scale was over 127). 
+Finally, each binary image was scaled again into a 16x16 square box (the final 256 binary attributes).
+
+### Relevant Papers
+
+M Buscema, MetaNet: The Theory of Independent Judges, in Substance Use &amp; Misuse 33(2)1998, pp 439-461.</oml:description>
+  <oml:description_version>1</oml:description_version>
+  <oml:format>ARFF</oml:format>
+        <oml:upload_date>2015-05-25T22:22:34</oml:upload_date>
+    <oml:licence>Public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/1592293/semeion.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0000/1501/dataset_1501.pq</oml:parquet_url>  <oml:file_id>1592293</oml:file_id>  <oml:default_target_attribute>Class</oml:default_target_attribute>          <oml:tag>Chemistry</oml:tag><oml:tag>Life Science</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_34</oml:tag><oml:tag>study_50</oml:tag><oml:tag>study_7</oml:tag><oml:tag>study_98</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>      <oml:minio_url>https://openml1.win.tue.nl/datasets/0000/1501/dataset_1501.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2020-11-20 21:56:33</oml:processing_date>      <oml:md5_checksum>0fb35a1d7db2f76c8587f9125abcf048</oml:md5_checksum>
+</oml:data_set_description>

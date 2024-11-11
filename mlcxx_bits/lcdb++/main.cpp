@@ -317,7 +317,10 @@ void rands( size_t id, const std::string& algo, const std::string& loss,
     {
       auto loss_map = contrun[algo];
       if (loss_map.find(loss) != loss_map.end()) 
-          loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          if (algo == "ldc" || algo == "qdc" || algo == "lreg")
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          else
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::Cs);
       else 
           ERR("Not defined loss argument!");
     }
@@ -454,7 +457,11 @@ void boot( size_t id, const std::string& algo, const std::string& loss,
     {
       auto loss_map = contrun[algo];
       if (loss_map.find(loss) != loss_map.end()) 
-          loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          /* loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas); */
+         if (algo == "ldc" || algo == "qdc" || algo == "lreg")
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          else
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::Cs);
       else 
           ERR("Not defined loss argument!");
     }
@@ -591,7 +598,11 @@ void split ( size_t id, const std::string& algo, const std::string& loss,
     {
       auto loss_map = contrun[algo];
       if (loss_map.find(loss) != loss_map.end()) 
-          loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          /* loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas); */
+         if (algo == "ldc" || algo == "qdc" || algo == "lreg")
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::lambdas);
+          else
+            loss_map[loss](id, algo, loss, seed, nreps, path, lcdb::Cs);
       else 
           ERR("Not defined loss argument!");
     }
@@ -821,6 +832,7 @@ int main(int argc, char* argv[])
       LOG("Number of reps     -> " << nreps << "\n");
       LOG("HPT enabled        -> " << (hpt ? "Yes" : "No") << "\n");
 
+      PRINT(lcdb::lambdas)
       // Call the function to run the experiment
       if (type == "rands")
           rands(id, algo, loss, seed, nreps, hpt);

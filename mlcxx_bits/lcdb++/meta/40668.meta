@@ -1,0 +1,33 @@
+<oml:data_set_description xmlns:oml="http://openml.org/openml">
+  <oml:id>40668</oml:id>
+  <oml:name>connect-4</oml:name>
+  <oml:version>2</oml:version>
+  <oml:description>**Author**: John Tromp  
+**Source**: [UCI](https://archive.ics.uci.edu/ml/datasets/Connect-4) - 1995  
+**Please cite**: [UCI](https://archive.ics.uci.edu/ml/citation_policy.html)  
+
+**Connect-4**  
+This database contains all legal 8-ply positions in the game of connect-4 in which neither player has won yet, and in which the next move is not forced. Attributes represent board positions on a 6x6 board. The outcome class is the game-theoretical value for the first player (2: win, 1: loss, 0: draw).
+
+### Attribute Information  
+
+The board is numbered like:  
+6 . . . . . . .  
+5 . . . . . . .  
+4 . . . . . . .  
+3 . . . . . . .  
+2 . . . . . . .  
+1 . . . . . . .  
+a b c d e f g  
+
+The values represent:  
+0: Blank  
+1: Taken by Player 1  
+2: Taken by Player 2</oml:description>
+  <oml:description_version>2</oml:description_version>
+  <oml:format>ARFF</oml:format>
+  <oml:creator>John Tromp</oml:creator>      <oml:upload_date>2017-04-06T12:13:15</oml:upload_date>
+    <oml:licence>public</oml:licence>  <oml:url>https://api.openml.org/data/v1/download/4965243/connect-4.arff</oml:url>
+  <oml:parquet_url>https://openml1.win.tue.nl/datasets/0004/40668/dataset_40668.pq</oml:parquet_url>  <oml:file_id>4965243</oml:file_id>  <oml:default_target_attribute>class</oml:default_target_attribute>          <oml:tag>Economics</oml:tag><oml:tag>Manufacturing</oml:tag><oml:tag>OpenML-CC18</oml:tag><oml:tag>OpenML100</oml:tag><oml:tag>study_123</oml:tag><oml:tag>study_135</oml:tag><oml:tag>study_14</oml:tag><oml:tag>study_218</oml:tag><oml:tag>study_99</oml:tag><oml:tag>uci</oml:tag>  <oml:visibility>public</oml:visibility>  <oml:original_data_url>https://archive.ics.uci.edu/ml/datasets/Connect-4</oml:original_data_url>    <oml:minio_url>https://openml1.win.tue.nl/datasets/0004/40668/dataset_40668.pq</oml:minio_url>  <oml:status>active</oml:status>
+  <oml:processing_date>2021-11-16 16:48:06</oml:processing_date>      <oml:md5_checksum>1e84a44f5994bc14039544917cca265e</oml:md5_checksum>
+</oml:data_set_description>
