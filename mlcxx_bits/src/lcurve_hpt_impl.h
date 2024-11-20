@@ -254,8 +254,8 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
     {
       const auto res = split(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
 
-      arma::Mat<O> Xtrn = std::get<0>(res);
-      auto ytrn = std::get<2>(res);
+      const arma::Mat<O> Xtrn = std::get<0>(res);
+      const auto ytrn = std::get<2>(res);
 
       mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
                                                           hpt(cvp_, Xtrn, ytrn);
@@ -263,10 +263,9 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
       MODEL model = std::move(hpt.BestModel());
       model.Train(Xtrn, ytrn);
 
-
       /* test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_, */
       /*                       testset.labels_)); */
-      test_errors_(j,i) = loss.Evaluate(model, testset.inputs_,testset.labels_);
+      test_errors_(j,i) = loss.Evaluate(model,testset.inputs_,testset.labels_);
       if (prog_)
         pb.Update();
     }

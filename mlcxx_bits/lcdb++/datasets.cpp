@@ -19,8 +19,9 @@ void print_info ( const arma::Row<size_t>& ids )
   for (size_t id: ids)
   {
     Dataset dataset(id, lcdb::path);
-    LOG("Dimension  : " << dataset.dimension_);
-    LOG("Size       : " << dataset.size_);
+    LOG("Dimension    : " << dataset.dimension_);
+    LOG("Size         : " << dataset.size_);
+    LOG("Class Number : " << dataset.num_class_);
   }
 }
 
@@ -38,7 +39,6 @@ int main(int argc, char** argv)
   
   /* arma::Row<size_t> datasets = {11,15,23,37,1063}; */
   arma::Row<size_t> datasets = {11,37,39,53,61};
-  
   print_info(datasets);
   /* using Suite = data::classification::oml::Collect<>; */
 

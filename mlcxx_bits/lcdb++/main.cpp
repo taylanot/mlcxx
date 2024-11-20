@@ -20,14 +20,16 @@ int rand_( const size_t id,
   data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*                                             (1,1,size_t(dataset.size_*0.9)); */
+  const arma::irowvec Ns = arma::regspace<arma::irowvec>
+                                              (1,1,size_t(dataset.size_*0.9));
 
+  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
   src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
   lcurve.RandomSet(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
- 
+  PRINT_VAR(arma::size(lcurve.GetResults()))
+
   return 0;
 }
 
@@ -49,7 +51,8 @@ int hptrand_( const size_t id,
                    mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
                    args...);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
- 
+  PRINT_VAR(arma::size(lcurve.GetResults()))
+
   return 0;
 }
 
@@ -62,14 +65,15 @@ int boot_( const size_t id,
   data::classification::oml::Dataset dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*                                             (1,1,size_t(dataset.size_*0.9)); */
+  const arma::irowvec Ns = arma::regspace<arma::irowvec>
+                                              (1,1,size_t(dataset.size_*0.9));
 
+  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
   src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
   lcurve.Bootstrap(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
- 
+  PRINT_VAR(arma::size(lcurve.GetResults()))
   return 0;
 }
 
@@ -91,7 +95,8 @@ int hptboot_( const size_t id,
                    mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
                    args...);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
- 
+  PRINT_VAR(arma::size(lcurve.GetResults()))
+
   return 0;
 }
 
@@ -105,13 +110,15 @@ int add_( const size_t id,
 
   mlpack::RandomSeed(seed);
 
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-    /* (1,1,size_t(dataset.size_*0.9)); */
+  const arma::irowvec Ns = arma::regspace<arma::irowvec>
+    (1,1,size_t(dataset.size_*0.9));
 
+  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
   src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
   lcurve.Additive(dataset,
                   arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+  PRINT_VAR(arma::size(lcurve.GetResults()))
  
   return 0;
 }
@@ -135,6 +142,7 @@ int hptadd_( const size_t id,
                    mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
                    args...);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+  PRINT_VAR(arma::size(lcurve.GetResults()))
  
   return 0;
 }
@@ -152,10 +160,12 @@ int split_( const size_t id,
 
   data::StratifiedSplit(dataset,trainset,testset,lcdb::splitsize);
 
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*   (1,1,size_t(trainset.size_*0.9)); */
+  const arma::irowvec Ns = arma::regspace<arma::irowvec>
+    (1,1,size_t(trainset.size_*0.9));
 
+  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
   src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+
   lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
  
@@ -176,14 +186,15 @@ int hptsplit_( const size_t id,
 
   data::StratifiedSplit(dataset,trainset,testset,lcdb::splitsize);
 
-  const arma::irowvec Ns = arma::regspace<arma::irowvec>
-    (10,1,size_t(trainset.size_*0.9));
+  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
+  /*   (10,1,size_t(trainset.size_*0.9)); */
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(Ns,nreps,lcdb::vsize, true,true);
+  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true);
   lcurve.Split(trainset,testset,
                mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
                args...);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
+  PRINT(arma::size(lcurve.GetResults()))
  
   return 0;
 }
