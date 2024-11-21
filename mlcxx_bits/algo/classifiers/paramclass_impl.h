@@ -71,9 +71,7 @@ void LDC<T>::Train ( const arma::Mat<T>& inputs,
       inx = std::get<0>(extract);
       means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
       if ( inx.n_cols == 1 )
-      {
         covs_[*it] = arma::eye<arma::Mat<T>>(dim_,dim_);
-      }
       else
       {
         covs_[*it] = arma::cov(inx.t());
@@ -112,7 +110,6 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
       {
-  
         probs(class_(unique_(c)),n) = std::log(priors_(c)) 
                        -  0.5*arma::dot(means_.at(unique_(c))*
                         cov_, means_.at(unique_(c)))
@@ -241,14 +238,14 @@ void QDC<T>::Classify ( const arma::Mat<T>& inputs,
   {
     arma::Row<T> norm;
 
-    #pragma omp parallel for
+    /* #pragma omp parallel for */
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
       {
         norm = inputs.col(n).t() - means_.at(unique_(c));
         probs(class_(unique_(c)),n) = std::log(priors_(c)) 
-                  -  0.5*arma::det(covs_.at(unique_(c)))
+                  -  0.5*(arma::det(covs_.at(unique_(c)))+inputs.n_rows*std::log(2*arma::datum::pi))
                   - 0.5* arma::dot(norm*icovs_.at(unique_(c)),norm);
       }
       labels(n) = class_(probs.col(n).index_max());

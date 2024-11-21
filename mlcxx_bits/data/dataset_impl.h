@@ -38,8 +38,11 @@ void Dataset<T>::Generate ( const double& scale,
                             const std::string& type )
 {
   inputs_ = arma::mvnrnd(mean_,cov_,size_);
+  /* inputs_ = arma::randu(dimension_,size_); */
   if (type == "Linear")
     labels_ = scale*(arma::ones<arma::Mat<T>>(dimension_)).t()*inputs_+phase;
+  if (type == "-1/1")
+    labels_ = arma::randi<arma::Row<DTYPE>>(size_,arma::distr_param(-1,1));
   else if (type == "RandomLinear")
   {
     auto a=arma::randn<arma::Col<T>>(dimension_,
