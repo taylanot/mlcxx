@@ -17,6 +17,7 @@
 #include "utils/progress.h"
 #include "utils/convert.h"
 #include "utils/curl.h"
+#include "utils/xval.h"
 
 /* #include "utils/root.h" */
 /* #include "utils/deriv.h" */

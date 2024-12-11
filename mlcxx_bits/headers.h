@@ -108,6 +108,7 @@ const std::filesystem::path EXP_PATH = MLCXX_PATH.parent_path()/".exp";
 // local
 #include "utils/utils.h"
 #include "data/data.h"
+#include "xval/xval.h"
 
 #include "opt/opt.h"
 #include "stats/stats.h"

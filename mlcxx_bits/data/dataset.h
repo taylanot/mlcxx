@@ -24,6 +24,7 @@ public:
   arma::Mat<T> labels_;
 
   Dataset ( ) { };
+
   Dataset ( const size_t& D,
             const size_t& N );
 

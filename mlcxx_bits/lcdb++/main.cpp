@@ -23,8 +23,8 @@ int rand_( const size_t id,
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
                                               (1,1,size_t(dataset.size_*0.9));
 
-  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
-  src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+  src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true);
+  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
   lcurve.RandomSet(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
@@ -68,8 +68,8 @@ int boot_( const size_t id,
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
                                               (1,1,size_t(dataset.size_*0.9));
 
-  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
-  src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+  src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true);
+  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
   lcurve.Bootstrap(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
@@ -113,8 +113,8 @@ int add_( const size_t id,
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
     (1,1,size_t(dataset.size_*0.9));
 
-  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
   src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
   lcurve.Additive(dataset,
                   arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
@@ -163,8 +163,8 @@ int split_( const size_t id,
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
     (1,1,size_t(trainset.size_*0.9));
 
-  /* src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true); */
-  src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true);
+  src::LCurve<MODEL,LOSS> lcurve(Ns,nreps,true,true);
+  /* src::LCurve<MODEL,LOSS> lcurve(lcdb::Ns,nreps,true,true); */
 
   lcurve.Split(trainset,testset,arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
