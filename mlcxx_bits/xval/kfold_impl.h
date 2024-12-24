@@ -258,10 +258,12 @@ arma::Row<T> KFoldCV<MLAlgorithm,
   arma::Row<T> evaluations(k);
 
   size_t numInvalidScores = 0;
-  for (size_t i = 0; i < k; ++i)
+  for (size_t i = 0; i < k; i++)
   {
-    MLAlgorithm&& model  = base.Train(GetTrainingSubset(xs, i),
-        GetTrainingSubset(ys, i), args...);
+    auto inp = GetTrainingSubset(xs, i);
+    auto lab = GetTrainingSubset(ys, i);
+    MLAlgorithm&& model  = base.Train(inp, lab, args...);
+
     evaluations(i) = Metric::Evaluate(model, GetValidationSubset(xs, i),
         GetValidationSubset(ys, i));
     if (std::isnan(evaluations(i)) || std::isinf(evaluations(i)))

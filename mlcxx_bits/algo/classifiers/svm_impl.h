@@ -47,9 +47,9 @@ SVM<KERNEL,SOLVER,T>::SVM ( const arma::Mat<T>& inputs,
 template<class KERNEL,size_t SOLVER,class T>
 template<class... Args>
 SVM<KERNEL,SOLVER,T>::SVM ( const arma::Mat<T>& inputs,
-                     const arma::Row<size_t>& labels,
-                     const size_t& num_class,
-                     const Args&... args ) :
+                            const arma::Row<size_t>& labels,
+                            const size_t& num_class,
+                            const Args&... args ) :
                       nclass_(num_class), C_(T(1.0)), cov_(args...)
 {
   ulab_ = arma::unique(labels);
@@ -71,7 +71,7 @@ SVM<KERNEL,SOLVER,T>::SVM ( const arma::Mat<T>& inputs,
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
-                            const arma::Row<size_t>& y )
+                                   const arma::Row<size_t>& y )
 {
   if (solver_ == "QP")
     _QP(X,y);
@@ -84,7 +84,8 @@ void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
 }
 
 template<class KERNEL,size_t SOLVER,class T>
-std::pair<int,int> SVM<KERNEL,SOLVER,T>::_selectset ( arma::Row<T> G, arma::Mat<T> Q )
+std::pair<int,int> SVM<KERNEL,SOLVER,T>::_selectset ( arma::Row<T> G,
+                                                      arma::Mat<T> Q )
 {
   size_t len = y_.n_elem;
 
@@ -294,7 +295,7 @@ size_t SVM<KERNEL,SOLVER,T>::_geti ( size_t j, size_t N )
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::_QP ( const arma::Mat<T>& X,
-                          const arma::Row<size_t>& y )
+                                 const arma::Row<size_t>& y )
 {
   /* ulab_ = arma::unique(y); */
   /* BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0, */
@@ -339,7 +340,7 @@ void SVM<KERNEL,SOLVER,T>::_QP ( const arma::Mat<T>& X,
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
-                               arma::Row<size_t>& preds ) 
+                                      arma::Row<size_t>& preds ) 
 {
   if (!oneclass_)
   {
@@ -360,8 +361,8 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
-                               arma::Row<size_t>& preds,
-                               arma::Mat<T>& probs ) 
+                                      arma::Row<size_t>& preds,
+                                      arma::Mat<T>& probs ) 
 {
   arma::Mat<T> dec_func;
   if (!oneclass_)
@@ -378,7 +379,6 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
         preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
         probs.row(0) = 1. / (1. + arma::exp(dec_func));
         probs.row(1) = 1 - probs.row(0);
-        /* probs = (dec_func - arma::min(dec_func,1).eval()(0,0))  / (arma::max(dec_func,1) - arma::min(dec_func,1)).eval()(0,0); */
       }
       else
       {
@@ -400,7 +400,7 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
 
 template<class KERNEL,size_t SOLVER,class T>
 T SVM<KERNEL,SOLVER,T>::ComputeError ( const arma::Mat<T>& points, 
-                                const arma::Row<size_t>& responses ) 
+                                       const arma::Row<size_t>& responses ) 
 {
   arma::Row<size_t> predictions;
   Classify(points,predictions);
@@ -410,7 +410,7 @@ T SVM<KERNEL,SOLVER,T>::ComputeError ( const arma::Mat<T>& points,
 
 template<class KERNEL,size_t SOLVER,class T>
 T SVM<KERNEL,SOLVER,T>::ComputeAccuracy ( const arma::Mat<T>& points, 
-                                   const arma::Row<size_t>& responses )
+                                          const arma::Row<size_t>& responses )
 {
   return (1. - ComputeError(points, responses));
 }

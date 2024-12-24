@@ -55,7 +55,7 @@ namespace lcdb
 
   // Where to save the experiments
   /* static const std::filesystem::path path = EXP_PATH/"lcdb++"; */
-  static const std::filesystem::path path = "lcdb++";
+  static const std::filesystem::path path = "lcdb++_end_add";
   // Number of instance limit 
   static const size_t nlim = 2000;
   // Number of features limit 

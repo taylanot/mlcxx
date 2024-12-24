@@ -26,10 +26,10 @@ class SVM
    * @param num_class : number of classes
    * @param args      : kernel parameters
    */
-  template<class... Args>
-  SVM ( const size_t& num_class,
-        const Args&... args ) : C_(T(1.)), cov_(args...), oneclass_(false)
-  { };
+  /* template<class... Args> */
+  /* SVM ( const size_t& num_class, */
+  /*       const Args&... args ) : C_(T(1.)), cov_(args...), oneclass_(false) */
+  /* { }; */
 
   /**
    * @param num_class : number of classes
@@ -139,8 +139,8 @@ private:
   size_t nclass_;
   T C_;
   utils::covmat<KERNEL> cov_;
-  const arma::Mat<T>* X_;
   arma::Row<int> y_;
+  const arma::Mat<T>* X_;
   arma::Row<size_t> ulab_;
   arma::Row<T> alphas_;
   arma::Row<T> old_alphas_;

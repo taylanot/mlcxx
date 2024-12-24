@@ -58,6 +58,13 @@ public:
 
   /**
    * @param inputs  : input data, X
+   * @param preds   : prediction of labels of the input, \hat{y}
+   */ 
+  void Classify( const arma::Mat<O>& inputs, arma::Row<size_t>& preds );
+
+
+  /**
+   * @param inputs  : input data, X
    * @param labels  : labels of the input, y
    */ 
   O ComputeError( const arma::Mat<O>& inputs, const arma::Mat<O>& labels );

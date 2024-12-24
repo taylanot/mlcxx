@@ -200,7 +200,7 @@ class KFoldCV
            typename = void>
   void Shuffle ( );
 
- private:
+ public:
   //! An auxiliary object.
   Base base;
 
@@ -268,7 +268,7 @@ public:
            typename = void>
   arma::Row<T> TrainAndEvaluate ( const MLAlgorithmArgs& ...mlAlgorithmArgs );
 
-private:
+public:
   /**
    * Calculate the index of the first column of the ith validation subset.
    *
