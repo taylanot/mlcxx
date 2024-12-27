@@ -74,7 +74,7 @@ using NB    = mlpack::NaiveBayesClassifier<>;
 /* int main ( int argc, char** argv ) */
 /* { */
 /*   size_t did = 11; */
-/*   std::filesystem::path dir = EXP_PATH/"17_12_24/mxval"/(std::to_string(did))/"ks/lreg"; */
+/*   std::filesystem::path dir = EXP_PATH/"17_12_24/mxval"/(std::to_string(did))/"ks/ann"; */
 /*   std::filesystem::create_directories(dir); */
 /*   Dataset dataset(did); */
 
@@ -84,7 +84,7 @@ using NB    = mlpack::NaiveBayesClassifier<>;
 /*   for (size_t i=0; i<ks.n_elem; i++) */
 /*     std::filesystem::create_directories(dir/(std::to_string(ks[i]))); */
 
-/*   size_t rep = 1000; */
+/*   size_t rep = 100; */
 /*   #pragma omp parallel for collapse(2) */
 /*   for (size_t i=0; i<ks.n_elem; i++) */
 /*     for (size_t j=0; j<rep; j++) */
@@ -95,28 +95,101 @@ using NB    = mlpack::NaiveBayesClassifier<>;
 /*     } */
 /* } */
 
-/* // multiple-cross validation procedure for one given model */
-int main ( int argc, char** argv )
-{
-  Dataset dataset(2,5,2);
-  dataset.Generate("Simple");
+/* template<typename RowType, typename MatType> */
+/* void OneHotEncoding(const RowType& labelsIn, */
+/*                     MatType& output) */
+/* { */
+/*   arma::Row<size_t> ulabels = arma::unique(labelsIn); */
+/*   std::unordered_map<typename MatType::elem_type, size_t> labelMap; */
+/*   // Here we loop over the unique indeces and fill the labelMap */
+/*   for (size_t i = 0; i < ulabels.n_elem ; ++i) */
+/*       labelMap[i] = ulabels[i]; */
 
-  mlpack::RandomSeed(SEED);
-  xval::KFoldCV<LREG, mlpack::Accuracy> xv(2, dataset.inputs_, dataset.labels_,true);
-  mlpack::RandomSeed(SEED);
-  xval::KFoldCV<QDC, mlpack::Accuracy> xv2(2, dataset.inputs_, dataset.labels_,true);
-  PRINT_VAR(xv.xs);
-  PRINT_VAR(xv.GetTrainingSubset(xv.xs,0));
-  PRINT_VAR(xv2.xs);
-  PRINT_VAR(xv2.GetTrainingSubset(xv2.xs,0));
-}
+/*   // Resize output matrix to necessary size, and fill it with zeros. */
+/*   output.zeros(ulabels.n_elem, labelsIn.n_elem); */
+/*   // Fill ones in at the required places. */
+/*   for (size_t i = 0; i < labelsIn.n_elem; ++i) */
+/*     output(labelMap[labelsIn[i]], i) = 1; */
+/* } */
+
+/* template<class O=DTYPE> */
+/* arma::Mat<O> OneHotEncode( const arma::Row<size_t>& labels, */
+/*                            const arma::Row<size_t>& ulabels ) */
+/* { */
+/*   size_t i=0; */
+/*   return arma::Mat<O>(ulabels.n_elem, labels.n_elem). */
+/*     each_col( [&](arma::vec& col){col(ulabels[labels[i++]])=1.;} ); */
+/* } */
+
+/* template<class O=DTYPE> */
+/* arma::Row<size_t> OneHotDecode( const arma::Mat<O>& labels, */
+/*                                 const arma::Row<size_t>& ulabels ) */
+/* { */
+/*   return ulabels.cols(arma::index_max(labels,0)); */
+/* } */
+
+/* // multiple-cross validation procedure for one given model */
+/* int main ( int argc, char** argv ) */
+/* { */
+/*   size_t did = 11; */
+/*   OpenML dataset(did); */
+
+/*   arma::mat oneHot, temp; */
+/*   OneHotEncoding(dataset.labels_, oneHot); */
+/*   PRINT_VAR(dataset.labels_.cols(0,5)); */
+/*   PRINT_VAR(oneHot.cols(0,5)); */
+/* } */
 
 /* int main ( int argc, char** argv ) */
 /* { */
-/*   mlpack::RandomSeed(123); // Set a specific random seed. */
-/*   PRINT_VAR(arma::randn(1)); */
-/*   PRINT_VAR(arma::randn(1)); */
-/*   mlpack::RandomSeed(124); // Set a specific random seed. */
-/*   PRINT_VAR(arma::randn(1)); */
-/*   PRINT_VAR(arma::randn(1)); */
+/*   size_t did = 11; */
+/*   OpenML dataset(did); */
+
+/*   arma::mat oneHot, temp; */
+/*   PRINT(dataset.labels_.cols(0,5)); */
+/*   oneHot = OneHotEncode(dataset.labels_, arma::unique(dataset.labels_).eval()).cols(0,5); */
+/*   PRINT(oneHot) */
+/*   arma::Row<size_t> labels = OneHotDecode(oneHot, arma::unique(dataset.labels_)); */
+/*   PRINT(labels) */
+/*   /1* PRINT_VAR(dataset.labels_.cols(0,5)); *1/ */
+/*   /1* PRINT_VAR(oneHot.cols(0,5)); *1/ */
 /* } */
+
+// multiple-cross validation procedure for one given model
+int main ( int argc, char** argv )
+{
+  size_t did = 11;
+  OpenML dataset(did);
+  std::filesystem::path dir = EXP_PATH/"17_12_24/mxval"/(std::to_string(did))/"ks/ann";
+  std::filesystem::create_directories(dir);
+
+  typedef mlpack::FFN<mlpack::CrossEntropyError,mlpack::HeInitialization> Network;
+
+  Network network;
+  network.Add<mlpack::Linear>(16); 
+  network.Add<mlpack::ReLU>();                       
+  network.Add<mlpack::Linear>(3);  
+  network.Add<mlpack::Softmax>();  
+
+
+  algo::ANN<Network> model(dataset.inputs_, dataset.labels_,&network,false);
+  arma::Row<size_t> pred;
+  model.Classify(dataset.inputs_,pred);
+
+  mlpack::Accuracy metric;
+  PRINT(metric.Evaluate(model,dataset.inputs_,dataset.labels_));
+  /* for (size_t i=0; i<ks.n_elem; i++) */
+  /*   std::filesystem::create_directories(dir/(std::to_string(ks[i]))); */
+
+  /* size_t rep = 10; */
+  /* #pragma omp parallel for collapse(2) */
+  /* for (size_t i=0; i<ks.n_elem; i++) */
+  /*   for (size_t j=0; j<rep; j++) */
+  /*   { */
+  /*     LOG("ks :  "<<ks[i]); */
+  /*     xval::KFoldCV<NN, mlpack::Accuracy> xv(ks[i], dataset.inputs_, dataset.labels_,true); */
+  /*     xv.TrainAndEvaluate(&network).save(dir/(std::to_string(ks[i]))/(std::to_string(j)+".csv"),arma::csv_ascii); */
+  /*   } */
+}
+
+
