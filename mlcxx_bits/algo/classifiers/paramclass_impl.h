@@ -106,6 +106,7 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
   }
   else
   {
+    #pragma omp parallel for 
     for ( size_t n=0; n<inputs.n_cols; n++ ) 
     {
       for ( size_t c=0; c<unique_.n_elem; c++ )
@@ -116,8 +117,8 @@ void LDC<T>::Classify ( const arma::Mat<T>& inputs,
                     + arma::dot(inputs.col(n).t()*cov_,means_.at(unique_(c)));
       }
       labels(n) = class_(probs.col(n).index_max());
-      
     }
+
     probs = arma::exp(probs.each_row() - arma::max(probs,0));
     probs = probs.each_row()/arma::sum(probs,0);
   }

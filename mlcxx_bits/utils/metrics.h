@@ -14,6 +14,44 @@
 
 namespace utils {
 //=============================================================================
+// LogLossRaw : Only binary classification task, see cross entropy for multi-class
+//=============================================================================
+class LogLossRaw 
+{
+public:
+  /**
+   * Run classification and calculate cross-entropy loss.
+   *
+   * @param model A classification model.
+   * @param data Column-major data containing test items.
+   * @param labels Ground truth (correct) labels for the test items.
+   */
+  template<typename MLAlgorithm,
+           typename DataType,
+           typename LabelType,
+           class O=DTYPE>
+  static O Evaluate( MLAlgorithm& model,
+                     const DataType& data,
+                     const LabelType& labels )
+  {
+    mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
+        "MSE::Evaluate()",
+        "responses");
+    LabelType preds;
+    arma::Mat<O> probs;
+    model.Classify(data, preds, probs);
+    BOOST_ASSERT_MSG((size_t) probs.n_rows == 2, 
+                      "LogLoss : Not binary classification." );
+    return -arma::accu( labels % arma::log(arma::max(probs,0))
+                      +(1.-labels)%arma::log(1.-arma::max(probs,0))
+                      ) /preds.n_cols;
+  }
+
+  static const bool NeedsMinimization = true;
+};
+
+
+//=============================================================================
 // LogLoss : Only binary classification task, see cross entropy for multi-class
 //=============================================================================
 class LogLoss 
@@ -40,12 +78,13 @@ public:
     LabelType preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
+    BOOST_ASSERT_MSG((size_t) probs.n_rows == 2, 
+                      "LogLoss : Not binary classification." );
     probs.clamp(std::numeric_limits<O>::epsilon(),
                 1.-std::numeric_limits<O>::epsilon());
     arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
-    probs = probs.rows(unq);
-    BOOST_ASSERT_MSG((size_t) probs.n_rows == 2, 
-                      "LogLoss : Not binary classification." );
+    /* probs = probs.rows(unq); */
+    
     /* LabelType labs = arma::clamp(labels,1.e-16,1.-1.e-16); */
     return -arma::accu( labels % arma::log(arma::max(probs,0))
                       +(1.-labels)%arma::log(1.-arma::max(probs,0))

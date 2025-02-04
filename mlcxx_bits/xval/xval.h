@@ -8,7 +8,7 @@
 #define XVAL_H
 
 #include "xval/kfold.h"
-/* #include "xval/corentropy.h" */
+/* #include "xval/xkfold.h" */
 
 #endif
 

@@ -180,7 +180,7 @@ class KFoldCV
 
  private:
   //! A short alias for CVBase.
-  using Base = mlpack::CVBase<MLAlgorithm,MatType,PredictionsType, WeightsType>;
+  using Base = mlpack::CVBase<MLAlgorithm,MatType,PredictionsType,WeightsType>;
 
  public:
   /**

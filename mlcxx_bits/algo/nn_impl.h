@@ -13,20 +13,20 @@ namespace algo {
 
 
 
-template<class NET,class OPT,class MET,class O>
-template<class... OptArgs>
-ANN<NET,OPT,MET,O>::ANN ( NET* network, bool early, const OptArgs&... args ) 
-{
-  network_ = network;
-  early_ = early;
-  opt_ = std::make_unique<OPT>(args...);
-}
+/* template<class NET,class OPT,class MET,class O> */
+/* template<class... OptArgs> */
+/* ANN<NET,OPT,MET,O>::ANN ( NET* network, bool early, const OptArgs&... args ) */ 
+/* { */
+/*   network_ = network; */
+/*   early_ = early; */
+/*   opt_ = std::make_unique<OPT>(args...); */
+/* } */
 
 template<class NET,class OPT,class MET,class O>
 template<class... OptArgs>
 ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
                           const arma::Mat<O>& labels,
-                          NET* network, bool early, const OptArgs&... args ) 
+                          const NET network, bool early, const OptArgs&... args ) 
 
 {
   network_ = network;
@@ -39,7 +39,7 @@ template<class NET,class OPT,class MET,class O>
 template<class... OptArgs>
 ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
                           const arma::Row<size_t>& labels,
-                          NET* network, bool early, const OptArgs&... args ) 
+                          const NET network, bool early, const OptArgs&... args ) 
 
 {
   network_ = network;
@@ -47,6 +47,35 @@ ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
   opt_ = std::make_unique<OPT>(args...);
   Train(inputs,labels);
 }
+
+template<class NET,class OPT,class MET,class O>
+template<class... OptArgs>
+void ANN<NET,OPT,MET,O>::Train ( const arma::Mat<O>& inputs,
+                                 const arma::Row<size_t>& labels,
+                                 const NET network, bool early,
+                                 const OptArgs&... args ) 
+
+{
+  network_ = network;
+  early_ = early;
+  opt_ = std::make_unique<OPT>(args...);
+  Train(inputs,labels);
+}
+
+template<class NET,class OPT,class MET,class O>
+template<class... OptArgs>
+void ANN<NET,OPT,MET,O>::Train ( const arma::Mat<O>& inputs,
+                                 const arma::Mat<O>& labels,
+                                 const NET network, bool early,
+                                 const OptArgs&... args ) 
+
+{
+  network_ = network;
+  early_ = early;
+  opt_ = std::make_unique<OPT>(args...);
+  Train(inputs,labels);
+}
+
 template<class NET,class OPT,class MET,class O>
 void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
                                 const arma::Mat<O>& labels ) 
@@ -54,10 +83,10 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
   // Safety Net for learning curve generation from scratch,
   // but you might want to start from a trained model. So future modification
   // might be needed...
-  if (network_->Parameters().n_elem != 0)
-    network_->Reset();
+  if (network_.Parameters().n_elem != 0)
+    network_.Reset();
   if (!early_)
-    network_->Train(inputs,labels,*opt_);
+    network_.Train(inputs,labels,*opt_);
   else
   {
     arma::Mat<O> inp,lab,val_inp,val_lab;
@@ -68,12 +97,12 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
     auto func = [&](const arma::Mat<O>& inputs )
     {
       arma::Mat<O> pred;
-      network_->Predict(val_inp, pred);
+      network_.Predict(val_inp, pred);
       return MET::Evaluate(pred, val_lab)/pred.n_cols;
     };
 
     ens::EarlyStopAtMinLossType<arma::Mat<O>> stop(func,5);
-    network_->Train(inp,lab,*opt_,stop);
+    network_.Train(inp,lab,*opt_,stop);
 
   }
 }
@@ -90,10 +119,10 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
   // Safety Net for learning curve generation from scratch,
   // but you might want to start from a trained model. So future modification
   // might be needed...
-  if (network_->Parameters().n_elem != 0)
-    network_->Reset();
+  if (network_.Parameters().n_elem != 0)
+    network_.Reset();
   if (!early_)
-    network_->Train(inputs,convlabels,*opt_);
+    network_.Train(inputs,convlabels,*opt_);
   else
   {
     arma::Mat<O> inp,lab,val_inp,val_lab;
@@ -104,12 +133,12 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
     auto func = [&](const arma::Mat<O>& inputs )
     {
       arma::Mat<O> pred;
-      network_->Predict(val_inp, pred);
+      network_.Predict(val_inp, pred);
       return MET::Evaluate(pred, val_lab)/pred.n_cols;
     };
 
     ens::EarlyStopAtMinLossType<arma::Mat<O>> stop(func,5);
-    network_->Train(inp,lab,*opt_,stop);
+    network_.Train(inp,lab,*opt_,stop);
 
   }
 }
@@ -118,7 +147,7 @@ template<class NET,class OPT,class MET,class O>
 void ANN<NET,OPT,MET,O>::Predict( const arma::Mat<O>& inputs,
                                   arma::Mat<O>& preds )
 {
-  network_->Predict(inputs,preds);
+  network_.Predict(inputs,preds);
 }
 
 template<class NET,class OPT,class MET,class O>
@@ -126,7 +155,7 @@ void ANN<NET,OPT,MET,O>::Classify( const arma::Mat<O>& inputs,
                                    arma::Row<size_t>& preds )
 {
   arma::Mat<O> temp;
-  network_->Predict(inputs,temp);
+  network_.Predict(inputs,temp);
 
   preds = _OneHotDecode(temp,ulab_);
 }
@@ -136,7 +165,7 @@ O ANN<NET,OPT,MET,O>::ComputeError( const arma::Mat<O>& inputs,
                                     const arma::Mat<O>& labels )
 {
   arma::Mat<O> preds;
-  network_->Predict(inputs,preds);
+  network_.Predict(inputs,preds);
   return MET::Evaluate(preds, labels)/preds.n_elem;
 }
 

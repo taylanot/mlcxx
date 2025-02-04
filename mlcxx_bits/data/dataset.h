@@ -177,6 +177,10 @@ struct Dataset
   arma::Row<size_t> labels_;
 
   Dataset ( ) { } ;
+
+  Dataset ( const arma::Mat<T>& inputs,
+            const arma::Row<size_t>& labels );
+
   Dataset ( const size_t& D,
             const size_t& N,
             const size_t& Nc );

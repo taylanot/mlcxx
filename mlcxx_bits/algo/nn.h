@@ -31,8 +31,8 @@ public:
    * @param network : pointer to the network object
    * @param args    : optimizer arguments in the given order
    */
-  template<class... OptArgs>
-  ANN ( NET* network, bool early = false, const OptArgs&... args );
+  /* template<class... OptArgs> */
+  /* ANN ( NET* network, bool early = false, const OptArgs&... args ); */
 
   /**
    * @param inputs  : input data, X
@@ -43,16 +43,25 @@ public:
   template<class... OptArgs>
   ANN ( const arma::Mat<O>& inputs,
         const arma::Mat<O>& labels,
-        NET* network, bool early = false, const OptArgs&... args ) ;
+        const NET network, bool early = false, const OptArgs&... args ) ;
+
   template<class... OptArgs>
   ANN ( const arma::Mat<O>& inputs,
         const arma::Row<size_t>& labels,
-        NET* network, bool early = false, const OptArgs&... args ) ;
+        const NET network, bool early = false, const OptArgs&... args ) ;
   /**
    * @param inputs  : input data, X
    * @param labels  : labels of the input, y
    */
   void Train( const arma::Mat<O>& inputs, const arma::Mat<O>& labels );
+
+  template<class... OptArgs>
+  void Train( const arma::Mat<O>& inputs, const arma::Mat<O>& labels,
+              const NET network, bool early = false, const OptArgs&... args  );
+
+  template<class... OptArgs>
+  void Train( const arma::Mat<O>& inputs, const arma::Row<size_t>& labels,
+              const NET network, bool early = false, const OptArgs&... args  );
 
   void Train( const arma::Mat<O>& inputs, const arma::Row<size_t>& labels );
 
@@ -98,7 +107,8 @@ private:
   // A predefined network pointer. We have to define the network outside with
   // this construction. This gives more freedom on how you want to create your
   // network. Moreover, it gives you the flexibility to 
-  NET* network_; // network pointer
+  /* NET* network_; // network pointer */
+  NET network_; // network pointer
 
   bool early_; // Early stopping flag
                
@@ -112,5 +122,3 @@ private:
 #include "nn_impl.h"
 
 #endif
-
-

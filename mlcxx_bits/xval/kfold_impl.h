@@ -298,7 +298,7 @@ arma::Row<T> KFoldCV<MLAlgorithm,
                 WeightsType,T>::TrainAndEvaluate
                                             ( const MLAlgorithmArgs&... args )
 {
-  arma::vec evaluations(k);
+  arma::Row<DTYPE> evaluations(k);
 
   for (size_t i = 0; i < k; ++i)
   {

@@ -352,6 +352,13 @@ namespace classification {
 // Dataset
 //=============================================================================
 template<class T>
+Dataset<T>::Dataset ( const arma::Mat<T>& inputs,
+                      const arma::Row<size_t>& labels ) :
+                      size_(labels.n_elem), dimension_(inputs.n_rows),
+                      num_class_(arma::unique(labels).eval().n_elem),
+                      inputs_(inputs),
+                      labels_(labels) { }
+template<class T>
 Dataset<T>::Dataset ( const size_t& D,
                       const size_t& N,
                       const size_t& Nc ) :

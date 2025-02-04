@@ -18,8 +18,8 @@ int main ( int argc, char** argv )
   arma::wall_clock timer;
   timer.tic();
 
-  utils::data::regression::Dataset dataset(1, 1000);
-  dataset.Generate("Linear",0.5);
+  data::regression::Dataset dataset(1, 1000);
+  dataset.Generate(std::string("Linear"),0.5);
 
   arma::Row<size_t> bss = {24,32,128};
   arma::Row<double> lrs = {0.0001,0.001}; 
@@ -28,21 +28,20 @@ int main ( int argc, char** argv )
   NetworkType network;
   network.Add<mlpack::Linear>(1);
 
-  algo::ANN<NetworkType> model(&network,lrs[0],bss[0]);
 
   arma::irowvec Ns = arma::regspace<arma::irowvec>(10,10,100); 
   src::LCurveHPT<algo::ANN<NetworkType>, mlpack::MSE> 
-      LCHPT(Ns,10,0.2,false,false,true);
+      LCHPT(Ns,10,0.2,true);
 
   src::LCurve<algo::ANN<NetworkType>, mlpack::MSE> 
-      LC(Ns,10,false,false,true);
+      LC(Ns,10,false);
 
-  LCHPT.Bootstrap(dataset.inputs_,dataset.GetLabels(0),
-      mlpack::Fixed(&network),lrs,bss);
+  /* LCHPT.RandomSet(dataset.inputs_,dataset.GetLabels(0), */
+  /*     mlpack::Fixed(&network),lrs,bss); */
   /* LCHPT.test_errors_.save("lchpt.csv", arma::csv_ascii); */
 
-  LC.Bootstrap(dataset.inputs_,dataset.GetLabels(0),
-      &network,lrs[0],bss[0]);
+  LC.RandomSet(dataset.inputs_,dataset.GetLabels(0),
+      network,lrs[0],bss[0]);
 
   /* LC.test_errors_.save("lc.csv", arma::csv_ascii); */
 
