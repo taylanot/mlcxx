@@ -30,7 +30,7 @@ namespace xval {
  */
 template<typename MLAlgorithm,
          typename Metric,
-         typename MatType = arma::mat,
+         typename MatType = arma::Mat<DTYPE>,
          typename PredictionsType =
              typename mlpack::MetaInfoExtractor
                             <MLAlgorithm,MatType>::PredictionsType,

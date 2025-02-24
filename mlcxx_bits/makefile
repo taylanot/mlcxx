@@ -51,7 +51,8 @@ CXXFLAGS  += $(INCLFLAGS)
 
 
 # libraries needed for mlcxx library
-LIBS_NAME +=  armadillo boost_serialization boost_program_options highs curl #lapack #boost_iostreams
+# LIBS_NAME +=  armadillo boost_serialization boost_program_options highs curl #lapack #boost_iostreams
+LIBS_NAME +=  armadillo highs curl #lapack #boost_iostreams
 LIBS := $(addprefix -l,$(LIBS_NAME))
 
 # source files to be compiled (search recursively for .cpp files)

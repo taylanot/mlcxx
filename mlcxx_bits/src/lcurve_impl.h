@@ -29,6 +29,8 @@ LCurve<MODEL,LOSS,O>::LCurve ( const arma::irowvec& Ns,
 
 repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog)
 {
+  RegisterSignalHandler( );
+  globalSafeFailFunc = [this]() { this->CleanUp(); };
   test_errors_.resize(repeat_,Ns_.n_elem);
 }
 
@@ -62,7 +64,7 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
 
-  #pragma omp parallel for collapse(2) if(parallel_)
+  /* #pragma omp parallel for collapse(2) if(parallel_) */
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
     for(size_t j=0; j < size_t(repeat_); j++)
     {
@@ -217,7 +219,76 @@ void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
         pb.Update();
     }
   }
+}
 
+//=============================================================================
+// LCurve::CleanUp
+//=============================================================================     
+template<class MODEL,
+         class LOSS,class O>
+void LCurve<MODEL,LOSS,O>::CleanUp ( )
+{
+  LOG("CleanUp is called!");
+  Save("lcurve.bin");
+}
+
+//=============================================================================
+// LCurve::RegisterSignalHandler
+//=============================================================================     
+template<class MODEL,
+         class LOSS,class O>
+void LCurve<MODEL,LOSS,O>::RegisterSignalHandler( )
+{
+  signal(SIGALRM, LCurve<MODEL,LOSS,O>::SignalHandler);
+}
+
+//=============================================================================
+// LCurve::SignalHandler
+//=============================================================================     
+template<class MODEL,
+         class LOSS,class O>
+void LCurve<MODEL,LOSS,O>::SignalHandler( int sig )
+{
+  if (globalSafeFailFunc) globalSafeFailFunc();  
+  LOG("Time limit exceeded! Exiting...");
+  std::exit(0);
+}
+
+//=============================================================================
+// LCurve::Save
+//=============================================================================     
+template<class MODEL,
+         class LOSS,class O>
+void LCurve<MODEL,LOSS,O>::Save ( const std::string& filename )
+{
+  std::ofstream file(filename, std::ios::binary);
+  if (!file) 
+    ERR("Cannot open file for writing: " << filename);
+
+  cereal::BinaryOutputArchive archive(file);
+  archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
+  LOG("LCurve object saved to " << filename);
+}
+
+//=============================================================================
+// LCurve::Load
+//=============================================================================
+template<class MODEL,
+         class LOSS,class O>
+std::shared_ptr<LCurve<MODEL,LOSS,O>> LCurve<MODEL,LOSS,O>::Load
+                                              ( const std::string& filename )
+{
+  std::ifstream file(filename, std::ios::binary);
+  if (!file) 
+  {
+    ERR("Error: Cannot open file for reading: " << filename);
+    return nullptr;
+  }
+  cereal::BinaryInputArchive archive(file);
+  auto lcurve = std::make_shared<LCurve<MODEL,LOSS,O>>();
+  archive(cereal::make_nvp("Lcurve", *lcurve));  // Deserialize into a new object
+  LOG("TaskHandler loaded from " << filename);
+  return lcurve;
 }
 
 } // namespace src

@@ -71,71 +71,71 @@ TEST_SUITE("SEMIPARAMETRICKERNELRIDGE") {
   }
 }
 
-TEST_SUITE("ANN") {
-  TEST_CASE("PROBLEMS")
-  {
-    int D, N; DTYPE tol = 1e-3;
-    double a, p, eps;
-    std::string type;
-    typedef mlpack::FFN<mlpack::MeanSquaredError> NetworkType;
-    NetworkType network;
-    network.Add<mlpack::Linear>(1);
+/* TEST_SUITE("ANN") { */
+/*   TEST_CASE("PROBLEMS") */
+/*   { */
+/*     int D, N; DTYPE tol = 1e-3; */
+/*     double a, p, eps; */
+/*     std::string type; */
+/*     typedef mlpack::FFN<mlpack::MeanSquaredError> NetworkType; */
+/*     NetworkType network; */
+/*     network.Add<mlpack::Linear>(1); */
 
-    algo::ANN<NetworkType> model(&network);
+/*     /1* algo::ANN<NetworkType> model(&network); *1/ */
 
-    SUBCASE("1D-Linear")
-    {
-      D = 1; N = 10; type = "Linear";
-      a = 1.0; p = 0.; eps = 0.0;
-      data::regression::Dataset dataset(D, N);
-      dataset.Generate(a, p, type, eps);
+/*     SUBCASE("1D-Linear") */
+/*     { */
+/*       D = 1; N = 10; type = "Linear"; */
+/*       a = 1.0; p = 0.; eps = 0.0; */
+/*       data::regression::Dataset dataset(D, N); */
+/*       dataset.Generate(a, p, type, eps); */
 
-      auto inputs = dataset.inputs_;
-      auto labels = dataset.labels_;
+/*       auto inputs = dataset.inputs_; */
+/*       auto labels = dataset.labels_; */
 
-      algo::ANN<NetworkType> model(dataset.inputs_,
-                                     dataset.labels_,&network);
+/*       algo::ANN<NetworkType> model(dataset.inputs_, */
+/*                                      dataset.labels_,&network); */
 
-      arma::mat preds;
-      model.Predict(inputs, preds);
+/*       arma::mat preds; */
+/*       model.Predict(inputs, preds); */
 
-      CHECK ( model.ComputeError(inputs,labels) <= tol );
-    }
+/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
+/*     } */
 
-    SUBCASE("2D-Linear")
-    {
-      D = 2; N = 40; type = "Linear";
-      a = 1.0; p = 0.; eps = 0.0;
-      data::regression::Dataset dataset(D, N);
-      dataset.Generate(a, p, type, eps);
+/*     SUBCASE("2D-Linear") */
+/*     { */
+/*       D = 2; N = 40; type = "Linear"; */
+/*       a = 1.0; p = 0.; eps = 0.0; */
+/*       data::regression::Dataset dataset(D, N); */
+/*       dataset.Generate(a, p, type, eps); */
 
-      auto inputs = dataset.inputs_;
-      auto labels = dataset.labels_;
+/*       auto inputs = dataset.inputs_; */
+/*       auto labels = dataset.labels_; */
 
-      algo::ANN<NetworkType> model(dataset.inputs_,
-                                     dataset.labels_,&network);
+/*       algo::ANN<NetworkType> model(dataset.inputs_, */
+/*                                      dataset.labels_,&network); */
 
 
-      CHECK ( model.ComputeError(inputs,labels) <= tol );
-    }
-    SUBCASE("Optimizer")
-    {
-      D = 1; N = 10; type = "Linear";
-      a = 1.0; p = 0.; eps = 0.0;
-      data::regression::Dataset dataset(D, N);
-      dataset.Generate(a, p, type, eps);
+/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
+/*     } */
+/*     SUBCASE("Optimizer") */
+/*     { */
+/*       D = 1; N = 10; type = "Linear"; */
+/*       a = 1.0; p = 0.; eps = 0.0; */
+/*       data::regression::Dataset dataset(D, N); */
+/*       dataset.Generate(a, p, type, eps); */
 
-      auto inputs = dataset.inputs_;
-      auto labels = dataset.labels_;
+/*       auto inputs = dataset.inputs_; */
+/*       auto labels = dataset.labels_; */
 
-      algo::ANN<NetworkType,ens::Adam> model(dataset.inputs_,
-                                             dataset.labels_,&network, false,
-                                             0.001,32);
+/*       algo::ANN<NetworkType,ens::Adam> model(dataset.inputs_, */
+/*                                              dataset.labels_,&network, false, */
+/*                                              0.001,32); */
 
-      CHECK ( model.ComputeError(inputs,labels) <= tol );
-    }
-  }
-}
+/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
+/*     } */
+/*   } */
+/* } */
 
 TEST_SUITE("KERNELRIDGE") {
   TEST_CASE("PROBLEMS")

@@ -68,8 +68,6 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <numeric>
 #include <typeinfo>
 #include <iostream>
-/* #include <sstream> */
-/* #include <fstream> */
 #include <stdexcept>
 #include <algorithm>
 #include <filesystem>
@@ -79,7 +77,8 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <regex>
 #include <type_traits>
 #include <unordered_map>
-
+#include <unistd.h>
+#include <csignal>
 
 
 // Define some of the constants paths
@@ -94,6 +93,10 @@ const std::filesystem::path EXP_PATH = MLCXX_PATH.parent_path()/".exp";
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/binomial.hpp>
+#include <boost/math/special_functions/beta.hpp>
+#include <boost/math/distributions/empirical_cumulative_distribution_function.hpp>
+#include <boost/math/statistics/t_test.hpp>
+
 #include <boost/serialization/nvp.hpp>
 #include <boost/random.hpp>
 

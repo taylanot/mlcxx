@@ -9,6 +9,53 @@
 
 namespace stats {
 ///////////////////////////////////////////////////////////////////////////////
+//    Hypothesis Testing for Quantile differences
+//
+//    H0 : Q(qx)-P(qy) = delta
+//    H1A: Q(qx)-P(qy) < delta
+//    H1B: Q(qx)-P(qy) > delta
+//
+//    * 1-pvalue < alpha/2 -> accept H1B
+//    * pvalue < alpha/2   -> accept H1A
+//    * otherwise          -> accept H0
+//    References
+//    ----------
+//    [1]  Alan D. Hutson (2009). A distribution function estimator for 
+//            the difference of order statistics from two independent samples
+//    
+///////////////////////////////////////////////////////////////////////////////
+template<class VectorType=arma::Row<DTYPE>, class T=DTYPE>
+T qtest( T delta, const VectorType& x, const VectorType& y,
+         const T qx = 0.5, const T qy = 0.5 )
+{
+  using ECDF = 
+    boost::math::empirical_cumulative_distribution_function<std::vector<DTYPE>>;
+  ECDF F(arma::conv_to<std::vector<DTYPE>>::from(x));
+  // Get the sizes of the populations
+  size_t m = x.n_elem;
+  size_t n = y.n_elem;
+  // Get the order statistic rounded to the nearest integer 
+  size_t i = std::ceil(qx*m)-1;
+  size_t j = std::ceil(qy*n)-1;
+  // Combination calculator 
+  auto C = [](size_t a, size_t b) 
+    {return boost::math::binomial_coefficient<T>(a,b);};
+  auto beta = [](T x, T p, T q) 
+    {return boost::math::beta<T>(p,q,x);};
+  auto wj = [&C,&beta,&j,&n](T k) 
+    {return j*C(n,j)*(beta(k/n,j,n-j+1.)-beta((k-1.)/n,j,n-j+1.));};
+  /* auto wj = [&C,&beta](const T k,const T j, const T n) */ 
+  /*   {return j*C(n,j)*(beta(k/n,j,n-j+1.)-beta((k-1.)/n,j,n-j+1.));}; */
+  T sum = 0;
+  for (size_t k=1; k<=n; k++)
+  {
+    sum += beta(F(delta+y[k-1]),i,m-i+1.)*wj(k);
+  }
+  return i*C(m,i)*sum;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 //    rankdata
 //    * Ranks the data in a vector 
 //    * TODO: 
@@ -88,69 +135,7 @@ arma::rowvec _terms( const arma::rowvec& x, size_t k )
   }
   return res;  
 }
-/////////////////////////////////////////////////////////////////////////////////
-////    _cdf_cvm_inf
-////    * Calculate the exact p-value of the Cramer-von Mises two-sample test.
-/////////////////////////////////////////////////////////////////////////////////
-//double _exact_cvm_2samp_pval ( const double& s, const double& m, 
-//                               const double& n )
-//{
-//  double lcm, a , b, zeta, zeta_bnd, comb, max_gs;
-//
-//  lcm = std::lcm ((int) m, (int) n);
-//
-//  a = floor(lcm/m); b = floor(lcm/n);
-//  
-//  double exp1 = pow(lcm, 2) * (m + n) * (6 * s - (m*n) * ((4 * m *n) - 1));
-//  double exp2 = pow(6*m*n,2);
-//  zeta = floor( exp1 / exp2 );
-//
-//  zeta_bnd = pow(lcm,2) * (m+n);
-//
-//  comb = boost::math::factorial<double> (m+n) /
-//  ( boost::math::factorial<double> (m) *  boost::math::factorial<double> (n) );
-//
-//  max_gs = std::max( zeta_bnd, comb );
-//
-//    
-//  std::map<int, arma::imat> gs;
-//
-//  for( int i=0; i < m; i++ )
-//  { 
-//    arma::imat tmp;
-//    gs[i] = tmp;
-//  }
-//  arma::imat first = "0;1";
-//  gs[0] = first;
-//
-//  int g;
-//  arma::umat ind;
-//  int val;
-//
-//  for( int u=0; u < n+1; u++ )
-//  {
-//    arma::imat temp(2,1);
-//    
-//    for ( int v=0; v < m; v++ )
-//    {
-//      g = gs[v];
-//      if ( temp(0) == g(0) )
-//      {
-//        tmp = k
-//
-//
-//      //g = gs[v];
-//      //ind = arma::find(temp(0),g);
-//
-//
-//      //if (vi(0) == 0)
-//      //  temp = arma::join_rows(inter,tmp(k
-//    }
-//  }
-//
-//
-//  return 0;
-//}
+
 ///////////////////////////////////////////////////////////////////////////////
 //    _cdf_cvm_inf
 //    * Calculate the cdf of the Cramér-von Mises statistic. (Inf. sample size)

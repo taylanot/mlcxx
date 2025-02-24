@@ -8,10 +8,18 @@
 #define TEST_STATS_H
 
 TEST_SUITE("HYPOTHESIS") {
-  arma::rowvec b = {1,2,3,4};
+  using Vec = arma::Row<DTYPE>;
+  DTYPE alpha = 0.5;
   TEST_CASE("CramerVonMisses-2Sample_Approximaate")
   {
-    CHECK ( stats::cramervonmisses_2samp(b,b,"asymptotic") == 1. );
+    Vec v = {1,2,3,4};
+    CHECK ( stats::cramervonmisses_2samp(v,v,"asymptotic") == 1. );
+  }
+  TEST_CASE("qtest")
+  {
+    Vec x = arma::randu<arma::Row<DTYPE>>(10);
+    Vec y = arma::randu<arma::Row<DTYPE>>(10, arma::distr_param(1,2));
+    CHECK ( 1.-stats::qtest<Vec,double>(0,x,y) < alpha/2 );
   }
 }
 

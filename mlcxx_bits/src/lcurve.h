@@ -11,6 +11,8 @@
 
 namespace src {
 
+// Global function pointer this is for cleanup-related things.
+std::function<void()> globalSafeFailFunc;  
 //=============================================================================
 // LCurve 
 //=============================================================================
@@ -112,20 +114,49 @@ public:
   void Split ( const T& trainset,
                const T& testset,
                const Ts&... args );
-
-  /* Get the results of the learning curve generation
-   *
-   */
-
+ 
+  /* Get the results of the learning curve generation */
   arma::Mat<O> GetResults (  ) const  {return test_errors_;}
 
+  /* Serliazation with cereal for the class. */
+  template <class Archive>
+  void serialize(Archive& ar) 
+  {
+    ar( CEREAL_NVP(repeat_),
+        CEREAL_NVP(Ns_),
+        CEREAL_NVP(parallel_),
+        CEREAL_NVP(prog_),
+        CEREAL_NVP(loss_),
+        CEREAL_NVP(test_errors_));
+  }
+
+  /* Clean Up Method for the over-time processes */
+  void CleanUp( );
+
+  /* Save the object to a BinaryFile
+   *
+   * @param filename : binary file name
+   */
+  void Save ( const std::string& filename );
+
+  /* Registering the signal handler for some easy stopping. */
+  void RegisterSignalHandler ( );
+
+  /* Registering the signal handler for some easy stopping. */
+  static void SignalHandler ( int sig );
+
+  /* Load the object from a BinaryFile
+   *
+   * @param filename : binary file name
+   */
+  static std::shared_ptr<LCurve<MODEL,LOSS,O>> Load 
+                                              ( const std::string& filename ); 
+  
 private:
-  /* SPLIT split_; */
   size_t repeat_;
   arma::irowvec Ns_;
   bool parallel_;
   bool prog_;
-  arma::Mat<O> results_;
 
   LOSS loss_;
 
@@ -139,4 +170,3 @@ private:
 #include "lcurve_impl.h"
 
 #endif
-

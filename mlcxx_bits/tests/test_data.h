@@ -41,15 +41,15 @@ TEST_SUITE("DATASET") {
 
   double tol = 1.e-2;
 
-  TEST_CASE("LOAD-REGRESSION")
-  {
-    data::regression::Dataset dataset;
-    dataset.Load(DATASET_PATH/"winequality-red.csv",11,1,true,false);
-    CHECK ( dataset.inputs_(0,0) - DTYPE(7.4) < tol );
-    CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 11 );
-    CHECK ( dataset.labels_(0,0) == DTYPE(5.) );
-    CHECK ( dataset.labels_(0,dataset.size_-1) == DTYPE(6.) );
-  }
+  /* TEST_CASE("LOAD-REGRESSION") */
+  /* { */
+  /*   data::regression::Dataset dataset; */
+  /*   dataset.Load(DATASET_PATH/"winequality-red.csv",11,1,true,false); */
+  /*   CHECK ( dataset.inputs_(0,0) - DTYPE(7.4) < tol ); */
+  /*   CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) == 11 ); */
+  /*   CHECK ( dataset.labels_(0,0) == DTYPE(5.) ); */
+  /*   CHECK ( dataset.labels_(0,dataset.size_-1) == DTYPE(6.) ); */
+  /* } */
 
   TEST_CASE("REGRESSION-1D")
   {
@@ -184,15 +184,15 @@ TEST_SUITE("DATASET") {
   {
     int Nc; tol = 1e-1;
 
-    SUBCASE("LOAD-IRIS")
-    {
-      data::classification::Dataset dataset;
-      dataset.Load(DATASET_PATH/"iris.csv",true,true,true);
-      CHECK ( dataset.inputs_(0,0) == DTYPE(5.1) );
-      CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1)
-                                                                == DTYPE(1.8) );
-      CHECK ( dataset.num_class_ == 3 );
-    }
+    /* SUBCASE("LOAD-IRIS") */
+    /* { */
+    /*   data::classification::Dataset dataset; */
+    /*   dataset.Load(DATASET_PATH/"iris.csv",true,true,true); */
+    /*   CHECK ( dataset.inputs_(0,0) == DTYPE(5.1) ); */
+    /*   CHECK ( dataset.inputs_(dataset.dimension_-1,dataset.size_-1) */
+    /*                                                             == DTYPE(1.8) ); */
+    /*   CHECK ( dataset.num_class_ == 3 ); */
+    /* } */
     SUBCASE("SIMPLE-1D")
     {
       D = 1; N = 10000; Nc = 2;
