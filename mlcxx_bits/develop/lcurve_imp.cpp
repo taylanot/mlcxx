@@ -20,24 +20,26 @@ int main ( int argc, char** argv )
   std::filesystem::create_directories(path);
   std::filesystem::current_path(path);
 
-  arma::wall_clock timer;
-  timer.tic();
-  alarm(1);
+  /* auto loaded = src::LCurve<mlpack::LinearRegression<>,mlpack::MSE>::Load("LCurve.bin"); */
+  /* src::LCurve<mlpack::LinearRegression<>,mlpack::MSE> task = std::move(*loaded); */
+  /* std::cout << task.GetResults() << std::endl; */
 
-  size_t rep = 10000;
 
-  data::regression::Dataset dataset(3,100);
-  dataset.Generate("Linear");
+  /* arma::wall_clock timer; */
+  /* timer.tic(); */
+  /* alarm(1); */
 
-  /* dataset.Generate(std::string("RandomLinear"),.2); */
+  /* size_t rep = 10000; */
 
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,30);
+  /* data::regression::Dataset dataset(3,100); */
+  /* dataset.Generate("Linear"); */
 
-  src::LCurve<mlpack::LinearRegression<>,mlpack::MSE> lc(Ns,rep,true,true);
-  lc.Bootstrap(dataset.inputs_,dataset.labels_,true);
-  /* lc.test_errors_.save("pinv_"+std::to_string(Ds(i))+".csv",arma::csv_ascii); */
+  /* arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,30); */
 
-  PRINT_TIME(timer.toc());
+  /* src::LCurve<mlpack::LinearRegression<>,mlpack::MSE> lc(Ns,rep,true,true); */
+  /* lc.Bootstrap(dataset.inputs_,dataset.labels_,true); */
+
+  /* PRINT_TIME(timer.toc()); */
 
   return 0;
 }
@@ -93,7 +95,11 @@ int main ( int argc, char** argv )
 /*     { */
 /*       std::cout << "Task " << taskId << " started...\n"; */
 /*       data[0] = 1.; */
-/*       sleep(10); // Simulating a long-running task */
+/*       #pragma omp parallel for collapse(2) */
+/*       for (int i=0;i<100;i++) */
+/*         for (int j=0;j<100;j++) */
+/*           sleep(1); // Simulating a long-running task */
+                     
 /*       std::cout << "Task " << taskId << " completed!\n"; */
 /*     } */
 
@@ -143,29 +149,17 @@ int main ( int argc, char** argv )
 
 /* int main() */ 
 /* { */
-/*   /1* TaskHandler task(42); // Assigning a task ID *1/ */
-/*   /1* alarm(2); // Set a 5-second timeout *1/ */
-/*   /1* task.runTask(); // Start long-running task *1/ */
+/*   TaskHandler task(42); // Assigning a task ID */
+/*   alarm(2); // Set a 5-second timeout */
+/*   task.runTask(); // Start long-running task */
 
-/*   auto loaded = TaskHandler::loadFromBinary("name.bin"); */
-/*   TaskHandler task = std::move(*loaded); */
-/*   std::cout << "taskId: " << task.GetId() << std::endl; */
-/*   std::cout << "data: " << task.GetData() << std::endl; */
+/*   /1* auto loaded = TaskHandler::loadFromBinary("name.bin"); *1/ */
+/*   /1* TaskHandler task = std::move(*loaded); *1/ */
+/*   /1* std::cout << "taskId: " << task.GetId() << std::endl; *1/ */
+/*   /1* std::cout << "data: " << task.GetData() << std::endl; *1/ */
 
 
 /*   return 0; */
 /* } */
-
-
-/* /1* #include <armadillo> *1/ */
-/* /1* #define ARMA_USE_HDF5 *1/ */
-
-/* /1* int main() *1/ */ 
-/* /1* { *1/ */
-/* /1*   arma::Row<double> vec(10); *1/ */
-/* /1*   vec.save(arma::hdf5_name("vec.hdf5")); *1/ */
-
-/* /1*   return 0; *1/ */
-/* /1* } *1/ */
 
 

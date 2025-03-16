@@ -211,13 +211,14 @@ struct Dataset
               const bool count = false );
 };
 
+} // namespace classification
 
 namespace oml {
 
 //=============================================================================
 // Dataset
 //=============================================================================
-template<class T=DTYPE>
+template<class LTYPE=size_t, class T=DTYPE>
 class Dataset 
 {
 public:
@@ -233,7 +234,7 @@ private:
 
 public:
   arma::Mat<T> inputs_;
-  arma::Row<size_t> labels_;
+  arma::Row<LTYPE> labels_;
 
   Dataset ( ) { } ;
 
@@ -272,7 +273,6 @@ private:
 
 } // namesapce oml
 
-} // namespace classification
 
 } // namespace data
 

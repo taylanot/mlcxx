@@ -32,8 +32,8 @@ class LDC
                                                           lambda_(lambda) { } ;
 
   /**
-   * @param inputs  : X
-   * @param labels  : y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
    */
   LDC ( const arma::Mat<T>& inputs,
@@ -51,11 +51,11 @@ class LDC
         const size_t& num_class,
         const double& lambda );
    /**
-   * @param inputs  : X
-   * @param labels  : y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
-   * @param lambda  : regularization
-   * @param priors  : known priors
+   * @param lambda    : regularization
+   * @param priors    : known priors
    */
   LDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
@@ -69,6 +69,15 @@ class LDC
    */
   void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
+
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   */
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels,
+               const size_t num_class );
 
   /**
    * @param inputs  : X*
@@ -175,11 +184,11 @@ class QDC
         const size_t& num_class,
         const double& lambda );
    /**
-   * @param inputs  : X
-   * @param labels  : y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
-   * @param lambda  : regularization
-   * @param priors  : known priors
+   * @param lambda    : regularization
+   * @param priors    : known priors
    */
   QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
@@ -188,13 +197,13 @@ class QDC
         const arma::Row<T>& priors );
                                
   /**
-   * @param inputs  : X
-   * @param labels  : y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
    */
   QDC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
-        const size_t& num_class);
+        const size_t& num_class );
 
   /**
    * @param inputs  : X
@@ -202,6 +211,15 @@ class QDC
    */
   void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
+
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   */
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels,
+               const size_t num_class );
 
   /**
    * @param inputs  : X*

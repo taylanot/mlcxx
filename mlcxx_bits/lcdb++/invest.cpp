@@ -32,7 +32,7 @@ void report( const Dataset& dataset )
 // multiple-cross validation procedure for one given model
 int main ( int argc, char** argv )
 {
-  size_t did = 1046;
+  size_t did = 61;
   OpenML dataset(did);
   report (dataset);
   data::classification::Transformer scale(dataset);

@@ -84,6 +84,15 @@ void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
 }
 
 template<class KERNEL,size_t SOLVER,class T>
+void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
+                                   const arma::Row<size_t>& y,
+                                   const size_t num_class )
+{
+ this -> nclass_ = num_class;
+ this -> Train(X,y);
+
+}
+template<class KERNEL,size_t SOLVER,class T>
 std::pair<int,int> SVM<KERNEL,SOLVER,T>::_selectset ( arma::Row<T> G,
                                                       arma::Mat<T> Q )
 {

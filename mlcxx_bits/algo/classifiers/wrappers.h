@@ -84,6 +84,18 @@ class LogisticRegression
   }
 
   /**
+   * @param inputs  : X
+   * @param labels  : y
+   * @param num_class: number of classes
+   */
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels,
+               const size_t num_class ) 
+  {
+    this -> num_class_ = num_class;
+    this -> Train(inputs, labels);
+  }
+  /**
    * @param inputs  : X*
    * @param labels  : y*
    */

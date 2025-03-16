@@ -53,7 +53,8 @@ template<class KERNEL, class T>
 void KernelRidge<KERNEL,T>::Predict ( const arma::Mat<T>& inputs,
                                             arma::Row<T>& labels ) const
 {
-  arma::Mat<T> k_xpx = cov_.GetMatrix(inputs,train_inp_);
+
+  arma::Mat<T> k_xpx = cov_.GetMatrix(train_inp_,inputs);
   labels = (parameters_ * k_xpx );
 }
 

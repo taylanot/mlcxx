@@ -566,13 +566,15 @@ void Dataset<T>::Load ( const std::string& filename,
   }
 }
 
+} // namespace classification
+
 namespace oml
 {
 //=============================================================================
 // Dataset
 //=============================================================================
-template<class T>
-Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) : 
+template<class LTYPE,class T>
+Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path ) : 
   id_(id), path_(path)
 {
   std::filesystem::create_directories(filepath_);
@@ -604,8 +606,8 @@ Dataset<T>::Dataset( const size_t& id, const std::filesystem::path& path ) :
   }
 }
 
-template<class T>
-Dataset<T>::Dataset( const size_t& id ) : 
+template<class LTYPE,class T>
+Dataset<LTYPE,T>::Dataset( const size_t& id ) : 
   id_(id), path_(DATASET_PATH/"openml")
 {
   std::filesystem::create_directories(filepath_);
@@ -637,8 +639,8 @@ Dataset<T>::Dataset( const size_t& id ) :
   }
 }
 
-template<class T>
-bool Dataset<T>::_download( )
+template<class LTYPE,class T>
+bool Dataset<LTYPE,T>::_download( )
 {
     CURL* curl;
     CURLcode res;
@@ -683,8 +685,8 @@ bool Dataset<T>::_download( )
     return true;
 } 
 
-template<class T>
-std::string Dataset<T>::_fetchmetadata()
+template<class LTYPE,class T>
+std::string Dataset<LTYPE,T>::_fetchmetadata()
 {
   
   // Function to fetch metadata from OpenMLdd
@@ -724,8 +726,8 @@ std::string Dataset<T>::_fetchmetadata()
   return readBuffer;
 }
 
-template<class T>
-std::string Dataset<T>::_readmetadata()
+template<class LTYPE,class T>
+std::string Dataset<LTYPE,T>::_readmetadata()
 {
   std::ifstream infile(metafile_);
   if (!infile.is_open())
@@ -739,8 +741,8 @@ std::string Dataset<T>::_readmetadata()
   return buffer.str();
 }
 
-template<class T>
-std::string Dataset<T>::_gettargetname( const std::string& metadata )
+template<class LTYPE,class T>
+std::string Dataset<LTYPE,T>::_gettargetname( const std::string& metadata )
 {
   // Define a regular expression to find the <default_target_value> element
   std::regex re(R"(<oml:default_target_attribute>(.*?)</oml:default_target_attribute>)");
@@ -758,8 +760,8 @@ std::string Dataset<T>::_gettargetname( const std::string& metadata )
   }
 }
 
-template<class T>
-std::string Dataset<T>::_getdownurl( const std::string& metadata )
+template<class LTYPE,class T>
+std::string Dataset<LTYPE,T>::_getdownurl( const std::string& metadata )
 {
   // Define a regular expression to find the <default_target_value> element
   std::regex re(R"(<oml:url>(.*?)</oml:url>)");
@@ -778,8 +780,8 @@ std::string Dataset<T>::_getdownurl( const std::string& metadata )
   }
 }
 
-template<class T>
-int Dataset<T>::_findlabel ( const std::string& targetname )
+template<class LTYPE,class T>
+int Dataset<LTYPE,T>::_findlabel ( const std::string& targetname )
 {
   std::ifstream file(file_);
   std::string line;
@@ -814,8 +816,8 @@ int Dataset<T>::_findlabel ( const std::string& targetname )
   return -1; // Attribute not found
 }
 
-template<class T>
-bool Dataset<T>::_iscateg(const arma::Row<T>& row)
+template<class LTYPE,class T>
+bool Dataset<LTYPE,T>::_iscateg(const arma::Row<T>& row)
 {
   std::set<int> distinctValues;
   
@@ -836,8 +838,8 @@ bool Dataset<T>::_iscateg(const arma::Row<T>& row)
   return distinctValues.size() < row.n_elem;
 }
 
-template<class T>
-arma::Row<size_t> Dataset<T>::_convcateg(const arma::Row<T>& row)
+template<class LTYPE,class T>
+arma::Row<size_t> Dataset<LTYPE,T>::_convcateg(const arma::Row<T>& row)
 {
   std::unordered_map<T, size_t> valueToIndex;
   size_t categoryIndex = 0;
@@ -861,8 +863,8 @@ arma::Row<size_t> Dataset<T>::_convcateg(const arma::Row<T>& row)
   return categoricalRow;
 }
 
-template<class T>
-arma::Row<size_t> Dataset<T>::_procrow(const arma::Row<T>& row)
+template<class LTYPE, class T>
+arma::Row<size_t> Dataset<LTYPE,T>::_procrow(const arma::Row<T>& row)
 {
   if (_iscateg(row)) 
   {
@@ -880,8 +882,8 @@ arma::Row<size_t> Dataset<T>::_procrow(const arma::Row<T>& row)
 }
 
 
-template<class T>
-void Dataset<T>::_load( )
+template<class LTYPE,class T>
+void Dataset<LTYPE,T>::_load( )
 {
   int idx = -1;
   arma::Mat<DTYPE> data;
@@ -892,7 +894,11 @@ void Dataset<T>::_load( )
   if (idx<0)
     throw std::runtime_error("Cannot find the label!");
 
-  labels_ = _procrow(data.row(idx));
+  if constexpr (std::is_same<LTYPE, size_t>::value)
+    labels_ = _procrow(data.row(idx));
+  else
+    labels_ = data.row(idx);
+  /* labels_ = _procrow(data.row(idx)); */
   data.shed_row(idx);
   inputs_ = data;
   dimension_ = inputs_.n_rows;
@@ -903,7 +909,6 @@ void Dataset<T>::_load( )
 
 } // namespace oml
 
-} // namespace classification
 } // namespace data
 
 

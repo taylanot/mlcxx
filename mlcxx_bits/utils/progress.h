@@ -31,18 +31,6 @@ public:
     }
   }
 
-  /* void Update(int i) */
-  /* { */
-  /*   #pragma omp critical */
-  /*   { */
-  /*     if (curr_ != i) */
-  /*     { */
-  /*       curr_ = i ; */
-  /*       Show(); */
-  /*     } */
-  /*   } */
-  /* } */
-
 private:
   int tot_;
   int curr_;

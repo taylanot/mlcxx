@@ -79,6 +79,14 @@ class SVM
    * @param labels  : y
    */
   void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels,
+               const size_t num_class );
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : y
+   */
+  void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
 
   /**

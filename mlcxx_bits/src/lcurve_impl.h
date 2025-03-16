@@ -25,9 +25,12 @@ template<class MODEL,
 LCurve<MODEL,LOSS,O>::LCurve ( const arma::irowvec& Ns,
                                const double repeat,
                                const bool parallel, 
-                               const bool prog ) :
+                               const bool prog,
+                               const std::string type,
+                               const std::string name ) :
 
-repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog)
+repeat_(repeat), Ns_(Ns), parallel_(parallel),
+  prog_(prog), type_(type), name_(name)
 {
   RegisterSignalHandler( );
   globalSafeFailFunc = [this]() { this->CleanUp(); };
@@ -64,7 +67,7 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
 
-  /* #pragma omp parallel for collapse(2) if(parallel_) */
+  #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
     for(size_t j=0; j < size_t(repeat_); j++)
     {
@@ -228,8 +231,8 @@ template<class MODEL,
          class LOSS,class O>
 void LCurve<MODEL,LOSS,O>::CleanUp ( )
 {
-  LOG("CleanUp is called!");
-  Save("lcurve.bin");
+  LOG("\rCleanUp is called!"<<std::flush);
+  Save(name_+".bin");
 }
 
 //=============================================================================
@@ -250,8 +253,8 @@ template<class MODEL,
 void LCurve<MODEL,LOSS,O>::SignalHandler( int sig )
 {
   if (globalSafeFailFunc) globalSafeFailFunc();  
-  LOG("Time limit exceeded! Exiting...");
-  std::exit(0);
+  LOG("\rTime limit exceeded! Exiting..." << std::flush);
+  std::quick_exit(0);
 }
 
 //=============================================================================
@@ -263,11 +266,11 @@ void LCurve<MODEL,LOSS,O>::Save ( const std::string& filename )
 {
   std::ofstream file(filename, std::ios::binary);
   if (!file) 
-    ERR("Cannot open file for writing: " << filename);
+    ERR("\rCannot open file for writing: " << filename << std::flush);
 
   cereal::BinaryOutputArchive archive(file);
   archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
-  LOG("LCurve object saved to " << filename);
+  LOG("\rLCurve object saved to " << filename << std::flush);
 }
 
 //=============================================================================
@@ -281,13 +284,13 @@ std::shared_ptr<LCurve<MODEL,LOSS,O>> LCurve<MODEL,LOSS,O>::Load
   std::ifstream file(filename, std::ios::binary);
   if (!file) 
   {
-    ERR("Error: Cannot open file for reading: " << filename);
+    ERR("\rError: Cannot open file for reading: " << filename);
     return nullptr;
   }
   cereal::BinaryInputArchive archive(file);
   auto lcurve = std::make_shared<LCurve<MODEL,LOSS,O>>();
-  archive(cereal::make_nvp("Lcurve", *lcurve));  // Deserialize into a new object
-  LOG("TaskHandler loaded from " << filename);
+  archive(cereal::make_nvp("LCurve", *lcurve));  // Deserialize into a new object
+  LOG("\rLCurve oaded from " << filename);
   return lcurve;
 }
 
