@@ -360,6 +360,15 @@ void NMC<T>::Train ( const arma::Mat<T>& inputs,
 }
 
 template<class T>
+void NMC<T>::Train ( const arma::Mat<T>& inputs,
+                     const arma::Row<size_t>& labels,
+                     const size_t num_class )
+{
+  this -> num_class_ = num_class;
+  this -> Train (inputs,labels);
+}
+
+template<class T>
 void NMC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
 {

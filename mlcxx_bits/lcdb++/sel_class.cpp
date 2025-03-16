@@ -14,14 +14,25 @@ using LREG = algo::classification::LogisticRegression<>;
 using LDA = algo::classification::LDC<>; 
 using QDA = algo::classification::QDC<>;
 using LSVM = mlpack::LinearSVM<>;
+using ADAB  = mlpack::AdaBoost<mlpack::ID3DecisionStump>; 
+using RFOR  = mlpack::RandomForest<>; 
+using DT    = mlpack::DecisionTree<>; 
+using LSVC  = algo::classification::SVM<mlpack::LinearKernel>; 
+using GSVC  = algo::classification::SVM<mlpack::GaussianKernel>; 
+using NMC   = algo::classification::NMC<>; 
+using NNC   = algo::classification::NNC<>; 
+
 
 using METRIC = mlpack::Accuracy;
+using srowvec = arma::Row<size_t>;
+using rowvec = arma::Row<DTYPE>;
 
-template<class MODEL,class DATA=OpenML>
-void RunExperiment(DATA trainset,DATA testset,size_t fold, size_t dense,size_t reps)
+template<class MODEL,class DATA=OpenML,class HPTSPACE=arma::Row<DTYPE>>
+void RunExperiment ( DATA trainset,
+                     DATA testset,
+                     size_t fold, size_t dense, size_t reps,
+                     HPTSPACE ls )
 {
-  arma::Row<DTYPE> ls = arma::logspace<arma::Row<DTYPE>>(-10,4,dense);
-
   arma::Row<DTYPE> mean_sel(reps);
   arma::Row<DTYPE> med_sel(reps);
   arma::Row<DTYPE> qlow_sel(reps);
@@ -143,13 +154,29 @@ int main ( int argc, char** argv )
     testset = trans.TransInp(testset);
   }
 
+  arma::Row<DTYPE> ls = arma::logspace<arma::Row<DTYPE>>(-10,4,dense);
+  srowvec ns = arma::regspace<srowvec>(1,1000,dense);
 
   if ( what == "lda" )
-    RunExperiment<LDA>(trainset,testset,fold,dense,reps);
+    RunExperiment<LDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+  else if ( what == "nmc" )
+    RunExperiment<NMC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
   else if ( what == "qda" )
-    RunExperiment<QDA>(trainset,testset,fold,dense,reps);
+    RunExperiment<QDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
   else if ( what == "lreg" )
-    RunExperiment<LREG>(trainset,testset,fold,dense,reps);
+    RunExperiment<LREG,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+  else if ( what == "lsvc" )
+    RunExperiment<LSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+  else if ( what == "gsvc" )
+    RunExperiment<GSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+  else if ( what == "adab" )
+    RunExperiment<ADAB,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+  else if ( what == "dt" )
+    RunExperiment<DT,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+  else if ( what == "rfor" )
+    RunExperiment<RFOR,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+  else if ( what == "nnc" )
+    RunExperiment<NNC,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
   else
     ERR("NOTHING TO RUN");
 

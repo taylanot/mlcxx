@@ -312,8 +312,8 @@ class NMC
   NMC ( const size_t& num_classes );
 
   /**
-   * @param inputs  : X
-   * @param labels  : y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
    */
   NMC ( const arma::Mat<T>& inputs,
@@ -322,25 +322,33 @@ class NMC
 
   // THINGS I DO FOR LOVE! (STUPID COMPILERS) //
   /**
-   * @param inputs X
-   * @param labels y
+   * @param inputs    : X
+   * @param labels    : y
    * @param num_class : number of classes
-   * @param shrink s
+   * @param shrink    : s
    */
   NMC ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
         const size_t& num_class,
         const double& shrink );
   /**
-   * @param inputs X
-   * @param labels y
+   * @param inputs : X
+   * @param labels : y
    */
   void Train ( const arma::Mat<T>& inputs,
                const arma::Row<size_t>& labels );
+  /**
+   * @param inputs    : X
+   * @param labels    : y
+   * @param num_class : number of classes
+   */
+  void Train ( const arma::Mat<T>& inputs,
+               const arma::Row<size_t>& labels,
+               const size_t num_class );
 
   /**
-   * @param inputs X*
-   * @param labels y*
+   * @param inputs : X*
+   * @param labels : y*
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels ) const;
@@ -356,16 +364,16 @@ class NMC
   /**
    * Calculate the Error Rate
    *
-   * @param inputs 
-   * @param labels 
+   * @param inputs : X*
+   * @param labels : y
    */
   T ComputeError ( const arma::Mat<T>& points, 
                    const arma::Row<size_t>& responses ) const;
   /**
    * Calculate the Accuracy
    *
-   * @param inputs 
-   * @param labels 
+   * @param inputs : X* 
+   * @param labels : y
    */
   T ComputeAccuracy ( const arma::Mat<T>& points, 
                       const arma::Row<size_t>& responses ) const;
