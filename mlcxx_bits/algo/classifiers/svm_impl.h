@@ -73,14 +73,10 @@ template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
                                    const arma::Row<size_t>& y )
 {
-  if (solver_ == "QP")
-    _QP(X,y);
-  else if (solver_ == "randSMO")
-    _randSMO(X,y);
-  else if (solver_ == "fanSMO")
+  if (solver_ == "fanSMO")
     _fanSMO(X,y);
   else
-    ERR("Not Implemented: Try QP or SMO");
+    ERR("Not Implemented: Try fanSMO");
 }
 
 template<class KERNEL,size_t SOLVER,class T>
@@ -92,86 +88,93 @@ void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
  this -> Train(X,y);
 
 }
+
 template<class KERNEL,size_t SOLVER,class T>
 std::pair<int,int> SVM<KERNEL,SOLVER,T>::_selectset ( arma::Row<T> G,
                                                       arma::Mat<T> Q )
 {
+  T inf =  arma::datum::inf;
+  T G_max = -inf;
+  T G_min = inf;
+  T obj_min = inf;
   size_t len = y_.n_elem;
 
-  // Step 1: Select `i`
-  arma::uvec indices_i = arma::find(((y_ == +1) % (alphas_ < C_)) 
-      || ((y_ == -1) % (alphas_ > 0)));
-  arma::Col<T> G_candidates_i = -y_(indices_i) % G(indices_i);
-  
-  // Find the index of the maximum element in G_candidates_i
   int i = -1;
-  T G_max = -arma::datum::inf;
-  if (!G_candidates_i.is_empty()) 
+  for (size_t t=0; t<len; t++)
   {
-    arma::uword i_max_idx;
-    G_max = G_candidates_i.max(i_max_idx);
-    i = indices_i(i_max_idx);
+    if ( (y_[t] == +1 && alphas_[t] < C_) || (y_[t] == -1 && alphas_[t] > 0.) )
+    {
+      if ( -y_[t]*G[t] >= G_max )
+      {
+        i = t;
+        G_max = -y_[t] * G[t];
+      }
+    }
   }
 
-  // Step 2: Select `j`
-  arma::uvec indices_j = arma::find(((y_ == +1) % (alphas_ > 0.)) ||
-                                    ((y_ == -1) % (alphas_ < C_)));
   int j = -1;
-  T obj_min = arma::datum::inf;
-  T G_min = arma::datum::inf;
-
-  #pragma omp parallel for
-  for (size_t t=0; t<len; t++) {
-      T b = G_max + y_[t] * G[t];
-      
-      if (-y_[t] * G[t] <= G_min) {
-          G_min = -y_[t] * G[t];
+  for (size_t t=0; t<len; t++)
+  {
+    if ( (y_[t] == +1 && alphas_[t] > 0.) || (y_[t] == -1 && alphas_[t] < C_) )
+    {
+      T b = G_max + y_[t]*G[t];
+      if ( -y_[t]*G[t] <= G_max )
+        G_min = -y_[t]*G[t];
+      if ( b > 0. )
+      {
+        T a = Q(i,i) + Q(t,t) - 2.*y_[i]*y_[t]*Q(i,t);
+        if ( a <= 0. )
+          a = tau_;
+        if (-(b*b)/a <= obj_min)
+        {
+          j = t; 
+          obj_min = -(b*b)/a;
+        }
       }
 
-      if (b > 0) {
-          T a = Q(i, i) + Q(t, t) - 2 * y_[i] * y_[t] * Q(i, t);
-          if (a <= 0) a = tau_;
-          T obj_val = -(b * b) / a;
-          if (obj_val <= obj_min) {
-              j = t;
-              obj_min = obj_val;
-          }
-      }
-  }
+    }
+  } 
 
-  // Check stopping criterion
-  if (G_max - G_min < eps_) {
-      return {-1, -1};
-  }
-
-  return {i, j};
+  if (G_max-G_min < eps_)
+    return {-1,-1};
+  else
+    return {i, j};
 }
+
+
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
                                      const arma::Row<size_t>& y )
 {
+  
   X_ = &X;
   y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
-  alphas_.resize(y_.n_elem);
-  arma::Row<T> G(y_.n_elem); G.fill(-1);
+  size_t N = y_.n_elem;
+  alphas_.resize(N);
+  arma::Row<T> G(N); G.fill(-1.);
+  /* arma::Mat<T> K = cov_.GetMatrix_approx(X,X,100); */
   arma::Mat<T> K = cov_.GetMatrix(X,X);
   arma::Mat<T> Q = (y_.t() * y_) % K;
+  PRINT_VAR(Q.is_symmetric(1.e-3));
 
   while (max_iter_>iter_++) 
   {
     auto [i, j] = _selectset(G, Q);
+    PRINT("i:"<<i<<"j:"<<j)
     if (j == -1) break;  // Termination condition if no valid (i, j) is found
 
     // Compute `a` and set to tau if non-positive
-    T a = Q(i, i) + Q(j, j) - 2 * y_[i] * y_[j] * Q(i, j);
-    if (a <= 0) a = tau_;
+    T a = Q(i, i) + Q(j, j) - 2 * y_[i]*y_[j] * Q(i, j);
+    if (a <= 0.) 
+      a = tau_;
 
     // Compute `b`
     T b = -y_[i] * G[i] + y_[j] * G[j];
 
     // Store old alpha values
-    T oldAi = alphas_[i], oldAj = alphas_[j];
+    T oldAi = alphas_[i];
+    T oldAj = alphas_[j];
 
     // Update alpha values for i and j
     alphas_[i] += y_[i] * b / a;
@@ -195,157 +198,17 @@ void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
     T deltaAj = alphas_[j] - oldAj;
 
     // Vectorized gradient update: G += Q.col(i) * deltaAi + Q.col(j) * deltaAj
-    G += (Q.col(i) * deltaAi + Q.col(j) * deltaAj).t();
-  }
-  idx_ = arma::find(alphas_ >= 0.); 
-}
-
-template<class KERNEL,size_t SOLVER,class T>
-void SVM<KERNEL,SOLVER,T>::_randSMO ( const arma::Mat<T>& X,
-                               const arma::Row<size_t>& y )
-{
-  X_ = &X;
-  y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
-
-  size_t N = X.n_cols;
-  alphas_.zeros(N);
-  old_alphas_.zeros(N);
-  arma::Mat<T> Kij;
-  
-  while ( (iter_++ == 0 || iter_ < max_iter_ ) & 
-          (arma::norm(old_alphas_-alphas_,2) < eps_) )
-  {
-    old_alphas_ = alphas_;
-    size_t i;
-    arma::Row<T> updates(2);
-
-    #pragma omp parallel for
-    for ( size_t j=0; j<N; j++)
+    /* G += (Q.col(i) * deltaAi + Q.col(j) * deltaAj).t(); */
+    size_t len = y_.n_elem;
+    for (size_t h=0; h<len; h++)
     {
-      i = _geti(j,N);
-      Kij = cov_.GetMatrix(X_->col(i).eval()) 
-        + cov_.GetMatrix(X_->col(j).eval()) 
-        - 2. * cov_.GetMatrix(X_->col(i).eval(), X_->col(j).eval());
-      if (Kij(0,0) == 0.)
-        continue;
-
-      updates(0) = alphas_(i); updates(1) = alphas_(j); 
-      arma::Row<T> LH = _getLH(i,j,updates);
-      
-      T Ei = _E(i);
-      T Ej = _E(j);
-
-      alphas_(j) = updates(1) + (T(y_(j)) * (Ei-Ej))/Kij(0,0);
-      alphas_(j) = std::max(alphas_(j),LH(0));
-      alphas_(j) = std::min(alphas_(j),LH(1));
-
-      alphas_(i) = (updates(0) + T(y_(i)*y_(j)) * (updates(1)-alphas_(j)));
-
-      b_ = _b(_w()); 
-      
+      G[h] += Q(h,i)*deltaAi+Q(h,j)*deltaAj;
     }
   }
-  idx_ = arma::find(alphas_ >= 0.); 
+  idx_ = arma::find(alphas_ > tau_); 
 }
 
-template<class KERNEL,size_t SOLVER,class T>
-int SVM<KERNEL,SOLVER,T>::_E ( size_t i )
-{
-  arma::Row<T> w = _w();
-  return (arma::sign( w * X_->col(i) + _b(w) ).eval() - y_(i)).eval()(0,0);
-}
 
-template<class KERNEL,size_t SOLVER,class T>
-arma::Row<T> SVM<KERNEL,SOLVER,T>::_w ( )
-{
-  return (alphas_ % y_) * X_->t() ;
-}
-
-template<class KERNEL,size_t SOLVER,class T>
-T SVM<KERNEL,SOLVER,T>::_b ( const arma::Row<T>& w )
-{
-  b_ = arma::mean(y_ - (w * (*X_))); 
-  return b_;
-}
-
-template<class KERNEL,size_t SOLVER,class T>
-arma::Row<T> SVM<KERNEL,SOLVER,T>::_getLH ( size_t i, size_t j,
-                                     const arma::Row<T>& updates )
-{
-  arma::Row<T> LH(2);
-  if (y_(i) != y_(j))
-  {
-    LH(0) = std::max(T(0.),updates(1)-updates(0));
-    LH(1) = std::min(C_,C_-updates(0)+updates(1));
-  }
-  else
-  {
-    LH(0) = std::max(T(0.),updates(0)+updates(1)-C_);
-    LH(1) = std::min(C_,updates(0)+updates(1));
-  }
-  return LH;
-}
-
-template<class KERNEL,size_t SOLVER,class T>
-size_t SVM<KERNEL,SOLVER,T>::_geti ( size_t j, size_t N )
-{
-  /* arma::Row<T> is = {1,2,0,1,0,3,4,0,1,2}; */
-  /* return is(iterx_++); */
-  size_t draw;
-  for (size_t h=0; h < max_iter_; h++)
-  {
-    draw = arma::randi(arma::distr_param(0,N-1));
-    if (draw != j)
-      return draw;
-  }
-  return draw;
-  ERR("Could not draw a different i...");
-}
-
-template<class KERNEL,size_t SOLVER,class T>
-void SVM<KERNEL,SOLVER,T>::_QP ( const arma::Mat<T>& X,
-                                 const arma::Row<size_t>& y )
-{
-  /* ulab_ = arma::unique(y); */
-  /* BOOST_ASSERT_MSG(ulab_.n_elem <= 2 && ulab_.n_elem > 0, */
-  /*                 "SVM:Only binary labels, please!"); */
-
-  /* if (ulab_.n_elem == 1) */
-  /* { */
-  /*   oneclass_ = true; */
-  /*   return; */
-  /* } */
-
-  X_ = &X;
-
-  y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
-
-  int n_samples = X.n_cols;
-  alphas_.ones(n_samples);
-  
-  // Compute the kernel matrix
-  
-  auto K = cov_.GetMatrix(X,X);
-  // Formulate the QP problem
-  arma::Mat<T> P = K % ((y_).t() * (y_));
-
-  arma::Row<T> q = -arma::ones<arma::Row<T>>(n_samples);
-  arma::Mat<T> G = arma::join_cols(
-                              -arma::eye<arma::Mat<T>>(n_samples, n_samples),
-                              arma::eye<arma::Mat<T>>(n_samples, n_samples));
-  arma::Row<T> h = arma::join_rows(arma::zeros<arma::Row<T>>(n_samples),
-                                  arma::ones<arma::Row<T>>(n_samples) * C_);
-
-  arma::Mat<T> A = arma::conv_to<arma::Mat<T>>::from(y_);
-  arma::Row<T> b = arma::zeros<arma::Row<T>>(1);
-  bool success = opt::quadprog(alphas_,P, q, G, h, A, b);
-  if (!success)
-    ERR("HiGHS did not terminate by itself!");
-
-  idx_ = arma::find(alphas_ >= 0. && alphas_<=C_); // Find the support vectors
-  b_ = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
-        - ((alphas_ % y_) * cov_.GetMatrix(X, X.cols(idx_))))/idx_.n_elem;
-}
 
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
@@ -382,8 +245,17 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
       {
         probs.set_size(nclass_,inputs.n_cols);
         preds.set_size(inputs.n_cols);
-        arma::Row<T> w = _w();
-        dec_func =  w * inputs + _b(w) ;
+        arma::Mat<T> svs = X_->cols(idx_);
+        PRINT_VAR(arma::size(idx_));
+        arma::Mat<T> K = cov_.GetMatrix(svs,inputs);
+        arma::Mat<T> Ksv = cov_.GetMatrix(svs);
+
+        b_ = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
+        - ((alphas_.cols(idx_) % y_.cols(idx_)) * Ksv)) /idx_.n_elem;
+        PRINT_VAR(b_)
+        dec_func = (alphas_.cols(idx_) % y_.cols(idx_)) * K ;
+        /* dec_func = (alphas_ % y_) * cov_.GetMatrix_approx(svs,inputs,100) + b_; */
+
         preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
         preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
         probs.row(0) = 1. / (1. + arma::exp(dec_func));

@@ -51,7 +51,8 @@ struct covmat
                            const arma::Mat<T>& input2 ) const
   {
     arma::Mat<T> matrix(input1.n_cols, input2.n_cols);
-
+    
+    #pragma omp parallel for collapse(2)
     for (int i = 0; i < int(input1.n_cols); i++)
         for (int j = 0; j < int(input2.n_cols); j++)
             matrix(i,j) = kernel_.Evaluate(input1.col(i).eval(),
@@ -59,6 +60,32 @@ struct covmat
 
     return matrix;
   }
+
+  /*
+   * This is for column ordered data
+   */
+  arma::Mat<T> GetMatrix_approx ( const arma::Mat<T>& input1,
+                                  const arma::Mat<T>& input2, size_t k ) const
+  {
+    size_t n_samples = input1.n_rows;
+
+    arma::uvec indices = arma::randi<arma::uvec>(k,arma::distr_param(0,n_samples-1));
+
+    arma::Mat<T> landmarks = input1.cols(indices);
+
+    // Compute W and C
+    arma::Mat<T> W = this->GetMatrix(landmarks, landmarks);
+    arma::Mat<T> C = this->GetMatrix(input1, landmarks);
+
+    // Compute pseudoinverse of W
+    arma::Mat<T> W_pinv = arma::pinv(W);
+
+    // Approximated kernel matrix: K_approx = C * W_pinv * C^T
+    arma::Mat<T> K_approx = C * W_pinv * C.t();
+
+    return K_approx;
+  }
+
   arma::Mat<T> GetMatrix ( const arma::Mat<T>& input1 ) const
   {
     return GetMatrix(input1, input1); 

@@ -90,26 +90,70 @@
 /* } */
 
 using LSVC  = algo::classification::SVM<mlpack::LinearKernel>; 
-using GSVC  = algo::classification::SVM<mlpack::GaussianKernel>; 
+using GSVC0  = algo::classification::SVM<mlpack::GaussianKernel,0>; 
+using GSVC1  = algo::classification::SVM<mlpack::GaussianKernel,1>; 
+using GSVC2  = algo::classification::SVM<mlpack::GaussianKernel,2>; 
 using ESVC  = algo::classification::SVM<mlpack::EpanechnikovKernel>; 
 using LDC   = algo::classification::LDC<>; 
-using Dataset = data::classification::oml::Dataset<>;
+using Dataset = data::oml::Dataset<>;
 using Metric = mlpack::Accuracy;
+
+/* int main() */
+/* { */
+/*   arma::wall_clock timer; */
+/*   timer.tic(); */
+/*   arma::irowvec ids = {11}; */
+/*   Dataset dataset(ids[0]); */
+/*   Metric metric; */
+/*   for (int i=0; i<100; i++) */
+/*   { */
+/*     arma::uvec idx = arma::randi<arma::uvec>(60,arma::distr_param(0,627)); */
+/*     arma::Mat<DTYPE> inp = dataset.inputs_.cols(idx); */
+/*     arma::Row<size_t> lab = dataset.labels_.cols(idx); */
+/*     GSVC0 gsvc(inp,lab,2,DTYPE(1.),DTYPE(0.01)); */
+/*     /1* PRINT(metric.Evaluate(gsvc,dataset.inputs_, dataset.labels_)); *1/ */
+/*   } */
+/*   PRINT_TIME(timer.toc()); */
+/*   timer.tic(); */
+/*   for (int i=0; i<100; i++) */
+/*   { */
+/*     arma::uvec idx = arma::randi<arma::uvec>(60,arma::distr_param(0,627)); */
+/*     arma::Mat<DTYPE> inp = dataset.inputs_.cols(idx); */
+/*     arma::Row<size_t> lab = dataset.labels_.cols(idx); */
+/*     GSVC1 gsvc(inp,lab,2,DTYPE(1.),DTYPE(0.01)); */
+/*     /1* PRINT(metric.Evaluate(gsvc,dataset.inputs_, dataset.labels_)); *1/ */
+/*   } */
+/*   PRINT_TIME(timer.toc()); */
+/*   timer.tic(); */
+/*   for (int i=0; i<100; i++) */
+/*   { */
+/*     arma::uvec idx = arma::randi<arma::uvec>(60,arma::distr_param(0,627)); */
+/*     arma::Mat<DTYPE> inp = dataset.inputs_.cols(idx); */
+/*     arma::Row<size_t> lab = dataset.labels_.cols(idx); */
+/*     GSVC2 gsvc(inp,lab,2,DTYPE(1.),DTYPE(0.01)); */
+/*     /1* PRINT(metric.Evaluate(gsvc,dataset.inputs_, dataset.labels_)); *1/ */
+/*   } */
+/*   PRINT_TIME(timer.toc()); */
+/*   /1* LSVC lsvc(dataset.inputs_,dataset.labels_,dataset.num_class_,DTYPE(1.)); *1/ */
+/*   /1* PRINT(metric.Evaluate(lsvc,dataset.inputs_, dataset.labels_)); *1/ */
+/*   return 0; */
+/* } */
 
 int main()
 {
-  arma::irowvec ids = {11};
-  Dataset dataset(ids[0]);
+  arma::wall_clock timer;
+  Dataset dataset(61);
+  PRINT_VAR(dataset.size_);
   Metric metric;
-  for (int i=0; i<1000; i++)
-  {
-    arma::uvec idx = arma::randi<arma::uvec>(60,arma::distr_param(0,627));
-    arma::Mat<DTYPE> inp = dataset.inputs_.cols(idx);
-    arma::Row<size_t> lab = dataset.labels_.cols(idx);
-    GSVC gsvc(inp,lab,2,DTYPE(1.),DTYPE(0.01));
-    PRINT(metric.Evaluate(gsvc,dataset.inputs_, dataset.labels_));
-  }
-  /* LSVC lsvc(dataset.inputs_,dataset.labels_,dataset.num_class_,DTYPE(1.)); */
-  /* PRINT(metric.Evaluate(lsvc,dataset.inputs_, dataset.labels_)); */
+  auto inp = dataset.inputs_;
+  auto lab = dataset.labels_;
+
+  timer.tic();
+  GSVC0 gsvc0(inp,lab,dataset.num_class_,DTYPE(1.),DTYPE(1.0));
+  PRINT_VAR(gsvc0.ComputeError(inp,lab));
+  PRINT_TIME(timer.toc());
+
+
   return 0;
 }
+

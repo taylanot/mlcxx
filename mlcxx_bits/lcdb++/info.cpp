@@ -5,11 +5,10 @@
  * Investigate the dataset from openml with given id
  *
  */
-#define DTYPE float
+#define DTYPE double
 
 #include <headers.h>
 
-using MODEL = algo::regression::KernelRidge<mlpack::GaussianKernel>;
 using OpenML = data::oml::Dataset<DTYPE>;
 
 int main ( int argc, char** argv )
@@ -34,6 +33,7 @@ int main ( int argc, char** argv )
   data::oml::Dataset<DTYPE> dataset(id);
 
   data::report(dataset);
+  mlpack::RandomForest model(dataset.inputs_, dataset.labels_,dataset.num_class_,20,1,1e-7,0,false);
 
   PRINT_TIME(timer.toc());
 

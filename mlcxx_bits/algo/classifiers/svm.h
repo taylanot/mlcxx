@@ -142,7 +142,7 @@ class SVM
   }
 
 private:
-  std::map<int,std::string> solvers_ = {{0,"randSMO"},{1,"fanSMO"},{2,"QP"}};
+  std::map<int,std::string> solvers_ = {{0,"fanSMO"}};
   std::string solver_ = solvers_[SOLVER];
   size_t nclass_;
   T C_;
@@ -156,7 +156,7 @@ private:
   T b_ = 0;
   bool oneclass_ = false;
   T eps_ = 1e-3;
-  T tau_ = 1e-8;
+  T tau_ = 1e-12;
   size_t max_iter_ = 5000;
   size_t iter_ = 0;
   
@@ -167,12 +167,6 @@ private:
    * @param labels  : y
    */
 
-  void _QP ( const arma::Mat<T>& inputs,
-             const arma::Row<size_t>& labels );
-
-  void _randSMO ( const arma::Mat<T>& inputs,
-                  const arma::Row<size_t>& labels );
-
   void _fanSMO ( const arma::Mat<T>& inputs,
                  const arma::Row<size_t>& labels );
 
@@ -182,17 +176,10 @@ private:
    */
   std::pair<int, int> _selectset ( arma::Row<T> G, arma::Mat<T> Q );
 
-  int _E ( size_t i );
 
-  arma::Row<T> _w ( );
 
-  T _b ( const arma::Row<T>& w );
-
-  arma::Row<T> _getLH ( size_t i, size_t j,
-                        const arma::Row<T>& alpha_update );
-
-  size_t _geti ( size_t j, size_t N );
 };
+
 } // namespace classification
 } // namespace algo
 #include "svm_impl.h"

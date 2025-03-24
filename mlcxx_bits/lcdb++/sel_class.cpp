@@ -31,14 +31,15 @@ template<class MODEL,class DATA=OpenML,class HPTSPACE=arma::Row<DTYPE>>
 void RunExperiment ( DATA trainset,
                      DATA testset,
                      size_t fold, size_t dense, size_t reps,
-                     HPTSPACE ls )
+                     HPTSPACE ls,
+                     size_t parallel)
 {
   arma::Row<DTYPE> mean_sel(reps);
   arma::Row<DTYPE> med_sel(reps);
   arma::Row<DTYPE> qlow_sel(reps);
   arma::Row<DTYPE> qhigh_sel(reps);
 
-  #pragma omp parallel for
+  #pragma omp parallel for if (parallel)
   for (size_t rep=0; rep < reps; rep++)
   {
     LOG( "- rep:  " << rep );
@@ -87,6 +88,7 @@ int main ( int argc, char** argv )
   size_t reps = 100;
   size_t scale = 0;
   size_t dense = 1000;
+  size_t parallel = 1;
   std::string what = "lda";
 
   // Parse command-line arguments
@@ -121,6 +123,10 @@ int main ( int argc, char** argv )
       {
         dense = std::stoi(argv[i + 1]); // Convert string to int
       }
+      else if (arg == "-parallel" && i + 1 < argc) 
+      {
+        parallel = std::stoi(argv[i + 1]); // Convert string to int
+      }
   }
   
   PRINT_VAR(id);
@@ -129,7 +135,14 @@ int main ( int argc, char** argv )
   PRINT_VAR(scale);
   PRINT_VAR(dense);
 
-  std::filesystem::path TODAY = "12_03_25";
+
+  // generate dataset (small_datasets)
+  /* OpenML dataset(id,"oml"); */
+  OpenML dataset(id);
+  OpenML trainset,testset;
+
+  std::filesystem::path TODAY = "16_03_25";
+  /* std::filesystem::path dir = TODAY; */
   std::filesystem::path dir = EXP_PATH/TODAY;
   if (scale)
     dir = dir / std::string("trans_"+std::to_string(id)+"_"+what+std::to_string(fold));
@@ -138,10 +151,6 @@ int main ( int argc, char** argv )
 
   std::filesystem::create_directories(dir);
   std::filesystem::current_path(dir);
-
-  // generate dataset (small_datasets)
-  OpenML dataset(id);
-  OpenML trainset,testset;
 
   data::StratifiedSplit(dataset,trainset,testset,0.2);
   /* data::Split(dataset,trainset,testset,0.2); */
@@ -155,28 +164,31 @@ int main ( int argc, char** argv )
   }
 
   arma::Row<DTYPE> ls = arma::logspace<arma::Row<DTYPE>>(-10,4,dense);
-  srowvec ns = arma::regspace<srowvec>(1,1000,dense);
+  srowvec ns_adab = arma::regspace<srowvec>(2,dense+2,dense);
+  srowvec ns_rfor = arma::regspace<srowvec>(20,25,4);
+  srowvec ns_nnc = arma::regspace<srowvec>(20,dense+20,dense);
+  srowvec ns_dt = arma::regspace<srowvec>(1,dense+1,dense);
 
   if ( what == "lda" )
-    RunExperiment<LDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<LDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "nmc" )
-    RunExperiment<NMC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<NMC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "qda" )
-    RunExperiment<QDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<QDA,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "lreg" )
-    RunExperiment<LREG,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<LREG,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "lsvc" )
-    RunExperiment<LSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<LSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "gsvc" )
-    RunExperiment<GSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls);
+    RunExperiment<GSVC,OpenML,rowvec>(trainset,testset,fold,dense,reps,ls,parallel);
   else if ( what == "adab" )
-    RunExperiment<ADAB,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+    RunExperiment<ADAB,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns_adab,parallel);
   else if ( what == "dt" )
-    RunExperiment<DT,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+    RunExperiment<DT,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns_dt,parallel);
   else if ( what == "rfor" )
-    RunExperiment<RFOR,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+    RunExperiment<RFOR,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns_rfor,parallel);
   else if ( what == "nnc" )
-    RunExperiment<NNC,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns);
+    RunExperiment<NNC,OpenML,srowvec>(trainset,testset,fold,dense,reps,ns_nnc,parallel);
   else
     ERR("NOTHING TO RUN");
 
