@@ -142,7 +142,7 @@ using Metric = mlpack::Accuracy;
 int main()
 {
   arma::wall_clock timer;
-  Dataset dataset(61);
+  Dataset dataset(37);
   PRINT_VAR(dataset.size_);
   Metric metric;
   auto inp = dataset.inputs_;

@@ -156,12 +156,10 @@ void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
   /* arma::Mat<T> K = cov_.GetMatrix_approx(X,X,100); */
   arma::Mat<T> K = cov_.GetMatrix(X,X);
   arma::Mat<T> Q = (y_.t() * y_) % K;
-  PRINT_VAR(Q.is_symmetric(1.e-3));
 
   while (max_iter_>iter_++) 
   {
     auto [i, j] = _selectset(G, Q);
-    PRINT("i:"<<i<<"j:"<<j)
     if (j == -1) break;  // Termination condition if no valid (i, j) is found
 
     // Compute `a` and set to tau if non-positive
@@ -246,15 +244,13 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
         probs.set_size(nclass_,inputs.n_cols);
         preds.set_size(inputs.n_cols);
         arma::Mat<T> svs = X_->cols(idx_);
-        PRINT_VAR(arma::size(idx_));
         arma::Mat<T> K = cov_.GetMatrix(svs,inputs);
         arma::Mat<T> Ksv = cov_.GetMatrix(svs);
 
         b_ = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
         - ((alphas_.cols(idx_) % y_.cols(idx_)) * Ksv)) /idx_.n_elem;
-        PRINT_VAR(b_)
+
         dec_func = (alphas_.cols(idx_) % y_.cols(idx_)) * K ;
-        /* dec_func = (alphas_ % y_) * cov_.GetMatrix_approx(svs,inputs,100) + b_; */
 
         preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
         preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);
