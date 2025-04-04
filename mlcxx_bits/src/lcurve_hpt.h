@@ -33,11 +33,18 @@ public:
    * @param prog        : boolean for showing the progrress bar
    *
    */
+using CVP = typename std::conditional<
+        std::is_same<CV<MODEL, LOSS, OPT, O, O>, mlpack::SimpleCV<MODEL, LOSS, OPT, O, O>>::value,
+        DTYPE, // Use DTYPE if CV is SimpleCV
+        size_t // Otherwise, use size_t
+    >::type;
+
   LCurveHPT( const arma::irowvec& Ns,
-             const double repeat,
-             const double cvp = 0.2,
+             const size_t repeat,
+             const CVP cvp=0.2,
              const bool parallel = false, 
              const bool prog = false );
+
   /* Generate Learning Curves with bootstrapping
    *
    * @param dataset   : whole large dataset 
@@ -124,11 +131,21 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-
   arma::mat GetResults (  ) {return test_errors_;}
-
+  
 private:
-  /* SPLIT split_; */
+
+  /* 
+   * Get the Hyper-parameter tuning object depending on the model
+   *
+   * @param Xtrn : inputs used for hyper-parmeter tuning
+   * @param ytrn : labels used for hyper-parameter tuning
+
+   */
+  template<class T>
+  mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
+    _GetHpt (const arma::Mat<DTYPE>& Xtrn, const T& ytrn);
+
   size_t repeat_;
   arma::irowvec Ns_;
   bool parallel_;
@@ -137,7 +154,7 @@ private:
   bool save_data_;
   std::string name_;
   arma::Mat<O> results_;
-  double cvp_;
+  CVP cvp_;
   arma::Mat<O> test_errors_;
 
 };

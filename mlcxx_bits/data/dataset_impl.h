@@ -601,7 +601,7 @@ Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path )
   }
   else
   {
-    WARNING("Dataset " << id_ << " is already present.");
+    WARN("Dataset " << id_ << " is already present.");
     this->_load();
   }
 }
@@ -634,7 +634,7 @@ Dataset<LTYPE,T>::Dataset( const size_t& id ) :
   }
   else
   {
-    WARNING("Dataset " << id_ << " is already present.");
+    WARN("Dataset " << id_ << " is already present.");
     this->_load();
   }
 }
@@ -755,8 +755,8 @@ std::string Dataset<LTYPE,T>::_gettargetname( const std::string& metadata )
   }
   else
   {
-    ERR("Probably something went wrong with meta data fetch!!!");
-    return "";
+    WARN("Cannot find the target name using 'class' instead!!!");
+    return "class";
   }
 }
 
@@ -775,7 +775,7 @@ std::string Dataset<LTYPE,T>::_getdownurl( const std::string& metadata )
   }
   else
   {
-    ERR("Probably something went wrong with meta data fetch!!!");
+    WARN("Probably something went wrong with meta data fetch!!!");
     return "";
   }
 }

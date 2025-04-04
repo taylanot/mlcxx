@@ -9,19 +9,18 @@
 #ifndef LCDB_CONFIG
 #define LCDB_CONFIG
 
+using DATASET = data::oml::Dataset<>;
 namespace lcdb
 {
-  // SuitID 
-  
+  // Dataset
   // Models 
   using LREG  = algo::classification::LogisticRegression<>;  // x
   using NMC   = algo::classification::NMC<>; 
   using NNC   = algo::classification::NNC<>; 
   using LDC   = algo::classification::LDC<>; 
   using QDC   = algo::classification::QDC<>; 
-  using LSVC  = algo::classification::SVM<mlpack::LinearKernel>; 
-  using GSVC  = algo::classification::SVM<mlpack::GaussianKernel>; 
-  using ESVC  = algo::classification::SVM<mlpack::EpanechnikovKernel>; 
+  using LSVC  = algo::classification::SVM<mlpack::LinearKernel,0>; 
+  using GSVC  = algo::classification::SVM<mlpack::GaussianKernel,0>; 
   using ADAB  = mlpack::AdaBoost<mlpack::ID3DecisionStump>; 
   using RFOR  = mlpack::RandomForest<>; 
   using DT    = mlpack::DecisionTree<>; 
@@ -55,7 +54,7 @@ namespace lcdb
 
   // Where to save the experiments
   /* static const std::filesystem::path path = EXP_PATH/"lcdb++"; */
-  static const std::filesystem::path path = "lcdb++_end_add";
+  static const std::filesystem::path path = "lcdb++_svcs09";
   // Number of instance limit 
   static const size_t nlim = 2000;
   // Number of features limit 

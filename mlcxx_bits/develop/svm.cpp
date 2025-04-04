@@ -142,15 +142,19 @@ using Metric = mlpack::Accuracy;
 int main()
 {
   arma::wall_clock timer;
-  Dataset dataset(37);
+  Dataset dataset(41027);
   PRINT_VAR(dataset.size_);
-  Metric metric;
+  /* Metric metric; */
   auto inp = dataset.inputs_;
   auto lab = dataset.labels_;
 
   timer.tic();
-  GSVC0 gsvc0(inp,lab,dataset.num_class_,DTYPE(1.),DTYPE(1.0));
-  PRINT_VAR(gsvc0.ComputeError(inp,lab));
+  arma::irowvec Ns = arma::regspace<arma::irowvec>(1,1,100);
+  src::LCurve<GSVC0,mlpack::Accuracy> lcurve(Ns,1,true,true);
+  /* GSVC0 gsvc0(inp,lab,dataset.num_class_,DTYPE(1.),DTYPE(1.0)); */
+  /* lcurve.Generate(inp, lab, dataset.num_class_); */
+  lcurve.RandomSet(inp, lab, dataset.num_class_);
+  lcurve.GetResults().save("random_testing.csv",arma::csv_ascii);
   PRINT_TIME(timer.toc());
 
 

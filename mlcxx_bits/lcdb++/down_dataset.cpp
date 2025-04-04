@@ -5,9 +5,10 @@
  * Download datasets with given ids
  *
  */
-#define DTYPE float
+#define DTYPE double
 
 #include <headers.h>
+#include "config.h"
 
 using OpenML = data::oml::Dataset<DTYPE>;
 
@@ -42,7 +43,7 @@ int main(int argc, char** argv)
 
         LOG("Processing ID: " << id );
 
-        data::oml::Dataset<DTYPE> dataset(id,"down_datasets");
+        OpenML dataset(id,lcdb::path);
 
         data::report(dataset);
 

@@ -75,7 +75,7 @@ public:
                   const T& testset,
                   const Ts&... args );
 
-private:
+public:
   /* Generate Learning Curves with RandomSet Selection
    *
    * @param dataset   : whole large dataset inputs
@@ -198,7 +198,7 @@ private:
   arma::irowvec Ns_;
   bool parallel_;
   bool prog_;
-  bool type_;
+  std::string type_;
   std::string name_;
 
   LOSS loss_;

@@ -153,8 +153,11 @@ void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
   size_t N = y_.n_elem;
   alphas_.resize(N);
   arma::Row<T> G(N); G.fill(-1.);
-  /* arma::Mat<T> K = cov_.GetMatrix_approx(X,X,100); */
-  arma::Mat<T> K = cov_.GetMatrix(X,X);
+  arma::Mat<T> K;
+  if (N > 200)
+    K = cov_.GetMatrix_approx(X,X,200);
+  else
+    K = cov_.GetMatrix(X,X);
   arma::Mat<T> Q = (y_.t() * y_) % K;
 
   while (max_iter_>iter_++) 

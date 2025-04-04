@@ -33,7 +33,6 @@ int main ( int argc, char** argv )
   data::oml::Dataset<DTYPE> dataset(id);
 
   data::report(dataset);
-  mlpack::RandomForest model(dataset.inputs_, dataset.labels_,dataset.num_class_,20,1,1e-7,0,false);
 
   PRINT_TIME(timer.toc());
 

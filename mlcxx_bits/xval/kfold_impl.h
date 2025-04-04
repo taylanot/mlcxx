@@ -269,7 +269,7 @@ arma::Row<T> KFoldCV<MLAlgorithm,
     if (std::isnan(evaluations(i)) || std::isinf(evaluations(i)))
     {
       ++numInvalidScores;
-      WARNING("KFoldCV::TrainAndEvaluate(): fold " << i << " returned "
+      WARN("KFoldCV::TrainAndEvaluate(): fold " << i << " returned "
           << "a score of " << evaluations(i) << "; ignoring when computing "
           << "the average score.");
     }
@@ -278,7 +278,7 @@ arma::Row<T> KFoldCV<MLAlgorithm,
   }
 
   if (numInvalidScores == k)
-    WARNING("KFoldCV::TrainAndEvaluate(): all folds returned invalid "
+    WARN("KFoldCV::TrainAndEvaluate(): all folds returned invalid "
         << "scores!  Returning 0.0 as overall score.");
 
   return evaluations;

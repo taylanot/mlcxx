@@ -6,7 +6,7 @@
  *
  */
 
-#define DTYPE double  
+#define DTYPE double
 
 #include <headers.h>
 #include "lcdb++/config.h"
@@ -17,7 +17,7 @@ int rand_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  DATASET dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
@@ -28,7 +28,7 @@ int rand_( const size_t id,
   lcurve.RandomSet(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
+  /* PRINT_VAR(arma::size(lcurve.GetResults())) */
 
   return 0;
 }
@@ -40,18 +40,18 @@ int hptrand_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  /* DATASET dataset(id,lcdb::path); */
 
-  mlpack::RandomSeed(seed);
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*                                             (10,1,size_t(dataset.size_*0.9)); */
+  /* mlpack::RandomSeed(seed); */
+  /* /1* const arma::irowvec Ns = arma::regspace<arma::irowvec> *1/ */
+  /* /1*                                             (10,1,size_t(dataset.size_*0.9)); *1/ */
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true);
-  lcurve.RandomSet(dataset,
-                   mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
-                   args...);
-  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
+  /* src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true); */
+  /* lcurve.RandomSet(dataset, */
+  /*                  mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem), */
+  /*                  args...); */
+  /* lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii); */
+  /* PRINT_VAR(arma::size(lcurve.GetResults())) */
 
   return 0;
 }
@@ -62,7 +62,7 @@ int boot_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  DATASET dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
   const arma::irowvec Ns = arma::regspace<arma::irowvec>
@@ -73,7 +73,6 @@ int boot_( const size_t id,
   lcurve.Bootstrap(dataset,
                    arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
   return 0;
 }
 
@@ -84,18 +83,18 @@ int hptboot_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  /* DATASET dataset(id,lcdb::path); */
 
-  mlpack::RandomSeed(seed);
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*                                             (10,1,size_t(dataset.size_*0.9)); */
+  /* mlpack::RandomSeed(seed); */
+  /* /1* const arma::irowvec Ns = arma::regspace<arma::irowvec> *1/ */
+  /* /1*                                             (10,1,size_t(dataset.size_*0.9)); *1/ */
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true);
-  lcurve.Bootstrap(dataset,
-                   mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
-                   args...);
-  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
+  /* src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true); */
+  /* lcurve.Bootstrap(dataset, */
+  /*                  mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem), */
+  /*                  args...); */
+  /* lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii); */
+  /* PRINT_VAR(arma::size(lcurve.GetResults())) */
 
   return 0;
 }
@@ -106,7 +105,7 @@ int add_( const size_t id,
           const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  DATASET dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
 
@@ -118,7 +117,7 @@ int add_( const size_t id,
   lcurve.Additive(dataset,
                   arma::unique(dataset.labels_).eval().n_elem);
   lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
+  /* PRINT_VAR(arma::size(lcurve.GetResults())) */
  
   return 0;
 }
@@ -130,19 +129,19 @@ int hptadd_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  /* DATASET dataset(id,lcdb::path); */
 
-  mlpack::RandomSeed(seed);
+  /* mlpack::RandomSeed(seed); */
 
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*   (10,1,size_t(dataset.size_*0.9)); */
+  /* /1* const arma::irowvec Ns = arma::regspace<arma::irowvec> *1/ */
+  /* /1*   (10,1,size_t(dataset.size_*0.9)); *1/ */
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize, true,true);
-  lcurve.Additive(dataset,
-                   mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
-                   args...);
-  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT_VAR(arma::size(lcurve.GetResults()))
+  /* src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize, true,true); */
+  /* lcurve.Additive(dataset, */
+  /*                  mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem), */
+  /*                  args...); */
+  /* lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii); */
+  /* PRINT_VAR(arma::size(lcurve.GetResults())) */
  
   return 0;
 }
@@ -153,10 +152,10 @@ int split_( const size_t id,
            const size_t seed, const size_t nreps,
            const std::filesystem::path& path ) 
 {
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  DATASET dataset(id,lcdb::path);
 
   mlpack::RandomSeed(seed);
-  data::classification::oml::Dataset trainset,testset;
+  DATASET trainset,testset;
 
   data::StratifiedSplit(dataset,trainset,testset,lcdb::splitsize);
 
@@ -179,22 +178,22 @@ int hptsplit_( const size_t id,
               const std::filesystem::path& path, Args... args ) 
 {
  
-  data::classification::oml::Dataset dataset(id,lcdb::path);
+  /* DATASET dataset(id,lcdb::path); */
 
-  mlpack::RandomSeed(seed);
-  data::classification::oml::Dataset trainset,testset;
+  /* mlpack::RandomSeed(seed); */
+  /* DATASET trainset,testset; */
 
-  data::StratifiedSplit(dataset,trainset,testset,lcdb::splitsize);
+  /* data::StratifiedSplit(dataset,trainset,testset,lcdb::splitsize); */
 
-  /* const arma::irowvec Ns = arma::regspace<arma::irowvec> */
-  /*   (10,1,size_t(trainset.size_*0.9)); */
+  /* /1* const arma::irowvec Ns = arma::regspace<arma::irowvec> *1/ */
+  /* /1*   (10,1,size_t(trainset.size_*0.9)); *1/ */
 
-  src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true);
-  lcurve.Split(trainset,testset,
-               mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem),
-               args...);
-  lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii);
-  PRINT(arma::size(lcurve.GetResults()))
+  /* src::LCurveHPT<MODEL,LOSS> lcurve(lcdb::hptNs,nreps,lcdb::vsize,true,true); */
+  /* lcurve.Split(trainset,testset, */
+  /*              mlpack::Fixed(arma::unique(dataset.labels_).eval().n_elem), */
+  /*              args...); */
+  /* lcurve.GetResults().save(path/(loss+".csv"),arma::csv_ascii); */
+  /* PRINT(arma::size(lcurve.GetResults())) */
  
   return 0;
 }
@@ -257,10 +256,6 @@ void rands( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", rand_<lcdb::LSVC, lcdb::Crs>},
                 {"bri", rand_<lcdb::LSVC, lcdb::Bri>},
                 {"auc", rand_<lcdb::LSVC, lcdb::Auc>}}},
-      {"esvc", {{"acc", rand_<lcdb::ESVC, lcdb::Acc>},
-                {"crs", rand_<lcdb::ESVC, lcdb::Crs>},
-                {"bri", rand_<lcdb::ESVC, lcdb::Bri>},
-                {"auc", rand_<lcdb::ESVC, lcdb::Auc>}}},
       {"gsvc", {{"acc", rand_<lcdb::GSVC, lcdb::Acc>},
                 {"crs", rand_<lcdb::GSVC, lcdb::Crs>},
                 {"bri", rand_<lcdb::GSVC, lcdb::Bri>},
@@ -303,10 +298,6 @@ void rands( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", hptrand_<lcdb::LSVC, lcdb::Crs,cont>},
                 {"bri", hptrand_<lcdb::LSVC, lcdb::Bri,cont>},
                 {"auc", hptrand_<lcdb::LSVC, lcdb::Auc,cont>}}},
-      {"esvc", {{"acc", hptrand_<lcdb::ESVC, lcdb::Acc,cont>},
-                {"crs", hptrand_<lcdb::ESVC, lcdb::Crs,cont>},
-                {"bri", hptrand_<lcdb::ESVC, lcdb::Bri,cont>},
-                {"auc", hptrand_<lcdb::ESVC, lcdb::Auc,cont>}}},
       {"gsvc", {{"acc", hptrand_<lcdb::GSVC, lcdb::Acc,cont>},
                 {"crs", hptrand_<lcdb::GSVC, lcdb::Crs,cont>},
                 {"bri", hptrand_<lcdb::GSVC, lcdb::Bri,cont>},
@@ -397,10 +388,6 @@ void boot( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", boot_<lcdb::LSVC, lcdb::Crs>},
                 {"bri", boot_<lcdb::LSVC, lcdb::Bri>},
                 {"auc", boot_<lcdb::LSVC, lcdb::Auc>}}},
-      {"esvc", {{"acc", boot_<lcdb::ESVC, lcdb::Acc>},
-                {"crs", boot_<lcdb::ESVC, lcdb::Crs>},
-                {"bri", boot_<lcdb::ESVC, lcdb::Bri>},
-                {"auc", boot_<lcdb::ESVC, lcdb::Auc>}}},
       {"gsvc", {{"acc", boot_<lcdb::GSVC, lcdb::Acc>},
                 {"crs", boot_<lcdb::GSVC, lcdb::Crs>},
                 {"bri", boot_<lcdb::GSVC, lcdb::Bri>},
@@ -443,10 +430,6 @@ void boot( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", hptboot_<lcdb::LSVC, lcdb::Crs,cont>},
                 {"bri", hptboot_<lcdb::LSVC, lcdb::Bri,cont>},
                 {"auc", hptboot_<lcdb::LSVC, lcdb::Auc,cont>}}},
-      {"esvc", {{"acc", hptboot_<lcdb::ESVC, lcdb::Acc,cont>},
-                {"crs", hptboot_<lcdb::ESVC, lcdb::Crs,cont>},
-                {"bri", hptboot_<lcdb::ESVC, lcdb::Bri,cont>},
-                {"auc", hptboot_<lcdb::ESVC, lcdb::Auc,cont>}}},
       {"gsvc", {{"acc", hptboot_<lcdb::GSVC, lcdb::Acc,cont>},
                 {"crs", hptboot_<lcdb::GSVC, lcdb::Crs,cont>},
                 {"bri", hptboot_<lcdb::GSVC, lcdb::Bri,cont>},
@@ -538,10 +521,6 @@ void split ( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", split_<lcdb::LSVC, lcdb::Crs>},
                 {"bri", split_<lcdb::LSVC, lcdb::Bri>},
                 {"auc", split_<lcdb::LSVC, lcdb::Auc>}}},
-      {"esvc", {{"acc", split_<lcdb::ESVC, lcdb::Acc>},
-                {"crs", split_<lcdb::ESVC, lcdb::Crs>},
-                {"bri", split_<lcdb::ESVC, lcdb::Bri>},
-                {"auc", split_<lcdb::ESVC, lcdb::Auc>}}},
       {"gsvc", {{"acc", split_<lcdb::GSVC, lcdb::Acc>},
                 {"crs", split_<lcdb::GSVC, lcdb::Crs>},
                 {"bri", split_<lcdb::GSVC, lcdb::Bri>},
@@ -584,10 +563,6 @@ void split ( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", hptsplit_<lcdb::LSVC, lcdb::Crs,cont>},
                 {"bri", hptsplit_<lcdb::LSVC, lcdb::Bri,cont>},
                 {"auc", hptsplit_<lcdb::LSVC, lcdb::Auc,cont>}}},
-      {"esvc", {{"acc", hptsplit_<lcdb::ESVC, lcdb::Acc,cont>},
-                {"crs", hptsplit_<lcdb::ESVC, lcdb::Crs,cont>},
-                {"bri", hptsplit_<lcdb::ESVC, lcdb::Bri,cont>},
-                {"auc", hptsplit_<lcdb::ESVC, lcdb::Auc,cont>}}},
       {"gsvc", {{"acc", hptsplit_<lcdb::GSVC, lcdb::Acc,cont>},
                 {"crs", hptsplit_<lcdb::GSVC, lcdb::Crs,cont>},
                 {"bri", hptsplit_<lcdb::GSVC, lcdb::Bri,cont>},
@@ -679,10 +654,6 @@ void add ( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", add_<lcdb::LSVC, lcdb::Crs>},
                 {"bri", add_<lcdb::LSVC, lcdb::Bri>},
                 {"auc", add_<lcdb::LSVC, lcdb::Auc>}}},
-      {"esvc", {{"acc", add_<lcdb::ESVC, lcdb::Acc>},
-                {"crs", add_<lcdb::ESVC, lcdb::Crs>},
-                {"bri", add_<lcdb::ESVC, lcdb::Bri>},
-                {"auc", add_<lcdb::ESVC, lcdb::Auc>}}},
       {"gsvc", {{"acc", add_<lcdb::GSVC, lcdb::Acc>},
                 {"crs", add_<lcdb::GSVC, lcdb::Crs>},
                 {"bri", add_<lcdb::GSVC, lcdb::Bri>},
@@ -725,10 +696,6 @@ void add ( size_t id, const std::string& algo, const std::string& loss,
                 {"crs", hptadd_<lcdb::LSVC, lcdb::Crs,cont>},
                 {"bri", hptadd_<lcdb::LSVC, lcdb::Bri,cont>},
                 {"auc", hptadd_<lcdb::LSVC, lcdb::Auc,cont>}}},
-      {"esvc", {{"acc", hptadd_<lcdb::ESVC, lcdb::Acc,cont>},
-                {"crs", hptadd_<lcdb::ESVC, lcdb::Crs,cont>},
-                {"bri", hptadd_<lcdb::ESVC, lcdb::Bri,cont>},
-                {"auc", hptadd_<lcdb::ESVC, lcdb::Auc,cont>}}},
       {"gsvc", {{"acc", hptadd_<lcdb::GSVC, lcdb::Acc,cont>},
                 {"crs", hptadd_<lcdb::GSVC, lcdb::Crs,cont>},
                 {"bri", hptadd_<lcdb::GSVC, lcdb::Bri,cont>},
@@ -843,7 +810,6 @@ int main(int argc, char* argv[])
       LOG("Number of reps     -> " << nreps << "\n");
       LOG("HPT enabled        -> " << (hpt ? "Yes" : "No") << "\n");
 
-      PRINT(lcdb::lambdas)
       // Call the function to run the experiment
       if (type == "rands")
           rands(id, algo, loss, seed, nreps, hpt);

@@ -13,7 +13,7 @@ namespace algo {
 namespace classification {
 
 template<class KERNEL=mlpack::LinearKernel,
-         size_t SOLVER= 1,
+         size_t SOLVER=0,
          class T=DTYPE>
 class SVM 
 {

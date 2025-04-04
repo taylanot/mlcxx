@@ -27,9 +27,9 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #define PRINT_ERR(...) std::cerr << '\n' <<  __VA_ARGS__ << '\n' << std::endl; 
 
 #ifdef DISABLE_WARNINGS
-#define WARNING(msg) // Do nothing
+#define WARN(msg) // Do nothing
 #else
-#define WARNING(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
+#define WARN(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
 #endif
 
 #ifdef DISABLE_LOGS

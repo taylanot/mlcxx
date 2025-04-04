@@ -27,8 +27,8 @@ template<class MODEL,
          class OPT,
          class O>
 LCurveHPT<MODEL,LOSS,CV,OPT,O>::LCurveHPT ( const arma::irowvec& Ns,
-                                            const double repeat,
-                                            const double cvp,
+                                            const size_t repeat,
+                                            const CVP cvp,
                                             const bool parallel, 
                                             const bool prog ) :
 repeat_(repeat), Ns_(Ns), parallel_(parallel), prog_(prog), cvp_(cvp)
@@ -79,9 +79,10 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
       const arma::Mat<O> inps = inputs.cols(idx);
       const T  labs = labels.cols(idx);
-      mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> hpt(cvp_,
-          inps, labs);
+      /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> hpt(cvp_, */
+      /*     inps, labs); */
 
+      auto hpt = _GetHpt(inps,labs);
       hpt.Optimize(args...);
       MODEL model = std::move(hpt.BestModel());
       model.Train(inps,labs);
@@ -126,9 +127,10 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::RandomSet ( const arma::Mat<O>& inputs,
       T ytrn = std::get<2>(res);
       T ytst = std::get<3>(res);
 
-      mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
-                                                          hpt(cvp_, Xtrn, ytrn);
+      /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> */
+      /*                                                     hpt(cvp_, Xtrn, ytrn); */
 
+      auto hpt = _GetHpt(Xtrn,ytrn);
       hpt.Optimize(args...);
       MODEL model = std::move(hpt.BestModel());
       model.Train(Xtrn, ytrn);
@@ -197,8 +199,9 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs,
     {
       data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
 
-      mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
-                                                          hpt(cvp_, Xtrn, ytrn);
+      /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> */
+      /*                                                     hpt(cvp_, Xtrn, ytrn); */
+      auto hpt = _GetHpt(Xtrn,ytrn);
       hpt.Optimize(args...);
       MODEL model = std::move(hpt.BestModel());
       model.Train(Xtrn, ytrn);
@@ -257,21 +260,37 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
       const arma::Mat<O> Xtrn = std::get<0>(res);
       const auto ytrn = std::get<2>(res);
 
-      mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
-                                                          hpt(cvp_, Xtrn, ytrn);
+      /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> */
+      /*                                                     hpt(cvp_, Xtrn, ytrn); */
+      auto hpt = _GetHpt(Xtrn,ytrn);
       hpt.Optimize(args...);
       MODEL model = std::move(hpt.BestModel());
       model.Train(Xtrn, ytrn);
 
-      /* test_errors_(j,i) = static_cast<O>(loss.Evaluate(model, testset.inputs_, */
-      /*                       testset.labels_)); */
       test_errors_(j,i) = loss.Evaluate(model,testset.inputs_,testset.labels_);
       if (prog_)
         pb.Update();
     }
   }
 
+}
+template<class MODEL,
+         class LOSS,
+         template<typename, typename, typename, typename, typename> class CV,
+         class OPT,
+         class O>
+template<class T>
+mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> 
+ LCurveHPT<MODEL,LOSS,CV,OPT,O>::_GetHpt ( const arma::Mat<DTYPE>& Xtrn,
+                                           const T& ytrn )
+{
 
+  if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
+    return mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
+      (cvp_, Xtrn, ytrn);
+  else
+    return mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
+      (cvp_, Xtrn, ytrn,size_t(arma::unique(ytrn).eval().n_elem));
 }
 
 } // namespace src
