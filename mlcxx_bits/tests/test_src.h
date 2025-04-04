@@ -273,6 +273,7 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
 
   TEST_CASE("CLASSIFICATION")
   {
+    using MODEL = algo::classification::NMC<>;
     SUBCASE("BOOT")
     {
       int D, N, Nc;
@@ -282,12 +283,11 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       dataset.Generate(type);
 
       arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
-      int repeat = 100; 
-      src::LCurveHPT<algo::classification::NMC<>,
-                     mlpack::Accuracy> lcurve(Ns,repeat);
+      int repeat = 10; 
+      src::LCurveHPT<MODEL,mlpack::Accuracy> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
-      lcurve.Bootstrap(dataset,mlpack::Fixed(Nc),hps);
+      lcurve.Bootstrap(dataset,hps);
 
       CHECK (!is_decr(arma::mean(lcurve.GetResults())));
     }
@@ -303,11 +303,11 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       int repeat = 100; 
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
-      src::LCurveHPT<algo::classification::NMC<>,
+      src::LCurveHPT<MODEL,
                      mlpack::Accuracy> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
-      lcurve.RandomSet<data::N_StratSplit>(inputs,labels,mlpack::Fixed(Nc),hps);
+      lcurve.RandomSet<data::N_StratSplit>(inputs,labels,hps);
 
       CHECK (!is_decr(arma::mean(lcurve.GetResults())));
     }
@@ -324,11 +324,11 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       int repeat = 100; 
       auto inputs = dataset.inputs_;
       auto labels = dataset.labels_;
-      src::LCurveHPT<algo::classification::NMC<>,
+      src::LCurveHPT<MODEL,
                      mlpack::Accuracy> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
-      lcurve.Additive<data::N_StratSplit>(inputs,labels,mlpack::Fixed(Nc),hps);
+      lcurve.Additive<data::N_StratSplit>(inputs,labels,hps);
 
       CHECK (!is_decr(arma::mean(lcurve.GetResults())));
     }
@@ -347,11 +347,11 @@ TEST_SUITE("LEARNINGCURVESWITHHPT") {
       arma::irowvec Ns = arma::regspace<arma::irowvec>(10,1,12);
       int repeat = 100; 
 
-      src::LCurveHPT<algo::classification::NMC<>,
+      src::LCurveHPT<MODEL,
                   mlpack::Accuracy> lcurve(Ns,repeat);
       
       auto hps = arma::linspace<arma::Row<DTYPE>>(0.01,1,10);
-      lcurve.Split<data::N_StratSplit>(trainset,testset,mlpack::Fixed(Nc),hps);
+      lcurve.Split<data::N_StratSplit>(trainset,testset,hps);
 
       CHECK (!is_decr(arma::mean(lcurve.GetResults())));
     }

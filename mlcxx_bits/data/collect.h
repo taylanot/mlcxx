@@ -9,13 +9,12 @@
 #define COLLECT_H
 
 namespace data {
-namespace classification {
 namespace oml {
 
 //=============================================================================
 // Collect
 //=============================================================================
-template<class T=DTYPE>
+template<class T=size_t>
 class Collect
 {
 public:
@@ -63,7 +62,6 @@ private:
 
 
 } // namesapce oml
-} // namesapce classification
 } // namesapce data
 
 #include "collect_impl.h"

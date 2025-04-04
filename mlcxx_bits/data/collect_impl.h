@@ -9,7 +9,6 @@
 #define COLLECT_IMPL_H
 
 namespace data {
-namespace classification {
 namespace oml {
 
 //=============================================================================
@@ -120,7 +119,6 @@ arma::Row<size_t> Collect<T>::_getkeys()
 }
 
 } // namesapce oml
-} // namesapce classification
 } // namesapce data
 
 #endif

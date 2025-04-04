@@ -188,8 +188,10 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs,
     T yrest = std::get<3>(res);
 
     
-    mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
-                                                          hpt(cvp_, Xtrn, ytrn);
+    /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> */
+    /*                                                       hpt(cvp_, Xtrn, ytrn); */
+
+    auto hpt = _GetHpt(Xtrn,ytrn);
     hpt.Optimize(args...);
     MODEL model = hpt.BestModel();
     model.Train(Xtrn, ytrn);
@@ -200,7 +202,7 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Additive ( const arma::Mat<O>& inputs,
       data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
 
       /* mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>> */
-      /*                                                     hpt(cvp_, Xtrn, ytrn); */
+      /*                                              hpt(cvp_, Xtrn, ytrn); */
       auto hpt = _GetHpt(Xtrn,ytrn);
       hpt.Optimize(args...);
       MODEL model = std::move(hpt.BestModel());

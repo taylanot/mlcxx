@@ -9,8 +9,8 @@
 
 TEST_SUITE("OPENML") {
 
-  using Dataset = data::classification::oml::Dataset<>;
-  using Collect = data::classification::oml::Collect<>;
+  using Dataset = data::oml::Dataset<>;
+  using Collect = data::oml::Collect<>;
 
   TEST_CASE("Dataset")
   {

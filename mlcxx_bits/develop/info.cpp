@@ -42,7 +42,7 @@ int main(int argc, char** argv)
     arma::irowvec Ns = {10,5};
     arma::Row<DTYPE> lambdas = {1,10};
     src::LCurveHPT<LREG,mlpack::Accuracy> lcurve(Ns, 2,0.2);
-    lcurve.Bootstrap(data.inputs_,data.labels_,lambdas);
+    lcurve.Additive(data.inputs_,data.labels_,lambdas);
     PRINT_VAR(lcurve.GetResults());
     PRINT_TIME(total_timer.toc());
 
