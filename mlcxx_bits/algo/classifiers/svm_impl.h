@@ -16,7 +16,7 @@ template<class KERNEL,size_t SOLVER,class T>
 template<class... Args>
 SVM<KERNEL,SOLVER,T>::SVM ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels,
-                     const size_t& num_class,
+                     const size_t num_class,
                      const T& C,
                      const Args&... args) : 
                       nclass_(num_class), C_(C), cov_(args...)
@@ -48,7 +48,7 @@ template<class KERNEL,size_t SOLVER,class T>
 template<class... Args>
 SVM<KERNEL,SOLVER,T>::SVM ( const arma::Mat<T>& inputs,
                             const arma::Row<size_t>& labels,
-                            const size_t& num_class,
+                            const size_t num_class,
                             const Args&... args ) :
                       nclass_(num_class), C_(T(1.0)), cov_(args...)
 {

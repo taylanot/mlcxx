@@ -36,6 +36,8 @@ public:
   void Set ( const size_t& D,
              const size_t& N );
 
+  void Update ( const arma::Mat<T>& input, const arma::Mat<T>& labels  ); 
+
   void Outlier_ ( const size_t& Nout );
 
   void Generate ( const double& scale,
@@ -73,9 +75,23 @@ public:
               const bool count = false );
 
   arma::Row<T> GetLabels( const size_t id );
+
+  /* Serliazation with cereal for the class. */
+  template <class Archive>
+  void serialize(Archive& ar) 
+  {
+    ar( CEREAL_NVP(size_),
+        CEREAL_NVP(inputs_),
+        CEREAL_NVP(labels_),
+        CEREAL_NVP(dimension_) );
+  }
+
+
 private:
   arma::Col<T> mean_;
   arma::Mat<T> cov_;
+
+  void _update_info ( );
 
 };
 
@@ -189,6 +205,7 @@ struct Dataset
              const size_t& N,
              const size_t& Nc );
 
+
   void Generate ( const std::string& type );
 
   void _banana ( const double& delta );
@@ -209,6 +226,18 @@ struct Dataset
               const bool last = true,
               const bool transpose = true ,
               const bool count = false );
+
+  /* Serliazation with cereal for the class. */
+  template <class Archive>
+  void serialize(Archive& ar) 
+  {
+    ar( CEREAL_NVP(size_),
+        CEREAL_NVP(num_class_),
+        CEREAL_NVP(inputs_),
+        CEREAL_NVP(labels_),
+        CEREAL_NVP(dimension_) );
+  }
+
 };
 
 } // namespace classification
@@ -228,11 +257,6 @@ public:
   size_t num_class_;
   std::filesystem::path path_; 
 
-private:
-  std::filesystem::path filepath_ = path_ / "datasets";
-  std::filesystem::path metapath_ = path_ / "meta";
-
-public:
   arma::Mat<T> inputs_;
   arma::Row<LTYPE> labels_;
 
@@ -242,12 +266,33 @@ public:
 
   Dataset ( const size_t& id );
 
-  /* Dataset ( const size_t& id, const std::filesystem::path& path ); */
+  void Update ( const arma::Mat<T>& input, const arma::Row<LTYPE>& labels  ); 
+
+  /* Serliazation with cereal for the class. */
+  template <class Archive>
+  void serialize(Archive& ar) 
+  {
+    ar( CEREAL_NVP(size_),
+        CEREAL_NVP(id_),
+        CEREAL_NVP(path_.string()),
+        CEREAL_NVP(num_class_),
+        CEREAL_NVP(meta_url_),
+        CEREAL_NVP(down_url_),
+        CEREAL_NVP(file_),
+        CEREAL_NVP(metafile_),
+        CEREAL_NVP(inputs_),
+        CEREAL_NVP(labels_),
+        CEREAL_NVP(dimension_) );
+  }
 
 
 private:
 
+  std::filesystem::path filepath_ = path_ / "datasets";
+  std::filesystem::path metapath_ = path_ / "meta";
+
   bool _download (  ); 
+  void _update_info(  ); 
 
   void _load ( );
 
@@ -268,6 +313,8 @@ private:
 
   std::string file_;
   std::string metafile_;
+
+
 
 };
 

@@ -67,6 +67,8 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
 
   ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
 
+
+  arma::uvec ids = arma::regspace<arma::uvec>(0,inputs.n_elem);
   #pragma omp parallel for collapse(2) if(parallel_)
   for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
     for(size_t j=0; j < size_t(repeat_); j++)
@@ -75,10 +77,11 @@ void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs,
                                 arma::distr_param(0,labels.n_elem-1));
       const arma::Mat<O> inps = inputs.cols(idx); 
       const T labs = labels.cols(idx); 
+      const auto rest = data::SetDiff(ids,idx);
       MODEL model(inps,labs,args...);
 
-      test_errors_(j,i) = loss_.Evaluate(model,inputs,
-                                               labels);
+      test_errors_(j,i) = loss_.Evaluate(model,inputs.cols(rest).eval(),
+                                               labels.cols(rest).eval());
       if (prog_)
         pb.Update();
     }

@@ -10,6 +10,8 @@
 #include "src/lcurve.h"
 #include "src/lcurve_hpt.h"
 
+#include "src/lcurve_new.h"
+
 /* #include "src/lcurve_legacy.h" */
 /* #include "src/lcurve_hpt_legacy.h" */
 

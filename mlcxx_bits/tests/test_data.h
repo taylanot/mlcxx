@@ -737,4 +737,20 @@ TEST_SUITE("STRATIFIED-SPLIT") {
 
 }
 
+TEST_SUITE("Manipulation") {
+  TEST_CASE("SetDiff")
+  {
+    arma::uvec a = {1,2,3,4};
+    arma::uvec b = {1,3};
+    arma::uvec expect = {2,4};
+
+    auto res = data::SetDiff(a,b);
+    CHECK ( arma::all(res == expect) );
+
+
+  }
+  
+}
+
+#
 #endif

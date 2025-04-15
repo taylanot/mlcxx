@@ -37,7 +37,7 @@ class SVM
    * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const size_t& num_class, const T& C, const Args&... args ) : 
+  SVM ( const size_t num_class, const T& C, const Args&... args ) : 
                        solver_("QP"),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
    * @param num_class : number of classes
@@ -46,7 +46,7 @@ class SVM
    * @param args      : kernel parameters
    */
   template<class... Args>
-  SVM ( const size_t& num_class, const std::string solver, 
+  SVM ( const size_t num_class, const std::string solver, 
         const T& C, const Args&... args ) :
         solver_(solver),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
@@ -59,7 +59,7 @@ class SVM
   template<class... Args>
   SVM ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
-        const size_t& num_class,
+        const size_t num_class,
         const T& C,
         const Args&... args );
  /**
@@ -71,7 +71,7 @@ class SVM
   template<class... Args>
   SVM ( const arma::Mat<T>& inputs,
         const arma::Row<size_t>& labels,
-        const size_t& num_class,
+        const size_t num_class,
         const Args&... args );
 
   /**

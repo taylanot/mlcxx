@@ -4,9 +4,6 @@
  *
  * A simple toy data generation interface
  *
- * TODO: Increase the dimensionality, add some classification datasets banana??
- * TODO: Maybe add a base class for datagen
- * TODO: Maybe Functional data generation can be done with each_row()
  *
  *
  */
@@ -349,7 +346,7 @@ namespace data {
 namespace classification {
 
 //=============================================================================
-// Dataset
+// classification::Dataset
 //=============================================================================
 template<class T>
 Dataset<T>::Dataset ( const arma::Mat<T>& inputs,
@@ -363,6 +360,7 @@ Dataset<T>::Dataset ( const size_t& D,
                       const size_t& N,
                       const size_t& Nc ) :
                       size_(N), dimension_(D), num_class_(Nc) { }
+
 
 template<class T>
 void Dataset<T>::Generate ( const std::string& type )
@@ -566,6 +564,7 @@ void Dataset<T>::Load ( const std::string& filename,
   }
 }
 
+
 } // namespace classification
 
 namespace oml
@@ -604,6 +603,13 @@ Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path )
     WARN("Dataset " << id_ << " is already present.");
     this->_load();
   }
+}
+
+template<class LTYPE,class T>
+void Dataset<LTYPE,T>::Update ( const arma::Mat<T>& inputs,
+                                const arma::Row<LTYPE>& labels  )
+{
+  inputs_ = inputs; labels_ = labels; this->_update_info();
 }
 
 template<class LTYPE,class T>
@@ -901,11 +907,17 @@ void Dataset<LTYPE,T>::_load( )
   /* labels_ = _procrow(data.row(idx)); */
   data.shed_row(idx);
   inputs_ = data;
-  dimension_ = inputs_.n_rows;
-  size_ = inputs_.n_cols;
-  num_class_ = (arma::unique(labels_).eval()).n_elem;
+  this->_update_info();
 }
 
+template<class LTYPE,class T>
+void Dataset<LTYPE,T>::_update_info( )
+{
+  dimension_ = inputs_.n_rows;
+  size_ = inputs_.n_cols;
+  if (std::is_same<LTYPE,size_t>::value)
+    num_class_ = (arma::unique(labels_).eval()).n_elem;
+}
 
 } // namespace oml
 
