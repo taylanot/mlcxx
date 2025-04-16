@@ -75,6 +75,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 #include <random>
 #include <cassert>
 #include <regex>
+#include <optional>
 #include <type_traits>
 #include <unordered_map>
 #include <unistd.h>

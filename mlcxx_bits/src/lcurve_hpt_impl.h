@@ -276,9 +276,10 @@ void LCurveHPT<MODEL,LOSS,CV,OPT,O>::Split( const T& trainset,
   }
 
 }
+
 template<class MODEL,
          class LOSS,
-         template<typename, typename, typename, typename, typename> class CV,
+         template<class, class, class, class, class> class CV,
          class OPT,
          class O>
 template<class T>
@@ -286,7 +287,6 @@ mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
  LCurveHPT<MODEL,LOSS,CV,OPT,O>::_GetHpt ( const arma::Mat<DTYPE>& Xtrn,
                                            const T& ytrn )
 {
-
   if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
     return mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
       (cvp_, Xtrn, ytrn);

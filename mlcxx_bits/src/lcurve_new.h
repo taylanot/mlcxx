@@ -20,6 +20,8 @@ template< class MODEL,
           class DATASET,
           class SPLIT,
           class LOSS,
+          template<class,class,class,class,class> class CV= mlpack::SimpleCV,
+          class OPT=ens::GridSearch,
           class O=DTYPE>
 class LCurve
 {
@@ -34,10 +36,33 @@ public:
    * @param repeat      : amount of times the training for single N takes place
    * @param parallel    : boolean for using parallel computations 
    * @param prog        : boolean for showing the progrress bar
+   * @param name        : name the object later on used for saving etc...
    *
    */
   LCurve ( const arma::Row<size_t>& Ns,
            const size_t repeat,
+           const bool parallel = false, 
+           const bool prog = false,
+           const std::string name = "LCurve" );
+
+  /* Learning Curve Generator
+   *
+   * @param Ns          : row vector of training points 
+   * @param repeat      : amount of times the training for single N takes place
+   * @param parallel    : boolean for using parallel computations 
+   * @param prog        : boolean for showing the progrress bar
+   * @param name        : name the object later on used for saving etc...
+   *
+   */
+  using CVP = typename std::conditional<
+        std::is_same<CV<MODEL, LOSS, OPT, O, O>,
+                     mlpack::SimpleCV<MODEL, LOSS, OPT, O, O>>::value,
+        DTYPE, // Use DTYPE if CV is SimpleCV
+        size_t // Otherwise, use size_t
+    >::type;
+  LCurve ( const arma::Row<size_t>& Ns,
+           const size_t repeat,
+           const CVP cvp = 0.2,
            const bool parallel = false, 
            const bool prog = false,
            const std::string name = "LCurve" );
@@ -52,18 +77,6 @@ public:
   void Generate ( const DATASET& dataset,
                   const Ts&... args );
 
-  /* Generate Learning Curves with RandomSet Selection
-   *
-   * @param inputs    : whole large dataset inputs
-   * @param labels    : whole large dataset labels
-   * @param args      : possible arguments for the model initialization
-   *
-   */
-  template<class T, class... Ts>
-  void Generate ( const arma::Mat<O>& inputs,
-                  const T& labels,
-                  const Ts&... args );
-
   /* Generate Learning Curves with Train and Test Splitted Datasets
    *
    * @param trainset  : dataset used for training 
@@ -71,14 +84,15 @@ public:
    * @param args      : possible arguments for the model initialization
    *
    */
-  template<class T, class... Ts>
-  void Generate ( const T& trainset,
-                  const T& testset,
+  template<class... Ts>
+  void Generate ( const DATASET& trainset,
+                  const DATASET& testset,
                   const Ts&... args );
+
 
   /* Continue Learning Curve Generation
    *
-   *
+   * @param args      : possible arguments for the model initialization
    */
   template<class... Ts>
   void Continue ( const Ts&... args );
@@ -111,10 +125,16 @@ public:
    *
    * @param filename : binary file name
    */
-  static std::shared_ptr<LCurve<MODEL,DATASET,SPLIT,LOSS,O>> Load 
+  static std::shared_ptr<LCurve<MODEL,DATASET,SPLIT,LOSS,CV,OPT,O>> Load 
                                               ( const std::string& filename ); 
   arma::Mat<O> test_errors_;
+
 private: 
+
+  template<class T>
+  mlpack::HyperParameterTuner<MODEL,LOSS,CV,OPT,arma::Mat<O>>
+    _GetHpt (const arma::Mat<DTYPE>& Xtrn, const T& ytrn);
+
   void _CheckStatus( );
   /* Split your data */
   void _SplitData( DATASET dataset );
@@ -138,6 +158,7 @@ private:
 
   LOSS loss_;
   SPLIT split_;
+  std::optional<CVP> cvp_;
 
   /* arma::Mat<O> test_errors_; */
 };
