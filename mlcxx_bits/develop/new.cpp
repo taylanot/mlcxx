@@ -11,37 +11,48 @@
 
 using Dataset = data::oml::Dataset<DTYPE>;
 using namespace lcurve;
-
+using LCurve_=LCurve<mlpack::LinearRegression<>,
+                    Dataset,
+                    data::RandomSelect,
+                    /* data::Bootstrap, */
+                    /* data::Additive, */
+                    mlpack::MSE>;
 int main ( ) 
 {
-  Dataset data(212);
+  /* Dataset data(212); */
   
-  auto Ns = arma::regspace<arma::Row<size_t>>(10,1,12);
-  LCurve<mlpack::LinearRegression<>,
-         Dataset,
-         data::RandomSelect,
-         /* data::Bootstrap, */
-         /* data::Additive, */
-         /* mlpack::MSE> curve(Ns,size_t(2),0.2,true,true); */
-         mlpack::MSE> curve(Ns,size_t(2),DTYPE(0.2),true,true);
-  auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
-  /* curve.Generate(data); */
-  curve.Generate(data,lambdas);
-  PRINT_VAR(curve.GetResults());
-  curve.test_errors_(0,0) = arma::datum::nan;
-  curve.test_errors_(1,2) = arma::datum::nan;
-  PRINT_VAR(curve.GetResults());
-  curve.Generate(data,lambdas);
-  /* curve.Generate(data); */
-  PRINT_VAR(curve.GetResults());
+  /* auto Ns = arma::regspace<arma::Row<size_t>>(10,1,12); */
+  /* LCurve<mlpack::LinearRegression<>, */
+  /*        Dataset, */
+  /*        data::RandomSelect, */
+  /*        /1* data::Bootstrap, *1/ */
+  /*        /1* data::Additive, *1/ */
+  /*        /1* mlpack::MSE> curve(Ns,size_t(2),0.2,true,true); *1/ */
+  /*        mlpack::MSE> curve(Ns,size_t(10000),DTYPE(0.2),true,true); */
+  /* auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
+  /* /1* curve.Generate(data); *1/ */
+  /* curve.Generate(data,lambdas); */
+  /* /1* PRINT_VAR(curve.GetResults()); *1/ */
+  /* /1* curve.test_errors_(0,0) = arma::datum::nan; *1/ */
+  /* /1* curve.test_errors_(1,2) = arma::datum::nan; *1/ */
+  /* /1* PRINT_VAR(curve.GetResults()); *1/ */
+  /* /1* curve.Generate(data,lambdas); *1/ */
+  /* /1* /2* curve.Generate(data); *2/ *1/ */
+  /* /1* PRINT_VAR(curve.GetResults()); *1/ */
 
 
-  /* arma::mat A(5, 5, arma::fill::randu); */
+  /* /1* arma::mat A(5, 5, arma::fill::randu); *1/ */
 
-  /* A.fill(arma::datum::nan); */
-  /*  arma::uvec indices = arma::find_nan(A); */
-  /* PRINT(A); */
-  /* PRINT_VAR(indices) */
+  /* /1* A.fill(arma::datum::nan); *1/ */
+  /* /1*  arma::uvec indices = arma::find_nan(A); *1/ */
+  /* /1* PRINT(A); *1/ */
+  /* /1* PRINT_VAR(indices) *1/ */
+
+  auto loaded = LCurve_::Load(std::string("LCurve.bin"));
+  LCurve_ task = std::move(*loaded);
+  PRINT(task.GetResults());
+
+
 
   return 0;
 }

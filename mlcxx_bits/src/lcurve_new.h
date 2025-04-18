@@ -43,6 +43,7 @@ public:
            const size_t repeat,
            const bool parallel = false, 
            const bool prog = false,
+           const std::filesystem::path path = "./",
            const std::string name = "LCurve" );
 
   /* Learning Curve Generator
@@ -65,6 +66,7 @@ public:
            const CVP cvp = 0.2,
            const bool parallel = false, 
            const bool prog = false,
+           const std::filesystem::path path = "./",
            const std::string name = "LCurve" );
 
   /* Generate Learning Curves 
@@ -136,8 +138,12 @@ private:
     _GetHpt (const arma::Mat<DTYPE>& Xtrn, const T& ytrn);
 
   void _CheckStatus( );
-  /* Split your data */
-  void _SplitData( DATASET dataset );
+
+  /* Split your dataset
+   *
+   * @param dataset : whole dataset
+   */
+  void _SplitData( const DATASET& dataset );
 
   /* Clean Up Method for the over-time processes */
   void _CleanUp( );
@@ -153,8 +159,11 @@ private:
   bool parallel_;
   bool prog_;
   std::string name_;
+  std::filesystem::path path_;
+
   std::unordered_map<size_t,std::pair<DATASET,DATASET> > data_;
   arma::uvec jobs_;
+  std::optional<DATASET> testset_;
 
   LOSS loss_;
   SPLIT split_;

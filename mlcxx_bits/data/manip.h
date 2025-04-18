@@ -925,29 +925,6 @@ struct Additive
   }
 };
 
-/**
- * Given a dataset, first do a train-test split then select N of them randomly 
- * without replacement from the trainset
- *
- * @param dataset : dataset to be splited 
- * @param size    : size of the selection
- * @param repeat  : how many times repeat the process
- */
-
-struct Split
-{
-  
-  template<class DATASET,class T>
-  void operator()
-  ( const DATASET& dataset, const arma::Row<T> sizes, const size_t repeat,
-    std::unordered_map<size_t,std::pair<DATASET,DATASET>>& collect,
-    size_t& counter )
-	{
-   
-	}
-
-};
-
 } // namespace data
 #endif
 

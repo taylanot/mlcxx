@@ -70,7 +70,7 @@ all: $(TARGETS)
 
 $(TARGETS): % : %.cpp 
 	@mkdir -p $(dir $(BUILD_DIR)/$@)
-	$(CXX) $(CXXFLAGS) $< -o $< -o $(addprefix $(BUILD_DIR)/,$@) $(LDFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $< -o $(addprefix $(BUILD_DIR)/,$@) $(LDFLAGS) $(LIBS)
 
 # Rule for cleaning
 clean:
