@@ -11,6 +11,7 @@
 #include "dataset.h"
 #include "collect.h"
 #include "manip.h"
+#include "sample.h"
 #include "transform.h"
 
 namespace data {

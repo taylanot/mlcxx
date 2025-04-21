@@ -153,11 +153,12 @@ void LCurve<MODEL,DATASET,
                                              const Ts&... args )
 {
   testset_=testset;
+
   if (data_.empty() && !test_errors_.is_finite())
     this->_SplitData(trainset);
   else
     this->_CheckStatus();
-
+  PRINT("OUT")
   // With this version you cannot use the split version, fyi....
   BOOST_ASSERT_MSG( int(Ns_.max()) < int(trainset.inputs_.n_cols), 
         "There are not enough data for test set creation!" );
@@ -183,8 +184,8 @@ void LCurve<MODEL,DATASET,
                   data_[jobs_[k]].first.labels_);
 
       test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
-                          loss_.Evaluate(model,testset_.inputs_,
-                                               testset_.labels_);
+                          loss_.Evaluate(model,testset_.value().inputs_,
+                                               testset_.value().labels_);
     }
     else
     {
@@ -192,8 +193,8 @@ void LCurve<MODEL,DATASET,
                 data_[jobs_[k]].first.labels_, args...);
 
     test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
-                          loss_.Evaluate(model,testset_.inputs_,
-                                               testset_.labels_);
+                          loss_.Evaluate(model,testset_.value().inputs_,
+                                               testset_.value().labels_);
     }
 
     if (prog_)
@@ -227,32 +228,48 @@ void LCurve<MODEL,DATASET,
   {
     this->_CheckStatus();
 
+    ProgressBar pb("LCurve.Generate", jobs_.n_elem);
+    #pragma omp parallel for if (parallel_)
+    for (size_t k=0; k < jobs_.n_elem ; k++)
+    {
+      if (cvp_.has_value())
+      {
+        auto hpt = _GetHpt(data_[jobs_[k]].first.inputs_,
+                           data_[jobs_[k]].first.labels_);
 
-    // Here I should be able to call merge all the above code to continue 
-    // my generation, right?
-    
-    /* ProgressBar pb("LCurve.Generate", Ns_.n_elem*repeat_); */
+        hpt.Optimize(args...);
+        MODEL model = std::move(hpt.BestModel());
+        model.Train(data_[jobs_[k]].first.inputs_,
+                    data_[jobs_[k]].first.labels_);
 
-    /* #pragma omp parallel for if (parallel_) */
-    /* for (size_t k=0; k < jobs_.n_elem ; k++) */
-    /* { */
-    /*   MODEL model(data_[jobs_[k]].first.inputs_, */
-    /*               data_[jobs_[k]].first.labels_, args...); */
+        if(testset_.has_value()) 
+          test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
+                              loss_.Evaluate(model,testset_.value().inputs_,
+                                                   testset_.value().labels_);
+        else
+          test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
+                            loss_.Evaluate(model,data_[jobs_[k]].second.inputs_,
+                                                data_[jobs_[k]].second.labels_);
+      }
+      else
+      {
+        MODEL model(data_[jobs_[k]].first.inputs_,
+                  data_[jobs_[k]].first.labels_, args...);
 
-    /*   if (testset_.has_value()) */
-    /*     test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = */ 
-    /*                           loss_.Evaluate(model,testset_.inputs_, */
-    /*                                                testset_.labels_); */
-    /*   else */
-    /*   test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = */ 
-    /*                       loss_.Evaluate(model,data_[jobs_[k]].second.inputs_, */
-    /*                                            data_[jobs_[k]].second.labels_); */
+        if (testset_.has_value()) 
+          test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
+                            loss_.Evaluate(model,testset_.value().inputs_,
+                                                 testset_.value().labels_);
+        else
+          test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = 
+                            loss_.Evaluate(model,data_[jobs_[k]].second.inputs_,
+                                                data_[jobs_[k]].second.labels_);
+      }
 
-    /*   if (prog_) */
-    /*     pb.Update(); */
-    /* } */
+      if (prog_)
+        pb.Update();
+    }
   }
-    
 }
 
 //=============================================================================
@@ -268,7 +285,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,CV,OPT,O>::_CheckStatus(  )
 {
   if (jobs_.empty())
     jobs_.clear();
-  jobs_ = arma::find_nan( test_errors_ );
+  jobs_ = arma::find_nan( test_errors_.t() );
 }
 
 //=============================================================================
@@ -407,4 +424,37 @@ LCurve<MODEL,DATASET,
 }
 
 } // namespace lcurve
+
+
+namespace cereal
+{
+
+	template <class Archive, class T>
+	void save(Archive& ar, const std::optional<T>& opt)
+	{
+    bool hasVal = opt.has_value();
+		ar(CEREAL_NVP(hasVal));
+		if (hasVal)
+		{
+			const T& value = *opt;
+			ar(cereal::make_nvp("value", value));
+		}
+	}
+
+	template <class Archive, class T>
+	void load(Archive& ar, std::optional<T>& opt)
+	{
+  	bool hasVal;
+		ar(CEREAL_NVP(hasVal));
+		if (hasVal)
+		{
+			T value;
+			ar(CEREAL_NVP(value));
+			opt = std::move(value);
+		}
+		else
+			opt = std::nullopt;
+		
+	}
+}
 #endif

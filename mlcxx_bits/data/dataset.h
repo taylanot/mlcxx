@@ -285,6 +285,12 @@ public:
         CEREAL_NVP(dimension_) );
   }
 
+  /* Save the object to a BinaryFile
+   *
+   * @param filename : binary file name
+   */
+  void Save ( const std::string& filename );
+  static std::shared_ptr<Dataset<LTYPE,T>> Load ( const std::string& filename );
 
 private:
 

@@ -114,6 +114,8 @@ public:
         CEREAL_NVP(name_),
         CEREAL_NVP(data_),
         CEREAL_NVP(jobs_),
+        CEREAL_NVP(cvp_),
+        CEREAL_NVP(testset_),
         CEREAL_NVP(test_errors_));
   }
 

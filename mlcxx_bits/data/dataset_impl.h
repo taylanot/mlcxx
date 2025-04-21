@@ -887,6 +887,35 @@ arma::Row<size_t> Dataset<LTYPE,T>::_procrow(const arma::Row<T>& row)
     return _convcateg(row);
 }
 
+template<class LTYPE,class T>
+void Dataset<LTYPE,T>::Save( const std::string& filename )
+{
+  std::ofstream file(filename, std::ios::binary);
+  if (!file) 
+    ERR("\rCannot open file for writing: " << filename << std::flush);
+
+  cereal::BinaryOutputArchive archive(file);
+  archive(cereal::make_nvp("Dataset", *this));  // Serialize the current object
+  LOG("\rDataset object saved to " << filename << std::flush);
+
+}
+
+template<class LTYPE,class T>
+std::shared_ptr<Dataset<LTYPE,T>> Dataset<LTYPE,T>::Load 
+                                                ( const std::string& filename )
+{
+  std::ifstream file(filename, std::ios::binary);
+  if (!file) 
+  {
+    ERR("\rError: Cannot open file for reading: " << filename);
+    return nullptr;
+  }
+  cereal::BinaryInputArchive archive(file);
+  auto dataset = std::make_shared<Dataset<LTYPE,T>>();
+  archive(cereal::make_nvp("Dataset", *dataset));// Deserialize into a new object
+  LOG("\rDataset loaded from " << filename);
+  return dataset;
+}
 
 template<class LTYPE,class T>
 void Dataset<LTYPE,T>::_load( )
