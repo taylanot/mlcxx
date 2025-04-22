@@ -131,7 +131,7 @@ class LDC
   }
 
   private:
-
+  public:
   size_t dim_;
   size_t num_class_;
   size_t size_;
