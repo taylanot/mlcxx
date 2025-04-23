@@ -74,8 +74,10 @@ template<class MODEL,
 template<class... Ts>
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
 {
-   ProgressBar pb("LCurve.Generate", jobs_.n_elem);
+  if (arma::find_nan(test_errors_).n_elem != jobs_.n_elem)
+    this->_CheckStatus();
 
+  ProgressBar pb("LCurve.Generate", jobs_.n_elem);
   #pragma omp parallel for if (parallel_)
   for (size_t k=0; k < jobs_.n_elem ; k++)
   {
@@ -105,10 +107,11 @@ template<template<class,class,class,class,class> class CV,
          class OPT,
          class T,
          class... Ts>
-
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
                                                     const Ts&... args )
 {
+  if (arma::find_nan(test_errors_).eval().n_elem != jobs_.n_elem)
+    this->_CheckStatus();
 
   ProgressBar pb("LCurve.Generate", jobs_.n_elem);
 
@@ -141,75 +144,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
   }
 }
 
-/* /1* Continue Generatig Learning Curves */ 
-/*  * */
-/*  * @param dataset   : whole large dataset inputs */
-/*  * @param args      : possible arguments for the model initialization */
-/*  * */
-/*  *1/ */
-/* template<class MODEL, */
-/*          class DATASET, */
-/*          class SPLIT, */
-/*          class LOSS, */
-/*          template<class, class, class, class, class> class CV, */
-/*          class OPT, */
-/*          class O> */
-/* template<class... Ts> */
-/* void LCurve<MODEL,DATASET, */
-/*             SPLIT,LOSS,CV,OPT,O>::Continue ( const Ts&... args ) */
-/* { */
-/*   /1* if (data_.empty()) *1/ */
-/*   /1* { *1/ */
-/*   /1*   LOG("\rData split was not found.Sorry, but exiting..." << std::flush); *1/ */
-/*   /1*   std::quick_exit(0); *1/ */
-/*   /1* } *1/ */
-/*   /1* else *1/ */
-/*   /1* { *1/ */
-/*   /1*   this->_CheckStatus(); *1/ */
 
-/*   /1*   ProgressBar pb("LCurve.Generate", jobs_.n_elem); *1/ */
-/*   /1*   #pragma omp parallel for if (parallel_) *1/ */
-/*   /1*   for (size_t k=0; k < jobs_.n_elem ; k++) *1/ */
-/*   /1*   { *1/ */
-/*   /1*     if (cvp_.has_value()) *1/ */
-/*   /1*     { *1/ */
-/*   /1*       auto hpt = _GetHpt(data_[jobs_[k]].first.inputs_, *1/ */
-/*   /1*                          data_[jobs_[k]].first.labels_); *1/ */
-
-/*   /1*       hpt.Optimize(args...); *1/ */
-/*   /1*       MODEL model = std::move(hpt.BestModel()); *1/ */
-/*   /1*       model.Train(data_[jobs_[k]].first.inputs_, *1/ */
-/*   /1*                   data_[jobs_[k]].first.labels_); *1/ */
-
-/*   /1*       if(testset_.has_value()) *1/ */ 
-/*   /1*         test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = *1/ */ 
-/*   /1*                             loss_.Evaluate(model,testset_.value().inputs_, *1/ */
-/*   /1*                                                  testset_.value().labels_); *1/ */
-/*   /1*       else *1/ */
-/*   /1*         test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = *1/ */ 
-/*   /1*                           loss_.Evaluate(model,data_[jobs_[k]].second.inputs_, *1/ */
-/*   /1*                                               data_[jobs_[k]].second.labels_); *1/ */
-/*   /1*     } *1/ */
-/*   /1*     else *1/ */
-/*   /1*     { *1/ */
-/*   /1*       MODEL model(data_[jobs_[k]].first.inputs_, *1/ */
-/*   /1*                 data_[jobs_[k]].first.labels_, args...); *1/ */
-
-/*   /1*       if (testset_.has_value()) *1/ */ 
-/*   /1*         test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = *1/ */ 
-/*   /1*                           loss_.Evaluate(model,testset_.value().inputs_, *1/ */
-/*   /1*                                                testset_.value().labels_); *1/ */
-/*   /1*       else *1/ */
-/*   /1*         test_errors_(jobs_[k]/Ns_.n_elem, jobs_[k] % Ns_.n_elem) = *1/ */ 
-/*   /1*                           loss_.Evaluate(model,data_[jobs_[k]].second.inputs_, *1/ */
-/*   /1*                                               data_[jobs_[k]].second.labels_); *1/ */
-/*   /1*     } *1/ */
-
-/*   /1*     if (prog_) *1/ */
-/*   /1*       pb.Update(); *1/ */
-/*   /1*   } *1/ */
-/*   /1* } *1/ */
-/* } */
 
 //=============================================================================
 // LCurve::_CheckStatus
@@ -221,6 +156,7 @@ template<class MODEL,
          class O>
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_CheckStatus(  )
 {
+  WARN("Finding the incomplete jobs...");
   if (jobs_.empty())
     jobs_.clear();
   jobs_ = arma::find_nan( test_errors_.t() );
@@ -256,6 +192,9 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_RegisterSignalHandler( )
   signal(SIGINT, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
   // this handles kill
   signal(SIGTERM, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+  // this handles kill
+  signal(SIGKILL, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+
 }
 
 //=============================================================================
@@ -268,6 +207,8 @@ template<class MODEL,
          class O>
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler( int sig )
 {
+  // If one of the signals is detected by our failsafe function,
+  // a gracefull exit is initiated...
   if (_globalSafeFailFunc) _globalSafeFailFunc();  
   LOG("\rStopping program for some reason! Exiting..." << std::flush);
   std::quick_exit(0);
@@ -301,36 +242,44 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Save ( const std::string& filename )
   if (!file) 
     ERR("\rCannot open file for writing: " << (path_/filename) << std::flush);
 
+  // Serialize the object nicely...
   cereal::BinaryOutputArchive archive(file);
   archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
+                                               //
   LOG("\rLCurve object saved to " << (path_/filename) << std::flush);
 }
 
-/* //============================================================================= */
-/* // LCurve::Load */
-/* //============================================================================= */
-/* template<class MODEL, */
-/*          class DATASET, */
-/*          class SPLIT, */
-/*          class LOSS, */
-/*          template<class, class, class, class, class> class CV, */
-/*          class OPT,class O> */
-/* std::shared_ptr<LCurve<MODEL,DATASET,SPLIT,LOSS,CV,OPT,O>> */ 
-/* LCurve<MODEL,DATASET, */
-/*        SPLIT,LOSS,CV,OPT,O>::Load ( const std::string& filename ) */
-/* { */
-/*   std::ifstream file(filename, std::ios::binary); */
-/*   if (!file) */ 
-/*   { */
-/*     ERR("\rError: Cannot open file for reading: " << filename); */
-/*     return nullptr; */
-/*   } */
-/*   cereal::BinaryInputArchive archive(file); */
-/*   auto lcurve = std::make_shared<LCurve<MODEL,DATASET,SPLIT,LOSS,CV,OPT,O>>(); */
-/*   archive(cereal::make_nvp("LCurve", *lcurve));// Deserialize into a new object */
-/*   LOG("\rLCurve loaded from " << filename); */
-/*   return lcurve; */
-/* } */
+//=============================================================================
+// LCurve::Load
+//=============================================================================
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+std::shared_ptr<LCurve<MODEL,DATASET,SPLIT,LOSS,O>> 
+LCurve<MODEL,DATASET, SPLIT,LOSS,O>::Load ( const std::string& filename )
+{
+  std::ifstream file(filename, std::ios::binary);
+  if (!file) 
+  {
+    ERR("\rError: Cannot open file for reading: " << filename);
+    return nullptr;
+  }
+
+  // Deserialize into a new object
+  cereal::BinaryInputArchive archive(file);
+  auto lcurve = std::make_shared<LCurve<MODEL,DATASET,SPLIT,LOSS,O>>();
+  archive(cereal::make_nvp("LCurve", *lcurve));
+                                               //
+  // These are for making sure the loaded function is safe to fail too...
+  _globalSafeFailFunc = [lcurve]() { lcurve->_CleanUp(); };
+  lcurve->_RegisterSignalHandler();
+
+  LOG("\rLCurve loaded from " << filename);
+  return lcurve;
+}
+
 //=============================================================================
 // LCurve::_GetHPT
 //=============================================================================     
@@ -347,6 +296,8 @@ auto LCurve<MODEL,DATASET, SPLIT,LOSS,O>::_GetHpt ( const Tin& Xtrn,
 {
   using TunerType = mlpack::HyperParameterTuner<MODEL, LOSS, CV, OPT, Tin>;
 
+  // If we detact the classification algorithm takes in number of classes,
+  // another Tuner is called...
   if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
     return TunerType(cvp, Xtrn, ytrn);
   else
@@ -367,6 +318,8 @@ auto LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_GetModel ( const Tin& Xtrn,
                                                      const Tlab& ytrn,
                                                      const Ts&... args )
 {
+  // If we detact the classification algorithm takes in number of classes,
+  // another model initializer is called...
   if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
     return MODEL(Xtrn,ytrn,args...);
   else
