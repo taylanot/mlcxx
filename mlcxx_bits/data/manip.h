@@ -281,25 +281,36 @@ void Split ( const arma::Mat<T>& input,
   const arma::uvec order =
       arma::shuffle(arma::regspace<arma::uvec>(0, input.n_cols - 1));
 
-  trainData = input.cols(order.rows(0,trainNum-1));
+  trainData = input.cols( order.head(trainNum) );
+  testData = input.cols( order.tail(input.n_cols-trainNum) );
 
-  testData = input.cols(order.rows(trainNum,input.n_cols-1));
+}
 
-  /* const size_t trainSize = trainNum; */
-  /* const size_t testSize = input.n_cols - trainSize; */
+template<typename T>
+void Split ( const arma::Row<T>& input,
+             arma::Row<T>& trainData,
+             arma::Row<T>& testData,
+             const size_t trainNum )
+{
+  const arma::uvec order =
+      arma::shuffle(arma::regspace<arma::uvec>(0, input.n_cols - 1));
 
-  /* trainData.set_size(input.n_rows, trainSize); */
-  /* testData.set_size(input.n_rows, testSize); */
+  trainData = input.cols( order.head(trainNum) );
+  testData = input.cols( order.tail(input.n_cols-trainNum) );
 
-  /* const arma::Col<size_t> order = */
-  /*     arma::shuffle(arma::linspace<arma::Col<size_t>>(0, input.n_cols -1, */
-  /*                                                     input.n_cols)); */
+}
 
-  /* for ( size_t i = 0; i != trainSize; ++i ) */
-  /*   trainData.col(i) = input.col(order[i]); */
-  /* for ( size_t i = 0; i != testSize; ++i ) */
-  /*   testData.col(i) = input.col(order[i + trainSize]); */
+template<typename T>
+void Split ( const arma::Col<T>& input,
+             arma::Col<T>& trainData,
+             arma::Col<T>& testData,
+             const size_t trainNum )
+{
+  const arma::uvec order =
+      arma::shuffle(arma::regspace<arma::uvec>(0, input.n_rows- 1));
 
+  trainData = input.rows( order.head(trainNum) );
+  testData = input.rows( order.tail(input.n_rows-trainNum) );
 }
 
 /**

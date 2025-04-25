@@ -18,7 +18,7 @@ template<class K, class T>
 template<class... Ts>
 GaussianProcess<K,T>::GaussianProcess ( const arma::Mat<T>& inputs,
                                         const arma::Row<T>& labels,
-                                        const double& lambda,
+                                        const T lambda,
                                         const Ts&... args ) :
                                         cov_(args...), lambda_(lambda)
 {
@@ -71,7 +71,7 @@ T GaussianProcess<K,T>::ComputeError ( const arma::Mat<T>& inputs,
 
   temp = labels - temp;
 
-  const double cost = arma::dot(temp, temp) / n_points;
+  const T cost = arma::dot(temp, temp) / n_points;
 
   return cost;
 }
@@ -81,11 +81,11 @@ T GaussianProcess<K,T>::LogLikelihood ( const arma::Mat<T>& inputs,
                                         const arma::Row<T>& labels ) const
 {
   return -0.5*arma::dot(labels,parameters_) - arma::trace(arma::log(L_))
-                                            - 0.5*double(N_)*std::log(2.*M_PI);
+                                            - 0.5*T(N_)*std::log(2.*M_PI);
 }
 
 template<class K, class T>
-void GaussianProcess<K,T>::SamplePosterior ( const size_t& M,
+void GaussianProcess<K,T>::SamplePosterior ( const size_t M,
                                              const arma::Mat<T>& inputs,
                                              arma::Mat<T>& labels )
 { 
@@ -98,7 +98,7 @@ void GaussianProcess<K,T>::SamplePosterior ( const size_t& M,
 }
 
 template<class K,class T>
-void GaussianProcess<K,T>::SamplePrior ( const size_t& M,
+void GaussianProcess<K,T>::SamplePrior ( const size_t M,
                                          const arma::Mat<T>& inputs,
                                          arma::Mat<T>& labels ) const
 {

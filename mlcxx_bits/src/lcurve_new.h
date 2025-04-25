@@ -32,12 +32,14 @@ public:
 
   /* Learning Curve Generator
    *
+   * @param dataset     : this is the training and the testset combined
    * @param Ns          : row vector of training points 
    * @param repeat      : amount of times the training for single N takes place
    * @param parallel    : boolean for using parallel computations 
    * @param prog        : boolean for showing the progrress bar
+   * @param path        : path for the saving etc...
    * @param name        : name the object later on used for saving etc...
-   *
+   * @param seed        : for reproduction it is essential
    */
   LCurve ( const DATASET& dataset,
            const arma::Row<size_t>& Ns,
@@ -45,16 +47,20 @@ public:
            const bool parallel = false, 
            const bool prog = false,
            const std::filesystem::path path = "./",
-           const std::string name = "LCurve" );
+           const std::string name = "LCurve",
+           const size_t seed = SEED );
 
   /* Learning Curve Generator
    *
+   * @param trainset    : this is the training set used for sampling
+   * @param testset     : seperate testset only used for testing
    * @param Ns          : row vector of training points 
    * @param repeat      : amount of times the training for single N takes place
    * @param parallel    : boolean for using parallel computations 
    * @param prog        : boolean for showing the progrress bar
+   * @param path        : path for the saving etc...
    * @param name        : name the object later on used for saving etc...
-   *
+   * @param seed        : for reproduction it is essential
    */
   LCurve ( const DATASET& trainset,
            const DATASET& testset,
@@ -63,12 +69,13 @@ public:
            const bool parallel = false, 
            const bool prog = false,
            const std::filesystem::path path = "./",
-           const std::string name = "LCurve" );
+           const std::string name = "LCurve",
+           const size_t seed = SEED );
 
   /* Generate Learning Curves 
    *
-   * @param dataset   : whole large dataset inputs
-   * @param args      : possible arguments for the model initialization
+   * @param cvp   : this is either number of folds or percent of split
+   * @param args  : possible arguments for hpt. optimization of the model
    *
    */
   template<template<class,class,class,class,class> class CV = mlpack::SimpleCV,
@@ -80,10 +87,11 @@ public:
   void Generate ( const T cvp,
                   const Ts&... args );
 
-  /* template<class CV,class OPT = ens::GridSearch, class... Ts> */
-  /* void Generate ( const O cvp, */
-  /*                 const Ts&... args ); */
-
+  /* Generate Learning Curves 
+   *
+   * @param args  : possible arguments for model initialization
+   *
+   */
   template<class... Ts>
   void Generate ( const Ts&... args );
 
@@ -100,10 +108,11 @@ public:
         CEREAL_NVP(parallel_),
         CEREAL_NVP(prog_),
         CEREAL_NVP(name_),
-        CEREAL_NVP(data_),
-        CEREAL_NVP(jobs_),
+        CEREAL_NVP(seed_),
         CEREAL_NVP(testset_),
+        CEREAL_NVP(trainset_),
         CEREAL_NVP(num_class_),
+        CEREAL_NVP(seeds_),
         CEREAL_NVP(test_errors_));
   }
 
@@ -121,12 +130,18 @@ public:
                                               ( const std::string& filename ); 
   arma::Mat<O> test_errors_;
 
-  /* Clean Up Method for the over-time processes */
+  /* Clean Up Method for the over-time processes 
+   * __This should not be used outside, it is public just because I want to 
+   *    load with safe stopping. */
   void _CleanUp( );
 
-  /* Registering the signal handler for some easy stopping. */
+  /* Registering the signal handler for some easy stopping. 
+   * __This should not be used outside, it is public just because I want to 
+   *    load with safe stopping. */
   void _RegisterSignalHandler ( );
 
+  /* Check the Status of the l.curve generation how many do you have left? */
+  bool CheckStatus( bool print = false );
 
 private: 
 
@@ -137,39 +152,45 @@ private:
   template<class Tin, class Tlab, class...Ts>
   auto _GetModel ( const Tin& Xtrn, const Tlab& ytrn, const Ts&... args );
 
-  void _CheckStatus( );
 
-  /* Split your dataset
+  /* Split your dataset and return both the train and test sets.
    *
    * @param dataset : whole dataset
    */
-  void _SplitData( const DATASET& dataset );
+  std::vector<std::pair<arma::uvec,arma::uvec>>
+  _SplitData( const DATASET& dataset, const size_t seed );
 
   /* Registering the signal handler for some easy stopping. */
   static void _SignalHandler ( int sig );
 
-  size_t repeat_;
-  arma::Row<size_t> Ns_;
-  bool parallel_;
-  bool prog_;
-  std::string name_;
-  std::filesystem::path path_;
+  size_t repeat_; // Times that we repeat the l.curve generation.
+  arma::Row<size_t> Ns_; // All the sample sizes used for l.curve generation.
+  bool parallel_; // Do you want to have paralelization or not? I say go for it!
+  bool prog_; // Triggaring the progress bar. Not essential...
+  std::string name_; // Name of the object, this is your escape name 
+  std::filesystem::path path_; // Where do you run the experiment from anything,
+                               // happens this is your place to look for.
+  size_t seed_; // For reproduction purposes...
 
-  std::unordered_map<size_t,std::pair<DATASET,DATASET> > data_;
-  arma::uvec jobs_;
-
+  // Testset is sometimes there and sometimes not...
   std::optional<DATASET> testset_;
+  // This is the set used for training.
+  DATASET trainset_;
+
+  // If your learner takes in number of clasesses this is usefull not present
+  // for some binary classifiers in mlpack and regression models.
   std::optional<size_t> num_class_;
 
+  // This for initializing the seeds used for every repitition
+  // depends on the initial seed 
+  arma::irowvec seeds_;
+
+  //  Loss and split objects used for learning curve creation
   LOSS loss_;
   SPLIT split_;
-  /* std::optional<std::variant<O,size_t>> cvp_; */
-  /* arma::Mat<O> test_errors_; */
 };
 
 } // namespace lcurve_
-
-
 
 #include "lcurve_impl_new.h"
 

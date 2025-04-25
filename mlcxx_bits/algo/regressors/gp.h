@@ -21,12 +21,13 @@ template<class K,class T=DTYPE>
 class GaussianProcess
 {
   public:
+
   /**
    * Non-working model 
    * @param args  : kernel parameters
    */
   template<typename... Ts>
-  GaussianProcess<K,T> ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
+  GaussianProcess ( const Ts&... args ) : cov_(args...), lambda_(0.0) { };
 
   /**
    * @param X     : inputs 
@@ -34,10 +35,10 @@ class GaussianProcess
    * @param args  : kernel parameters 
    */
   template<typename... Ts>
-  GaussianProcess<K,T> ( const arma::Mat<T>& inputs,
-                         const arma::Row<T>& labels,
-                         const double& lambda,
-                         const Ts&... args );
+  GaussianProcess ( const arma::Mat<T>& inputs,
+                    const arma::Row<T>& labels,
+                    const T lambda,
+                    const Ts&... args );
   
   /**
    * @param X     : inputs 
@@ -83,9 +84,9 @@ class GaussianProcess
    * @param X      : inputs
    * @param y      : labels
    */
-  void  SamplePrior ( const size_t& k,
+  void  SamplePrior ( const size_t k,
                       const arma::Mat<T>& inputs,
-                            arma::Mat<T>& labels ) const;
+                      arma::Mat<T>& labels ) const;
 
   /**
    * Sample functions from the prior 
@@ -93,9 +94,9 @@ class GaussianProcess
    * @param X      : inputs
    * @param y      : labels
    */
-  void  SamplePosterior ( const size_t& k,
+  void  SamplePosterior ( const size_t k,
                           const arma::Mat<T>& inputs,
-                                arma::Mat<T>& labels );
+                          arma::Mat<T>& labels );
   /**
    * Get Parameters
    *
@@ -109,7 +110,7 @@ class GaussianProcess
    *
    * @param lambda      : lambda
    */
-  void Lambda( const double& lambda ) { lambda_ = lambda; }
+  void Lambda( const T& lambda ) { lambda_ = lambda; }
 
   /**
    * Serialize the model.
@@ -133,7 +134,7 @@ class GaussianProcess
   size_t N_;   // for later usage
   arma::Col<T> parameters_;
   utils::covmat<K,T> cov_;
-  double  lambda_;
+  T lambda_;
 };
 
 

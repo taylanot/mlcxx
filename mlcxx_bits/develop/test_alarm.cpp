@@ -12,7 +12,7 @@
 /* using DATASET = data::oml::Dataset<DTYPE>; */
 /* using MODEL = mlpack::LinearRegression<>; */
 /* using LOSS = mlpack::MSE; */
-/* using SAMPLE = data::RandomSelect; */
+/* using SAMPLE = data::RandomSelect2; */
 
 // classification set
 using DATASET = data::oml::Dataset<size_t>;
@@ -20,72 +20,39 @@ using MODEL = mlpack::LogisticRegression<>;
 using LOSS = mlpack::Accuracy;
 using SAMPLE = data::RandomSelect;
 
-/* int main (int argc, char** argv) */
-/* { */
-
-/*   DATASET data(212); */
-/*   auto Ns = arma::regspace<arma::Row<size_t>>(10,1,15); */
-/*   lcurve::LCurve<MODEL, */ 
-/*                  DATASET, */
-/*                  SAMPLE, */
-/*                  LOSS> curve(data,Ns,size_t(2),true,true); */
-/*   auto ls = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
-/*   curve.Generate(0.2,ls); */
-/*   /1* std::optional<std::variant<size_t,DTYPE>> cvp; *1/ */
-/*   /1* cvp = size_t(0.2); *1/ */
-/*   /1* PRINT(cvp.value().index()); *1/ */
-/*   return 0; */
-/* } */
-
-/* void foo(double a, size_t b) { */
-/*     std::cout << "Received double: " << a << " and size_t: " << b << std::endl; */
-/* } */
-
-/* int main() { */
-/*     // Define your variant, which can hold either a double or a size_t */
-/*   std::optional<std::variant<double, size_t>> a; */
-/*   a = 0.2; */
-/*   size_t additional_value = 42; */
-
-/*   // Use std::visit to call foo with the appropriate variant value and additional parameter */
-/*     std::visit([&](auto&& arg) { foo(arg, additional_value); }, a.value()); */
-
-/*     return 0; */
-/* } */
-
-int main ( ) 
+int main (int argc, char** argv ) 
 {
-  DATASET data(151);
-  /* PRINT_VAR(data.size_); */
-  /* PRINT_VAR(data.inputs_.n_cols); */
-  /* PRINT_VAR(data.labels_.n_cols); */
+  auto& conf = CLIStore::getInstance();
 
-  // Select Testing
-  /* data::RandomSelect2 split; */
-  /* std::vector<std::pair<arma::Row<size_t>,arma::Row<size_t>>> collect; */
-  /* auto Ns = arma::Row<size_t>({1,2,5}); */
-  /* split(size_t(data.size_),Ns,size_t(2),collect); */
-  /* PRINT_VAR(collect.at(0).first.n_elem); */
-  /* PRINT_VAR(collect.at(0).second.n_elem); */
-  /* PRINT_VAR(collect.at(5).first.n_elem); */
-  /* PRINT_VAR(collect.at(5).second.n_elem); */
+  conf.Register<bool>("load",true);
 
-  /* PRINT_VAR(split_data.first.n_elem); */
-  /* PRINT_VAR(split_data.second.n_elem); */
-  
-  auto Ns = arma::regspace<arma::Row<size_t>>(50,1,51);
-  lcurve::LCurve<MODEL,
-         DATASET,
-         SAMPLE,
-         /* data::Bootstrap, */
-         /* data::Additive, */
-         /* mlpack::MSE> curve(Ns,size_t(2),0.2,true,true); */
-         LOSS> curve(data,Ns,size_t(1000),true,true);
+  conf.Parse(argc,argv);
 
+  DATASET data(4);
+  PRINT_VAR(data.size_);
   auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
-  /* curve.Generate(data); */
-  curve.Generate(0.2,lambdas);
-  PRINT_VAR(curve.GetResults());
+  auto Ns = arma::regspace<arma::Row<size_t>>(10,1,data.size_-1);
+
+  if (!conf.Get<bool>("load"))
+  { 
+    lcurve::LCurve<MODEL,
+                   DATASET,
+                   SAMPLE,
+                   LOSS> curve(data,Ns,size_t(10000),true,true);
+
+    curve.Generate(0.2,lambdas);
+
+  }  
+  else
+  {
+    auto loaded = lcurve::LCurve<MODEL,DATASET,SAMPLE,LOSS>::Load
+                            (std::string("LCurve.bin"));
+    loaded->CheckStatus();
+    PRINT_VAR(arma::size(arma::find_nonfinite(loaded->GetResults())));
+    auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
+    loaded->Generate(0.2,lambdas);
+  }
+
 
   /* auto Ns = arma::regspace<arma::Row<size_t>>(10,1,11); */
   /* lcurve::LCurve<MODEL, */

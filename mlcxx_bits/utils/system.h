@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef DATA_MANI_H
-#define DATA_MANI_H
+#ifndef MY_SYS_H
+#define MY_SYS_H
 
 namespace utils {
 

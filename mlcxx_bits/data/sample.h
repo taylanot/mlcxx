@@ -19,10 +19,11 @@ namespace data {
  * @param repeat  : how many times repeat the process
  */
 
-struct RandomSelect
+struct RandomSelect_
 {
   template<class DATASET,class T>
-  std::pair<DATASET,DATASET> operator() ( const DATASET& dataset, const T size )
+  std::pair<DATASET,DATASET> operator() ( const DATASET& dataset, const T size,
+                                          const size_t seed = SEED )
   {
     DATASET trainset,testset;
     Split(dataset,trainset,testset,size);
@@ -42,6 +43,36 @@ struct RandomSelect
 
 };
 
+struct RandomSelect
+{
+  template<class T,class O=arma::uword>
+  std::pair<arma::Col<O>,arma::Col<O>> operator() 
+  ( const size_t size, const T N )
+  {
+    auto total = arma::regspace<arma::Col<O>>(0,size-1);
+    arma::Col<O> a,b;
+    Split(total,a,b,N);
+    return std::pair<arma::Col<O>,arma::Col<O>>(a,b);
+  }
+
+  template<class O=arma::uword>
+  void operator() ( const size_t size,
+                    const arma::Row<size_t> Ns,
+                    const size_t repeat,
+                    std::vector<std::pair<arma::Col<O>,arma::Col<O>>>& collect,
+                    const size_t seed = SEED )
+	{
+    mlpack::RandomSeed(seed);
+    O counter = 0;
+    collect.clear();
+    collect.resize(repeat*Ns.n_elem);
+    for (size_t j = 0; j < repeat; ++j)
+      for (size_t i = 0; i < Ns.n_elem; ++i)
+        collect.at(counter++) = (*this)(size, Ns[i]); 
+	}
+
+};
+
 /**
  * Given a dataset, select N of them randomly with replacement and seperate the 
  * rest.
@@ -55,7 +86,8 @@ struct RandomSelect
 struct Bootstrap
 {
   template<class DATASET,class T>
-  std::pair<DATASET,DATASET> operator()(const DATASET& dataset, const T size)
+  std::pair<DATASET,DATASET> operator()( const DATASET& dataset, const T size,
+                                         const size_t seed = SEED )
   {
     DATASET trainset,testset;
     auto all = arma::regspace<arma::uvec>(0,1,dataset.labels_.n_cols-1);
@@ -97,8 +129,9 @@ struct Additive
   void operator()
   ( const DATASET& dataset, const arma::Row<T> sizes, const size_t repeat,
     std::unordered_map<size_t,std::pair<DATASET,DATASET>>& collect,
-    size_t& counter )
+    size_t& counter, const size_t seed = SEED  )
   {
+    mlpack::RandomSeed(seed);
     for (size_t j = 0; j < repeat; ++j)
     {
       DATASET trainset,testset;
