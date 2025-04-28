@@ -53,8 +53,6 @@ T SetDiff( const T& check, const T& with )
   return result;
 }
 
-
-
 //=============================================================================
 // Migrate : Exchange N random data points between train and test sets
 //=============================================================================
@@ -64,9 +62,7 @@ void Migrate ( arma::Mat<T>& train_inp,
                arma::Mat<T>& test_inp,
                arma::Row<U>& test_lab,
                const size_t N )
-             
 {
-
   BOOST_ASSERT_MSG(train_inp.n_cols == train_lab.n_elem &&
                    train_inp.n_rows == test_inp.n_rows &&
                    test_inp.n_cols == test_lab.n_elem &&
@@ -82,13 +78,13 @@ void Migrate ( arma::Mat<T>& train_inp,
   test_inp.shed_cols(idx);
 }
 
+
 template<typename T, typename U>
 void Migrate ( arma::Mat<T>& train_inp,
                arma::Mat<U>& train_lab,
                arma::Mat<T>& test_inp,
                arma::Mat<U>& test_lab,
                const size_t N )
-             
 {
   BOOST_ASSERT_MSG(test_inp.n_cols == test_lab.n_elem &&
                    train_inp.n_rows == test_inp.n_rows &&
@@ -105,12 +101,12 @@ void Migrate ( arma::Mat<T>& train_inp,
   test_inp.shed_cols(idx);
 }
 
+
 template<typename T>
 void Migrate ( const T& dataset,
                T& trainset,
                T& testset,
                const size_t N )
-             
 {
   Migrate(trainset.inputs_,trainset.labels_,testset.inputs_,testset.labels_,N);
 
@@ -119,6 +115,21 @@ void Migrate ( const T& dataset,
 
   trainset.num_class_ = arma::unique(trainset.labels_).eval().n_cols;
   testset.num_class_ = arma::unique(testset.labels_).eval().n_cols;
+}
+
+template<typename T=arma::uword>
+void Migrate ( const arma::Col<T>& dataset,
+               arma::Col<T>& trainset,
+               arma::Col<T>& testset,
+               const size_t N )
+{
+  BOOST_ASSERT_MSG( testset.n_elem >= N, 
+                   "Requested element number is bigger than what you have.");
+
+  trainset.resize(trainset.n_elem+N);
+  arma::uvec idx = arma::randperm(testset.n_elem, N);
+  trainset.tail(N) = testset.rows(idx);
+  testset.shed_rows(idx);
 }
 //=============================================================================
 // select_header : Select the relavent parts of the database by using 

@@ -15,10 +15,19 @@
 /* using SAMPLE = data::RandomSelect; */
 
 // classification set
-using DATASET = data::oml::Dataset<size_t>;
-using MODEL = mlpack::LogisticRegression<>;
+/* using DATASET = data::oml::Dataset<size_t>; */
+using DATASET = data::Dataset<arma::Row<size_t>>;
+
+/* using MODEL = mlpack::LogisticRegression<>; */
+using MODEL = algo::classification::NMC<>;
+/* using MODEL = mlpack::LinearRegression<>; */
+
 using LOSS = mlpack::Accuracy;
-using SAMPLE = data::RandomSelect;
+/* using LOSS = mlpack::MSE; */
+
+/* using SAMPLE = data::RandomSelect<>; */
+using SAMPLE = data::Additive<>;
+/* using SAMPLE = data::Bootstrap<>; */
 
 /* int main (int argc, char** argv) */
 /* { */
@@ -55,37 +64,28 @@ using SAMPLE = data::RandomSelect;
 
 int main ( ) 
 {
-  DATASET data(151);
-  /* PRINT_VAR(data.size_); */
-  /* PRINT_VAR(data.inputs_.n_cols); */
-  /* PRINT_VAR(data.labels_.n_cols); */
+  /* DATASET data(151); */
+  /* DATASET data(151); */
+  DATASET data(2);
+  /* data.Linear(1000); */
+  data.Banana(1000);
 
-  // Select Testing
-  /* data::RandomSelect2 split; */
-  /* std::vector<std::pair<arma::Row<size_t>,arma::Row<size_t>>> collect; */
-  /* auto Ns = arma::Row<size_t>({1,2,5}); */
-  /* split(size_t(data.size_),Ns,size_t(2),collect); */
-  /* PRINT_VAR(collect.at(0).first.n_elem); */
-  /* PRINT_VAR(collect.at(0).second.n_elem); */
-  /* PRINT_VAR(collect.at(5).first.n_elem); */
-  /* PRINT_VAR(collect.at(5).second.n_elem); */
-
-  /* PRINT_VAR(split_data.first.n_elem); */
-  /* PRINT_VAR(split_data.second.n_elem); */
-  
-  auto Ns = arma::regspace<arma::Row<size_t>>(50,1,51);
+  auto Ns = arma::regspace<arma::Row<size_t>>(2,10,100);
   lcurve::LCurve<MODEL,
-         DATASET,
-         SAMPLE,
-         /* data::Bootstrap, */
-         /* data::Additive, */
-         /* mlpack::MSE> curve(Ns,size_t(2),0.2,true,true); */
-         LOSS> curve(data,Ns,size_t(1000),true,true);
+                 DATASET,
+                 SAMPLE,
+                 LOSS> curve(data,Ns,size_t(1000),true,true);
+  /* auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
+  curve.Generate( );
 
-  auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
-  /* curve.Generate(data); */
-  curve.Generate(0.2,lambdas);
-  PRINT_VAR(curve.GetResults());
+  /* curve.Generate(0.2,lambdas); */
+  /* PRINT_VAR(curve.GetResults()); */
+  /* curve.test_errors_(0,0) = arma::datum::inf; */
+  /* curve.test_errors_(1,0) = arma::datum::inf; */
+  /* curve.Generate( ); */
+  curve.GetResults().save("nmc_curve.csv",arma::csv_ascii);
+  /* PRINT_VAR(curve.GetResults()); */
+
 
   /* auto Ns = arma::regspace<arma::Row<size_t>>(10,1,11); */
   /* lcurve::LCurve<MODEL, */

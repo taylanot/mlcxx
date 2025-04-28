@@ -18,7 +18,9 @@
 using DATASET = data::oml::Dataset<size_t>;
 using MODEL = mlpack::LogisticRegression<>;
 using LOSS = mlpack::Accuracy;
-using SAMPLE = data::RandomSelect;
+/* using SAMPLE = data::RandomSelect<arma::uword>; */
+/* using SAMPLE = data::Bootstrap<arma::uword>; */
+using SAMPLE = data::Additive<arma::uword>;
 
 int main (int argc, char** argv ) 
 {
@@ -38,11 +40,12 @@ int main (int argc, char** argv )
     lcurve::LCurve<MODEL,
                    DATASET,
                    SAMPLE,
-                   LOSS> curve(data,Ns,size_t(10000),true,true);
+                   LOSS> curve(data,Ns,size_t(10000),false,true);
 
     curve.Generate(0.2,lambdas);
 
   }  
+
   else
   {
     auto loaded = lcurve::LCurve<MODEL,DATASET,SAMPLE,LOSS>::Load

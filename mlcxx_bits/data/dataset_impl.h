@@ -10,6 +10,168 @@
 #ifndef DATASET_IMPL_H
 #define DATASET_IMPL_H
 
+namespace  data {
+
+//=============================================================================
+// Dataset
+//=============================================================================
+template<class LABEL,class T>
+Dataset<LABEL,T>::Dataset ( size_t dim, size_t seed ) : 
+  dimension_(dim),seed_(seed) {  };
+
+template<class LABEL,class T>
+Dataset<LABEL,T>::Dataset ( size_t dim, size_t num_class, size_t seed ) : 
+  dimension_(dim), num_class_(num_class), seed_(seed) {  };
+
+//=============================================================================
+// Dataset::Linear
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Linear ( const size_t N, const T noise_std )
+{
+  mlpack::RandomSeed(seed_.value());
+  inputs_ = arma::randn(dimension_,N);
+  labels_ = arma::ones(1,dimension_) * inputs_ + 
+    arma::randn(1,N,arma::distr_param(T(0),T(noise_std)));
+  this->_update_info();
+}
+//=============================================================================
+// Dataset::Sine
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Sine ( const size_t N, const T noise_std )
+{
+  mlpack::RandomSeed(seed_.value());
+  inputs_ = arma::randn(dimension_,N);
+  labels_ = arma::sin(arma::ones(1,dimension_) * inputs_) + 
+    arma::randn(1,N,arma::distr_param(T(0),T(noise_std)));
+  this->_update_info();
+}
+//=============================================================================
+// Dataset::Banana
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Banana ( const size_t N, const T delta )
+{
+  if (dimension_ != 2)
+    WARN("Dataset::Banana requires dimension to be 2, overwriting dimension_!");
+  mlpack::RandomSeed(seed_.value());
+  double r = 5.;
+  double s = 1.0;
+  arma::Mat<T> i1, i2, temp;
+
+  temp = 0.125*M_PI + 1.25*M_PI*
+              arma::randu<arma::Mat<T>>(1,N, arma::distr_param(0.,1.));
+
+  i1 = arma::join_cols(r*arma::sin(temp),r*arma::cos(temp));
+  i1 += s*arma::randu<arma::Mat<T>>(2,N, arma::distr_param(0.,1.));
+
+  temp = 0.375*M_PI - 1.25*M_PI*
+              arma::randu<arma::Mat<T>>(1,N, arma::distr_param(0.,1.));
+
+  i2 = arma::join_cols(r*arma::sin(temp),r*arma::cos(temp));
+  i2 += s*arma::randu<arma::Mat<T>>(2,N, arma::distr_param(0.,1.));
+  i2 -= 0.75*r;
+
+  i2 += delta;
+
+  inputs_ = arma::join_rows(i1,i2);
+
+  labels_.set_size(2*N);
+  if constexpr ( std::is_same<LABEL,arma::Row<size_t>>::value )
+    labels_.subvec(0, N-1).zeros(); 
+  else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
+    labels_.subvec(0, N-1).fill(-1); 
+  labels_.subvec(N, 2*N - 1).ones();
+
+  this->_update_info();
+}
+
+//=============================================================================
+// Dataset::Dipping
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Dipping ( const size_t N, const T r, const T noise_std )
+
+{
+  arma::Mat<T> x1(dimension_, N, arma::fill::randn);
+  x1.each_row() /= arma::sqrt(arma::sum(arma::pow(x1,2),0));
+
+  if ( r != 1 )
+    x1 *= r;
+
+  arma::Mat<T> cov(dimension_, dimension_, arma::fill::eye);
+  arma::Col<T> mean(dimension_);
+  mean.zeros(); cov *= 0.1;
+  arma::Mat<T> x2 = arma::mvnrnd(mean, cov, N);
+
+  inputs_ = arma::join_rows(x1,x2);
+
+  if ( noise_std > 0 )
+    inputs_ += arma::randn<arma::Mat<T>>(dimension_,2*N,
+                           arma::distr_param(0., noise_std));
+
+  labels_.set_size(2*N);
+  if constexpr ( std::is_same<LABEL,arma::Row<size_t>>::value )
+    labels_.subvec(0, N-1).zeros(); 
+  else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
+    labels_.subvec(0, N-1).fill(-1); 
+  labels_.subvec(N, 2*N - 1).ones();
+
+  this->_update_info();
+}
+
+//=============================================================================
+// Dataset::Gaussian
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Gaussian ( const size_t N,
+                                  const arma::Row<T>& means,
+                                  const arma::Row<T>& stds )
+
+{
+  BOOST_ASSERT_MSG( means.n_elem == stds.n_elem,
+      "means and std should have same size.");
+
+  size_t n_class = means.n_elem;
+
+  inputs_.set_size(dimension_, N*n_class, arma::fill::zeros);
+  labels_.set_size(dimension_, N*n_class, arma::fill::zeros);
+  if constexpr ( std::is_same<LABEL,arma::Row<size_t>>::value )
+      labels_.subvec(0, N-1).zeros(); 
+    else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
+    {
+      BOOST_ASSERT_MSG( means.n_elem == 2, 
+          "To use Row<int> you need binary classification problem");
+      labels_.subvec(0, N-1).fill(-1); 
+    }
+   
+  for (size_t i = 0; i < n_class ; ++i)
+  {
+    inputs_.cols(i * N, (i + 1) * N - 1) = means(i) + 
+                            stds(i) * arma::randn<arma::Mat<T>>(dimension_, N);
+
+    if (i>0)
+      labels_.subvec(N, 2*N - 1).ones();
+  }
+
+  this->_update_info();
+}
+//=============================================================================
+// Dataset::_update_info
+//=============================================================================
+template<class LABEL,class T>
+void Dataset<LABEL,T>::_update_info(  )
+{
+  size_ = inputs_.n_cols;
+  dimension_ = inputs_.n_rows;
+  if constexpr ( std::is_same<LABEL,arma::Row<size_t>>::value )
+    num_class_ = arma::unique(labels_).eval().n_elem;
+  else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
+    num_class_ = 2;
+}
+
+} // namespace data
 namespace data {
 namespace regression {
 
