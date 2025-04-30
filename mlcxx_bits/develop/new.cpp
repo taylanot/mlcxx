@@ -15,18 +15,20 @@
 /* using SAMPLE = data::RandomSelect; */
 
 // classification set
-/* using DATASET = data::oml::Dataset<size_t>; */
+using ODATASET = data::oml::Dataset<size_t>;
 using DATASET = data::Dataset<arma::Row<size_t>>;
 
 /* using MODEL = mlpack::LogisticRegression<>; */
-using MODEL = algo::classification::NMC<>;
+/* using MODEL = algo::classification::NMC<>; */
+using MODEL = algo::classification::SVM<mlpack::GaussianKernel,0>; 
+/* using MODEL = mlpack::DecisionTree<>; */
 /* using MODEL = mlpack::LinearRegression<>; */
 
 using LOSS = mlpack::Accuracy;
 /* using LOSS = mlpack::MSE; */
 
-/* using SAMPLE = data::RandomSelect<>; */
-using SAMPLE = data::Additive<>;
+using SAMPLE = data::RandomSelect<>;
+/* using SAMPLE = data::Additive<>; */
 /* using SAMPLE = data::Bootstrap<>; */
 
 /* int main (int argc, char** argv) */
@@ -64,17 +66,24 @@ using SAMPLE = data::Additive<>;
 
 int main ( ) 
 {
+  ODATASET data(11);
+  PRINT_VAR(data.num_class_.value());
+  PRINT_VAR(data.size_);
   /* DATASET data(151); */
-  /* DATASET data(151); */
-  DATASET data(2);
-  /* data.Linear(1000); */
-  data.Banana(1000);
+  /* DATASET data(2); */
+  /* LOSS loss; */
+  /* /1* data.Linear(1000); *1/ */
+  /* data.Banana(1000); */
 
-  auto Ns = arma::regspace<arma::Row<size_t>>(2,10,100);
+  /* MODEL model; */
+  /* model.Train(data.inputs_,data.labels_,data.num_class_.value()); */
+  /* PRINT_VAR(loss.Evaluate(model,data.inputs_,data.labels_)); */
+  /* PRINT_VAR((mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)) */
+  auto Ns = arma::regspace<arma::Row<size_t>>(2,100,size_t(0.9*data.size_));
   lcurve::LCurve<MODEL,
-                 DATASET,
+                 ODATASET,
                  SAMPLE,
-                 LOSS> curve(data,Ns,size_t(1000),true,true);
+                 LOSS,double> curve(data,Ns,size_t(1),false,true,"./","LCurve",24);
   /* auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
   curve.Generate( );
 
@@ -83,7 +92,7 @@ int main ( )
   /* curve.test_errors_(0,0) = arma::datum::inf; */
   /* curve.test_errors_(1,0) = arma::datum::inf; */
   /* curve.Generate( ); */
-  curve.GetResults().save("nmc_curve.csv",arma::csv_ascii);
+  curve.GetResults().save("curve1.csv",arma::csv_ascii);
   /* PRINT_VAR(curve.GetResults()); */
 
 

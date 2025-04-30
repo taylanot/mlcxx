@@ -41,12 +41,11 @@ repeat_(repeat),Ns_(Ns),parallel_(parallel),prog_(prog),name_(name),
 
   if (typeid(dataset.labels_) == typeid(arma::Row<size_t>) ||
         typeid(dataset.labels_) == typeid(arma::Row<int>) )
-    num_class_ = dataset.num_class_;
+    num_class_ = dataset.num_class_.value();
 
   // Create the seeds for the jobs
   mlpack::RandomSeed(seed_);
   seeds_ = arma::randi<arma::irowvec>(repeat_,arma::distr_param(0,1000));
-  /* this->_SplitData(dataset); */
 }
 
 template<class MODEL,
@@ -90,15 +89,18 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
     {
       if (test_errors_(id, k) == arma::datum::inf)
       { 
-        auto model = _GetModel(trainset_.inputs_.cols(data[k].first).eval(),
-                               trainset_.labels_.cols(data[k].first).eval(),
+        auto model = _GetModel(decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].first).eval()),
+                               decltype(trainset_.labels_)
+                                (trainset_.labels_.cols(data[k].first).eval()),
                                args...);
 
         if (!testset_.has_value())
           test_errors_(id, k) = loss_.Evaluate(model,
-                                trainset_.inputs_.cols(data[k].second).eval(),
-
-                                trainset_.labels_.cols(data[k].second).eval());
+                                decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                                (trainset_.labels_.cols(data[k].second).eval()));
         else
           test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
                                                       testset_.value().labels_);
@@ -155,19 +157,31 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
 
         MODEL model = std::apply([&](auto&&... arg) 
         {
-          return _GetModel(trainset_.inputs_.cols(data[k].first).eval(),
-                           trainset_.labels_.cols(data[k].first).eval(),
+          return _GetModel(decltype(trainset_.inputs_)
+                            (trainset_.inputs_.cols(data[k].first).eval()),
+                           decltype(trainset_.labels_)
+                            (trainset_.labels_.cols(data[k].first).eval()),
                            std::forward<decltype(arg)>(arg)...);
         }, best);
 
+        /* if (!testset_.has_value()) */
+        /*   test_errors_(id, k) = loss_.Evaluate(model, */
+        /*                         trainset_.inputs_.cols(data[k].second).eval(), */
+        /*                         trainset_.labels_.cols(data[k].second).eval()); */
+        /* else */
+        /*   test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_, */
+        /*                                               testset_.value().labels_); */
+
         if (!testset_.has_value())
           test_errors_(id, k) = loss_.Evaluate(model,
-                                trainset_.inputs_.cols(data[k].second).eval(),
-
-                                trainset_.labels_.cols(data[k].second).eval());
+                                decltype(trainset_.inputs_)
+                              (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                              (trainset_.labels_.cols(data[k].second).eval()));
         else
           test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
                                                       testset_.value().labels_);
+
       }
       else
         continue;

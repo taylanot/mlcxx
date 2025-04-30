@@ -86,7 +86,6 @@ void SVM<KERNEL,SOLVER,T>::Train ( const arma::Mat<T>& X,
 {
  this -> nclass_ = num_class;
  this -> Train(X,y);
-
 }
 
 template<class KERNEL,size_t SOLVER,class T>
@@ -147,19 +146,19 @@ template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
                                      const arma::Row<size_t>& y )
 {
-  
-  X_ = &X;
+  X_ = X;
   y_  = (arma::conv_to<arma::Row<int>>::from((y==ulab_(0)) * -2 + 1));
   size_t N = y_.n_elem;
   alphas_.resize(N);
+  /* alphas_ = 0.; */
   arma::Row<T> G(N); G.fill(-1.);
   arma::Mat<T> K;
-  if (N > 200)
-    K = cov_.GetMatrix_approx(X,X,200);
-  else
-    K = cov_.GetMatrix(X,X);
+  /* if (N > 200) */
+  /*   K = cov_.GetMatrix_approx(X,X,200); */
+  /* else */
+  /*   K = cov_.GetMatrix(X,X); */
+  K = cov_.GetMatrix(X,X);
   arma::Mat<T> Q = (y_.t() * y_) % K;
-
   while (max_iter_>iter_++) 
   {
     auto [i, j] = _selectset(G, Q);
@@ -219,7 +218,9 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
   {
     arma::Mat<T> temp;
     if (nclass_==2)
+    {
       Classify(inputs,preds,temp);
+    }
     else 
     {
       ova_.Classify(inputs,preds,temp);
@@ -238,6 +239,7 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
                                       arma::Mat<T>& probs ) 
 {
   arma::Mat<T> dec_func;
+
   if (!oneclass_)
   {
     if (nclass_==2)
@@ -246,7 +248,7 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
       {
         probs.set_size(nclass_,inputs.n_cols);
         preds.set_size(inputs.n_cols);
-        arma::Mat<T> svs = X_->cols(idx_);
+        arma::Mat<T> svs = X_.cols(idx_);
         arma::Mat<T> K = cov_.GetMatrix(svs,inputs);
         arma::Mat<T> Ksv = cov_.GetMatrix(svs);
 

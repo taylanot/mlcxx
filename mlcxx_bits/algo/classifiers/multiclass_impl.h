@@ -121,6 +121,7 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
   else
     preds.fill(unq_[0]);
 }
+
 template<class MODEL, class T>
 T OnevAll<MODEL,T>::ComputeError ( const arma::Mat<T>& inputs,
                                    const arma::Row<size_t>& labels )

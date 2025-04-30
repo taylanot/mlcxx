@@ -148,7 +148,7 @@ private:
   T C_;
   utils::covmat<KERNEL> cov_;
   arma::Row<int> y_;
-  const arma::Mat<T>* X_;
+  arma::Mat<T> X_; // When I use here a pointer to the matrix it goes wrong...
   arma::Row<size_t> ulab_;
   arma::Row<T> alphas_;
   arma::Row<T> old_alphas_;

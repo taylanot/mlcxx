@@ -109,19 +109,18 @@ public:
    */
   template<typename MLAlgorithm,
            typename DataType,
-           typename LabelType,
            class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
-                     const LabelType& labels )
+                     const arma::Row<size_t>& labels )
   {
     mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
         "MSE::Evaluate()",
         "responses");
     // Get the encoded version of the labels
-    arma::Mat<DTYPE> encoded;
+    arma::Mat<O> encoded;
     mlpack::data::OneHotEncoding(labels,encoded);
-    LabelType preds;
+    arma::Row<size_t> preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
     arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
@@ -151,11 +150,10 @@ public:
    */
   template<typename MLAlgorithm,
            typename DataType,
-           typename LabelType,
            class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
-                     const LabelType& labels )
+                     const arma::Row<size_t>& labels )
   {
     mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
         "MSE::Evaluate()",
@@ -196,18 +194,17 @@ public:
    */
   template<typename MLAlgorithm,
            typename DataType,
-           typename LabelType,
            class O=DTYPE>
   static O Evaluate( MLAlgorithm& model,
                      const DataType& data,
-                     const LabelType& labels )
+                     const arma::Row<size_t>& labels )
   {
     mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
         "MSE::Evaluate()",
         "responses");
     arma::Mat<O> encoded;
     mlpack::data::OneHotEncoding(labels,encoded);
-    LabelType preds;
+    arma::Row<size_t> preds;
     arma::Mat<O> probs;
     model.Classify(data, preds, probs);
     arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));

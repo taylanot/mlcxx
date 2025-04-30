@@ -13,7 +13,7 @@ class CLIStore
 {
 public:
   // Define the supported value types
-  using FlagValue = std::variant<int, DTYPE, std::string, bool>;
+  using FlagValue = std::variant<int, DTYPE, std::string, bool, size_t>;
 
   // Singleton access
   static CLIStore& getInstance()
@@ -129,6 +129,91 @@ public:
     }
   }
 
+  // Print what you are holding
+  void Print ( std::ostream& out = std::cout) 
+  {
+    out << std::string(50, '-') << "\n"
+        << std::left  
+        << std::setw(25) << "Flag Name"
+        << std::setw(25) << "Flag Value" << std::endl
+        << std::string(50, '-') << "\n";
+
+    for (const auto &entry : flags_)
+    {
+      const auto &key = entry.first;
+      const auto &value = entry.second;
+
+      std::string value_str;
+      std::string type_str;
+
+      std::visit([&](const auto &val)
+      {
+        std::ostringstream oss;
+        oss << val;
+        value_str = oss.str();
+
+      }, value);
+
+      out << std::left
+          << std::setw(25) << key
+          << std::setw(25) << value_str
+          << "\n";
+    }
+    out << std::string(50, '-') << "\n";
+  }
+
+  std::string Sanitize(const std::string &input)
+  {
+    std::string output = input;
+
+    // Replace '.' with 'p' (e.g., 0.01 → 0p01)
+    std::replace(output.begin(), output.end(), '.', 'p');
+
+    // Remove or replace other non-alphanumerics as needed
+    for (char &c : output)
+      if (!std::isalnum(static_cast<unsigned char>(c)))
+        c = '_';
+
+    return output;
+  }
+
+  std::string GenName ( )
+  {
+    std::vector<std::string> keys;
+    for (const auto &pair : flags_)
+    {
+      keys.push_back(pair.first);
+    }
+    std::sort(keys.begin(), keys.end()); // deterministic order
+
+    std::ostringstream oss;
+
+    for (const auto &key : keys)
+    {
+      const auto &value = flags_.at(key);
+
+      std::string value_str;
+      std::visit([&](const auto &val)
+      {
+        std::ostringstream val_stream;
+
+        if constexpr (std::is_same_v<decltype(val), bool>)
+          val_stream << (val ? "true" : "false");
+        else
+          val_stream << val;
+
+        value_str = val_stream.str();
+      }, value);
+
+      oss << Sanitize(key) << "_" << Sanitize(value_str) << "+";
+    }
+
+    std::string result = oss.str();
+    if (!result.empty())
+      result.erase(result.size() - 1); // remove last "__"
+
+    return result;
+  }
 
 private:
   CLIStore() = default;  // Private constructor
@@ -158,6 +243,8 @@ private:
     const auto& val = flags_.at(name);
     if (std::holds_alternative<int>(val))
       return std::stoi(valueStr);
+    if (std::holds_alternative<size_t>(val))
+      return static_cast<size_t>(std::stoi(valueStr));
     if (std::holds_alternative<DTYPE>(val))
       return std::stod(valueStr);
     if (std::holds_alternative<std::string>(val))
