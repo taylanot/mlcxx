@@ -26,35 +26,49 @@ int main (int argc, char** argv )
 {
   auto& conf = CLIStore::getInstance();
 
-  conf.Register<bool>("load",true);
+  conf.Register<bool>("load",true,{true,false});
+  conf.Register<std::string>("add","a",{"a","b","c","d"});
 
   conf.Parse(argc,argv);
-
-  DATASET data(4);
-  PRINT_VAR(data.size_);
-  auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
-  auto Ns = arma::regspace<arma::Row<size_t>>(10,1,data.size_-1);
-
-  if (!conf.Get<bool>("load"))
-  { 
-    lcurve::LCurve<MODEL,
-                   DATASET,
-                   SAMPLE,
-                   LOSS> curve(data,Ns,size_t(10000),false,true);
-
-    curve.Generate(0.2,lambdas);
-
-  }  
-
-  else
+  conf.Print();
+  auto load_vals = conf.GetOptions<bool>("load");
+  for (bool val : load_vals)
   {
-    auto loaded = lcurve::LCurve<MODEL,DATASET,SAMPLE,LOSS>::Load
-                            (std::string("LCurve.bin"));
-    loaded->CheckStatus();
-    PRINT_VAR(arma::size(arma::find_nonfinite(loaded->GetResults())));
-    auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10);
-    loaded->Generate(0.2,lambdas);
+    conf.Set("load",val);
+    conf.Print();
   }
+  auto add_vals = conf.GetOptions<std::string>("add");
+  for (std::string val : add_vals)
+  {
+    conf.Set("add",val);
+    conf.Print();
+  }
+
+  /* DATASET data(4); */
+  /* PRINT_VAR(data.size_); */
+  /* auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
+  /* auto Ns = arma::regspace<arma::Row<size_t>>(10,1,data.size_-1); */
+
+  /* if (!conf.Get<bool>("load")) */
+  /* { */ 
+  /*   lcurve::LCurve<MODEL, */
+  /*                  DATASET, */
+  /*                  SAMPLE, */
+  /*                  LOSS> curve(data,Ns,size_t(10000),false,true); */
+
+  /*   curve.Generate(0.2,lambdas); */
+
+  /* } */  
+
+  /* else */
+  /* { */
+  /*   auto loaded = lcurve::LCurve<MODEL,DATASET,SAMPLE,LOSS>::Load */
+  /*                           (std::string("LCurve.bin")); */
+  /*   loaded->CheckStatus(); */
+  /*   PRINT_VAR(arma::size(arma::find_nonfinite(loaded->GetResults()))); */
+  /*   auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
+  /*   loaded->Generate(0.2,lambdas); */
+  /* } */
 
 
   /* auto Ns = arma::regspace<arma::Row<size_t>>(10,1,11); */

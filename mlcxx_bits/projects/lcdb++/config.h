@@ -102,15 +102,11 @@ namespace lcdb
     };
 
     if (logspace_models.contains(model_name))
-      return arma::logspace<arma::Row<DTYPE>>(-8, 2, 11);
+      return arma::logspace<arma::Row<DTYPE>>(-8,4,100);
     else
-      return arma::regspace<arma::Row<size_t>>(1, 1, 10);
+      return arma::regspace<arma::Row<size_t>>(1,1,100);
   };
-  // hpt option for the QDC, LDC, LREG and Cs GSVC,LSVC,ESVC
-  static const auto hptset1 = arma::logspace<arma::Row<DTYPE>>(-8,2,11);
 
-  // hpt option for NNC, AdaBoost, RandomForest, DecisionTree
-  static auto hptset2 = arma::regspace<arma::Row<DTYPE>>(1,1,10);
 
   // Where to save the experiments
   /* static const std::filesystem::path path = EXP_PATH/"lcdb++"; */

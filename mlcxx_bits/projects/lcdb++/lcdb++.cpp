@@ -13,20 +13,11 @@
 
 using namespace lcdb;
 
-// Define aliases
-
-
-
 void run_jobs ( CLIStore& conf ) 
 {
   std::filesystem::create_directories(lcdb::path);
 
   lcdb::DATASET data(conf.Get<size_t>("id")); 
-  arma::Row<size_t> Ns;
-  if ( conf.Get<bool>("hpt") )
-    Ns = arma::regspace<arma::Row<size_t>>(10,1,100);
-  else
-    Ns = arma::regspace<arma::Row<size_t>>(1,10,size_t(0.9*data.size_));
 
   try
   {
@@ -42,8 +33,9 @@ void run_jobs ( CLIStore& conf )
 
         std::visit([&](auto j) {
           using J = typename decltype(j)::type;
-          auto curve = lcurve::LCurve<MODEL,DATASET,SAMPLE,LOSS>::Load
-                          (conf.GenName()+".bin");
+          auto curve = lcurve::LCurve<T,DATASET,O,J,float>::Load(
+              lcdb::path/(conf.GenName({"id","hpt","split","algo",
+                                        "loss","samp","reps"})+".bin")) ;
           if (conf.Get<bool>("hpt"))
           {
             lcdb::HptSet hptset = lcdb::get_hptset(
@@ -53,9 +45,13 @@ void run_jobs ( CLIStore& conf )
             {
               curve->Generate(lcdb::vsize,vec);
             }, hptset);
+
           }
           else 
-            curve.Generate();
+          {
+            curve->Generate();
+          }
+
         }, _loss);
       }, _samp);
     }, _model);
@@ -73,11 +69,13 @@ void init_jobs ( CLIStore& conf )
 
   lcdb::DATASET data(conf.Get<size_t>("id")); 
   arma::Row<size_t> Ns;
-  if ( conf.Get<bool>("hpt") )
-    Ns = arma::regspace<arma::Row<size_t>>(10,1,100);
-  else
-    Ns = arma::regspace<arma::Row<size_t>>(1,10,size_t(0.9*data.size_));
 
+  if ( conf.Get<bool>("hpt") )
+    Ns = arma::regspace<arma::Row<size_t>>(10,1,
+          size_t((1.-lcdb::splitsize)*data.size_));
+  else
+    Ns = arma::regspace<arma::Row<size_t>>(1,1,
+        size_t((1.-lcdb::splitsize)*data.size_));
   try
   {
     lcdb::MODS _model = lcdb::models.at(conf.Get<std::string>("algo"));
@@ -92,12 +90,30 @@ void init_jobs ( CLIStore& conf )
 
         std::visit([&](auto j) {
           using J = typename decltype(j)::type;
-          lcurve::LCurve<T,
-                         DATASET,
-                         O,
-                         J,float> curve(data,Ns,conf.Get<size_t>("reps"),
-                                        true,true,lcdb::path);
-          curve.Save(conf.GenName());
+
+            if ( conf.Get<bool>("split") )
+            {
+              lcdb::DATASET trainset,testset;
+              data::Split(data,trainset,testset,lcdb::splitsize);
+              lcurve::LCurve<T,DATASET,O,J,FIDEL> 
+                curve(trainset,testset,Ns,conf.Get<size_t>("reps"),
+                      true,true,lcdb::path,
+                                        conf.GenName({"id","hpt","split","algo",
+                                                      "loss","samp","reps"}));
+
+              curve.Save(conf.GenName({"id","hpt","split","algo",
+                                     "loss","samp","reps"})+".bin");
+            }
+            else
+            {
+              lcurve::LCurve<T,DATASET,O,J,FIDEL> 
+                curve(data,Ns,conf.Get<size_t>("reps"), true,true,lcdb::path,
+                                        conf.GenName({"id","hpt","split","algo",
+                                                      "loss","samp","reps"}));
+
+              curve.Save(conf.GenName({"id","hpt","split","algo",
+                                     "loss","samp","reps"})+".bin");
+          }
         }, _loss);
       }, _samp);
     }, _model);
@@ -113,25 +129,52 @@ int main(int argc, char* argv[])
 
   auto& conf = CLIStore::getInstance();
 
-  conf.Register<size_t>("id",11);
-  conf.Register<bool>("hpt",false);
-  conf.Register<bool>("split",false);
+  conf.Register<size_t>("id",11,{11,37});
+  conf.Register<bool>("hpt",false,{true,false});
+  conf.Register<bool>("split",false,{true,false});
   conf.Register<std::string>("state","init");
-  conf.Register<std::string>("algo","nmc");
-  conf.Register<std::string>("loss","acc");
-  conf.Register<std::string>("samp","rands");
+  conf.Register<std::string>("algo","nmc",
+      {"nmc","nnc","ldc","qdc","lreg","lsvc","gsvc","adab","rfor","dt"});
+      /* {"nmc","nnc"}); */
+  conf.Register<std::string>("loss","acc",{"acc","auc","bri","crs"});
+  conf.Register<std::string>("samp","rands",{"rands","add","boot"});
   conf.Register<size_t>("reps",1);
   conf.Register<size_t>("seed",24);
-
   conf.Parse(argc,argv);
-  conf.Print();
+  /* conf.Set("split",false); */
 
   if ( conf.Get<std::string>("state") == "init" )
-    init_jobs ( CLIStore::getInstance() );
+  {
+
+    auto id_vals = conf.GetOptions<size_t>("id");
+    auto algo_vals = conf.GetOptions<std::string>("algo");
+    auto samp_vals = conf.GetOptions<std::string>("samp");
+    auto loss_vals = conf.GetOptions<std::string>("loss");
+    auto split_vals = conf.GetOptions<bool>("split");
+    auto hpt_vals = conf.GetOptions<bool>("hpt");
+
+    for (size_t id_val : id_vals)
+      for (std::string algo_val : algo_vals)
+        for (std::string samp_val : samp_vals)
+          for (std::string loss_val : loss_vals)
+            for (bool hpt_val : hpt_vals)
+              for (bool split_val : split_vals)
+              {
+                conf.Set("id",id_val);
+                conf.Set("algo",algo_val);
+                conf.Set("samp",samp_val);
+                conf.Set("loss",loss_val);
+                conf.Set("hpt",hpt_val);
+                conf.Set("split",split_val);
+                conf.Print();
+                init_jobs ( CLIStore::getInstance() );
+              }
+  }
   else if ( conf.Get<std::string>("state") == "run" )
+  {
+    conf.Print();
     run_jobs ( CLIStore::getInstance() );
-  else if ( conf.Get<std::string>("state") == "save" )
-    save_res ( CLIStore::getInstance() );
+  }
 
   arma::wall_clock timer;
   timer.tic();

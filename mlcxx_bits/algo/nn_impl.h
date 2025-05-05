@@ -23,6 +23,27 @@ namespace algo {
 /* } */
 
 template<class NET,class OPT,class MET,class O>
+ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
+                          const arma::Mat<O>& labels ) 
+
+{
+  early_ = false;
+  opt_ = std::make_unique<OPT>();
+  Train(inputs,labels);
+}
+template<class NET,class OPT,class MET,class O>
+ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
+                          const arma::Mat<O>& labels,
+                          const NET network ) 
+
+{
+  network_ = network;
+  early_ = false;
+  opt_ = std::make_unique<OPT>();
+  Train(inputs,labels);
+}
+
+template<class NET,class OPT,class MET,class O>
 template<class... OptArgs>
 ANN<NET,OPT,MET,O>::ANN ( const arma::Mat<O>& inputs,
                           const arma::Mat<O>& labels,
@@ -185,6 +206,12 @@ arma::Row<size_t> ANN<NET,OPT,MET,O>::_OneHotDecode(
                                       const arma::Row<size_t>& ulabels )
 {
   return ulabels.cols(arma::index_max(labels,0));
+}
+
+template<class NET,class OPT,class MET,class O>
+arma::Mat<O> ANN<NET,OPT,MET,O>::Parameters ( ) 
+{
+  return network_.Parameters();
 }
 
 } // namespace algo

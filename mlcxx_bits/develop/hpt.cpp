@@ -1,49 +1,82 @@
 /**
- * @file compare.cpp
+ * @file hpt.cpp
  * @author Ozgur Taylan Turan
  *
- * Checking some peaking curves
  */
 
-//#define ARMA_DONT_USE_LAPACK
-//#define ARMA_DONT_USE_BLAS
-//#define ARMA_DONT_USE_ARPACK
-//#define ARMA_DONT_USE_OPENMP
 
 #include <headers.h>
 
+using LOSS = mlpack::MSE;
+using SAMPLE = data::RandomSelect<>;
+using DATASET = data::Dataset<arma::Mat<DTYPE>>;
 
 int main ( int argc, char** argv )
 {
   arma::wall_clock timer;
   timer.tic();
 
-  data::regression::Dataset dataset(1, 1000);
-  dataset.Generate(std::string("Linear"),0.5);
+  DATASET dataset(2);
+  dataset.Linear(5000);
 
-  arma::Row<size_t> bss = {24,32,128};
-  arma::Row<double> lrs = {0.0001,0.001}; 
+  auto lrs = arma::logspace<arma::Row<DTYPE>>(-5,-2,10);
  
+  /* typedef mlpack::FFN<mlpack::CrossEntropyError> NetworkType; */
   typedef mlpack::FFN<mlpack::MeanSquaredError> NetworkType;
-  NetworkType network;
+  NetworkType network, network2;
   network.Add<mlpack::Linear>(1);
+  network2.Add<mlpack::Linear>(2);
+  network2.Add<mlpack::Linear>(1);
+  std::vector<NetworkType> nets = {network,network2};
 
 
-  arma::irowvec Ns = arma::regspace<arma::irowvec>(10,10,100); 
-  src::LCurveHPT<algo::ANN<NetworkType>, mlpack::MSE> 
-      LCHPT(Ns,10,0.2,true);
 
-  src::LCurve<algo::ANN<NetworkType>, mlpack::MSE> 
-      LC(Ns,10,false);
 
-  /* LCHPT.RandomSet(dataset.inputs_,dataset.GetLabels(0), */
-  /*     mlpack::Fixed(&network),lrs,bss); */
-  /* LCHPT.test_errors_.save("lchpt.csv", arma::csv_ascii); */
+  mlpack::HyperParameterTuner<algo::ANN<NetworkType>, mlpack::MSE, mlpack::SimpleCV> 
+    hpt(0.2,dataset.inputs_,dataset.labels_);
+  /* std::vector<bool> early = {true,false}; */
+  std::vector<NetworkType> neti = {network};
+  std::vector<bool> early = {true};
+  /* auto a = hpt.Optimize(mlpack::Fixed(network),early,lrs); */
+  auto a = hpt.Optimize(neti,early,lrs);
+  /* PRINT(std::get<0>(a)); */
+  /* PRINT(std::get<1>(a)); */
 
-  LC.RandomSet(dataset.inputs_,dataset.GetLabels(0),
-      network,lrs[0],bss[0]);
+  /* ens::Adam opt; */
+/* // Get the unique labels */
+  /* this -> ulab_ = arma::unique(labels); */
+  /* // OneHotEncode the labels for the classifier network */
+  /* auto convlabels = _OneHotEncode(labels,ulab_); */
 
-  /* LC.test_errors_.save("lc.csv", arma::csv_ascii); */
+  /* network.Train(dataset.inputs_,,opt); */
+
+/*   auto Ns = arma::regspace<arma::Row<size_t>>(10,10,100); */ 
+
+/*   lcurve::LCurve< algo::ANN<NetworkType>, */
+/*                   DATASET, */
+/*                   SAMPLE, */
+/*                   LOSS>  curve(dataset,Ns,1,true,true); */
+
+/*   curve.GenerateFix ( 0.2, mlpack::Fixed(network), mlpack::Fixed(true),lrs); */
+
+  /* lcurve::LCurve< algo::ANN<NetworkType>, */
+  /*                 DATASET, */
+  /*                 SAMPLE, */
+  /*                 LOSS>  curve2(dataset,Ns,1,true,true); */
+
+  /* curve.Generate( 0.2, mlpack::Fixed(network2) ); */
+
+  /* curve.Generate<NetworkType>( network ); */
+
+  /* curve2.Generate<NetworkType>( network2 ); */
+
+
+
+  /* std::vector<bool> early = {true,false}; */
+  /* curve.Generate<mlpack::SimpleCV,ens::GridSearch,DTYPE,NetworkType>( 0.2, mlpack::Fixed(network),early ); */
+  /* curve.GenerateHpt( 0.2, mlpack::Fixed(&network), early ); */
+
+
 
   PRINT_TIME(timer.toc())
   return 0;

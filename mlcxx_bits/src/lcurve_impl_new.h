@@ -29,6 +29,7 @@ LCurve<MODEL,DATASET,SPLIT,LOSS,O>::LCurve ( const DATASET& dataset,
 repeat_(repeat),Ns_(Ns),parallel_(parallel),prog_(prog),name_(name),
   path_(path),seed_(seed),trainset_(dataset)
 {
+  std::filesystem::create_directories(path_);
   _RegisterSignalHandler( );
   _globalSafeFailFunc = [this]() { this->_CleanUp(); };
   test_errors_.resize(repeat_,Ns_.n_elem).fill(arma::datum::inf);
@@ -141,6 +142,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
 {
   if (this->CheckStatus())
     return;
+
   using DataHolder = std::vector<std::pair<arma::uvec,arma::uvec>>;
   auto run = [&] ( const size_t id, const DataHolder& data ) 
   {
@@ -149,8 +151,10 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
     {
       if (test_errors_(id, k) == arma::datum::inf)
       { 
-        auto hpt = _GetHpt<CV,OPT>(trainset_.inputs_.cols(data[k].first).eval(),
-                                   trainset_.labels_.cols(data[k].first).eval(),
+        auto hpt = _GetHpt<CV,OPT>(decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].first).eval()),
+                                  decltype(trainset_.inputs_)
+                                (trainset_.labels_.cols(data[k].first).eval()),
                                    cvp);
 
         auto best = hpt.Optimize(args...);
@@ -164,14 +168,6 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
                            std::forward<decltype(arg)>(arg)...);
         }, best);
 
-        /* if (!testset_.has_value()) */
-        /*   test_errors_(id, k) = loss_.Evaluate(model, */
-        /*                         trainset_.inputs_.cols(data[k].second).eval(), */
-        /*                         trainset_.labels_.cols(data[k].second).eval()); */
-        /* else */
-        /*   test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_, */
-        /*                                               testset_.value().labels_); */
-
         if (!testset_.has_value())
           test_errors_(id, k) = loss_.Evaluate(model,
                                 decltype(trainset_.inputs_)
@@ -181,7 +177,6 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
         else
           test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
                                                       testset_.value().labels_);
-
       }
       else
         continue;
@@ -202,8 +197,73 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
     if (prog_)
       pb.Update();
   }
-  this->Save(name_+".bin");
+  this->Save( name_+".bin" );
+}
 
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<template<class,class,class,class,class> class CV,
+         class OPT,
+         class T,
+         class... Ts>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate_ ( const T cvp,
+                                                     const Ts&... args )
+{
+  if (this->CheckStatus())
+    return;
+
+  using DataHolder = std::vector<std::pair<arma::uvec,arma::uvec>>;
+  auto run = [&] ( const size_t id, const DataHolder& data ) 
+  {
+    #pragma omp parallel for if (parallel_) 
+    for (size_t k=0; k < data.size() ; k++)
+    {
+      if (test_errors_(id, k) == arma::datum::inf)
+      { 
+        auto hpt = _GetHpt<CV,OPT>(decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].first).eval()),
+                                  decltype(trainset_.inputs_)
+                                (trainset_.labels_.cols(data[k].first).eval()),
+                                   cvp);
+
+        hpt.Optimize(args...);
+
+        // For the ones that think it is unfair to use the other sets to retrain
+        MODEL model = std::move(hpt.BestModel());
+
+        if (!testset_.has_value())
+          test_errors_(id, k) = loss_.Evaluate(model,
+                                decltype(trainset_.inputs_)
+                              (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                              (trainset_.labels_.cols(data[k].second).eval()));
+        else
+          test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
+                                                      testset_.value().labels_);
+      }
+      else
+        continue;
+    }
+
+  };
+
+  ProgressBar pb(name_, repeat_);
+  #pragma omp parallel for if (parallel_)
+  for (size_t id=0; id<repeat_;id++)
+  {
+    if (test_errors_.row(id).has_inf())
+    {
+      auto data = _SplitData(trainset_,seeds_[id]);
+      run( id, data );
+    }
+
+    if (prog_)
+      pb.Update();
+  }
+  this->Save( name_+".bin" );
 }
 
 //=============================================================================
@@ -293,7 +353,7 @@ template<class MODEL,
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_CleanUp ( )
 {
   LOG("CleanUp is called!"<<std::flush);
-  Save(name_+".bin");
+  Save( name_+".bin");
 }
 
 //=============================================================================

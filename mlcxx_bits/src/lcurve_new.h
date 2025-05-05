@@ -86,7 +86,14 @@ public:
            class... Ts>
   void Generate ( const T cvp,
                   const Ts&... args );
-
+  template<template<class,class,class,class,class> class CV = mlpack::SimpleCV,
+           class OPT = ens::GridSearch,
+           class T = typename std::conditional<
+                        std::is_same<CV<MODEL,LOSS,OPT,O,O>,
+           mlpack::SimpleCV<MODEL,LOSS,OPT,O,O>>::value,O,size_t>::type,
+           class... Ts>
+  void Generate_ ( const T cvp,
+                   const Ts&... args );
   /* Generate Learning Curves 
    *
    * @param args  : possible arguments for model initialization
@@ -109,6 +116,7 @@ public:
         CEREAL_NVP(prog_),
         CEREAL_NVP(name_),
         CEREAL_NVP(seed_),
+        CEREAL_NVP(path_),
         CEREAL_NVP(testset_),
         CEREAL_NVP(trainset_),
         CEREAL_NVP(num_class_),

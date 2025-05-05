@@ -19,8 +19,8 @@ using ODATASET = data::oml::Dataset<size_t>;
 using DATASET = data::Dataset<arma::Row<size_t>>;
 
 /* using MODEL = mlpack::LogisticRegression<>; */
-/* using MODEL = algo::classification::NMC<>; */
-using MODEL = algo::classification::SVM<mlpack::GaussianKernel,0>; 
+using MODEL = algo::classification::NMC<>;
+/* using MODEL = algo::classification::SVM<mlpack::GaussianKernel,0>; */ 
 /* using MODEL = mlpack::DecisionTree<>; */
 /* using MODEL = mlpack::LinearRegression<>; */
 
@@ -67,8 +67,9 @@ using SAMPLE = data::RandomSelect<>;
 int main ( ) 
 {
   ODATASET data(11);
-  PRINT_VAR(data.num_class_.value());
-  PRINT_VAR(data.size_);
+  ODATASET testdata,traindata;
+  data::Split(data,traindata,testdata,0.2);
+
   /* DATASET data(151); */
   /* DATASET data(2); */
   /* LOSS loss; */
@@ -83,7 +84,8 @@ int main ( )
   lcurve::LCurve<MODEL,
                  ODATASET,
                  SAMPLE,
-                 LOSS,double> curve(data,Ns,size_t(1),false,true,"./","LCurve",24);
+                 /* LOSS,double> curve(data,Ns,size_t(1),false,true,"./","LCurve",24); */
+                 LOSS,double> curve(traindata,testdata,Ns,size_t(1),false,true,"./","LCurve",24);
   /* auto lambdas = arma::linspace<arma::Row<DTYPE>>(0,1,10); */
   curve.Generate( );
 

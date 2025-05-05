@@ -40,5 +40,20 @@ namespace cereal
 			opt = std::nullopt;
 		
 	}
+
+
+  template <class Archive>
+  void save(Archive& ar, const std::filesystem::path& path)
+  {
+    ar(path.string());
+  }
+
+  template <class Archive>
+  void load(Archive& ar, std::filesystem::path& path)
+  {
+    std::string temp;
+    ar(temp);
+    path = std::filesystem::path(temp);
+  }
 }
 #endif

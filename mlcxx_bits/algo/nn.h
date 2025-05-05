@@ -37,9 +37,20 @@ public:
   /**
    * @param inputs  : input data, X
    * @param labels  : labels of the input, y
-   * @param network : pointer to the network object
-   * @param args    : optimizer arguments in the given order
+  */  
+  ANN ( const arma::Mat<O>& inputs,
+        const arma::Mat<O>& labels ) ;
+
+  /**
+   * @param inputs  : input data, X
+   * @param labels  : labels of the input, y
+   * @param network : network object
    */
+  
+  ANN ( const arma::Mat<O>& inputs,
+        const arma::Mat<O>& labels,
+        const NET network   ) ;
+
   template<class... OptArgs>
   ANN ( const arma::Mat<O>& inputs,
         const arma::Mat<O>& labels,
@@ -83,6 +94,8 @@ public:
    * @param labels  : labels of the input, y
    */ 
   O ComputeError( const arma::Mat<O>& inputs, const arma::Mat<O>& labels );
+
+  arma::Mat<O> Parameters( );
 
 
 private:
