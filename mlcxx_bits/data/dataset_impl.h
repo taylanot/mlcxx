@@ -744,8 +744,6 @@ Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path )
   meta_url_ = "https://www.openml.org/api/v1/data/" 
                           + std::to_string(id);
 
-  std::filesystem::create_directories(metapath_);
-
   metafile_ = metapath_/(std::to_string(id)+".meta");
   file_ = filepath_ / (std::to_string(id) + ".arff");
 
@@ -776,36 +774,7 @@ void Dataset<LTYPE,T>::Update ( const arma::Mat<T>& inputs,
 
 template<class LTYPE,class T>
 Dataset<LTYPE,T>::Dataset( const size_t& id ) : 
-  id_(id), path_(DATASET_PATH/"openml")
-{
-  std::filesystem::create_directories(filepath_);
-  std::filesystem::create_directories(metapath_);
-  
-  meta_url_ = "https://www.openml.org/api/v1/data/" 
-                          + std::to_string(id);
-
-  std::filesystem::create_directories(metapath_);
-
-  metafile_ = metapath_/(std::to_string(id)+".meta");
-  file_ = filepath_ / (std::to_string(id) + ".arff");
-
-
-  if (!std::filesystem::exists(metafile_))
-    this->_fetchmetadata();
-  
-  down_url_ = _getdownurl(_readmetadata());
-
-  if (!std::filesystem::exists(file_))
-  {
-    this->_download();
-    this->_load();
-  }
-  else
-  {
-    WARN("Dataset " << id_ << " is already present.");
-    this->_load();
-  }
-}
+  Dataset( id,DATASET_PATH/"openml") { }
 
 template<class LTYPE,class T>
 bool Dataset<LTYPE,T>::_download( )

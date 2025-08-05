@@ -4,8 +4,6 @@
  *
  * Some metrics that I miss in mlpack
  *
- * TODO: 
- *
  *
  */
 
@@ -161,6 +159,9 @@ public:
     arma::Mat<O> probs;
     arma::Row<size_t> preds;
     model.Classify(data, preds, probs);
+    /* PRINT_VAR(preds); */
+    /* PRINT_VAR(probs); */
+    /* PRINT_VAR(labels); */
     arma::Row<size_t> unq = arma::unique(labels);
     if (unq.n_elem == 1)
       return 1.;

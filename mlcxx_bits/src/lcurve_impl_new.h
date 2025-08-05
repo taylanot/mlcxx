@@ -125,9 +125,11 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
     if (prog_)
       pb.Update();
   }
-  this->Save(name_+".bin");
+  this->Save(name_);
 }
-
+//=============================================================================
+// LCurve::GenerateHpt
+//=============================================================================
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -137,8 +139,8 @@ template<template<class,class,class,class,class> class CV,
          class OPT,
          class T,
          class... Ts>
-void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
-                                                    const Ts&... args )
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt ( const T cvp,
+                                                       const Ts&... args )
 {
   if (this->CheckStatus())
     return;
@@ -151,11 +153,8 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
     {
       if (test_errors_(id, k) == arma::datum::inf)
       { 
-        auto hpt = _GetHpt<CV,OPT>(decltype(trainset_.inputs_)
-                                (trainset_.inputs_.cols(data[k].first).eval()),
-                                  decltype(trainset_.inputs_)
-                                (trainset_.labels_.cols(data[k].first).eval()),
-                                   cvp);
+        auto hpt = _GetHpt<CV,OPT>( (trainset_.inputs_.cols(data[k].first).eval()),
+                                (trainset_.labels_.cols(data[k].first).eval()), cvp);
 
         auto best = hpt.Optimize(args...);
 
@@ -197,9 +196,11 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const T cvp,
     if (prog_)
       pb.Update();
   }
-  this->Save( name_+".bin" );
+  this->Save( name_ );
 }
-
+//=============================================================================
+// LCurve::GenerateHpt_
+//=============================================================================
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -209,8 +210,8 @@ template<template<class,class,class,class,class> class CV,
          class OPT,
          class T,
          class... Ts>
-void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate_ ( const T cvp,
-                                                     const Ts&... args )
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt_ ( const T cvp,
+                                                        const Ts&... args )
 {
   if (this->CheckStatus())
     return;
@@ -223,16 +224,12 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate_ ( const T cvp,
     {
       if (test_errors_(id, k) == arma::datum::inf)
       { 
-        auto hpt = _GetHpt<CV,OPT>(decltype(trainset_.inputs_)
-                                (trainset_.inputs_.cols(data[k].first).eval()),
-                                  decltype(trainset_.inputs_)
-                                (trainset_.labels_.cols(data[k].first).eval()),
-                                   cvp);
+        auto hpt = _GetHpt<CV,OPT>( (trainset_.inputs_.cols(data[k].first).eval()),
+                                (trainset_.labels_.cols(data[k].first).eval()), cvp);
 
-        hpt.Optimize(args...);
+        auto best = hpt.Optimize(args...);
 
-        // For the ones that think it is unfair to use the other sets to retrain
-        MODEL model = std::move(hpt.BestModel());
+        MODEL model = std::move(hpt.BestModel()); 
 
         if (!testset_.has_value())
           test_errors_(id, k) = loss_.Evaluate(model,
@@ -263,7 +260,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate_ ( const T cvp,
     if (prog_)
       pb.Update();
   }
-  this->Save( name_+".bin" );
+  this->Save( name_ );
 }
 
 //=============================================================================
@@ -353,7 +350,7 @@ template<class MODEL,
 void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_CleanUp ( )
 {
   LOG("CleanUp is called!"<<std::flush);
-  Save( name_+".bin");
+  Save( name_ );
 }
 
 //=============================================================================
@@ -375,6 +372,30 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Save ( const std::string& filename )
   archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
                                                //
   LOG("LCurve object saved to " << (path_/filename) << std::flush);
+
+  /* std::string full_path = (path_ / filename).string(); */
+  /* std::ofstream file(full_path, std::ios::binary); */
+
+  /* if (!file) */ 
+  /* { */
+  /*   ERR("\rCannot open file for writing: " << full_path); */
+  /*   throw std::runtime_error("File open failed"); */
+  /* } */
+
+  /* try */ 
+  /* { */
+  /*   cereal::BinaryOutputArchive archive(file); */
+  /*   archive(cereal::make_nvp("LCurve", *this)); */
+  /*   file.flush();  // Force write to disk */
+  /*   if (!file) */ 
+  /*     throw std::runtime_error("File write failed (badbit or failbit set)"); */
+  /* } */ 
+  /* catch (const std::exception &e) */ 
+  /* { */
+  /*   ERR("\rSerialization failed: " << e.what()); */
+  /*   throw; */
+  /* } */
+  /* file.close(); */
 }
 
 //=============================================================================
@@ -452,6 +473,19 @@ auto LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_GetModel ( const Tin& Xtrn,
     return MODEL(Xtrn,ytrn,args...);
   else
     return MODEL(Xtrn,ytrn,num_class_.value(),args...);
+}
+
+//=============================================================================
+// LCurve::GetName
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+std::string LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GetName ( )
+{
+  return name_;
 }
 
 } // namespace lcurve

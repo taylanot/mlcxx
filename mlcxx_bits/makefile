@@ -42,7 +42,7 @@ CXX := g++
 BUILD_DIR := build
 
 # flags for the compiler
-CXXFLAGS := -std=c++20 -Wall -fopenmp -lstdc++fs #-lhighs -lcurl #-lopenblas
+CXXFLAGS := -std=c++23 -Wall -fopenmp -lstdc++fs #-lhighs -lcurl #-lopenblas
 
 # include our headers
 INCLFLAGS := -I .

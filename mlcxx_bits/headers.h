@@ -12,7 +12,7 @@ const unsigned int SEED = 8 ; // KOBEEEE
 //#define ARMA_USE_HDF5
 #define ARMA_WARN_LEVEL 1
 #define ARMA_USE_BLAS
-/* #define ARMA_USE_LAPACK */
+#define ARMA_USE_LAPACK
 #define DOCTEST_CONFIG_IMPLEMENT
 #define PRINT(...) std::cout << '\n' <<  __VA_ARGS__ << '\n' << std::endl; 
 #define PRINT_INFO(...) std::cout << '\n' <<  "[INFO]:"  << __VA_ARGS__  << '\n' << std::endl; 

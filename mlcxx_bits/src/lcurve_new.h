@@ -84,16 +84,17 @@ public:
                         std::is_same<CV<MODEL,LOSS,OPT,O,O>,
            mlpack::SimpleCV<MODEL,LOSS,OPT,O,O>>::value,O,size_t>::type,
            class... Ts>
-  void Generate ( const T cvp,
-                  const Ts&... args );
+  void GenerateHpt ( const T cvp,
+                     const Ts&... args );
+
   template<template<class,class,class,class,class> class CV = mlpack::SimpleCV,
            class OPT = ens::GridSearch,
            class T = typename std::conditional<
                         std::is_same<CV<MODEL,LOSS,OPT,O,O>,
            mlpack::SimpleCV<MODEL,LOSS,OPT,O,O>>::value,O,size_t>::type,
            class... Ts>
-  void Generate_ ( const T cvp,
-                   const Ts&... args );
+  void GenerateHpt_ ( const T cvp,
+                      const Ts&... args );
   /* Generate Learning Curves 
    *
    * @param args  : possible arguments for model initialization
@@ -151,6 +152,8 @@ public:
   /* Check the Status of the l.curve generation how many do you have left? */
   bool CheckStatus( bool print = false );
 
+  std::string GetName( );
+
 private: 
 
   template<template<class,class,class,class,class> class CV,
@@ -198,7 +201,7 @@ private:
   SPLIT split_;
 };
 
-} // namespace lcurve_
+} // namespace lcurve
 
 #include "lcurve_impl_new.h"
 
