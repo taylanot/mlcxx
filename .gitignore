@@ -38,4 +38,6 @@
 
 # Directories
 datasets/
+mlcxx_bits/projects/
+mlcxx_bits/build/
 

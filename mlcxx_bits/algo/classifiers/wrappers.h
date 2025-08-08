@@ -167,9 +167,9 @@ class LogisticRegression
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
-    ar & BOOST_SERIALIZATION_NVP(ulab_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
+    ar ( cereal::make_nvp("num_class",num_class_),
+         cereal::make_nvp("ulab",ulab_),
+         cereal::make_nvp("lambda",lambda_) );
 
   }
 

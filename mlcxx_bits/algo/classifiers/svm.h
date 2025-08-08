@@ -129,16 +129,16 @@ class SVM
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(cov_);
-    ar & BOOST_SERIALIZATION_NVP(X_);
-    ar & BOOST_SERIALIZATION_NVP(y_);
-    ar & BOOST_SERIALIZATION_NVP(alphas_);
-    ar & BOOST_SERIALIZATION_NVP(ulab_);
-    ar & BOOST_SERIALIZATION_NVP(idx_);
-    ar & BOOST_SERIALIZATION_NVP(b_);
-    ar & BOOST_SERIALIZATION_NVP(C_);
-    ar & BOOST_SERIALIZATION_NVP(oneclass_);
-    ar & BOOST_SERIALIZATION_NVP(solver_);
+    ar (  cereal::make_nvp("cov",cov_),
+          cereal::make_nvp("X",X_),
+          cereal::make_nvp("y",y_),
+          cereal::make_nvp("alphas",alphas_),
+          cereal::make_nvp("ulab",ulab_),
+          cereal::make_nvp("idx",idx_),
+          cereal::make_nvp("b",b_),
+          cereal::make_nvp("C",C_),
+          cereal::make_nvp("oneclass",oneclass_),
+          cereal::make_nvp("solver",solver_) );
   }
 
 private:
@@ -146,7 +146,7 @@ private:
   std::string solver_ = solvers_[SOLVER];
   size_t nclass_;
   T C_;
-  utils::covmat<KERNEL> cov_;
+  data::Gram<KERNEL> cov_;
   arma::Row<int> y_;
   arma::Mat<T> X_; // When I use here a pointer to the matrix it goes wrong...
   arma::Row<size_t> ulab_;

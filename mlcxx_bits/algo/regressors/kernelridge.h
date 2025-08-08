@@ -75,12 +75,12 @@ class KernelRidge
    * Serialize the model.
    */
   template<typename Archive>
-  void serialize ( Archive& ar, const unsigned int /* version */ )
+  void serialize ( Archive& ar, const unsigned int )
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(cov_);
-    ar & BOOST_SERIALIZATION_NVP(train_inp_);
+    ar ( cereal::make_nvp("parameters",parameters_),
+         cereal::make_nvp("lambda",lambda_),
+         cereal::make_nvp("cov",cov_),
+         cereal::make_nvp("train_inp",train_inp_));
   }
 
   private:
@@ -89,7 +89,7 @@ class KernelRidge
 
   arma::Mat<T> train_inp_;   // for later usage
   arma::Row<T> parameters_;
-  utils::covmat<KERNEL> cov_;
+  data::Gram<KERNEL> cov_;
   double lambda_;
 };
 
@@ -147,14 +147,14 @@ class Kernel
   template<typename Archive>
   void serialize ( Archive& ar, const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(train_inp_);
-    ar & BOOST_SERIALIZATION_NVP(train_lab_);
+    ar (cereal::make_nvp("train_inp",train_inp_),
+        cereal::make_nvp("train_lab",train_lab_));
   }
 
   private:
   arma::Mat<T> train_inp_;
   arma::Row<T> train_lab_;
-  utils::covmat<KERNEL> cov_;
+  data::Gram<KERNEL> cov_;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,13 +230,13 @@ class SemiParamKernelRidge2
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int /* version */)
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(M_);
-    ar & BOOST_SERIALIZATION_NVP(N_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(cov_);
-    ar & BOOST_SERIALIZATION_NVP(func_);
-    ar & BOOST_SERIALIZATION_NVP(train_inp_);
+    ar (  cereal::make_nvp("parameters",parameters_),
+          cereal::make_nvp("M",M_),
+          cereal::make_nvp("N",N_),
+          cereal::make_nvp("lambda",lambda_),
+          cereal::make_nvp("cov",cov_),
+          cereal::make_nvp("func",func_),
+          cereal::make_nvp("train_inp",train_inp_) );
   }
 
   private:
@@ -246,7 +246,7 @@ class SemiParamKernelRidge2
   arma::Mat<T> train_inp_;   // for later usage
   arma::Row<T> parameters_;
   arma::Mat<T> psi_;
-  utils::covmat<KERNEL> cov_;
+  data::Gram<KERNEL> cov_;
   double  lambda_;
   size_t M_;
   double perc_;
@@ -327,13 +327,13 @@ class SemiParamKernelRidge
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int /* version */)
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(M_);
-    ar & BOOST_SERIALIZATION_NVP(N_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(cov_);
-    ar & BOOST_SERIALIZATION_NVP(func_);
-    ar & BOOST_SERIALIZATION_NVP(train_inp_);
+    ar (cereal::make_nvp("parameters",parameters_),
+        cereal::make_nvp("M",M_),
+        cereal::make_nvp("N",N_),
+        cereal::make_nvp("lambda",lambda_),
+        cereal::make_nvp("cov",cov_),
+        cereal::make_nvp("func",func_),
+        cereal::make_nvp("train_inp",train_inp_) );
   }
 
   private:
@@ -343,7 +343,7 @@ class SemiParamKernelRidge
   arma::Mat<T> train_inp_;   // for later usage
   arma::Row<T> parameters_;
   arma::Mat<T> psi_;
-  utils::covmat<KERNEL> cov_;
+  data::Gram<KERNEL> cov_;
   double  lambda_;
   size_t M_;
   double perc_;

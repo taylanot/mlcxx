@@ -9,7 +9,7 @@
 //#define ARMA_DONT_USE_BLAS
 //#define ARMA_DONT_USE_ARPACK
 //#define ARMA_DONT_USE_OPENMP
-#include <headers.h>
+#include <lc++.h>
 #include "tests/doctest.h"
 #include "tests/tests.h"
 //-----------------------------------------------------------------------------

@@ -13,55 +13,6 @@ namespace algo {
 namespace classification {
 
 //=============================================================================
-// Parzen Classifier
-//=============================================================================
-
-/* Parzen::Parzen ( const arma::mat& inputs, */
-/*                  const arma::Row<size_t>& labels ) */
-/* { */
-/*   Train(inputs, labels); */
-/* } */
-
-/* Parzen::Parzen ( const arma::mat& inputs, */
-/*                  const arma::Row<size_t>& labels ) */
-/* { */
-/*   Train(inputs, labels); */
-/* } */
-
-/* void Parzen::Train ( const arma::mat& inputs, */
-/*                      const arma::Row<size_t>& labels ) */
-/* { */
-
-/*   dim_ = inputs.n_rows; */
-/*   unique_ = arma::unique(labels); */
-/*   num_class_ = unique_.n_cols; */
-/*   size_ = inputs.n_cols; */
-/*   parameters_ = inputs; */
-/* } */
-
-/* void Parzen::Classify ( const arma::mat& inputs, */
-/*                         arma::Row<size_t>& labels ) const */
-/* { */
-
-/* } */
-
-/* double Parzen::ComputeError ( const arma::mat& points, */ 
-/*                               const arma::Row<size_t>& responses ) const */
-/* { */
-/*   arma::Row<size_t> predictions; */
-/*   Classify(points,predictions); */
-/*   arma::Row<size_t> temp =  predictions - responses; */ 
-/*   double total = responses.n_cols; */
-/*   return (arma::accu(temp != 0))/total; */
-/* } */
-
-/* double Parzen::ComputeAccuracy ( const arma::mat& points, */ 
-/*                                  const arma::Row<size_t>& responses ) const */
-/* { */
-/*   return (1. - ComputeError(points, responses))*100; */
-/* } */
-
-//=============================================================================
 // Nearest Neighbour Classifier
 //=============================================================================
 template<class T>
@@ -69,10 +20,9 @@ NNC<T>::NNC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
               const size_t& num_class ): k_(1), nclass_(num_class)
 {
-  
   Train(inputs, labels);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 NNC<T>::NNC ( const arma::Mat<T>& inputs,
               const arma::Row<size_t>& labels,
@@ -81,7 +31,7 @@ NNC<T>::NNC ( const arma::Mat<T>& inputs,
 {
   Train(inputs, labels);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 void NNC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
@@ -99,7 +49,7 @@ void NNC<T>::Train ( const arma::Mat<T>& inputs,
   if ( k_ > inputs.n_cols )
       k_ = inputs.n_cols-1;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 void NNC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels,
@@ -108,6 +58,7 @@ void NNC<T>::Train ( const arma::Mat<T>& inputs,
   this ->nuclass_ = num_class;
   this -> Train(inputs,labels);
 }
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 void NNC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels ) const
@@ -115,7 +66,7 @@ void NNC<T>::Classify ( const arma::Mat<T>& inputs,
   arma::Mat<T> temp;
   Classify(inputs, labels, temp);
 }
-
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 void NNC<T>::Classify ( const arma::Mat<T>& inputs,
                         arma::Row<size_t>& labels,
@@ -158,6 +109,7 @@ void NNC<T>::Classify ( const arma::Mat<T>& inputs,
     }
   }
 }
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 T NNC<T>::ComputeError ( const arma::Mat<T>& points, 
                          const arma::Row<size_t>& responses ) const
@@ -169,7 +121,7 @@ T NNC<T>::ComputeError ( const arma::Mat<T>& points,
 
   return (arma::accu(temp != 0))/total;
 }
-
+///////////////////////////////////////////////////////////////////////////////
 template<class T>
 T NNC<T>::ComputeAccuracy ( const arma::Mat<T>& points, 
                             const arma::Row<size_t>& responses ) const

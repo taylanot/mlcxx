@@ -2,7 +2,7 @@
  * @file collect.h
  * @author Ozgur Taylan Turan
  *
- * COllection of datasets
+ * 
  */
 
 #ifndef COLLECT_H
@@ -12,13 +12,14 @@ namespace data {
 namespace oml {
 
 //=============================================================================
-// Collect
+// Collect : This is for collection of datasets through OpenML servers
 //=============================================================================
 template<class T=size_t>
 class Collect
 {
 public:
   /*
+   * Const
    * @param id  : id of the study
    */ 
   Collect ( const size_t& id );
@@ -30,7 +31,7 @@ public:
 
   /*
    * @param id    : id of the study
-   * @param paht  : path to save the study information
+   * @param paht  : path to save the collection
    */ 
   Collect ( const size_t& id, const std::filesystem::path& path );
 

@@ -1,288 +1,389 @@
 /**
- * @file lcurve_impl.h
  * @author Ozgur Taylan Turan
  *
  * Learning curve generator for an MLALgorithm given a dataset 
  *
- * TODO: 
- *
- * - You should put a warning for not using parallelization for neurla networks.
- *   
- *
- *
  */
 
-#ifndef LCURVE_IMPL_H
-#define LCURVE_IMPL_H
+#ifndef LCURVE_IMPL_NEW_H
+#define LCURVE_IMPL_NEW_H
 
-namespace src {
+namespace lcurve {
 
 //=============================================================================
 // LCurve
 //=============================================================================
 template<class MODEL,
-         class LOSS,class O>
-LCurve<MODEL,LOSS,O>::LCurve ( const arma::irowvec& Ns,
-                               const double repeat,
-                               const bool parallel, 
-                               const bool prog,
-                               const std::string type,
-                               const std::string name ) :
-
-repeat_(repeat), Ns_(Ns), parallel_(parallel),
-  prog_(prog), type_(type), name_(name)
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+LCurve<MODEL,DATASET,SPLIT,LOSS,O>::LCurve ( const DATASET& dataset,
+                                             const arma::Row<size_t>& Ns,
+                                             const size_t repeat,
+                                             const bool parallel, 
+                                             const bool prog,
+                                             const std::filesystem::path path,
+                                             const std::string name,
+                                             const size_t seed ) :
+repeat_(repeat),Ns_(Ns),parallel_(parallel),prog_(prog),name_(name),
+  path_(path),seed_(seed),trainset_(dataset)
 {
-  RegisterSignalHandler( );
-  globalSafeFailFunc = [this]() { this->CleanUp(); };
-  test_errors_.resize(repeat_,Ns_.n_elem);
-}
+  std::filesystem::create_directories(path_);
+  _RegisterSignalHandler( );
+  _globalSafeFailFunc = [this]() { this->_CleanUp(); };
+  test_errors_.resize(repeat_,Ns_.n_elem).fill(arma::datum::inf);
 
-//=============================================================================
-// LCurve::Bootstrap
-//=============================================================================     
-template<class MODEL,
-         class LOSS,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::Bootstrap ( const T& dataset,
-                                       const Ts&... args )
-{
-  Bootstrap(dataset.inputs_,dataset.labels_,args...);
-}
-
-//=============================================================================
-// LCurve::Bootstrap
-//=============================================================================     
-template<class MODEL,
-         class LOSS,class O>
-template<class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::Bootstrap ( const arma::Mat<O>& inputs, 
-                                       const T& labels,
-                                       const Ts&... args )
-{
   // With this version you cannot use the split version, fyi....
-  BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
+  assert ( int(Ns_.max()) < int(dataset.inputs_.n_cols) &&
         "There are not enough data for test set creation!" );
-  BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
+  assert ( int(dataset.labels_.n_rows) == int(1) && 
         "Only 1D outputs are allowed!" );
 
-  ProgressBar pb("LCurve.Bootstrap", Ns_.n_elem*repeat_);
+  if (typeid(dataset.labels_) == typeid(arma::Row<size_t>) ||
+        typeid(dataset.labels_) == typeid(arma::Row<int>) )
+    num_class_ = dataset.num_class_.value();
 
-
-  arma::uvec ids = arma::regspace<arma::uvec>(0,inputs.n_elem);
-  #pragma omp parallel for collapse(2) if(parallel_)
-  for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
-    for(size_t j=0; j < size_t(repeat_); j++)
-    {
-      const auto idx = arma::randi<arma::uvec>(Ns_[i],
-                                arma::distr_param(0,labels.n_elem-1));
-      const arma::Mat<O> inps = inputs.cols(idx); 
-      const T labs = labels.cols(idx); 
-      const auto rest = data::SetDiff(ids,idx);
-      MODEL model(inps,labs,args...);
-
-      test_errors_(j,i) = loss_.Evaluate(model,inputs.cols(rest).eval(),
-                                               labels.cols(rest).eval());
-      if (prog_)
-        pb.Update();
-    }
-
-}
-//=============================================================================
-// LCurve::RandomSet
-//=============================================================================     
-template<class MODEL,
-         class LOSS,class O>
-template<class SPLIT,class T, class... Ts>
-void LCurve<MODEL,LOSS,O>::RandomSet ( const arma::Mat<O>& inputs,
-                                       const T& labels,
-                                       const Ts&... args )
-{
-  BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
-        "There are not enough data for test set creation!" );
-  BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
-        "Only 1D outputs are allowed!" );
-
-  ProgressBar pb("LCurve.RandomSet", Ns_.n_elem*repeat_);
-
-  SPLIT split;
-  #pragma omp parallel for collapse(2) if(parallel_)
-  for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
-  {
-    for(size_t j=0; j < size_t(repeat_); j++)
-    {
-      const auto res = split(inputs, labels, size_t(Ns_(i)));
-      arma::Mat<O> Xtrn = std::get<0>(res);
-      arma::Mat<O> Xtst = std::get<1>(res);
-      T ytrn = std::get<2>(res);
-      T ytst = std::get<3>(res);
-
-      MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = loss_.Evaluate(model, Xtst, ytst);
-      if (prog_)
-        pb.Update();
-    }
-  }
-
+  // Create the seeds for the jobs
+  mlpack::RandomSeed(seed_);
+  seeds_ = arma::randi<arma::irowvec>(repeat_,arma::distr_param(0,1000));
 }
 
 template<class MODEL,
-         class LOSS,class O>
-template<class SPLIT,class T,class... Ts>
-void LCurve<MODEL,LOSS,O>::RandomSet( const T& dataset,
-                                      const Ts&... args )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+LCurve<MODEL,DATASET,SPLIT,LOSS,O>::LCurve ( const DATASET& trainset,
+                                             const DATASET& testset,
+                                             const arma::Row<size_t>& Ns,
+                                             const size_t repeat,
+                                             const bool parallel, 
+                                             const bool prog,
+                                             const std::filesystem::path path,
+                                             const std::string name,
+                                             const size_t seed ) :
+LCurve(trainset,Ns,repeat,parallel,prog,path,name)
 {
-  RandomSet(dataset.inputs_,dataset.labels_,args...);
+  testset_= trainset;
 }
 
 //=============================================================================
-// LCurve::Additive
-//=============================================================================     
+// LCurve::Generate
+//=============================================================================
 template<class MODEL,
-         class LOSS,class O>
-template<class SPLIT,class T,class... Ts>
-void LCurve<MODEL,LOSS,O>::Additive ( const arma::Mat<O>& inputs,
-                                            const T& labels,
-                                            const Ts&... args )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<class... Ts>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
 {
-  BOOST_ASSERT_MSG( int(Ns_.max()) < int(inputs.n_cols), 
-        "There are not enough data for test set creation!" );
-  BOOST_ASSERT_MSG( int(labels.n_rows) == int(1), 
-        "Only 1D outputs are allowed!" );
+  if (this->CheckStatus())
+    return;
 
-  ProgressBar pb("LCurve.Additive", Ns_.n_elem*repeat_);
-
-  SPLIT split;
-  #pragma omp parallel for if(parallel_)
-  for(size_t j=0; j < size_t(repeat_); j++)
+  using DataHolder = std::vector<std::pair<arma::uvec,arma::uvec>>;
+  auto run = [&] ( const size_t id, const DataHolder& data ) 
   {
-    const auto res = split(inputs,labels,size_t(Ns_(0)));
-
-    arma::Mat<O> Xtrn = std::get<0>(res);
-    arma::Mat<O> Xrest = std::get<1>(res);
-
-    T ytrn = std::get<2>(res);
-    T yrest = std::get<3>(res);
-
-    MODEL model(Xtrn, ytrn, args...);
-    test_errors_(j,0) = loss_.Evaluate(model,Xrest,yrest);
-    for (size_t i=1; i < size_t(Ns_.n_elem) ; i++)
+    #pragma omp parallel for if (parallel_) 
+    for (size_t k=0; k < data.size() ; k++)
     {
-      data::Migrate(Xtrn,ytrn,Xrest,yrest, Ns_[i]-Ns_[i-1]);
-      MODEL model(Xtrn, ytrn, args...);
-      test_errors_(j,i) = loss_.Evaluate(model,Xrest,yrest);
-      if (prog_)
-        pb.Update();
+      if (test_errors_(id, k) == arma::datum::inf)
+      { 
+        auto model = _GetModel(decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].first).eval()),
+                               decltype(trainset_.labels_)
+                                (trainset_.labels_.cols(data[k].first).eval()),
+                               args...);
+
+        if (!testset_.has_value())
+          test_errors_(id, k) = loss_.Evaluate(model,
+                                decltype(trainset_.inputs_)
+                                (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                                (trainset_.labels_.cols(data[k].second).eval()));
+        else
+          test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
+                                                      testset_.value().labels_);
+      }
+      else
+        continue;
     }
+
+  };
+
+  ProgressBar pb(name_, repeat_);
+  #pragma omp parallel for if (parallel_)
+  for (size_t id=0; id<repeat_;id++)
+  {
+    if (test_errors_.row(id).has_inf())
+    {
+      auto data = _SplitData(trainset_,seeds_[id]);
+      run( id, data );
+    }
+
     if (prog_)
       pb.Update();
   }
-
+  this->Save(name_);
 }
-
-template<class MODEL,
-         class LOSS,class O>
-template<class SPLIT,class T,class... Ts>
-void LCurve<MODEL,LOSS,O>::Additive ( const T& dataset,
-                                      const Ts&... args )
-{
-  Additive(dataset.inputs_, dataset.labels_,args...);
-}
-
 //=============================================================================
-// LCurve::Split
-//=============================================================================     
+// LCurve::GenerateHpt
+//=============================================================================
 template<class MODEL,
-         class LOSS,class O>
-template<class SPLIT,class T,class... Ts>
-void LCurve<MODEL,LOSS,O>::Split( const T& trainset,
-                                  const T& testset,
-                                  const Ts&... args )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<template<class,class,class,class,class> class CV,
+         class OPT,
+         class T,
+         class... Ts>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt ( const T cvp,
+                                                       const Ts&... args )
 {
-  BOOST_ASSERT_MSG( int(Ns_.max()) < int(trainset.inputs_.n_cols), 
-        "There are not enough data for learning curve generation!" );
-  BOOST_ASSERT_MSG( int(trainset.labels_.n_rows) == int(1) &&
-                    int(testset.labels_.n_rows) == int(1), 
-                    "Only 1D outputs are allowed!" );
-  ProgressBar pb("LCurve.Split", Ns_.n_elem*repeat_);
+  if (this->CheckStatus())
+    return;
 
-  SPLIT split;
-  #pragma omp parallel for collapse(2) if(parallel_)
-  for (size_t i=0; i < size_t(Ns_.n_elem) ; i++)
+  using DataHolder = std::vector<std::pair<arma::uvec,arma::uvec>>;
+  auto run = [&] ( const size_t id, const DataHolder& data ) 
   {
-    for(size_t j=0; j < size_t(repeat_); j++)
+    #pragma omp parallel for if (parallel_) 
+    for (size_t k=0; k < data.size() ; k++)
     {
-      const auto res = split(trainset.inputs_,trainset.labels_,size_t(Ns_(i)));
+      if (test_errors_(id, k) == arma::datum::inf)
+      { 
+        auto hpt = _GetHpt<CV,OPT>( (trainset_.inputs_.cols(data[k].first).eval()),
+                                (trainset_.labels_.cols(data[k].first).eval()), cvp);
 
-      arma::Mat<O> Xtrn = std::get<0>(res);
-      auto ytrn = std::get<2>(res);
+        auto best = hpt.Optimize(args...);
 
-      MODEL model(Xtrn, ytrn, args...);
-      /* test_errors_(j,i) = static_cast<O>(loss_.Evaluate(model, testset.inputs_, */
-      /*                     testset.labels_)); */
+        MODEL model = std::apply([&](auto&&... arg) 
+        {
+          return _GetModel(decltype(trainset_.inputs_)
+                            (trainset_.inputs_.cols(data[k].first).eval()),
+                           decltype(trainset_.labels_)
+                            (trainset_.labels_.cols(data[k].first).eval()),
+                           std::forward<decltype(arg)>(arg)...);
+        }, best);
 
-      test_errors_(j,i) = loss_.Evaluate(model, testset.inputs_,testset.labels_);
-      if (prog_)
-        pb.Update();
+        if (!testset_.has_value())
+          test_errors_(id, k) = loss_.Evaluate(model,
+                                decltype(trainset_.inputs_)
+                              (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                              (trainset_.labels_.cols(data[k].second).eval()));
+        else
+          test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
+                                                      testset_.value().labels_);
+      }
+      else
+        continue;
     }
+
+  };
+
+  ProgressBar pb(name_, repeat_);
+  #pragma omp parallel for if (parallel_)
+  for (size_t id=0; id<repeat_;id++)
+  {
+    if (test_errors_.row(id).has_inf())
+    {
+      auto data = _SplitData(trainset_,seeds_[id]);
+      run( id, data );
+    }
+
+    if (prog_)
+      pb.Update();
   }
+  this->Save( name_ );
+}
+//=============================================================================
+// LCurve::GenerateHpt_
+//=============================================================================
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<template<class,class,class,class,class> class CV,
+         class OPT,
+         class T,
+         class... Ts>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt_ ( const T cvp,
+                                                        const Ts&... args )
+{
+  if (this->CheckStatus())
+    return;
+
+  using DataHolder = std::vector<std::pair<arma::uvec,arma::uvec>>;
+  auto run = [&] ( const size_t id, const DataHolder& data ) 
+  {
+    #pragma omp parallel for if (parallel_) 
+    for (size_t k=0; k < data.size() ; k++)
+    {
+      if (test_errors_(id, k) == arma::datum::inf)
+      { 
+        auto hpt = _GetHpt<CV,OPT>( (trainset_.inputs_.cols(data[k].first).eval()),
+                                (trainset_.labels_.cols(data[k].first).eval()), cvp);
+
+        auto best = hpt.Optimize(args...);
+
+        MODEL model = std::move(hpt.BestModel()); 
+
+        if (!testset_.has_value())
+          test_errors_(id, k) = loss_.Evaluate(model,
+                                decltype(trainset_.inputs_)
+                              (trainset_.inputs_.cols(data[k].second).eval()),
+                                decltype(trainset_.labels_)
+                              (trainset_.labels_.cols(data[k].second).eval()));
+        else
+          test_errors_(id, k) = loss_.Evaluate(model, testset_.value().inputs_,
+                                                      testset_.value().labels_);
+      }
+      else
+        continue;
+    }
+
+  };
+
+  ProgressBar pb(name_, repeat_);
+  #pragma omp parallel for if (parallel_)
+  for (size_t id=0; id<repeat_;id++)
+  {
+    if (test_errors_.row(id).has_inf())
+    {
+      auto data = _SplitData(trainset_,seeds_[id]);
+      run( id, data );
+    }
+
+    if (prog_)
+      pb.Update();
+  }
+  this->Save( name_ );
 }
 
 //=============================================================================
-// LCurve::CleanUp
+// LCurve::CheckStatus
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
-void LCurve<MODEL,LOSS,O>::CleanUp ( )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+bool LCurve<MODEL,DATASET,SPLIT,LOSS,O>::CheckStatus( bool print  )
 {
-  LOG("\rCleanUp is called!"<<std::flush);
-  Save(name_+".bin");
+  O inc = 0;
+  for (size_t i=0; i<repeat_; i++)
+    inc += test_errors_.row(i).has_inf();
+  if (print)
+    LOG(name_ +":"+std::to_string(size_t(100-O(inc/repeat_)))+"% completed.");
+  if ( inc/repeat_ != 0 )
+    return false;
+  else 
+    return true;
 }
 
 //=============================================================================
-// LCurve::RegisterSignalHandler
+// LCurve::_SplitData
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
-void LCurve<MODEL,LOSS,O>::RegisterSignalHandler( )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+std::vector<std::pair<arma::uvec,arma::uvec>>
+  LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SplitData ( const DATASET& dataset,
+                                                   const size_t seed )
 {
-  signal(SIGALRM, LCurve<MODEL,LOSS,O>::SignalHandler);
+  
+  std::vector<std::pair<arma::uvec,arma::uvec>> data;
+    split_(dataset.size_,Ns_,size_t(1),data,seed);
+  return data;
+}
+//=============================================================================
+// LCurve::_RegisterSignalHandler
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_RegisterSignalHandler( )
+{
+  // for timer related quiting
+  signal(SIGALRM, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+  // keyboard interupt
+  signal(SIGINT, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+  // this handles termination
+  signal(SIGTERM, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+  // this handles kill
+  signal(SIGKILL, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
+
 }
 
 //=============================================================================
-// LCurve::SignalHandler
+// LCurve::_SignalHandler
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
-void LCurve<MODEL,LOSS,O>::SignalHandler( int sig )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler( int sig )
 {
-  if (globalSafeFailFunc) globalSafeFailFunc();  
-  LOG("\rTime limit exceeded! Exiting..." << std::flush);
+  // If one of the signals is detected by our failsafe function,
+  // a gracefull exit is initiated...
+  if (_globalSafeFailFunc) _globalSafeFailFunc();  
+  LOG("Stopping program for some reason! Exiting..." << std::flush);
   std::quick_exit(0);
+}
+
+//=============================================================================
+// LCurve::_CleanUp
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_CleanUp ( )
+{
+  LOG("CleanUp is called!"<<std::flush);
+  Save( name_ );
 }
 
 //=============================================================================
 // LCurve::Save
 //=============================================================================     
 template<class MODEL,
-         class LOSS,class O>
-void LCurve<MODEL,LOSS,O>::Save ( const std::string& filename )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Save ( const std::string& filename )
 {
-  std::ofstream file(filename, std::ios::binary);
+  std::ofstream file((path_/filename), std::ios::binary);
   if (!file) 
-    ERR("\rCannot open file for writing: " << filename << std::flush);
+    ERR("\rCannot open file for writing: " << (path_/filename) << std::flush);
 
+  // Serialize the object nicely...
   cereal::BinaryOutputArchive archive(file);
   archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
-  LOG("\rLCurve object saved to " << filename << std::flush);
+                                               //
+  LOG("LCurve object saved to " << (path_/filename) << std::flush);
 }
 
 //=============================================================================
 // LCurve::Load
 //=============================================================================
 template<class MODEL,
-         class LOSS,class O>
-std::shared_ptr<LCurve<MODEL,LOSS,O>> LCurve<MODEL,LOSS,O>::Load
-                                              ( const std::string& filename )
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+std::shared_ptr<LCurve<MODEL,DATASET,SPLIT,LOSS,O>> 
+LCurve<MODEL,DATASET, SPLIT,LOSS,O>::Load ( const std::string& filename )
 {
   std::ifstream file(filename, std::ios::binary);
   if (!file) 
@@ -290,12 +391,80 @@ std::shared_ptr<LCurve<MODEL,LOSS,O>> LCurve<MODEL,LOSS,O>::Load
     ERR("\rError: Cannot open file for reading: " << filename);
     return nullptr;
   }
+
+  // Deserialize into a new object
   cereal::BinaryInputArchive archive(file);
-  auto lcurve = std::make_shared<LCurve<MODEL,LOSS,O>>();
-  archive(cereal::make_nvp("LCurve", *lcurve));  // Deserialize into a new object
-  LOG("\rLCurve oaded from " << filename);
+  auto lcurve = std::make_shared<LCurve<MODEL,DATASET,SPLIT,LOSS,O>>();
+  archive(cereal::make_nvp("LCurve", *lcurve));
+                                               //
+  // These are for making sure the loaded function is safe to fail too...
+  _globalSafeFailFunc = [lcurve]() { lcurve->_CleanUp(); };
+  lcurve->_RegisterSignalHandler();
+
+  LOG("LCurve loaded from " << filename);
   return lcurve;
 }
 
-} // namespace src
+//=============================================================================
+// LCurve::_GetHPT
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<template<class,class,class,class,class> class CV,
+           class OPT,class Tin,class Tlab,class T>
+auto LCurve<MODEL,DATASET, SPLIT,LOSS,O>::_GetHpt ( const Tin& Xtrn,
+                                                    const Tlab& ytrn,
+                                                    const T cvp )
+{
+  using TunerType = mlpack::HyperParameterTuner<MODEL, LOSS, CV, OPT, Tin>;
+
+  // If we detact the classification algorithm takes in number of classes,
+  // another Tuner is called...
+  if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
+    return TunerType(cvp, Xtrn, ytrn);
+  else
+    return TunerType(cvp, Xtrn, ytrn,num_class_.value());
+
+}
+
+//=============================================================================
+// LCurve::_GetModel
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+template<class Tin, class Tlab, class... Ts>
+auto LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_GetModel ( const Tin& Xtrn,
+                                                     const Tlab& ytrn,
+                                                     const Ts&... args )
+{
+  // If we detact the classification algorithm takes in number of classes,
+  // another model initializer is called...
+  if constexpr (!mlpack::MetaInfoExtractor<MODEL>::TakesNumClasses)
+    return MODEL(Xtrn,ytrn,args...);
+  else
+    return MODEL(Xtrn,ytrn,num_class_.value(),args...);
+}
+
+//=============================================================================
+// LCurve::GetName
+//=============================================================================     
+template<class MODEL,
+         class DATASET,
+         class SPLIT,
+         class LOSS,
+         class O>
+std::string LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GetName ( )
+{
+  return name_;
+}
+
+} // namespace lcurve
+
+
 #endif

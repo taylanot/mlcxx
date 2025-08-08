@@ -2,11 +2,9 @@
  * @file transform_impl.h
  * @author Ozgur Taylan Turan
  *
- * A simple transform wrapper
- *
- * TODO
- *  Because of Some smarty pants in mlpack this does not work with float type 
- *  vector and matrices. Needs some in_place changing.
+ * A simple transform wrapper, where you can apply mlpack transformations to the 
+ * Dataset objects of our own. Here, you can also choose to apply those to 
+ * inputs or the labels.
  */
 
 #ifndef TRANSFORM_IMPL_H
@@ -21,7 +19,6 @@ namespace regression {
 template<class T, class D>
 Transformer<T,D>::Transformer( const D& dataset )
 {
-  // Temporary fix : correct form should be without conversion
   inp_.Fit(arma::conv_to<arma::mat>::from(dataset.inputs_));
   lab_.Fit(arma::conv_to<arma::rowvec>::from(dataset.labels_));
 };

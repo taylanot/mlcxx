@@ -119,14 +119,14 @@ class LDC
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
-    ar & BOOST_SERIALIZATION_NVP(size_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(means_);
-    ar & BOOST_SERIALIZATION_NVP(covs_);
-    ar & BOOST_SERIALIZATION_NVP(unique_);
-    ar & BOOST_SERIALIZATION_NVP(priors_);
+    ar (cereal::make_nvp("dim",dim_),
+        cereal::make_nvp("num_class",num_class_),
+        cereal::make_nvp("size",size_),
+        cereal::make_nvp("lambda",lambda_),
+        cereal::make_nvp("means",means_),
+        cereal::make_nvp("covs",covs_),
+        cereal::make_nvp("unique",unique_),
+        cereal::make_nvp("priors",priors_));
 
   }
 
@@ -260,16 +260,15 @@ class QDC
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
-    ar & BOOST_SERIALIZATION_NVP(size_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(means_);
-    ar & BOOST_SERIALIZATION_NVP(covs_);
-    ar & BOOST_SERIALIZATION_NVP(icovs_);
-    ar & BOOST_SERIALIZATION_NVP(unique_);
-    ar & BOOST_SERIALIZATION_NVP(priors_);
-
+    ar ( cereal::make_nvp("dim",dim_),
+         cereal::make_nvp("num_class",num_class_),
+         cereal::make_nvp("size",size_),
+         cereal::make_nvp("lambda",lambda_),
+         cereal::make_nvp("means",means_),
+         cereal::make_nvp("covs",covs_),
+         cereal::make_nvp("icovs",icovs_),
+         cereal::make_nvp("unique",unique_),
+         cereal::make_nvp("priors",priors_));
   }
 
   private:
@@ -390,13 +389,13 @@ class NMC
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(num_class_);
-    ar & BOOST_SERIALIZATION_NVP(unique_);
-    ar & BOOST_SERIALIZATION_NVP(metric_);
-    ar & BOOST_SERIALIZATION_NVP(shrink_);
-    ar & BOOST_SERIALIZATION_NVP(size_);
+    ar (  cereal::make_nvp("parameters",parameters_),
+          cereal::make_nvp("dim",dim_),
+          cereal::make_nvp("num_class",num_class_),
+          cereal::make_nvp("unique",unique_),
+          cereal::make_nvp("metric",metric_),
+          cereal::make_nvp("shrink",shrink_),
+          cereal::make_nvp("size",size_) );
   }
 
   private:

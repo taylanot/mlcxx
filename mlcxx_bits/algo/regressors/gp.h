@@ -118,11 +118,11 @@ class GaussianProcess
   template<typename Archive>
   void serialize ( Archive& ar, const unsigned int /* version */ )
   {
-    ar & BOOST_SERIALIZATION_NVP(parameters_);
-    ar & BOOST_SERIALIZATION_NVP(train_inp_);
-    ar & BOOST_SERIALIZATION_NVP(lambda_);
-    ar & BOOST_SERIALIZATION_NVP(cov_);
-    ar & BOOST_SERIALIZATION_NVP(L_);
+    ar ( cereal::make_nvp("parameters",parameters_),
+         cereal::make_nvp("train_inp",train_inp_),
+         cereal::make_nvp("lambda",lambda_),
+         cereal::make_nvp("cov",cov_),
+         cereal::make_nvp("L",L_) );
   }
 
   private:
@@ -133,7 +133,7 @@ class GaussianProcess
   arma::Mat<T> train_inp_;   // for later usage
   size_t N_;   // for later usage
   arma::Col<T> parameters_;
-  utils::covmat<K,T> cov_;
+  data::Gram<K,T> cov_;
   T lambda_;
 };
 

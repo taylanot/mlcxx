@@ -54,7 +54,7 @@ template<class T>
 arma::Row<size_t> Collect<T>::_getkeys()
 {
   
-  // Function to fetch metadata from OpenMLdd
+  // Function to fetch metadata from OpenML
   CURL* curl;
   CURLcode res;
   std::string readBuffer;

@@ -15,3 +15,5 @@ docker pull taylanot/cxx-dev:latest
 
 ## Documentation for various functionalities
 [Algorithms](docs/algo.md)
+[Learning Curve Generation](docs/src.md)
+[Data](docs/data.md)

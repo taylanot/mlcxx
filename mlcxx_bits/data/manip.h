@@ -15,10 +15,14 @@ namespace data {
 //=============================================================================
 // SetDiff : Difference between two vectors
 //=============================================================================
+/**
+ * @param check : The vector to be compared
+ * @param with  : Comparison is made with this vector
+ */
 template<class T>
 T SetDiff( const T& check, const T& with )
 {
-  BOOST_ASSERT_MSG( check.is_sorted() && with.is_sorted(),
+  assert ( check.is_sorted() && with.is_sorted() &&
                    "For this method I assumed you sorted your stuff...");
 
   T result;
@@ -36,13 +40,12 @@ T SetDiff( const T& check, const T& with )
           j++;
       else
       {
-          // a[i] == b[j], skip this element
           i++;
           j++;
       }
   }
 
-  // Append remaining elements from a
+  // Append remaining elements from check
   while (i < check.n_elem)
   {
       result.resize(result.n_elem+1);
@@ -56,6 +59,13 @@ T SetDiff( const T& check, const T& with )
 //=============================================================================
 // Migrate : Exchange N random data points between train and test sets
 //=============================================================================
+/**
+ * @param train_inp : inputs of the training set
+ * @param train_lab : labels of the training set
+ * @param test_inp  : inputs of the testing set
+ * @param test_lab  : labels of the testing set 
+ * @param N         : number of points that to be migrated (test->train)
+ */
 template<typename T, typename U>
 void Migrate ( arma::Mat<T>& train_inp,
                arma::Row<U>& train_lab,
@@ -63,10 +73,10 @@ void Migrate ( arma::Mat<T>& train_inp,
                arma::Row<U>& test_lab,
                const size_t N )
 {
-  BOOST_ASSERT_MSG(train_inp.n_cols == train_lab.n_elem &&
+  assert ( ( train_inp.n_cols == train_lab.n_elem &&
                    train_inp.n_rows == test_inp.n_rows &&
                    test_inp.n_cols == test_lab.n_elem &&
-                   test_lab.n_elem >= N, 
+                   test_lab.n_elem >= N) && 
                    "Requested element number is bigger than what you have.");
 
   train_inp.resize(train_inp.n_rows, train_inp.n_cols+N);
@@ -78,7 +88,6 @@ void Migrate ( arma::Mat<T>& train_inp,
   test_inp.shed_cols(idx);
 }
 
-
 template<typename T, typename U>
 void Migrate ( arma::Mat<T>& train_inp,
                arma::Mat<U>& train_lab,
@@ -86,10 +95,10 @@ void Migrate ( arma::Mat<T>& train_inp,
                arma::Mat<U>& test_lab,
                const size_t N )
 {
-  BOOST_ASSERT_MSG(test_inp.n_cols == test_lab.n_elem &&
+  assert (  ( test_inp.n_cols == test_lab.n_elem &&
                    train_inp.n_rows == test_inp.n_rows &&
                    test_lab.n_rows == train_lab.n_rows &&
-                   test_lab.n_elem >= N,
+                   test_lab.n_elem >= N ) &&
                    "Requested element number is bigger than what you have.");
 
   train_inp.resize(train_inp.n_rows, train_inp.n_cols+N);
@@ -100,11 +109,13 @@ void Migrate ( arma::Mat<T>& train_inp,
   test_lab.shed_cols(idx);
   test_inp.shed_cols(idx);
 }
-
-
+/**
+ * @param trainset  : training dataset
+ * @param testset   : testing dataset
+ * @param N         : number of points that to be migrated (test->train)
+ */
 template<typename T>
-void Migrate ( const T& dataset,
-               T& trainset,
+void Migrate ( T& trainset,
                T& testset,
                const size_t N )
 {
@@ -118,12 +129,11 @@ void Migrate ( const T& dataset,
 }
 
 template<typename T=arma::uword>
-void Migrate ( const arma::Col<T>& dataset,
-               arma::Col<T>& trainset,
+void Migrate ( arma::Col<T>& trainset,
                arma::Col<T>& testset,
                const size_t N )
 {
-  BOOST_ASSERT_MSG( testset.n_elem >= N, 
+  assert ( testset.n_elem >= N &&
                    "Requested element number is bigger than what you have.");
 
   trainset.resize(trainset.n_elem+N);
@@ -131,69 +141,11 @@ void Migrate ( const arma::Col<T>& dataset,
   trainset.tail(N) = testset.rows(idx);
   testset.shed_rows(idx);
 }
-//=============================================================================
-// select_header : Select the relavent parts of the database by using 
-//                  arma::field
-//=============================================================================
-arma::uvec select_header(const arma::field<std::string>& header,
-                         const std::string& which)
-{
-
-  size_t count=0;
-  for (size_t j = 0; j < header.n_elem; j++)
-  {
-    bool check = header(j).find(which) != std::string::npos;
-    if (check)
-      count++;
-  }
-
-  arma::uvec ids(count);
-  count = 0;
-  for (size_t j = 0; j < header.n_elem; j++)
-  {
-    bool check = header(j).find(which) != std::string::npos;
-    if (check)
-      ids(count++) = j;
-  }
-  return ids;
-}
 
 //=============================================================================
-// select_header : Selecting multiple relavent parts and finding the 
-//                  intersection between those by using arma::field
+// Split : Split datasets for a given number of training points
 //=============================================================================
-arma::uvec select_headers(const arma::field<std::string>& header,
-                          const std::vector<std::string>& whichs)
-{
-  BOOST_ASSERT_MSG ( whichs.size() > 1,
-      "The size of the search vector should be more than 1!");
-
-  arma::field<arma::uvec> ids(1,whichs.size());
-
-  size_t counter = 0;
-  for (std::string which: whichs)
-    ids(0,counter++) = select_header(header,which);
-
-  arma::uvec id;
-  for (size_t i=0; i<whichs.size()-1;i++)
-  {
-    if (i ==0)
-      id = arma::intersect(ids(i),ids(i+1));
-    else
-      id = arma::intersect(id,ids(i+1));
-
-  }
-
-
-  return id;
-}
-
-
 /**
- * Given an input dataset and labels, split into a training set and test set.
- * Example usage below.  This overload places the split dataset into the four
- * output parameters given (trainData, testData, trainLabel, and testLabel).
- *
  * @param input Input dataset to split.
  * @param label Input labels to split.
  * @param trainData Matrix to store training data into.
@@ -211,14 +163,6 @@ void Split ( const arma::Mat<T>& input,
              arma::Row<U>& testLabel,
              const size_t trainNum )
 {
-  /* const size_t trainSize = trainNum; */
-  /* const size_t testSize = input.n_cols - trainSize; */
-
-  /* trainData.set_size(input.n_rows, trainSize); */
-  /* testData.set_size(input.n_rows, testSize); */
-  /* trainLabel.set_size(trainSize); */
-  /* testLabel.set_size(testSize); */
-
   const arma::uvec order =
       arma::shuffle(arma::regspace<arma::uvec>(0, input.n_cols - 1));
 
@@ -240,29 +184,6 @@ void Split ( const arma::Mat<T>& input,
              const size_t trainNum )
 {
   //  I am going to solve this problem with a tinier bit of code
-  /* const size_t trainSize = trainNum; */
-  /* const size_t testSize = input.n_cols - trainSize; */
-
-  /* trainData.set_size(input.n_rows, trainSize); */
-  /* testData.set_size(input.n_rows, testSize); */
-  /* trainLabel.set_size(inputLabel.n_rows, trainSize); */
-  /* testLabel.set_size(inputLabel.n_rows, testSize); */
-
-  /* const arma::Col<size_t> order = */
-  /*     arma::shuffle(arma::linspace<arma::Col<size_t>>(0, input.n_cols - 1, */
-  /*                                                     input.n_cols)); */
-
-  /* for ( size_t i = 0; i != trainSize; ++i ) */
-  /* { */
-  /*   trainData.col(i) = input.col(order[i]); */
-  /*   trainLabel.col(i) = inputLabel.col(order[i]); */
-  /* } */
-
-  /* for ( size_t i = 0; i != testSize; ++i ) */
-  /* { */
-  /*   testData.col(i) = input.col(order[i + trainSize]); */
-  /*   testLabel.col(i) = inputLabel.col(order[i + trainSize]); */
-  /* } */
   const arma::uvec order =
       arma::shuffle(arma::regspace<arma::uvec>(0, input.n_cols - 1));
 
@@ -274,10 +195,6 @@ void Split ( const arma::Mat<T>& input,
 }
 
 /**
- * Given an input dataset, split into a training set and test set.
- * Example usage below. This overload places the split dataset into the two
- * output parameters given (trainData, testData).
- *
  * @param input Input dataset to split.
  * @param trainData Matrix to store training data into.
  * @param testData Matrix to store test data into.
@@ -325,18 +242,6 @@ void Split ( const arma::Col<T>& input,
 }
 
 /**
- * Given an input dataset and labels, split into a training set and test set.
- * Example usage below.  This overload returns the split dataset as a std::tuple
- * with four elements: an arma::Mat<T> containing the training data, an
- * arma::Mat<T> containing the test data, an arma::Row<U> containing the
- * training labels, and an arma::Row<U> containing the test labels.
- *
- * @code
- * arma::mat input = loadData();
- * arma::Row<size_t> label = loadLabel();
- * auto splitResult = Split(input, label, 0.2);
- * @endcode
- *
  * @param input Input dataset to split.
  * @param label Input labels to split.
  * @param trainNum number of training points desired.
@@ -383,16 +288,6 @@ Split ( const arma::Mat<T>& input,
                          std::move(testLabel));
 }
 /**
- * Given an input dataset, split into a training set and test set.
- * Example usage below.  This overload returns the split dataset as a std::tuple
- * with two elements: an arma::Mat<T> containing the training data and an
- * arma::Mat<T> containing the test data.
- *
- * @code
- * arma::mat input = loadData();
- * auto splitResult = Split(input, 0.2);
- * @endcode
- *
  * @param input Input dataset to split.
  * @param trainNum number of training points desired.
  * @return std::tuple containing trainData (arma::Mat<T>)
@@ -412,8 +307,6 @@ Split ( const arma::Mat<T>& input,
 }
 
 /**
- * Given a dataset, split into a training set and test set.
- *
  * @param dataset to be splitted
  * @param trainset to be splitted
  * @param testset to be splitted
@@ -441,8 +334,6 @@ void Split ( const T& dataset,
 }
 
 /**
- * Given a dataset, split into a training set and test set.
- *
  * @param dataset to be splitted
  * @param trainset to be filled
  * @param testset to be filled
@@ -468,6 +359,10 @@ void Split ( const T& dataset,
   testset.dimension_ = testset.inputs_.n_rows;
 }
 
+//=============================================================================
+// StratifiedSplit : Split datasets for a given number of training points
+// in a stratified manner
+//=============================================================================
 /**
  * @param input Input dataset to stratify.
  * @param inputLabel Input labels to stratify.
@@ -570,7 +465,7 @@ void StratifiedSplit(const arma::Mat<T>& input,
 
 /**
  * Unfortunately mlpack has an issue if you have a balanced dataset, so got it
- * from there with a minor fix
+ * from there with a minor fix 
  *
  * @param input Input dataset to stratify.
  * @param inputLabel Input labels to stratify.
@@ -684,8 +579,8 @@ void StratifiedSplit ( const T& dataset,
                        T& testset,
                         const size_t trainNum )
 {
-  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>) ||
-                   typeid(T) == typeid(oml::Dataset<size_t>) , 
+  assert ( ( typeid(T) == typeid(Dataset<arma::Row<size_t>>) ||
+                   typeid(T) == typeid(oml::Dataset<size_t>)) && 
       "StratifiedSplit can only be used for classification dataset type...");
 
   trainset = dataset; testset = dataset;
@@ -716,8 +611,8 @@ void StratifiedSplit ( const T& dataset,
              const double testRatio )
 {
 
-  BOOST_ASSERT_MSG(typeid(T) == typeid(classification::Dataset<>) ||
-                   typeid(T) == typeid(oml::Dataset<size_t>) , 
+  assert ( (typeid(T) == typeid(Dataset<arma::Row<size_t>>) ||
+                   typeid(T) == typeid(oml::Dataset<size_t>)) &&  
       "StratifiedSplit can only be used for classification dataset type...");
 
   trainset = dataset; testset = dataset;
@@ -752,49 +647,6 @@ StratifiedSplit ( const arma::Mat<T>& input,
                          std::move(trainLabel),
                          std::move(testLabel));
 }
-
-class N_Split
-{
-public:
-  template<class... Args>
-  auto operator()(Args... args)
-  {
-    return data::Split(args...);
-  }
-};
-
-class P_Split
-{
-public:
-  template<class... Args>
-  auto operator()(Args... args)
-  {
-    return mlpack::data::Split(args...);
-  }
-};
-
-class P_StratSplit
-{
-public:
-  template<class... Args>
-  auto operator()(Args... args)
-  {
-    return mlpack::data::StratifiedSplit(args...);
-  }
-};
-
-
-class N_StratSplit
-{
-public:
-  template<class... Args>
-  auto operator()(Args... args)
-  {
-    return data::StratifiedSplit(args...);
-  }
-};
-
-
 
 } // namespace data
 #endif

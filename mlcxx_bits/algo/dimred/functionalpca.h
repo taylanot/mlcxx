@@ -32,7 +32,7 @@ std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
   size_t N = inputs.n_cols;
   size_t M = labels.n_rows;
 
-  BOOST_ASSERT_MSG( D == 1, "FunctionalData input dim. != 1!");
+  assert ( D == 1 && "FunctionalData input dim. != 1!");
 
 
   arma::Mat<T> weights(1, N);

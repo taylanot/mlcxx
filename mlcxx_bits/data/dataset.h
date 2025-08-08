@@ -2,6 +2,8 @@
  * @file dataset.h
  * @author Ozgur Taylan Turan
  *
+ * Here lies the definitions of all the Dataset containers for regression,
+ * classification, functional and openml related containers.
  */
 
 #ifndef DATASET_H
@@ -10,7 +12,8 @@
 namespace data {
 
 //=============================================================================
-// Dataset
+// Dataset: This is a genearl Dataset container where you can decide at compile 
+//   time wheather you want to have a classification dataset or regression. 
 //=============================================================================
 template<class LABEL=arma::Row<DTYPE>,class T=DTYPE>
 class Dataset 
@@ -128,323 +131,235 @@ private:
 
 };
 
-namespace regression {
-
-//=============================================================================
-// Dataset
-//=============================================================================
-template<class T=DTYPE>
-class Dataset 
-{
-public:
-  size_t size_;
-  size_t dimension_;
-
-  arma::Mat<T> inputs_;
-  arma::Row<T> labels_;
-
-  Dataset ( ) { };
-
-  Dataset ( const size_t& D,
-            const size_t& N );
-
-  Dataset ( const size_t& D,
-            const size_t& N,
-            const arma::Col<T> mean,
-            const arma::Mat<T> cov );
-
-  void Set ( const size_t& D,
-             const size_t& N );
-
-  void Update ( const arma::Mat<T>& input, const arma::Mat<T>& labels  ); 
-
-  void Outlier_ ( const size_t& Nout );
-
-  void Generate ( const double& scale,
-                  const double& phase,
-                  const std::string& type ) ;
-
-  void Generate ( const double& scale,
-                  const double& phase,
-                  const std::string& type,
-                  const double& noise_std );
-
-  void Generate ( const std::string& type,
-                  const double& noise_std );
-
-  void Generate ( const arma::Row<T>& type,
-                  const double& noise_std );
-
-
-  void Generate ( const std::string& type );
-
-  void Noise ( const double& noise_std );
-
-  void Save ( const std::string& filename );
-
-  void Load ( const std::string& filename,
-              const size_t& Din,
-              const size_t& Dout,
-              const bool transpose = true,
-              const bool count = false );
-
-  void Load ( const std::string& filename,
-              const arma::uvec& ins,
-              const arma::uvec& outs, 
-              const bool transpose = true,
-              const bool count = false );
-
-  arma::Row<T> GetLabels( const size_t id );
-
-  /* Serliazation with cereal for the class. */
-  template <class Archive>
-  void serialize(Archive& ar) 
-  {
-    ar( CEREAL_NVP(size_),
-        CEREAL_NVP(inputs_),
-        CEREAL_NVP(labels_),
-        CEREAL_NVP(dimension_) );
-  }
-
-
-private:
-  arma::Col<T> mean_;
-  arma::Mat<T> cov_;
-
-  void _update_info ( );
-
-};
-
-} // regression 
-  
-namespace functional
-{
-
-template<class T=DTYPE>
-struct Dataset 
-{
-  size_t size_;
-  size_t dimension_;
-  size_t nfuncs_;
-  arma::Mat<T> weights_;
-
-  arma::Mat<T> inputs_;
-  arma::Mat<T> labels_;
-
-  Dataset ( ) { };
-  Dataset ( const size_t& D,
-            const size_t& N,
-            const size_t& M );
-
-  void Generate ( const std::string& type );
-
-  void Generate ( const std::string& type,
-                  const double& noise_std );
-
-  void Generate ( const std::string& type,
-                  const arma::Row<T>& noise_std );
-
-  void Noise ( const double& noise_std );
-
-  void Noise ( const arma::Row<T>& noise_std );
-
-  void Save ( const std::string& filename );
-
-  void Load ( const std::string& filename,
-              const size_t& Din,
-              const size_t& Dout, 
-              const bool& transpose = true,
-              const bool& count = false );
-
-  void Normalize ( );
-
-  void UnNormalize ( );
-
-};
-
-//=============================================================================
-// SineGen
-//=============================================================================
-template<class T=DTYPE>
-struct SineGen
-{
-  size_t size_;
-  size_t dimension_;
-
-  arma::Row<T> a_;
-  arma::Row<T> p_;
-
-  SineGen ( ) { };
-  SineGen ( const size_t& M );
-
-  arma::Mat<T> Predict ( const arma::Mat<T>& inputs,
-                         const std::string& type  = "Phase" ) const;
-
-  arma::Mat<T> Predict ( const arma::Mat<T>& inputs,
-                         const std::string& type,
-                         const double& eps ) const;
-
-  arma::Mat<T> Mean ( const arma::Mat<T>& inputs,
-                      const std::string& type = "Phase" ) const;
-
-  arma::Mat<T> Mean ( const arma::Mat<T>& inputs,
-                      const std::string& type,
-                      const double& eps ) const;
-
-  size_t GetM ( );
-
-};
-
-} //functional
-
-namespace classification {
-
-//=============================================================================
-// Dataset
-//=============================================================================
-template<class T=DTYPE>
-struct Dataset 
-{
-  size_t size_;
-  size_t dimension_;
-  size_t num_class_;
-
-  arma::Mat<T> inputs_;
-  arma::Row<size_t> labels_;
-
-  Dataset ( ) { } ;
-
-  Dataset ( const arma::Mat<T>& inputs,
-            const arma::Row<size_t>& labels );
-
-  Dataset ( const size_t& D,
-            const size_t& N,
-            const size_t& Nc );
-
-  void Set ( const size_t& D,
-             const size_t& N,
-             const size_t& Nc );
-
-
-  void Generate ( const std::string& type );
-
-  void _banana ( const double& delta );
-
-  void _dipping ( const double& r,
-                  const double& noise_std );
-
-  void _2classgauss ( const arma::Col<T>& mean1,
-                      const arma::Col<T>& mean2,
-                      const double& eps,
-                      const double& delta );
-
-  void _imbalance2classgauss ( const double& perc );
-
-  void Save ( const std::string& filename );
-
-  void Load ( const std::string& filename,
-              const bool last = true,
-              const bool transpose = true ,
-              const bool count = false );
-
-  /* Serliazation with cereal for the class. */
-  template <class Archive>
-  void serialize(Archive& ar) 
-  {
-    ar( CEREAL_NVP(size_),
-        CEREAL_NVP(num_class_),
-        CEREAL_NVP(inputs_),
-        CEREAL_NVP(labels_),
-        CEREAL_NVP(dimension_) );
-  }
-
-};
-
-} // namespace classification
-
 namespace oml {
 
 //=============================================================================
 // Dataset
 //=============================================================================
-template<class LTYPE=size_t, class T=DTYPE>
-class Dataset 
+
+template<class LTYPE = size_t, class T = DTYPE>
+class Dataset
 {
 public:
-  size_t id_;
-  size_t size_;
-  size_t dimension_;
-  std::optional<size_t> num_class_;
-  std::filesystem::path path_; 
+  size_t id_;                       // Dataset ID
+  size_t size_;                     // Number of samples
+  size_t dimension_;                // Feature dimension
+  std::optional<size_t> num_class_; // Number of classes (if categorical)
+  std::filesystem::path path_;      // Dataset path
 
-  arma::Mat<T> inputs_;
-  arma::Row<LTYPE> labels_;
+  arma::Mat<T> inputs_;             // Input data
+  arma::Row<LTYPE> labels_;         // Labels
 
-  Dataset ( ) { } ;
+  Dataset() { };
+  Dataset(const size_t& id, const std::filesystem::path& path);
+  Dataset(const size_t& id);
 
-  Dataset ( const size_t& id, const std::filesystem::path& path );
+  // Update dataset content
+  void Update(const arma::Mat<T>& input, const arma::Row<LTYPE>& labels);
 
-  Dataset ( const size_t& id );
-
-  void Update ( const arma::Mat<T>& input, const arma::Row<LTYPE>& labels  ); 
-
-  /* Serliazation with cereal for the class. */
+  /* Serialization with cereal */
   template <class Archive>
-  void serialize(Archive& ar) 
+  void serialize(Archive& ar)
   {
-    ar( CEREAL_NVP(size_),
-        CEREAL_NVP(id_),
-        CEREAL_NVP(path_.string()),
-        CEREAL_NVP(num_class_),
-        CEREAL_NVP(meta_url_),
-        CEREAL_NVP(down_url_),
-        CEREAL_NVP(file_),
-        CEREAL_NVP(metafile_),
-        CEREAL_NVP(inputs_),
-        CEREAL_NVP(labels_),
-        CEREAL_NVP(dimension_) );
+    ar(CEREAL_NVP(size_),
+       CEREAL_NVP(id_),
+       CEREAL_NVP(path_.string()),
+       CEREAL_NVP(num_class_),
+       CEREAL_NVP(meta_url_),
+       CEREAL_NVP(down_url_),
+       CEREAL_NVP(file_),
+       CEREAL_NVP(metafile_),
+       CEREAL_NVP(inputs_),
+       CEREAL_NVP(labels_),
+       CEREAL_NVP(dimension_));
   }
 
-  /* Save the object to a BinaryFile
-   *
-   * @param filename : binary file name
-   */
-  void Save ( const std::string& filename );
-  static std::shared_ptr<Dataset<LTYPE,T>> Load ( const std::string& filename );
+  // Save/load dataset in binary format
+  void Save(const std::string& filename);
+  static std::shared_ptr<Dataset<LTYPE, T>> Load(const std::string& filename);
 
 private:
+  std::filesystem::path filepath_ = path_ / "datasets"; // Data folder
+  std::filesystem::path metapath_ = path_ / "meta";     // Metadata folder
 
-  std::filesystem::path filepath_ = path_ / "datasets";
-  std::filesystem::path metapath_ = path_ / "meta";
+  bool _download();                  // Download dataset
+  void _update_info();                // Update metadata
+  void _load();                       // Load from disk
 
-  bool _download (  ); 
-  void _update_info(  ); 
+  bool _iscateg(const arma::Row<T>& row);     // Check if row is categorical
+  arma::Row<size_t> _convcateg(const arma::Row<T>& row); // Convert to categories
+  arma::Row<size_t> _procrow(const arma::Row<T>& row);   // Process row
 
-  void _load ( );
+  std::string _gettargetname(const std::string& metadata); // Extract target name
+  std::string _getdownurl(const std::string& metadata);    // Extract download URL
+  int _findlabel(const std::string& targetname);           // Find label index
 
-  bool _iscateg(const arma::Row<T>& row); 
-  arma::Row<size_t> _convcateg(const arma::Row<T>& row);
-  arma::Row<size_t> _procrow(const arma::Row<T>& row);
+  std::string _fetchmetadata();    // Fetch metadata from source
+  std::string _readmetadata();     // Read metadata from file
 
-  std::string _gettargetname (const std::string& metadata ); 
-  std::string _getdownurl (const std::string& metadata ); 
-
-  int _findlabel ( const std::string& targetname ); 
-
-  std::string _fetchmetadata( ); 
-  std::string _readmetadata( ); 
-
-  std::string meta_url_;
-  std::string down_url_;
-
-  std::string file_;
-  std::string metafile_;
-
-
-
+  std::string meta_url_;           // Metadata URL
+  std::string down_url_;           // Download URL
+  std::string file_;               // Dataset file name
+  std::string metafile_;           // Metadata file name
 };
 
+
 } // namesapce oml
+  
+namespace functional
+{
+template<class T = DTYPE>
+struct Dataset 
+{
+  size_t size_;        // Number of samples in the dataset
+  size_t dimension_;   // Number of features (input dimension)
+  size_t nfuncs_;      // Number of functions or outputs
+  arma::Mat<T> weights_; // Optional sample or feature weights
+
+  arma::Mat<T> inputs_; // Input feature matrix
+  arma::Mat<T> labels_; // Output/label matrix
+
+  /* Empty constructor */
+  Dataset() { }
+
+  /* Dataset initializer
+   *
+   * @param D : number of features (input dimension)
+   * @param N : number of samples
+   * @param M : number of outputs (functions)
+   */
+  Dataset(const size_t& D,
+          const size_t& N,
+          const size_t& M);
+
+  /* Generate synthetic dataset
+   *
+   * @param type : type of dataset to generate
+   */
+  void Generate(const std::string& type);
+
+  /* Generate synthetic dataset with Gaussian noise
+   *
+   * @param type      : type of dataset to generate
+   * @param noise_std : standard deviation of noise
+   */
+  void Generate(const std::string& type,
+                const double& noise_std);
+
+  /* Generate synthetic dataset with feature-wise Gaussian noise
+   *
+   * @param type      : type of dataset to generate
+   * @param noise_std : per-feature noise standard deviations
+   */
+  void Generate(const std::string& type,
+                const arma::Row<T>& noise_std);
+
+  /* Add Gaussian noise to dataset
+   *
+   * @param noise_std : standard deviation of noise
+   */
+  void Noise(const double& noise_std);
+
+  /* Add feature-wise Gaussian noise to dataset
+   *
+   * @param noise_std : per-feature noise standard deviations
+   */
+  void Noise(const arma::Row<T>& noise_std);
+
+  /* Save dataset to file
+   *
+   * @param filename : path to save file
+   */
+  void Save(const std::string& filename);
+
+  /* Load dataset from file
+   *
+   * @param filename  : path to file
+   * @param Din       : input dimension
+   * @param Dout      : output dimension
+   * @param transpose : whether to transpose loaded data (default: true)
+   * @param count     : whether to count number of samples (default: false)
+   */
+  void Load(const std::string& filename,
+            const size_t& Din,
+            const size_t& Dout, 
+            const bool& transpose = true,
+            const bool& count = false);
+
+  /* Normalize dataset (zero mean, unit variance) */
+  void Normalize();
+
+  /* Undo normalization on dataset */
+  void UnNormalize();
+};
+
+
+//=============================================================================
+// SineGen
+//=============================================================================
+template<class T = DTYPE>
+struct SineGen
+{
+  size_t size_;        ///< Number of generated samples
+  size_t dimension_;   ///< Number of sine functions (output dimension)
+
+  arma::Row<T> a_;     ///< Amplitude parameters for each function
+  arma::Row<T> p_;     ///< Phase parameters for each function
+
+  /* Empty constructor */
+  SineGen() { }
+
+  /* Initialize sine generator
+   *
+   * @param M : number of sine functions
+   */
+  SineGen(const size_t& M);
+
+  /* Predict sine outputs for given inputs
+   *
+   * @param inputs : input matrix
+   * @param type   : prediction type ("Phase" by default)
+   * @return       : predicted outputs
+   */
+  arma::Mat<T> Predict(const arma::Mat<T>& inputs,
+                       const std::string& type = "Phase") const;
+
+  /* Predict sine outputs with perturbation
+   *
+   * @param inputs : input matrix
+   * @param type   : prediction type
+   * @param eps    : perturbation parameter
+   * @return       : predicted outputs
+   */
+  arma::Mat<T> Predict(const arma::Mat<T>& inputs,
+                       const std::string& type,
+                       const double& eps) const;
+
+  /* Compute mean prediction
+   *
+   * @param inputs : input matrix
+   * @param type   : mean type ("Phase" by default)
+   * @return       : mean outputs
+   */
+  arma::Mat<T> Mean(const arma::Mat<T>& inputs,
+                    const std::string& type = "Phase") const;
+
+  /* Compute mean prediction with perturbation
+   *
+   * @param inputs : input matrix
+   * @param type   : mean type
+   * @param eps    : perturbation parameter
+   * @return       : mean outputs
+   */
+  arma::Mat<T> Mean(const arma::Mat<T>& inputs,
+                    const std::string& type,
+                    const double& eps) const;
+
+  /* Get number of sine functions */
+  size_t GetM();
+};
+
+} // namespace functional
 
 
 } // namespace data

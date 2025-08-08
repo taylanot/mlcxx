@@ -2,17 +2,15 @@
  * @file progress.h
  * @author Ozgur Taylan Turan
  *
- * Simple Progress thread safe progress bar for my loops
+ * Simple Progress thread safe progress bar for Learning Curve Generation 
+ *  tracking
  */
-
-
 
 #ifndef __PROGRESS_H
 #define __PROGRESS_H
 
 //=============================================================================
 // ProgresssBar : A Simple Progress Bar that shows the perc. of your loop
-//                It can be used with omp parallel too
 //=============================================================================
 class ProgressBar
 {

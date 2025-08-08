@@ -493,6 +493,7 @@ TEST_SUITE("SINEGEN") {
 
 TEST_SUITE("EXTRACT_CLASSES") {
     int D; int N=10; int Nc=2; double tol = 1e-6;
+    namespace ac = algo::classification;
     TEST_CASE("1D")
     {
       D = 1;
@@ -503,8 +504,8 @@ TEST_SUITE("EXTRACT_CLASSES") {
 
       std::tuple<arma::Mat<DTYPE>, arma::uvec> collect0;
       std::tuple<arma::Mat<DTYPE>, arma::uvec> collect1;
-      collect0 = utils::extract_class(data.inputs_, data.labels_,0);
-      collect1 = utils::extract_class(data.inputs_, data.labels_,1);
+      collect0 = ac::extract_class(data.inputs_, data.labels_,0);
+      collect1 = ac::extract_class(data.inputs_, data.labels_,1);
 
       arma::Mat<DTYPE> out0 = std::get<0>(collect0);
       arma::Mat<DTYPE> out1 = std::get<0>(collect1);
@@ -528,8 +529,8 @@ TEST_SUITE("EXTRACT_CLASSES") {
 
       std::tuple<arma::Mat<DTYPE>, arma::uvec> collect0;
       std::tuple<arma::Mat<DTYPE>, arma::uvec> collect1;
-      collect0 = utils::extract_class(data.inputs_, data.labels_,0);
-      collect1 = utils::extract_class(data.inputs_, data.labels_,1);
+      collect0 = ac::extract_class(data.inputs_, data.labels_,0);
+      collect1 = ac::extract_class(data.inputs_, data.labels_,1);
 
       arma::Mat<DTYPE> out0 = std::get<0>(collect0);
       arma::Mat<DTYPE> out1 = std::get<0>(collect1);
@@ -546,30 +547,6 @@ TEST_SUITE("EXTRACT_CLASSES") {
 }
 
 
-TEST_SUITE("SYSTEM") {
-  std::filesystem::path dir1 = "ali";
-  std::filesystem::path dir2 = "veli";
-  std::filesystem::path dir3 = "deli";
-  std::filesystem::path dir4 = "celi";
-  std::filesystem::path remdir1 = dir2;
-  std::filesystem::path remdir2 = dir4/dir2;
-  std::filesystem::path path = dir1/dir2/dir3/dir4;
-    TEST_CASE("SPLIT")
-    {
-      std::vector<std::filesystem::path> list = utils::split_path(path);
-      CHECK ( list[0] == dir1 );
-      CHECK ( list[1] == dir2 );
-      CHECK ( list[2] == dir3 );
-      CHECK ( list[3] == dir4 );
-    }
-    TEST_CASE("REMOVE")
-    {
-      std::filesystem::path check1 = utils::remove_path(path, remdir1);
-      std::filesystem::path check2 = utils::remove_path(path, remdir2);
-      CHECK ( check1 == dir1/dir3/dir4 );
-      CHECK ( check2 == dir1/dir3 );
-    }
-}
 
 TEST_SUITE("SPLIT-REGRESSION-DATASET") {
     

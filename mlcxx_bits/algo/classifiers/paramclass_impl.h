@@ -50,7 +50,7 @@ void LDC<T>::Train ( const arma::Mat<T>& inputs,
                      const arma::Row<size_t>& labels )
 {
   class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels, num_class_);
+  priors_ = get_prior<T>(labels, num_class_);
 
   dim_ = inputs.n_rows;
   size_ = inputs.n_cols;
@@ -67,7 +67,7 @@ void LDC<T>::Train ( const arma::Mat<T>& inputs,
 
     for(; it!=end; it++)
     {
-      auto extract = utils::extract_class(inputs, labels, *it);
+      auto extract = extract_class(inputs, labels, *it);
       inx = std::get<0>(extract);
       means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
       if ( inx.n_cols == 1 )
@@ -194,7 +194,7 @@ void QDC<T>::Train ( const arma::Mat<T>& inputs,
   unique_ = arma::unique(labels);
 
   class_ = arma::regspace<arma::Row<size_t>>(0,1,num_class_);
-  priors_ = utils::GetPrior(labels,num_class_);
+  priors_ = get_prior<T>(labels,num_class_);
   
   arma::Row<size_t>::iterator it = unique_.begin();
   arma::Row<size_t>::iterator end = unique_.end();
@@ -203,7 +203,7 @@ void QDC<T>::Train ( const arma::Mat<T>& inputs,
 
   for(; it!=end; it++)
   {
-    auto extract = utils::extract_class(inputs, labels, *it);
+    auto extract = extract_class(inputs, labels, *it);
 
     inx = std::get<0>(extract);
     means_[*it] = arma::conv_to<arma::Row<T>>::from(arma::mean(inx,1));
@@ -331,7 +331,7 @@ void NMC<T>::Train ( const arma::Mat<T>& inputs,
 
   for ( ;it!=it_end; ++it)
   {
-    auto extract = utils::extract_class(inputs, labels, *it);
+    auto extract = extract_class(inputs, labels, *it);
     index = std::get<1>(extract);
     nk(counter) = index.n_rows;
     parameters_.col(counter) = arma::mean(inputs.cols(index),1);
