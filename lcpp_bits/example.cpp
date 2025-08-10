@@ -6,7 +6,7 @@
  *
  */
 
-#include <lcxx.h>
+#include <lcpp.h>
 
 /* #define DTYPE double */
 /* #include "config.h" */

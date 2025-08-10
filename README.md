@@ -1,4 +1,4 @@
-# lcxx [LearningCurve++(xx)]
+# lcpp [LearningCurvePlusPlus)]
 **C++ Header-Only Learning Curve Generation Tool**  
 
 Generate learning curves for supervised machine learning algorithms with just header files — no separate compilation needed!  
@@ -15,7 +15,7 @@ Generate learning curves for supervised machine learning algorithms with just he
 ---
 
 ## 🧠 About  
-`lcxx` is designed to help you easily generate learning curves for supervised ML algorithms.  
+`lcpp` is designed to help you easily generate learning curves for supervised ML algorithms.  
 It provides a clean C++ header-only implementation, making it easy to integrate into your own projects without heavy build setup.  
 
 ---
