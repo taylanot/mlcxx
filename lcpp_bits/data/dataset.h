@@ -72,7 +72,7 @@ public:
    * @param noise_std : standard deviation of the Gaussian noise
    *
    */
-  void Linear ( const size_t N = 10, const T noise_std=T(1.));
+  void Linear ( const size_t N=10, const T noise_std=T(1.));
 
   /* Generate sinusoidal data for regression with Gaussian noise assumption
    *
@@ -80,7 +80,7 @@ public:
    * @param noise_std : standard deviation of the Gaussian noise
    *
    */
-  void Sine ( const size_t N = 10, const T noise_std=T(1.));
+  void Sine ( const size_t N=10, const T noise_std=T(1.));
 
   /* Generate banana dataset for classification
    *
@@ -88,7 +88,7 @@ public:
    * @param delta : distance between bananas
    *
    */
-  void Banana ( const size_t N = 10, const T delta=0. );
+  void Banana ( const size_t N=10, const T delta=0. );
 
   /* Generate dipping dataset for classification 
    * Loog, M., & Duin, R. P. W. (2012). The dipping phenomenon. 
@@ -98,7 +98,7 @@ public:
    * @param noise_std   : noise of the circle
    *
    */
-  void Dipping ( const size_t N, const T r=1, const T noise_std=0.1 );
+  void Dipping ( const size_t N=10, const T r=1, const T noise_std=0.1 );
 
   /* Generate dipping dataset for classification 
    * Loog, M., & Duin, R. P. W. (2012). The dipping phenomenon. 
@@ -108,9 +108,8 @@ public:
    * @param stds  : standard deviations of the Gaussian blobs
    *
    */
-  void Gaussian ( const size_t N,
-                  const arma::Row<T>& means,
-                  const arma::Row<T>& stds );
+  void Gaussian ( const size_t N=10,
+                  const arma::Row<T>& means = {-1,1} );
 
   /* Serliazation with cereal for the class. */
   template <class Archive>

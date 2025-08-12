@@ -14,6 +14,9 @@
 
 #ifndef MY_CEREAL_H
 #define MY_CEREAL_H
+
+namespace cereal {
+
 //-----------------------------------------------------------------------------
 // Save: std::optional<T> by first storing whether it has a value,
 // then storing the value if present.
@@ -69,5 +72,7 @@ void load(Archive& ar, std::filesystem::path& path)
     ar(temp);
     path = std::filesystem::path(temp);
 }
+
+} //namespace cereal
 
 #endif

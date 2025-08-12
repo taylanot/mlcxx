@@ -1,15 +1,12 @@
 /**
- * @file down_dataset.cpp
+ * @file openml.cpp
  * @author Ozgur Taylan Turan
  *
- * Download datasets with given ids
- *
+ * Download datasets with given ids and print a report about the dataset.
+ *  
  */
 
 #include <lcpp.h>
-
-/* #define DTYPE double */
-/* #include "config.h" */
 
 using OpenML = data::oml::Dataset<DTYPE>;
 

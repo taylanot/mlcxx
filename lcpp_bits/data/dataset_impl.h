@@ -119,35 +119,32 @@ void Dataset<LABEL,T>::Dipping ( const size_t N, const T r, const T noise_std )
 
   this->_update_info();
 }
+
 //=============================================================================
 // Dataset::Gaussian
 //=============================================================================
 template<class LABEL,class T>
 void Dataset<LABEL,T>::Gaussian ( const size_t N,
-                                  const arma::Row<T>& means,
-                                  const arma::Row<T>& stds )
+                                  const arma::Row<T>& means )
 
 {
-  assert ( means.n_elem == stds.n_elem && 
-      "means and std should have same size.");
-
   size_t n_class = means.n_elem;
 
-  inputs_.set_size(dimension_, N*n_class, arma::fill::zeros);
-  labels_.set_size(dimension_, N*n_class, arma::fill::zeros);
+  inputs_.set_size(dimension_, N*n_class);
+  labels_.set_size(N*n_class);
   if constexpr ( std::is_same<LABEL,arma::Row<size_t>>::value )
       labels_.subvec(0, N-1).zeros(); 
-    else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
-    {
-      assert ( means.n_elem == 2 && 
-          "To use Row<int> you need binary classification problem");
-      labels_.subvec(0, N-1).fill(-1); 
-    }
+  else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
+  {
+    assert ( means.n_elem == 2 && 
+        "To use Row<int> you need binary classification problem");
+    labels_.subvec(0, N-1).fill(-1); 
+  }
    
   for (size_t i = 0; i < n_class ; ++i)
   {
-    inputs_.cols(i * N, (i + 1) * N - 1) = means(i) + 
-                            stds(i) * arma::randn<arma::Mat<T>>(dimension_, N);
+    inputs_.cols(i * N, (i + 1) * N - 1) = means(i) 
+                                    + arma::randn<arma::Mat<T>>(dimension_, N);
 
     if (i>0)
       labels_.subvec(N, 2*N - 1).ones();

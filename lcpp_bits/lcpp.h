@@ -10,6 +10,7 @@
 #define ARMA_WARN_LEVEL 1
 
 #define ARMA_USE_LAPACK
+#define ARMA_USE_BLAS
 
 #define DOCTEST_CONFIG_IMPLEMENT
 
@@ -66,10 +67,12 @@
 #endif
 
 #define DEPEND_INFO() \
-  std::cout << '\n' << "[INFO]: MAIN_PACKAGES: " \
-  << "armadillo " <<arma::arma_version::as_string()  \
-  << " / " << mlpack::util::GetVersion() << \
-  " / ensmallen " << ens::version::as_string() << '\n' << std::endl; 
+  std::cout << '\n' << "[INFO]: DEPENDENCIES : " \
+  << "C++/" << __cplusplus \
+  << " | armadillo/" <<arma::arma_version::as_string()  \
+  << " | " << mlpack::util::GetVersion()  \
+  << " | ensmallen " << ens::version::as_string() \
+  << " | " <<  curl_version() << '\n' << std::endl; 
 
 // Define the precision for what is to come...
 #ifndef DTYPE

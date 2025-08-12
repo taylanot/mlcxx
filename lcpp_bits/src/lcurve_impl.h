@@ -110,6 +110,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
     }
 
   };
+  arma::wall_clock timer;
 
   ProgressBar pb(name_, repeat_);
   #pragma omp parallel for if (parallel_)
@@ -117,6 +118,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
   {
     if (test_errors_.row(id).has_inf())
     {
+
       auto data = _SplitData(trainset_,seeds_[id]);
       run( id, data );
     }
