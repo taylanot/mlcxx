@@ -9,7 +9,6 @@
 #ifndef LCURVE_NEW_H
 #define LCURVE_NEW_H
 
-
 namespace lcurve {
 
 // Global function pointer this is for cleanup-related things.
@@ -87,14 +86,6 @@ public:
   void GenerateHpt ( const T cvp,
                      const Ts&... args );
 
-  template<template<class,class,class,class,class> class CV = mlpack::SimpleCV,
-           class OPT = ens::GridSearch,
-           class T = typename std::conditional<
-                        std::is_same<CV<MODEL,LOSS,OPT,O,O>,
-           mlpack::SimpleCV<MODEL,LOSS,OPT,O,O>>::value,O,size_t>::type,
-           class... Ts>
-  void GenerateHpt_ ( const T cvp,
-                      const Ts&... args );
   /* Generate Learning Curves 
    *
    * @param args  : possible arguments for model initialization

@@ -1,4 +1,4 @@
-# Utilities (`utils/`)
+# utils 
 
 This folder contains general-purpose utilities that are used in **LCPP**.
 

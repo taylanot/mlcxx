@@ -23,12 +23,14 @@ It provides a clean C++ header-only implementation, making it easy to integrate 
 ## 🚀 Quick Start  
 Too lazy to set everything up?  
 Simply pull my prebuilt development image:  
+
 ```bash
 docker pull taylanot/cxx-dev:latest
 ```
+
 ---
 ## Documentation for each component
-[Algorithms](docs/algo.md)
-[Learning Curve Generation](docs/src.md)
-[Utilities](docs/utils.md)
-[Data](docs/data.md)
+[algo](docs/algo.md)
+[src](docs/src.md)
+[utils](docs/utils.md)
+[data](docs/data.md)

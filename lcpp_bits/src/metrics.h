@@ -12,86 +12,6 @@
 
 namespace metrics {
 //-----------------------------------------------------------------------------
-// LogLossRaw : Only binary classification, see cross entropy for multi-class
-//              No clamping is done to avoid numerical problems.
-//-----------------------------------------------------------------------------
-class LogLossRaw 
-{
-public:
-  /**
-   * Run classification and calculate cross-entropy loss.
-   *
-   * @param model A classification model.
-   * @param data Column-major data containing test items.
-   * @param labels Ground truth (correct) labels for the test items.
-   */
-  template<typename MLAlgorithm,
-           typename DataType,
-           typename LabelType,
-           class O=DTYPE>
-  static O Evaluate( MLAlgorithm& model,
-                     const DataType& data,
-                     const LabelType& labels )
-  {
-    mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
-        "MSE::Evaluate()",
-        "responses");
-    LabelType preds;
-    arma::Mat<O> probs;
-    model.Classify(data, preds, probs);
-    assert ((size_t) probs.n_rows == 2 &&
-                      "LogLoss : Not binary classification." );
-    return -arma::accu( labels % arma::log(arma::max(probs,0))
-                      +(1.-labels)%arma::log(1.-arma::max(probs,0))
-                      ) /preds.n_cols;
-  }
-
-  static const bool NeedsMinimization = true;
-};
-
-
-//-----------------------------------------------------------------------------
-// LogLoss : Only binary classification , see cross entropy for multi-class
-//-----------------------------------------------------------------------------
-class LogLoss 
-{
-public:
-  /**
-   * Run classification and calculate cross-entropy loss.
-   *
-   * @param model A classification model.
-   * @param data Column-major data containing test items.
-   * @param labels Ground truth (correct) labels for the test items.
-   */
-  template<typename MLAlgorithm,
-           typename DataType,
-           typename LabelType,
-           class O=DTYPE>
-  static O Evaluate( MLAlgorithm& model,
-                     const DataType& data,
-                     const LabelType& labels )
-  {
-    mlpack::util::CheckSameSizes(data,(size_t) labels.n_cols,
-        "MSE::Evaluate()",
-        "responses");
-    LabelType preds;
-    arma::Mat<O> probs;
-    model.Classify(data, preds, probs);
-    assert ((size_t) probs.n_rows == 2 && 
-                      "LogLoss : Not binary classification." );
-    probs.clamp(std::numeric_limits<O>::epsilon(),
-                1.-std::numeric_limits<O>::epsilon());
-    arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
-    
-    return -arma::accu( labels % arma::log(arma::max(probs,0))
-                      +(1.-labels)%arma::log(1.-arma::max(probs,0))
-                      ) /preds.n_cols;
-  }
-
-  static const bool NeedsMinimization = true;
-};
-
-//-----------------------------------------------------------------------------
 // CrossEntropy : Multi-class LogLoss
 //-----------------------------------------------------------------------------
 class CrossEntropy
@@ -125,7 +45,7 @@ public:
     // For numerical stability with the probability
     probs.clamp(std::numeric_limits<O>::epsilon(),
                 1.-std::numeric_limits<O>::epsilon());
-    return -arma::accu(encoded%arma::log(probs))/double(labels.n_cols); 
+    return -arma::accu(encoded%arma::log(probs))/DTYPE(labels.n_cols); 
   }
 
   static const bool NeedsMinimization = true;
@@ -334,6 +254,6 @@ class MSEClass
   static const bool NeedsMinimization = true;
 };
 
-} // namespace utils
+} // namespace metrics
 
 #endif 

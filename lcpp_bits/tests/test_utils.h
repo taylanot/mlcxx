@@ -132,6 +132,7 @@ TEST_SUITE("CURL")
     CHECK(target == "Start:AAABBB"); // Chunks should append sequentially
   }
 } // SUITE -> CURL
+///////////////////////////////////////////////////////////////////////////////
 TEST_SUITE("CLISTORE")
 {
   TEST_CASE("Register and Get basic types")
