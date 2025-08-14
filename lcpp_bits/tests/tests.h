@@ -7,7 +7,8 @@
 #ifndef TESTS_H
 #define TESTS_H
 
-#include "test_data.h"
+/* #include "test_data.h" */
+#include "test_utils.h"
 /* #include "test_algo.h" */
 /* #include "test_src.h" */
 

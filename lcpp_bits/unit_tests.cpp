@@ -5,13 +5,11 @@
  * Compiling the tests
  */
 
-//#define ARMA_DONT_USE_LAPACK
-//#define ARMA_DONT_USE_BLAS
-//#define ARMA_DONT_USE_ARPACK
-//#define ARMA_DONT_USE_OPENMP
-#include <lc++.h>
+#include <lcpp.h>
+
 #include "tests/doctest.h"
 #include "tests/tests.h"
+
 //-----------------------------------------------------------------------------
 //   main : our main function no need to do anything here...
 //-----------------------------------------------------------------------------

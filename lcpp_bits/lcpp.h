@@ -93,6 +93,7 @@
 #include <numeric>
 #include <typeinfo>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <algorithm>
 #include <filesystem>

@@ -112,7 +112,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
   };
   arma::wall_clock timer;
 
-  ProgressBar pb(name_, repeat_);
+  utils::ProgressBar pb(name_, repeat_);
   #pragma omp parallel for if (parallel_)
   for (size_t id=0; id<repeat_;id++)
   {
@@ -184,7 +184,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt ( const T cvp,
 
   };
 
-  ProgressBar pb(name_, repeat_);
+  utils::ProgressBar pb(name_, repeat_);
   #pragma omp parallel for if (parallel_)
   for (size_t id=0; id<repeat_;id++)
   {
@@ -248,7 +248,7 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt_ ( const T cvp,
 
   };
 
-  ProgressBar pb(name_, repeat_);
+  utils::ProgressBar pb(name_, repeat_);
   #pragma omp parallel for if (parallel_)
   for (size_t id=0; id<repeat_;id++)
   {
