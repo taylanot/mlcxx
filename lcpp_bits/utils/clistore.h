@@ -6,8 +6,8 @@
  * command-line interfaces...
  */
 
-#ifndef FLAG_H
-#define FLAG_H
+#ifndef CLISTORE_H
+#define CLISTORE_H
 
 //-----------------------------------------------------------------------------
 // CLIStore : This is a command line interface storing singleton.
