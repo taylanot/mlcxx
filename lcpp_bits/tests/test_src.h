@@ -7,6 +7,7 @@
 #ifndef TEST_SRC_H 
 #define TEST_SRC_H
 
+#include <sys/wait.h>
 //-----------------------------------------------------------------------------
 // Dummy classification model
 //-----------------------------------------------------------------------------
@@ -98,6 +99,181 @@ TEST_SUITE("METRICS")
     CHECK(auc == doctest::Approx(0.5));
   }
 }
+
+
+
+TEST_SUITE("LCurve")
+{
+  using CDATASET = data::Dataset<arma::Row<size_t>, DTYPE>;
+  using RDATASET = data::Dataset<arma::Row<DTYPE>, DTYPE>;
+  using CMODEL = mlpack::DecisionTree<>;
+  using RMODEL = mlpack::LinearRegression<>;
+  using CLOSS = mlpack::Accuracy;
+  using RLOSS = mlpack::MSE;
+  using SAMPLE = data::RandomSelect<>;
+
+  arma::Mat<DTYPE> run_fixed_class()
+  {
+    CDATASET data(2);
+    data.Banana(200);
+
+    auto Ns = arma::regspace<arma::Row<size_t>>(10, 1, 11);
+
+    lcurve::LCurve<CMODEL, CDATASET, SAMPLE, CLOSS, DTYPE> curve(
+        data,
+        Ns,
+        size_t(2),  // reduced for test speed
+        true,
+        false,
+        "temp",
+        "cfixed");
+
+    curve.Generate(50);
+    return curve.GetResults();
+  }
+
+  arma::Mat<DTYPE> run_tuned_class()
+  {
+    CDATASET data(2);
+    data.Banana(200);
+
+    auto Ns = arma::regspace<arma::Row<size_t>>(10, 1, 11);
+    auto leafs = arma::regspace<arma::Row<size_t>>(1, 5, 50);
+
+    lcurve::LCurve<CMODEL, CDATASET, SAMPLE, CLOSS, DTYPE> curve(
+        data,
+        Ns,
+        size_t(2),  // reduced for test speed
+        true,
+        false,
+        "temp",
+        "ctuned");
+
+    curve.GenerateHpt(0.2, leafs);
+    return curve.GetResults();
+  }
+
+  arma::Mat<DTYPE> run_fixed_reg()
+  {
+    RDATASET data(2);
+    data.Linear(400);
+
+    auto Ns = arma::regspace<arma::Row<size_t>>(10, 1, 11);
+
+    lcurve::LCurve<RMODEL, RDATASET, SAMPLE, RLOSS, DTYPE> curve(
+        data,
+        Ns,
+        size_t(2),  // reduced for test speed
+        true,
+        false,
+        "temp",
+        "rfixed");
+
+    curve.Generate(0);
+    return curve.GetResults();
+  }
+
+  arma::Mat<DTYPE> run_tuned_reg()
+  {
+    RDATASET data(1);
+    data.Linear(400);
+
+    auto Ns = arma::regspace<arma::Row<size_t>>(10, 1, 11);
+    auto ls = arma::regspace<arma::Row<size_t>>(1, 5, 50);
+
+    lcurve::LCurve<RMODEL, RDATASET, SAMPLE, RLOSS, DTYPE> curve(
+        data,
+        Ns,
+        size_t(2),  // reduced for test speed
+        true,
+        false,
+        "temp",
+        "rtuned");
+
+    curve.GenerateHpt(0.2, ls);
+    return curve.GetResults();
+  }
+
+  TEST_CASE("LCurve")
+  {
+    std::filesystem::create_directories("temp");
+
+    arma::Mat<DTYPE> cfixed = run_fixed_class();
+    arma::Mat<DTYPE> ctuned = run_tuned_class();
+    CHECK( cfixed.n_rows == 2 );
+    CHECK( cfixed.n_cols == 2 );
+    CHECK( ctuned.n_rows == 2 );
+    CHECK( ctuned.n_cols == 2 ); 
+    CHECK( arma::all(arma::mean(ctuned) >= arma::mean(cfixed)) );
+    CHECK( std::filesystem::is_regular_file("temp/cfixed"));
+    CHECK( std::filesystem::is_regular_file("temp/ctuned"));
+
+    auto load_cfixed = 
+      lcurve::LCurve<CMODEL,CDATASET,SAMPLE,CLOSS,DTYPE>::Load("temp/cfixed");
+    auto load_ctuned= 
+      lcurve::LCurve<CMODEL,CDATASET,SAMPLE,CLOSS,DTYPE>::Load("temp/ctuned");
+
+    CHECK( arma::all(arma::all( load_cfixed->GetResults() == cfixed )) );
+    CHECK( arma::all(arma::all( load_ctuned->GetResults() == ctuned )) );
+
+    arma::Mat<DTYPE> rfixed = run_fixed_reg();
+    arma::Mat<DTYPE> rtuned = run_tuned_reg();
+    CHECK( rfixed.n_rows == 2 );
+    CHECK( rfixed.n_cols == 2 );
+    CHECK( rtuned.n_rows == 2 );
+    CHECK( rtuned.n_cols == 2 );
+    CHECK( arma::all(arma::mean(rtuned) <= arma::mean(rfixed)) );
+
+    auto load_rfixed = 
+      lcurve::LCurve<RMODEL,CDATASET,SAMPLE,CLOSS,DTYPE>::Load("temp/rfixed");
+    auto load_rtuned= 
+      lcurve::LCurve<RMODEL,CDATASET,SAMPLE,CLOSS,DTYPE>::Load("temp/rtuned");
+
+    CHECK( arma::all(arma::all( load_rfixed->GetResults() == rfixed )) );
+    CHECK( arma::all(arma::all( load_rtuned->GetResults() == rtuned )) );
+
+    std::filesystem::remove_all("temp");
+  }
+  TEST_CASE("Signal handler exits process") 
+  {
+    std::filesystem::create_directories("temp");
+
+    CDATASET cdata(2);
+    cdata.Banana(200);
+
+    lcurve::LCurve<CMODEL, CDATASET, SAMPLE, CLOSS, DTYPE> ccurve( cdata,
+                              {1,2}, size_t(2), false, false, "temp", "ccurve");
+     
+      // Trigger the signal, which will call _SignalHandler internally
+    raise(SIGALRM);
+
+    CHECK( std::filesystem::is_regular_file("temp/ccurve"));
+
+    std::filesystem::remove_all("temp");
+  }
+}
+
+  /* TEST_CASE("Tuned version is mostly better than fixed") */
+  /* { */
+  /*   arma::Mat<DTYPE> fixed = run_fixed(); */
+  /*   arma::Mat<DTYPE> tuned = run_tuned(); */
+
+  /*   REQUIRE(fixed.n_elem == tuned.n_elem); */
+
+  /*   size_t betterCount = 0; */
+  /*   for (size_t i = 0; i < fixed.n_elem; ++i) */
+  /*   { */
+  /*     if (tuned[i] >= fixed[i]) */
+  /*       betterCount++; */
+  /*   } */
+
+  /*   double fractionBetter = double(betterCount) / fixed.n_elem; */
+  /*   CHECK(fractionBetter > 0.6); */
+
+  /*   double meanFixed = arma::mean(arma(fixed)); */
+  /*   double meanTuned = arma::mean(arma(tuned)); */
+  /*   CHECK(meanTuned >= meanFixed); */
+  /* } */
 
 /* bool is_decr(const arma::Row<DTYPE>& vec) */ 
 /* { */

@@ -54,7 +54,7 @@ template<class LABEL,class T>
 void Dataset<LABEL,T>::Banana ( const size_t N, const T delta )
 {
   if (dimension_ != 2)
-    WARN("Dataset::Banana requires dimension to be 2, overwriting dimension_!");
+    WARNING("Dataset::Banana requires dimension to be 2, overwriting dimension_!");
   mlpack::RandomSeed(seed_.value());
   double r = 5.;
   double s = 1.0;
@@ -275,7 +275,7 @@ Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path )
   }
   else
   {
-    WARN("Dataset " << id_ << " is already present.");
+    WARNING("Dataset " << id_ << " is already present.");
     this->_load();
   }
 }
@@ -407,7 +407,7 @@ std::string Dataset<LTYPE,T>::_gettargetname( const std::string& metadata )
   }
   else
   {
-    WARN("Cannot find the target name using 'class' instead!!!");
+    WARNING("Cannot find the target name using 'class' instead!!!");
     return "class";
   }
 }
@@ -427,7 +427,7 @@ std::string Dataset<LTYPE,T>::_getdownurl( const std::string& metadata )
   }
   else
   {
-    WARN("Probably something went wrong with meta data fetch!!!");
+    WARNING("Probably something went wrong with meta data fetch!!!");
     return "";
   }
 }

@@ -47,9 +47,10 @@
 
 // My Warning System
 #ifdef DISABLE_WARNINGS
-#define WARN(msg) // Do nothing
+
+#define WARNING(msg) // Do nothing
 #else
-#define WARN(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
+#define WARNING(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
 #endif
 
 // My Loggging System

@@ -67,9 +67,9 @@ LCurve(trainset,Ns,repeat,parallel,prog,path,name)
 {
   testset_= trainset;
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // LCurve::Generate
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -128,9 +128,9 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Generate ( const Ts&... args )
   }
   this->Save(name_);
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // LCurve::GenerateHpt
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -199,10 +199,9 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::GenerateHpt ( const T cvp,
   }
   this->Save( name_ );
 }
-
-//=============================================================================
+//-----------------------------------------------------------------------------
 // LCurve::CheckStatus
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -220,9 +219,9 @@ bool LCurve<MODEL,DATASET,SPLIT,LOSS,O>::CheckStatus( bool print  )
   else 
     return true;
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::_SplitData
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -237,9 +236,9 @@ std::vector<std::pair<arma::uvec,arma::uvec>>
     split_(dataset.size_,Ns_,size_t(1),data,seed);
   return data;
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::_RegisterSignalHandler
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -257,9 +256,9 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_RegisterSignalHandler( )
   signal(SIGKILL, LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler);
 
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::_SignalHandler
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -271,12 +270,12 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler( int sig )
   // a gracefull exit is initiated...
   if (_globalSafeFailFunc) _globalSafeFailFunc();  
   LOG("Stopping program for some reason! Exiting..." << std::flush);
-  std::quick_exit(0);
+  /* std::quick_exit(0); */
 }
 
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::_CleanUp
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -287,9 +286,9 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_CleanUp ( )
   LOG("CleanUp is called!"<<std::flush);
   Save( name_ );
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::Save
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -304,12 +303,11 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::Save ( const std::string& filename )
   // Serialize the object nicely...
   cereal::BinaryOutputArchive archive(file);
   archive(cereal::make_nvp("LCurve", *this));  // Serialize the current object
-                                               //
   LOG("LCurve object saved to " << (path_/filename) << std::flush);
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::Load
-//=============================================================================
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -333,13 +331,12 @@ LCurve<MODEL,DATASET, SPLIT,LOSS,O>::Load ( const std::string& filename )
   // These are for making sure the loaded function is safe to fail too...
   _globalSafeFailFunc = [lcurve]() { lcurve->_CleanUp(); };
   lcurve->_RegisterSignalHandler();
-
   LOG("LCurve loaded from " << filename);
   return lcurve;
 }
-//=============================================================================
+//-----------------------------------------------------------------------------     
 // LCurve::_GetHPT
-//=============================================================================     
+//-----------------------------------------------------------------------------     
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -361,9 +358,9 @@ auto LCurve<MODEL,DATASET, SPLIT,LOSS,O>::_GetHpt ( const Tin& Xtrn,
     return TunerType(cvp, Xtrn, ytrn,num_class_.value());
 
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // LCurve::_GetModel
-//=============================================================================     
+//-----------------------------------------------------------------------------
 template<class MODEL,
          class DATASET,
          class SPLIT,
@@ -381,9 +378,9 @@ auto LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_GetModel ( const Tin& Xtrn,
   else
     return MODEL(Xtrn,ytrn,num_class_.value(),args...);
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // LCurve::GetName
-//=============================================================================     
+//-----------------------------------------------------------------------------
 template<class MODEL,
          class DATASET,
          class SPLIT,

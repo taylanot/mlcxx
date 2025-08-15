@@ -16,10 +16,9 @@ class ProgressBar
 {
 public:
   ProgressBar(int total) : tot_(total), curr_(0), what_("Loop") 
-  { Show();}
+  { }
   ProgressBar(std::string what, int total) : tot_(total), curr_(0), what_(what) 
-  { Show(); }
-      
+  { }
 
   void Update()
   {
