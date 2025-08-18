@@ -1,5 +1,5 @@
 /**
- * @file unit_tests.cpp
+ * @file test.cpp
  * @author Ozgur Taylan Turan
  *
  * Compiling the tests
@@ -39,6 +39,8 @@ int main ( int argc, char** argv )
   PRINT_SEED(SEED);
 
   PRINT_TIME(timer.toc());
+
+  DEPEND_INFO();
   
   return 0; 
 }

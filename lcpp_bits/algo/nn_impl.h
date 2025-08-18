@@ -95,7 +95,9 @@ void ANN<NET,OPT,MET,O>::Train ( const arma::Mat<O>& inputs,
   network_ = network;
   early_ = early;
   opt_ = std::make_unique<OPT>(args...);
+  PRINT("HOI")
   Train(inputs,labels);
+  PRINT("OFNIET")
 }
 ///////////////////////////////////////////////////////////////////////////////
 template<class NET,class OPT,class MET,class O>
@@ -116,11 +118,12 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
     mlpack::data::Split(inputs,labels,
                         inp,val_inp,lab,val_lab,0.2);
 
-    auto func = [&](const arma::Mat<O>& inputs )
+    auto func = [&](const arma::Mat<O>& dummy)
     {
-      arma::Mat<O> pred;
-      network_.Predict(val_inp, pred);
-      return MET::Evaluate(pred, val_lab)/pred.n_cols;
+      if (MET::NeedsMinimization)
+        return MET::Evaluate(*this,val_inp,val_lab);
+      else
+        return -MET::Evaluate(*this,val_inp,val_lab);
     };
 
     ens::EarlyStopAtMinLossType<arma::Mat<O>> stop(func,5);
@@ -144,7 +147,9 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
   if (network_.Parameters().n_elem != 0)
     network_.Reset();
   if (!early_)
+  {
     network_.Train(inputs,convlabels,*opt_);
+  }
   else
   {
     arma::Mat<O> inp,lab,val_inp,val_lab;
@@ -152,16 +157,17 @@ void ANN<NET,OPT,MET,O>::Train( const arma::Mat<O>& inputs,
     mlpack::data::Split(inputs,convlabels,
                         inp,val_inp,lab,val_lab,0.2);
 
-    auto func = [&](const arma::Mat<O>& inputs )
+    auto val_lab_ = _OneHotDecode(val_lab,ulab_);
+    auto func = [&]( const arma::Mat<O>& dummy )
     {
-      arma::Mat<O> pred;
-      network_.Predict(val_inp, pred);
-      return MET::Evaluate(pred, val_lab)/pred.n_cols;
+      if (MET::NeedsMinimization)
+        return MET::Evaluate(*this,val_inp,val_lab_);
+      else
+        return -MET::Evaluate(*this,val_inp,val_lab_);
     };
 
     ens::EarlyStopAtMinLossType<arma::Mat<O>> stop(func,5);
     network_.Train(inp,lab,*opt_,stop);
-
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +184,6 @@ void ANN<NET,OPT,MET,O>::Classify( const arma::Mat<O>& inputs,
 {
   arma::Mat<O> temp;
   network_.Predict(inputs,temp);
-
   preds = _OneHotDecode(temp,ulab_);
 }
 ///////////////////////////////////////////////////////////////////////////////

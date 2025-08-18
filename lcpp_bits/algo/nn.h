@@ -17,7 +17,7 @@ namespace algo {
 
 template<class NET,
          class OPT=ens::StandardSGD,
-         class MET=mlpack::SquaredEuclideanDistance,
+         class MET=mlpack::MeanSquaredError,
          class O=DTYPE>
 class ANN
 {

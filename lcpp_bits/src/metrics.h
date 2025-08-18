@@ -78,9 +78,6 @@ public:
     arma::Mat<O> probs;
     arma::Row<size_t> preds;
     model.Classify(data, preds, probs);
-    /* PRINT_VAR(preds); */
-    /* PRINT_VAR(probs); */
-    /* PRINT_VAR(labels); */
     arma::Row<size_t> unq = arma::unique(labels);
     if (unq.n_elem == 1)
       return 1.;
@@ -129,9 +126,7 @@ public:
     model.Classify(data, preds, probs);
     arma::uvec unq = arma::conv_to<arma::uvec>::from(arma::unique(labels));
     probs = probs.rows(unq);
-    /* PRINT_VAR(arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows)) */
     return arma::accu(arma::pow(encoded-probs,2))/(labels.n_elem*probs.n_rows);
-    /* return O(probs.n_elem); */
   }
 
   static const bool NeedsMinimization = true;

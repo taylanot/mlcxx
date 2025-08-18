@@ -1,3 +1,9 @@
+/**
+ * @file simple.cpp
+ * @author Ozgur Taylan Turan
+ *  This is a simple program that create a learning curve with and without 
+ * hyper-parameter tunining for a simple case.
+ */
 #include <lcpp.h>
 
 // Since it is a classification task we use the template parameter 

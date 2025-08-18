@@ -3,7 +3,11 @@
  * @author Ozgur Taylan Turan
  *
  * SVM Classfier
- *
+ * fanSMO -> Fan, R.-E., Chen, P.-H., & Lin, C.-J. (2005). 
+ *            Working set selection using second order information for training
+ *            support vector machines.
+ *            Journal of Machine Learning Research, 6, 1889–1918.
+ *            Available at: https://www.jmlr.org/papers/v6/fan05a.html
  */
 
 #ifndef SVM_H
@@ -40,10 +44,10 @@ class SVM
    */
   template<class... Args>
   SVM ( const size_t num_class, const T& C, const Args&... args ) : 
-                       solver_("QP"),C_(C),cov_(args...), oneclass_(false) { } ;
+                       solver_("fanSMO"),C_(C),cov_(args...), oneclass_(false) { } ;
   /**
    * @param num_class : number of classes
-   * @param solver    : which optimization method QP or SMO
+   * @param solver    : which optimization method fanSMO
    * @param C         : regularization
    * @param args      : kernel parameters
    */

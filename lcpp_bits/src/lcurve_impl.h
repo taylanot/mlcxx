@@ -270,7 +270,8 @@ void LCurve<MODEL,DATASET,SPLIT,LOSS,O>::_SignalHandler( int sig )
   // a gracefull exit is initiated...
   if (_globalSafeFailFunc) _globalSafeFailFunc();  
   LOG("Stopping program for some reason! Exiting..." << std::flush);
-  /* std::quick_exit(0); */
+  if ( sig == SIGINT || sig == SIGTERM || sig == SIGKILL )
+    std::quick_exit(0);
 }
 
 //-----------------------------------------------------------------------------     

@@ -11,5 +11,6 @@
 #include "regressors/regressors.h"
 #include "classifiers/classifiers.h"
 #include "dimred/dimred.h"
+#include "nn.h"
 
 #endif

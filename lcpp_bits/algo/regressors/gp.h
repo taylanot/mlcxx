@@ -16,7 +16,7 @@ namespace regression {
 //-----------------------------------------------------------------------------
 // Gaussian Process Regression
 //-----------------------------------------------------------------------------
-template<class K,class T=DTYPE>
+template<class K=mlpack::GaussianKernel,class T=DTYPE>
 class GaussianProcess
 {
   public:
