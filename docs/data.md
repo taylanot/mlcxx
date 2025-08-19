@@ -103,7 +103,7 @@ size_t total = collector1.GetSize();     // Total number of datasets
 size_t counter = collector1.GetCounter(); // Current position in iteration
 auto keys = collector1.GetKeys();        // All available dataset IDs
 ...
-
+```
 --- 
-o
+
 [1] Loog, M., & Duin, R. P. W. (2012). The dipping phenomenon. 
