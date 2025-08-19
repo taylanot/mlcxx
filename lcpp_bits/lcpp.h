@@ -50,7 +50,7 @@
 
 #define WARNING(msg) // Do nothing
 #else
-#define WARNING(msg) std::clog << "\n" << "Warning: " << msg << std::endl << "\n"
+#define WARNING(msg) std::clog << "\n" << "Warning : " << msg << std::endl << "\n"
 #endif
 
 // My Loggging System
@@ -72,7 +72,7 @@
   << "C++/" << __cplusplus \
   << " | armadillo/" <<arma::arma_version::as_string()  \
   << " | " << mlpack::util::GetVersion()  \
-  << " | ensmallen " << ens::version::as_string() \
+  << " | ensmallen/" << ens::version::as_string() \
   << " | " <<  curl_version() << '\n' << std::endl; 
 
 // Define the precision for what is to come...

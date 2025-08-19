@@ -16,23 +16,20 @@ For classification tasks, the following models are available: Linear and Quadrat
   model.Classify(...);
 ```
 
----
 
 ## 2. regressor
 
 For regression tasks, the following models are available: Kernel Ridge Regression (`KernelRidge`), Semi-Parametric Kernel Ridge (`SemiParamKernelRidge`), and Gaussian Process (`GaussianProcess`). These are implemented in the `algo::regression` namespace. Furthermore, a kernel smoothing function (`kernelsmoothing`) with internal bandwidth optimization is provided in the `algo::functional` namespace.  
 
----
 
 ## 3. dimred
 
 For dimensionality reduction, the available method is Univariate Functional Principal Component Analysis (`ufpca`), which can be found in the `algo::functional` namespace.  
 
----
 
 ## 4. nn
 
-For those seeking a simple training procedure with *mlpack* artificial neural networks, this wrapper provides task-invariant training and prediction/classification functionality. Users can easily define a neural network architecture and train it with built-in early stopping, where 2% of the training data is randomly separated for validation. This class is templated over the network type, optimizer, and loss function. It is located in the `algo` namespace. Example usages of the `ANN` class for both classification and regression tasks can be found in the `examples` directory.  
+For those seeking a simple training procedure with *mlpack* artificial neural networks, this wrapper provides task-invariant training and prediction/classification functionality. Users can easily define a neural network architecture and train it with built-in early stopping, where 2% of the training data is randomly separated for validation. This class is templated over the network type, optimizer, and loss function. It is located in the `algo` namespace. You can pass the created network to the model and optimizer parameters to the `Train(...)` function. Example usages of the `ANN` class for both classification and regression tasks can be found in the `examples` directory. 
 
 
 ```cpp

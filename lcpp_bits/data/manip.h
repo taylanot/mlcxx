@@ -12,9 +12,9 @@
 
 namespace data { 
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 // SetDiff : Difference between two vectors
-//=============================================================================
+//-----------------------------------------------------------------------------
 /**
  * @param check : The vector to be compared
  * @param with  : Comparison is made with this vector
@@ -56,9 +56,9 @@ T SetDiff( const T& check, const T& with )
   return result;
 }
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Migrate : Exchange N random data points between train and test sets
-//=============================================================================
+//-----------------------------------------------------------------------------
 /**
  * @param train_inp : inputs of the training set
  * @param train_lab : labels of the training set
@@ -142,9 +142,9 @@ void Migrate ( arma::Col<T>& trainset,
   testset.shed_rows(idx);
 }
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Split : Split datasets for a given number of training points
-//=============================================================================
+//-----------------------------------------------------------------------------
 /**
  * @param input Input dataset to split.
  * @param label Input labels to split.
@@ -359,10 +359,10 @@ void Split ( const T& dataset,
   testset.dimension_ = testset.inputs_.n_rows;
 }
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 // StratifiedSplit : Split datasets for a given number of training points
 // in a stratified manner
-//=============================================================================
+//-----------------------------------------------------------------------------
 /**
  * @param input Input dataset to stratify.
  * @param inputLabel Input labels to stratify.
@@ -606,9 +606,9 @@ void StratifiedSplit ( const T& dataset,
  */
 template<typename T>
 void StratifiedSplit ( const T& dataset,
-             T& trainset,
-             T& testset,
-             const double testRatio )
+                       T& trainset,
+                       T& testset,
+                       const double testRatio )
 {
 
   assert ( (typeid(T) == typeid(Dataset<arma::Row<size_t>>) ||

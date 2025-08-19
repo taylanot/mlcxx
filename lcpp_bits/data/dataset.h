@@ -39,16 +39,6 @@ public:
 
   /* Dataset initializer
    *
-   * @param dim       : dimension of the dataset
-   * @param num_class : number of classes
-   *
-   */
-  Dataset ( const size_t dim, 
-            const size_t num_class,
-            const size_t seed = SEED );
-
-  /* Dataset initializer
-   *
    * @param inputs : input of the dataset
    * @param labels : output of the dataset
    *
@@ -82,7 +72,8 @@ public:
    */
   void Sine ( const size_t N=10, const T noise_std=T(1.));
 
-  /* Generate banana dataset for classification
+  /* Generate banana dataset for classification a.k.a the moon dataset in 
+   * sklearn.
    *
    * @param N     : number of samples for each class
    * @param delta : distance between bananas
@@ -100,8 +91,8 @@ public:
    */
   void Dipping ( const size_t N=10, const T r=1, const T noise_std=0.1 );
 
-  /* Generate dipping dataset for classification 
-   * Loog, M., & Duin, R. P. W. (2012). The dipping phenomenon. 
+  /* Create Gaussian blobs with number of blobs equal to the means provided
+   * all the blobs have spherical covariance.
    *
    * @param N     : number of samples for each class
    * @param means : means of the Gaussian blobs
@@ -134,7 +125,6 @@ namespace oml {
 //-----------------------------------------------------------------------------
 // oml::Dataset -> Downloads data from OpenML with given id
 //-----------------------------------------------------------------------------
-
 template<class LTYPE = size_t, class T = DTYPE>
 class Dataset
 {
@@ -184,13 +174,13 @@ private:
   void _update_info();                // Update metadata
   void _load();                       // Load from disk
 
-  bool _iscateg(const arma::Row<T>& row);     // Check if row is categorical
-  arma::Row<size_t> _convcateg(const arma::Row<T>& row); // Convert to categories
+  bool _iscateg(const arma::Row<T>& row); // Check if row is categorical
+  arma::Row<size_t> _convcateg(const arma::Row<T>& row); // Convert to categs
   arma::Row<size_t> _procrow(const arma::Row<T>& row);   // Process row
 
-  std::string _gettargetname(const std::string& metadata); // Extract target name
-  std::string _getdownurl(const std::string& metadata);    // Extract download URL
-  int _findlabel(const std::string& targetname);           // Find label index
+  std::string _gettargetname(const std::string& metadata);// target name
+  std::string _getdownurl(const std::string& metadata);   // download URL
+  int _findlabel(const std::string& targetname);          // Find label index
 
   std::string _fetchmetadata();    // Fetch metadata from source
   std::string _readmetadata();     // Read metadata from file
@@ -201,165 +191,58 @@ private:
   std::string metafile_;           // Metadata file name
 };
 
+//-----------------------------------------------------------------------------
+// Collect : This is for collection of datasets through OpenML servers
+//-----------------------------------------------------------------------------
+template<class T=size_t>
+class Collect
+{
+public:
+  /*
+   * Const
+   * @param id  : id of the study
+   */ 
+  Collect ( const size_t& id );
+
+  /*
+   * @param ids  : ids of datasets
+   */ 
+  Collect ( const arma::Row<size_t>& ids );
+
+  /*
+   * @param id    : id of the study
+   * @param paht  : path to save the collection
+   */ 
+  Collect ( const size_t& id, const std::filesystem::path& path );
+
+  Dataset<T> GetNext (  ); 
+
+  Dataset<T> GetID ( const size_t& id ); 
+
+  size_t GetSize (  ) const {return size_;}
+  size_t GetCounter (  ) const {return counter_;}
+  arma::Row<size_t> GetKeys ( ) const {return keys_;}
+
+private:
+  size_t id_;
+  size_t size_;
+  size_t counter_ = 0;
+
+  std::string url_;
+
+  arma::Row<size_t> _getkeys ( ); 
+
+  arma::Row<size_t> keys_;
+
+  std::filesystem::path path_; 
+  std::filesystem::path filespath_ = path_ / "collect";
+  std::filesystem::path metapath_ = path_ / "collect";
+  std::filesystem::path metafile_ = metapath_ / (std::to_string(id_)+".meta");
+
+};
 
 } // namesapce oml
   
-namespace functional
-{
-template<class T = DTYPE>
-struct Dataset 
-{
-  size_t size_;        // Number of samples in the dataset
-  size_t dimension_;   // Number of features (input dimension)
-  size_t nfuncs_;      // Number of functions or outputs
-  arma::Mat<T> weights_; // Optional sample or feature weights
-
-  arma::Mat<T> inputs_; // Input feature matrix
-  arma::Mat<T> labels_; // Output/label matrix
-
-  /* Empty constructor */
-  Dataset() { }
-
-  /* Dataset initializer
-   *
-   * @param D : number of features (input dimension)
-   * @param N : number of samples
-   * @param M : number of outputs (functions)
-   */
-  Dataset(const size_t& D,
-          const size_t& N,
-          const size_t& M);
-
-  /* Generate synthetic dataset
-   *
-   * @param type : type of dataset to generate
-   */
-  void Generate(const std::string& type);
-
-  /* Generate synthetic dataset with Gaussian noise
-   *
-   * @param type      : type of dataset to generate
-   * @param noise_std : standard deviation of noise
-   */
-  void Generate(const std::string& type,
-                const double& noise_std);
-
-  /* Generate synthetic dataset with feature-wise Gaussian noise
-   *
-   * @param type      : type of dataset to generate
-   * @param noise_std : per-feature noise standard deviations
-   */
-  void Generate(const std::string& type,
-                const arma::Row<T>& noise_std);
-
-  /* Add Gaussian noise to dataset
-   *
-   * @param noise_std : standard deviation of noise
-   */
-  void Noise(const double& noise_std);
-
-  /* Add feature-wise Gaussian noise to dataset
-   *
-   * @param noise_std : per-feature noise standard deviations
-   */
-  void Noise(const arma::Row<T>& noise_std);
-
-  /* Save dataset to file
-   *
-   * @param filename : path to save file
-   */
-  void Save(const std::string& filename);
-
-  /* Load dataset from file
-   *
-   * @param filename  : path to file
-   * @param Din       : input dimension
-   * @param Dout      : output dimension
-   * @param transpose : whether to transpose loaded data (default: true)
-   * @param count     : whether to count number of samples (default: false)
-   */
-  void Load(const std::string& filename,
-            const size_t& Din,
-            const size_t& Dout, 
-            const bool& transpose = true,
-            const bool& count = false);
-
-  /* Normalize dataset (zero mean, unit variance) */
-  void Normalize();
-
-  /* Undo normalization on dataset */
-  void UnNormalize();
-};
-
-
-//=============================================================================
-// SineGen
-//=============================================================================
-template<class T = DTYPE>
-struct SineGen
-{
-  size_t size_;        ///< Number of generated samples
-  size_t dimension_;   ///< Number of sine functions (output dimension)
-
-  arma::Row<T> a_;     ///< Amplitude parameters for each function
-  arma::Row<T> p_;     ///< Phase parameters for each function
-
-  /* Empty constructor */
-  SineGen() { }
-
-  /* Initialize sine generator
-   *
-   * @param M : number of sine functions
-   */
-  SineGen(const size_t& M);
-
-  /* Predict sine outputs for given inputs
-   *
-   * @param inputs : input matrix
-   * @param type   : prediction type ("Phase" by default)
-   * @return       : predicted outputs
-   */
-  arma::Mat<T> Predict(const arma::Mat<T>& inputs,
-                       const std::string& type = "Phase") const;
-
-  /* Predict sine outputs with perturbation
-   *
-   * @param inputs : input matrix
-   * @param type   : prediction type
-   * @param eps    : perturbation parameter
-   * @return       : predicted outputs
-   */
-  arma::Mat<T> Predict(const arma::Mat<T>& inputs,
-                       const std::string& type,
-                       const double& eps) const;
-
-  /* Compute mean prediction
-   *
-   * @param inputs : input matrix
-   * @param type   : mean type ("Phase" by default)
-   * @return       : mean outputs
-   */
-  arma::Mat<T> Mean(const arma::Mat<T>& inputs,
-                    const std::string& type = "Phase") const;
-
-  /* Compute mean prediction with perturbation
-   *
-   * @param inputs : input matrix
-   * @param type   : mean type
-   * @param eps    : perturbation parameter
-   * @return       : mean outputs
-   */
-  arma::Mat<T> Mean(const arma::Mat<T>& inputs,
-                    const std::string& type,
-                    const double& eps) const;
-
-  /* Get number of sine functions */
-  size_t GetM();
-};
-
-} // namespace functional
-
-
 } // namespace data
 
 

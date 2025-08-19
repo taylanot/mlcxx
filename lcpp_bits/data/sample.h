@@ -10,9 +10,11 @@
 #define SAMPLE_H
 
 namespace data {
+//-----------------------------------------------------------------------------
+// RandomSelect : Given a dataset, select N of them randomly without replacement 
+// and seperate the rest.
+//-----------------------------------------------------------------------------
 /**
- * Given a dataset, select N of them randomly without replacement and seperate 
- * the rest
  *
  * @param dataset : dataset to be splited 
  * @param size    : size of the selection
@@ -46,11 +48,11 @@ struct RandomSelect
         collect.at(counter++) = (*this)(total, size, Ns[i]); 
 	}
 };
-
+//-----------------------------------------------------------------------------
+// Bootstrap : Given a dataset, select N of them randomly with replacement and
+// seperate the rest.
+//-----------------------------------------------------------------------------
 /**
- * Given a dataset, select N of them randomly with replacement and seperate the 
- * rest.
- *
  * @param dataset : dataset to be splited 
  * @param size    : size of the selection
  * @param repeat  : how many times repeat the process
@@ -86,10 +88,11 @@ struct Bootstrap
         collect.at(counter++) = (*this)(total, size, Ns[i]); 
 	}
 };
-
+//-----------------------------------------------------------------------------
+// Additive : Given a dataset, select N of them randomly and keep on taking
+// form the rest.
+//-----------------------------------------------------------------------------
 /**
- * Given a dataset, select N of them randomly and keep on taking form the rest
- *
  * @param dataset : dataset to be splited 
  * @param size    : size of the selection
  * @param repeat  : how many times repeat the process

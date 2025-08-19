@@ -1,4 +1,4 @@
-# lcpp [LearningCurvePlusPlus)]
+# lcpp [LearningCurvePlusPlus]
 
 **C++ Header-Only Learning Curve Generation Tool**  
 

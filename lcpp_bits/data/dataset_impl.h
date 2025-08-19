@@ -18,11 +18,6 @@ namespace  data {
 template<class LABEL,class T>
 Dataset<LABEL,T>::Dataset ( size_t dim, size_t seed ) : 
   dimension_(dim),seed_(seed) {  };
-
-template<class LABEL,class T>
-Dataset<LABEL,T>::Dataset ( size_t dim, size_t num_class, size_t seed ) : 
-  dimension_(dim), num_class_(num_class), seed_(seed) {  };
-
 //-----------------------------------------------------------------------------
 // Dataset::Linear
 //-----------------------------------------------------------------------------
@@ -35,9 +30,9 @@ void Dataset<LABEL,T>::Linear ( const size_t N, const T noise_std )
     arma::randn(1,N,arma::distr_param(T(0),T(noise_std)));
   this->_update_info();
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset::Sine
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LABEL,class T>
 void Dataset<LABEL,T>::Sine ( const size_t N, const T noise_std )
 {
@@ -47,14 +42,15 @@ void Dataset<LABEL,T>::Sine ( const size_t N, const T noise_std )
     arma::randn(1,N,arma::distr_param(T(0),T(noise_std)));
   this->_update_info();
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset::Banana
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LABEL,class T>
 void Dataset<LABEL,T>::Banana ( const size_t N, const T delta )
 {
   if (dimension_ != 2)
-    WARNING("Dataset::Banana requires dimension to be 2, overwriting dimension_!");
+    WARNING("Dataset::Banana requires dimension to be 2,\
+            overwriting dimension_!");
   mlpack::RandomSeed(seed_.value());
   double r = 5.;
   double s = 1.0;
@@ -86,9 +82,9 @@ void Dataset<LABEL,T>::Banana ( const size_t N, const T delta )
 
   this->_update_info();
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset::Dipping
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LABEL,class T>
 void Dataset<LABEL,T>::Dipping ( const size_t N, const T r, const T noise_std )
 
@@ -120,9 +116,9 @@ void Dataset<LABEL,T>::Dipping ( const size_t N, const T r, const T noise_std )
   this->_update_info();
 }
 
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset::Gaussian
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LABEL,class T>
 void Dataset<LABEL,T>::Gaussian ( const size_t N,
                                   const arma::Row<T>& means )
@@ -152,9 +148,9 @@ void Dataset<LABEL,T>::Gaussian ( const size_t N,
 
   this->_update_info();
 }
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset::_update_info
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LABEL,class T>
 void Dataset<LABEL,T>::_update_info(  )
 {
@@ -165,90 +161,13 @@ void Dataset<LABEL,T>::_update_info(  )
   else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
     num_class_ = 2;
 }
-
 } // namespace data
-
-namespace data::functional {
-//=============================================================================
-// SineGen
-//=============================================================================
-template<class T>
-SineGen<T>::SineGen ( const size_t& M )
-{
-  size_ = M;
-
-  a_ = arma::Row<T>(size_, arma::fill::randn);
-  p_ = arma::Row<T>(size_, arma::fill::randn);
-}
-
-template<class T>
-arma::Mat<T> SineGen<T>::Predict ( const arma::Mat<T>& inputs, 
-                                   const std::string& type,
-                                   const double& eps ) const 
-{
-  arma::Mat<T> labels(size_, inputs.n_cols);
-  if ( type == "Phase" )
-  {
-    for ( size_t i=0; i<size_; i++ )
-      labels.row(i) = arma::sin(inputs+p_(i));
-  }
-  else if ( type == "Amplitude" )
-  {
-    for ( size_t i=0; i<size_; i++ )
-      labels.row(i) = a_(i) * arma::sin(inputs);
-  }
-  else if ( type == "PhaseAmplitude" )
-  {
-    for ( size_t i=0; i<size_; i++ )
-      labels.row(i) = a_(i)*arma::sin(inputs+p_(i));
-  }
-
-  if ( eps != 0. )
-    labels += arma::randn<arma::Mat<T>>(arma::size(labels),
-                                        arma::distr_param(0.,eps));
-
-  return labels;
-}
-///////////////////////////////////////////////////////////////////////////////
-template<class T>
-arma::Mat<T> SineGen<T>::Mean ( const arma::Mat<T>& inputs, 
-                                const std::string& type,
-                                const double& eps ) const 
-{
-  auto labels = Predict(inputs, type, eps);
-  return arma::zeros(arma::size(arma::mean(labels, 0)));
-}
-///////////////////////////////////////////////////////////////////////////////
-template<class T>
-arma::Mat<T> SineGen<T>::Mean ( const arma::Mat<T>& inputs, 
-                                const std::string& type ) const 
-{
-  auto labels = Predict(inputs, type);
-
-  return arma::zeros(arma::size(arma::mean(labels, 0)));
-}
-///////////////////////////////////////////////////////////////////////////////
-template<class T>
-arma::Mat<T> SineGen<T>::Predict ( const arma::Mat<T>& inputs, 
-                                   const std::string& type ) const
-{
-  return this-> Predict (inputs, type, 0.);
-}
-///////////////////////////////////////////////////////////////////////////////
-template<class T>
-size_t SineGen<T>::GetM ( )
-{
-  return size_;
-}
-///////////////////////////////////////////////////////////////////////////////
-} // namespace functional
-
 
 namespace data::oml
 {
 //=============================================================================
 // Dataset
-//=============================================================================
+//-----------------------------------------------------------------------------
 template<class LTYPE,class T>
 Dataset<LTYPE,T>::Dataset( const size_t& id, const std::filesystem::path& path ) : 
   id_(id), path_(path)
@@ -594,6 +513,120 @@ void Dataset<LTYPE,T>::_update_info( )
     num_class_ = (arma::unique(labels_).eval()).n_elem;
 }
 ///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+// Collect
+//-----------------------------------------------------------------------------
+template<class T>
+Collect<T>::Collect( const size_t& id ) : Collect( id, DATASET_PATH )
+{
+  std::filesystem::create_directories(metapath_);
+  std::filesystem::create_directories(filespath_);
+};
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+Collect<T>::Collect( const arma::Row<size_t>& ids ) : size_(ids.n_elem),
+                                                      keys_(ids)
+{
+  std::filesystem::create_directories(metapath_);
+  std::filesystem::create_directories(filespath_);
+};
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+Collect<T>::Collect( const size_t& id, const std::filesystem::path& path ) : 
+  id_(id), path_(path)
+{
+  std::filesystem::create_directories(metapath_);
+  std::filesystem::create_directories(filespath_);
+  url_ = "https://www.openml.org/api/v1/json/study/" + std::to_string(id);
+  keys_ = _getkeys();
+  size_ = keys_.n_elem;
+}
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+Dataset<T> Collect<T>::GetNext ( )
+{
+  return Dataset<T>(keys_[counter_++],filespath_);
+}
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+Dataset<T> Collect<T>::GetID ( const size_t& id )
+{
+  if (arma::any(arma::find(keys_ == id)))
+    return Dataset<T>(id);
+  else
+  {
+    ERR("Collect: cannot find the dataset, giving you the next instead...");
+    return GetNext();
+  }
+}
+///////////////////////////////////////////////////////////////////////////////
+template<class T>
+arma::Row<size_t> Collect<T>::_getkeys()
+{
+  
+  // Function to fetch metadata from OpenML
+  CURL* curl;
+  CURLcode res;
+  std::string readBuffer;
+
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+  curl = curl_easy_init();
+  if(curl) 
+  {
+    curl_easy_setopt(curl, CURLOPT_URL, url_.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, utils::WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+    res = curl_easy_perform(curl);
+    if(res != CURLE_OK) 
+      ERR("Collect:curl_easy_perform() failed: " << curl_easy_strerror(res)); 
+    curl_easy_cleanup(curl);
+  }
+  curl_global_cleanup();
+
+
+  if(res == CURLE_OK) 
+  {
+    // Save readBuffer to a text file
+    std::ofstream outFile(metafile_);
+    if (outFile.is_open())
+    {
+      outFile << readBuffer;
+      outFile.close();
+    }
+    else
+      ERR("Collect:Unable to open file for writing.");
+  }
+  else
+      ERR("Collect:Not Saving metadata.");
+  std::vector<size_t> dataIds;
+
+    // Regex to match the array inside "data_id": [...]
+    // I will use data_id because I want to control the splits...
+    std::regex arrayRegex(R"("data_id"\s*:\s*\[([^\]]+)\])");
+    std::smatch match;
+
+    // If the regex finds a match for the "data_id" array
+    if (std::regex_search(readBuffer, match, arrayRegex))
+    {
+      // The first captured group (the numbers inside the brackets)
+      std::string dataIdArrayStr = match[1].str();
+
+      // Regex to find individual numbers in the array
+      std::regex numberRegex(R"(\d+)");
+      auto numbersBegin = std::sregex_iterator(dataIdArrayStr.begin(),
+                                               dataIdArrayStr.end(),
+                                               numberRegex);
+      auto numbersEnd = std::sregex_iterator();
+
+      // Iterate over each match (number) and add it to the vector
+      for (std::sregex_iterator i = numbersBegin; i != numbersEnd; ++i) 
+      {
+        int dataId = std::stoi((*i).str());
+        dataIds.push_back(dataId);
+      }
+    }
+  return arma::conv_to<arma::Row<size_t>>::from(dataIds);
+}
 
 } // namespace oml
 

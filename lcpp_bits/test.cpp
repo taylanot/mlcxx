@@ -5,10 +5,15 @@
  * Compiling the tests
  */
 
+#define DISABLE_LOGS
+#define DISABLE_WARNINGS
+
 #include <lcpp.h>
 
 #include "tests/doctest.h"
 #include "tests/tests.h"
+
+
 
 //-----------------------------------------------------------------------------
 //   main : our main function no need to do anything here...
