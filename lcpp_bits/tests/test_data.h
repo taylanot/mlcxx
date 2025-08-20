@@ -11,11 +11,48 @@ TEST_SUITE("DATA")
 {
   TEST_CASE("GRAM")
   {
-
+    arma::Mat<DTYPE> X = { 1,2,3 };
+    data::Gram<mlpack::LinearKernel> gram;
+    {
+      auto mat = gram.GetMatrix(X);
+      CHECK( arma::approx_equal(mat,X.t()*X,"absdiff",1e-6) );
+    }
+    {
+      auto mat = gram.GetMatrix2(X,X);
+      CHECK( arma::approx_equal(mat,X*X.t(),"absdiff",1e-6) );
+    }
+    {
+      auto mat = gram.GetApprox(X,X,3);
+      CHECK( arma::approx_equal(mat,gram.GetMatrix(X),"absdiff",1e-6) ) ;
+    }
   }
+
   TEST_CASE("TRANSFORM")
   {
-
+    arma::Mat<DTYPE> X = {{1,2,3}};
+    arma::Row<DTYPE> y = {-1.2247,0,1.2247};
+    {
+      data::Dataset<arma::Row<DTYPE>> dataset(X,y);
+      data::Transformer trans(dataset);
+      auto tdataset = trans.Trans(dataset);
+      CHECK( arma::approx_equal(tdataset.inputs_,y,"absdiff",1e-3) ); 
+      CHECK( arma::approx_equal(tdataset.labels_,y,"absdiff",1e-3) ); 
+      auto itdataset = trans.InvTrans(tdataset);
+      CHECK( arma::approx_equal(itdataset.inputs_,X,"absdiff",1e-3) ); 
+      CHECK( arma::approx_equal(itdataset.labels_,y,"absdiff",1e-3) ); 
+    }
+    // Testing the Row<size_t> version
+    {
+      arma::Row<size_t> y_ = {0,1,1};
+      data::Dataset<arma::Row<size_t>> dataset(X,y_);
+      data::Transformer trans(dataset);
+      auto tdataset = trans.Trans(dataset);
+      CHECK( arma::approx_equal(tdataset.inputs_,y,"absdiff",1e-3) ); 
+      CHECK( arma::approx_equal(tdataset.labels_,y_,"absdiff",1e-3) ); 
+      auto itdataset = trans.InvTrans(tdataset);
+      CHECK( arma::approx_equal(itdataset.inputs_,X,"absdiff",1e-3) ); 
+      CHECK( arma::approx_equal(itdataset.labels_,y_,"absdiff",1e-3) ); 
+    }
   }
 }
 
@@ -175,40 +212,6 @@ TEST_SUITE("DATASET")
   }
 }
 
-/* TEST_SUITE("TRANSFORM") { */
-
-/*   double tol = 1e-6; */
-
-/*   TEST_CASE("REGRESSION") */
-/*   { */
-/*     data::regression::Dataset data(2, 10); */
-/*     data::regression::Dataset tdata,tbdata; */
-/*     data.Generate(1,0,"Linear",0); */
-/*     data::regression::Transformer trans(data); */
-/*     tdata = trans.Trans(data); */
-/*     tbdata = trans.InvTrans(tdata); */
-
-/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
-/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
-    
-/*   } */
-
-/*   TEST_CASE("CLASSIFICATION") */
-/*   { */
-/*     data::classification::Dataset data(2, 10, 2); */
-/*     data::classification::Dataset tdata,tbdata; */
-/*     data.Generate("Simple"); */
-/*     data::classification::Transformer trans(data); */
-/*     tdata = trans.Trans(data); */
-/*     tbdata = trans.InvTrans(tdata); */
-
-/*     CHECK ( arma::sum(data.inputs_(0,0) - tbdata.inputs_(0,0))  <= tol ); */
-/*     CHECK ( arma::sum(data.labels_(0,0) - tbdata.labels_(0,0))  <= tol ); */
-    
-/*   } */
-/* } */
-
-
 TEST_SUITE("MANIP") 
 {
   TEST_CASE("SetDiff")
@@ -220,25 +223,226 @@ TEST_SUITE("MANIP")
     auto res = data::SetDiff(a,b);
     CHECK ( arma::all(res == expect) );
   }
+
   TEST_CASE("Migrate")
   {
+    {
+      {
+        arma::Mat<DTYPE> a = {1,2,3,4};
+        arma::Mat<DTYPE> b = {5,6,7,8};
 
+        arma::Row<DTYPE> a_ = a;
+        arma::Row<DTYPE> b_ = b;
+
+        data::Dataset<arma::Row<DTYPE>> to(a,a_);
+        data::Dataset<arma::Row<DTYPE>> from(b,b_);
+
+        data::Migrate(to,from,2);
+
+        CHECK( to.size_ == 6 );
+        CHECK( from.size_ == 2 );
+
+        arma::Mat<DTYPE> expect {1,2,3,4,5,6,7,8};
+        arma::Mat<DTYPE> comb = arma::unique(
+                          arma::join_horiz(to.inputs_,from.inputs_)).eval().t();
+        CHECK( arma::approx_equal(comb, expect,"absdiff",1e-6) );
+        CHECK( arma::approx_equal(to.inputs_,
+                           arma::conv_to<arma::Mat<DTYPE>>::from(to.labels_),
+                           "absdiff",1e-6) );
+      }
+
+      {
+        arma::Mat<DTYPE> a = {1,2,3,4};
+        arma::Mat<DTYPE> b = {5,6,7,8};
+
+        auto a_ = arma::conv_to<arma::Row<size_t>>::from(a);
+        auto b_ = arma::conv_to<arma::Row<size_t>>::from(b);
+
+        data::Dataset<arma::Row<size_t>> to(a,a_);
+        data::Dataset<arma::Row<size_t>> from(b,b_);
+
+        data::Migrate(to,from,2);
+
+        CHECK( to.size_ == 6 );
+        CHECK( from.size_ == 2 );
+
+        arma::Mat<DTYPE> expect {1,2,3,4,5,6,7,8};
+        arma::Mat<DTYPE> comb = arma::unique(
+                          arma::join_horiz(to.inputs_,from.inputs_)).eval().t();
+        CHECK( arma::approx_equal(comb, expect,"absdiff",1e-6) );
+        CHECK( arma::approx_equal(to.inputs_,
+                           arma::conv_to<arma::Mat<DTYPE>>::from(to.labels_),
+                           "absdiff",1e-6) );
+      }
+
+    }
   }
   TEST_CASE("Split")
   {
+    {
+        arma::Mat<DTYPE> a = {1,2,3,4,5,6,7,8,9,10};
+        arma::Row<DTYPE> a_ = a;
 
+        data::Dataset<arma::Row<DTYPE>> dataset(a,a_);
+
+        data::Dataset<arma::Row<DTYPE>> set1, set2;
+
+        {
+          data::Split(dataset, set1,set2, size_t(5));
+
+          CHECK( set1.size_ == 5 );
+          CHECK( set2.size_ == 5 );
+          CHECK( dataset.size_ == 10 );
+
+          CHECK( arma::approx_equal(set1.inputs_,set1.labels_,"absdiff",1e-12) );
+          CHECK( arma::approx_equal(set2.inputs_,set2.labels_,"absdiff",1e-12) );
+          arma::Mat<DTYPE> sorted = arma::sort(
+                arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+          CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        }
+        {
+          data::Split(dataset, set1,set2, 0.5);
+
+          CHECK( set1.size_ == 5 );
+          CHECK( set2.size_ == 5 );
+          CHECK( dataset.size_ == 10 );
+
+          CHECK( arma::approx_equal(set1.inputs_,set1.labels_,"absdiff",1e-12) );
+          CHECK( arma::approx_equal(set2.inputs_,set2.labels_,"absdiff",1e-12) );
+          arma::Mat<DTYPE> sorted = arma::sort(
+                arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+          CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        }
+    }
+    {
+        arma::Mat<DTYPE> a = {1,2,3,4,5,6,7,8,9,10};
+        auto a_ = arma::conv_to<arma::Row<size_t>>::from(a);
+
+        data::Dataset<arma::Row<size_t>> dataset(a,a_);
+
+        data::Dataset<arma::Row<size_t>> set1, set2;
+        {
+          data::Split(dataset,set1,set2,size_t(5));
+
+          CHECK( set1.size_ == 5 );
+          CHECK( set2.size_ == 5 );
+          CHECK( dataset.size_ == 10 );
+
+          CHECK( arma::approx_equal(set1.inputs_,
+                arma::conv_to<arma::Mat<DTYPE>>::from(set1.labels_),
+                "absdiff",1e-12) );
+
+          CHECK( arma::approx_equal(set2.inputs_,
+                arma::conv_to<arma::Mat<DTYPE>>::from(set2.labels_),
+                "absdiff",1e-12) );
+
+          arma::Mat<DTYPE> sorted = arma::sort(
+                arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+          CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        }
+        {
+          data::Split(dataset,set1,set2,double(0.5));
+
+          CHECK( set1.size_ == 5 );
+          CHECK( set2.size_ == 5 );
+          CHECK( dataset.size_ == 10 );
+
+          CHECK( arma::approx_equal(set1.inputs_,
+                arma::conv_to<arma::Mat<DTYPE>>::from(set1.labels_),
+                "absdiff",1e-12) );
+
+          CHECK( arma::approx_equal(set2.inputs_,
+                arma::conv_to<arma::Mat<DTYPE>>::from(set2.labels_),
+                "absdiff",1e-12) );
+
+          arma::Mat<DTYPE> sorted = arma::sort(
+                arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+          CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        }
+
+    }
   }
+
   TEST_CASE("StratifiedSplit")
   {
+    {
+      arma::Mat<DTYPE> a = {1,2,3,4,5,6,7,8,9,10};
+      arma::Row<size_t> a_ = {0,0,0,0,0,1,1,1,1,1} ;
 
+      data::Dataset<arma::Row<size_t>> dataset(a,a_);
+
+      data::Dataset<arma::Row<size_t>> set1, set2;
+      {
+        data::StratifiedSplit(dataset, set1, set2, size_t(2));
+
+        CHECK( set1.size_ == 2 );
+        CHECK( set2.size_ == 8 );
+        CHECK( arma::unique(set1.labels_).eval().n_elem == 2 );
+        CHECK( arma::unique(set2.labels_).eval().n_elem == 2 );
+        CHECK( dataset.size_ == 10 );
+
+        arma::uvec idx = sort_index(arma::join_horiz(set1.inputs_,set2.inputs_));
+        arma::Mat<DTYPE> sorted = arma::sort(
+              arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+        CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        auto sorted_labels = arma::conv_to<arma::Row<size_t>>::from(
+          arma::join_horiz(set1.labels_,set2.labels_).eval().cols(idx));
+        CHECK( arma::approx_equal( sorted_labels, a_,"absdiff",1e-12) );
+      }
+      {
+        data::StratifiedSplit(dataset, set1, set2, double(0.8));
+
+        CHECK( set1.size_ == 2 );
+        CHECK( set2.size_ == 8 );
+        CHECK( arma::unique(set1.labels_).eval().n_elem == 2 );
+        CHECK( arma::unique(set2.labels_).eval().n_elem == 2 );
+        CHECK( dataset.size_ == 10 );
+
+        arma::uvec idx = sort_index(arma::join_horiz(set1.inputs_,set2.inputs_));
+        arma::Mat<DTYPE> sorted = arma::sort(
+              arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+        CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        auto sorted_labels = arma::conv_to<arma::Row<size_t>>::from(
+          arma::join_horiz(set1.labels_,set2.labels_).eval().cols(idx));
+        CHECK( arma::approx_equal( sorted_labels, a_,"absdiff",1e-12) );
+      }
+
+    }
+    {
+      arma::Mat<DTYPE> a = {1,2,3,4,5,6,7,8,9,10};
+      arma::Row<size_t> a_ = {0,0,0,0,1,1,1,1,1,1} ;
+
+      data::Dataset<arma::Row<size_t>> dataset(a,a_);
+
+      data::Dataset<arma::Row<size_t>> set1, set2;
+      {
+        data::StratifiedSplit(dataset, set1, set2, size_t(4));
+        
+        CHECK( set1.size_ == 5 );
+        CHECK( set2.size_ == 5 );
+        CHECK( arma::unique(set1.labels_).eval().n_elem == 2 );
+        CHECK( arma::unique(set2.labels_).eval().n_elem == 2 );
+        CHECK( DTYPE(arma::accu(set1.labels_))/3. == 1. );
+        CHECK( DTYPE(arma::accu(set2.labels_))/3. == 1. );
+        CHECK( dataset.size_ == 10 );
+
+        arma::uvec idx = sort_index(arma::join_horiz(set1.inputs_,set2.inputs_));
+        arma::Mat<DTYPE> sorted = arma::sort(
+              arma::join_horiz(set1.inputs_,set2.inputs_),"ascend",1);
+        CHECK( arma::approx_equal(sorted,a,"absdiff",1e-12) );
+        auto sorted_labels = arma::conv_to<arma::Row<size_t>>::from(
+          arma::join_horiz(set1.labels_,set2.labels_).eval().cols(idx));
+        CHECK( arma::approx_equal( sorted_labels, a_,"absdiff",1e-12) );
+      }
+    }
   }
 }
 
 TEST_SUITE("SAMPLE") 
 {
-   TEST_CASE("RandomSelect")
+  TEST_CASE("RandomSelect")
   {
-
+  
   }
   TEST_CASE("Additive")
   {
@@ -248,6 +452,5 @@ TEST_SUITE("SAMPLE")
   {
 
   }
- 
 }
 #endif

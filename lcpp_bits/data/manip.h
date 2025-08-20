@@ -124,8 +124,12 @@ void Migrate ( T& trainset,
   trainset.size_ = trainset.inputs_.n_cols;
   testset.size_ = testset.inputs_.n_cols;
 
-  trainset.num_class_ = arma::unique(trainset.labels_).eval().n_cols;
-  testset.num_class_ = arma::unique(testset.labels_).eval().n_cols;
+  if constexpr (std::is_same_v<T, data::oml::Dataset<size_t>> ||
+     std::is_same_v<T, data::Dataset<arma::Row<size_t>>> )
+  {
+    trainset.num_class_ = arma::unique(trainset.labels_).eval().n_cols;
+    testset.num_class_ = arma::unique(testset.labels_).eval().n_cols;
+  }
 }
 
 template<typename T=arma::uword>
@@ -325,11 +329,8 @@ void Split ( const T& dataset,
         trainset.inputs_, testset.inputs_,
         trainset.labels_, testset.labels_, trainNum);
 
-  trainset.size_ = trainset.inputs_.n_cols;
-  testset.size_ = testset.inputs_.n_cols;
-
-  trainset.dimension_ = trainset.inputs_.n_rows;
-  testset.dimension_ = testset.inputs_.n_rows;
+  trainset.Update(trainset.inputs_,trainset.labels_);
+  testset.Update(testset.inputs_,testset.labels_);
 
 }
 
@@ -339,11 +340,11 @@ void Split ( const T& dataset,
  * @param testset to be filled
  * @param testRatio percentage of test set
  */
-template<typename T>
+template<typename T,class O=DTYPE>
 void Split ( const T& dataset,
              T& trainset,
              T& testset,
-             const double testRatio )
+             const O testRatio )
 {
 
   trainset = dataset; testset = dataset;
@@ -352,11 +353,8 @@ void Split ( const T& dataset,
         trainset.inputs_, testset.inputs_,
         trainset.labels_, testset.labels_, testRatio);
 
-  trainset.size_ = trainset.inputs_.n_cols;
-  testset.size_ = testset.inputs_.n_cols;
-
-  trainset.dimension_ = trainset.inputs_.n_rows;
-  testset.dimension_ = testset.inputs_.n_rows;
+  trainset.Update(trainset.inputs_,trainset.labels_);
+  testset.Update(testset.inputs_,testset.labels_);
 }
 
 //-----------------------------------------------------------------------------
@@ -589,11 +587,8 @@ void StratifiedSplit ( const T& dataset,
                   trainset.inputs_, testset.inputs_,
                   trainset.labels_, testset.labels_, trainNum);
 
-  trainset.size_ = trainset.inputs_.n_cols;
-  testset.size_ = testset.inputs_.n_cols;
-
-  trainset.dimension_ = trainset.inputs_.n_rows;
-  testset.dimension_ = testset.inputs_.n_rows;
+  trainset.Update(trainset.inputs_,trainset.labels_);
+  testset.Update(testset.inputs_,testset.labels_);
 }
 
 /**
@@ -621,11 +616,8 @@ void StratifiedSplit ( const T& dataset,
                                 trainset.inputs_, testset.inputs_,
                                 trainset.labels_, testset.labels_, testRatio);
 
-  trainset.size_ = trainset.inputs_.n_cols;
-  testset.size_ = testset.inputs_.n_cols;
-
-  trainset.dimension_ = trainset.inputs_.n_rows;
-  testset.dimension_ = testset.inputs_.n_rows;
+  trainset.Update(trainset.inputs_,trainset.labels_);
+  testset.Update(testset.inputs_,testset.labels_);
 }
 
 template<typename T, typename U>

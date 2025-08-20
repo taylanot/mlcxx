@@ -201,7 +201,7 @@ struct Gram
      * @param k      Number of landmark points to sample.
      * @return Approximated Gram matrix.
      */
-    arma::Mat<T> GetMatrix_approx(const arma::Mat<T>& input1,
+    arma::Mat<T> GetApprox(const arma::Mat<T>& input1,
                                   const arma::Mat<T>& input2,
                                   size_t k) const
     {

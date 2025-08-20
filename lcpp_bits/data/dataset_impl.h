@@ -18,6 +18,16 @@ namespace  data {
 template<class LABEL,class T>
 Dataset<LABEL,T>::Dataset ( size_t dim, size_t seed ) : 
   dimension_(dim),seed_(seed) {  };
+
+template<class LABEL,class T>
+Dataset<LABEL,T>::Dataset ( const arma::Mat<T>& inputs,
+                            const LABEL& labels )
+{
+  inputs_ = inputs;
+  labels_ = labels;
+  this->_update_info();
+};
+
 //-----------------------------------------------------------------------------
 // Dataset::Linear
 //-----------------------------------------------------------------------------
@@ -161,11 +171,21 @@ void Dataset<LABEL,T>::_update_info(  )
   else if constexpr ( std::is_same<LABEL,arma::Row<int>>::value )
     num_class_ = 2;
 }
+//-----------------------------------------------------------------------------
+// Dataset:: Update
+//-----------------------------------------------------------------------------
+template<class LABEL,class T>
+void Dataset<LABEL,T>::Update ( const arma::Mat<T>& inputs,
+                                const LABEL& labels )
+{
+  this->inputs_ = inputs; this->labels_ = labels; this->_update_info();
+}
+
 } // namespace data
 
 namespace data::oml
 {
-//=============================================================================
+//-----------------------------------------------------------------------------
 // Dataset
 //-----------------------------------------------------------------------------
 template<class LTYPE,class T>
