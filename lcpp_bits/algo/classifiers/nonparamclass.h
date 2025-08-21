@@ -109,6 +109,7 @@ class NNC
          cereal::make_nvp("nuclass",nuclass_),
          cereal::make_nvp("nclass",nclass_),
          cereal::make_nvp("size",size_),
+         cereal::make_nvp("unique",unique_),
          cereal::make_nvp("k",k_),
          cereal::make_nvp("inputs",inputs_),
          cereal::make_nvp("labels",labels_) );

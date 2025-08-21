@@ -119,7 +119,7 @@ struct Additive
         if (i == 0)
           Split(total,trainset,testset,Ns[i]);
         else
-          Migrate(total,trainset,testset,Ns[i]-Ns[i-1]);
+          Migrate(trainset,testset,Ns[i]-Ns[i-1]);
         collect.at(counter++) = 
             std::pair<arma::Col<O>,arma::Col<O>>(trainset,testset);
       }

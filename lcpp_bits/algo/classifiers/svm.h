@@ -100,7 +100,7 @@ class SVM
    * @param labels  : y*
    */
   void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& labels );
+                  arma::Row<size_t>& labels ) const ;
 
 /**
    * @param inputs    : X*
@@ -109,7 +109,7 @@ class SVM
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels,
-                  arma::Mat<T>& dec_func );
+                  arma::Mat<T>& dec_func ) const;
   /**
    * Calculate the Error Rate
    *
@@ -135,15 +135,19 @@ class SVM
   void serialize ( Archive& ar,
                    const unsigned int /* version */ )
   {
-    ar (  cereal::make_nvp("cov",cov_),
-          cereal::make_nvp("X",X_),
+    ar (  cereal::make_nvp("X",X_),
+          cereal::make_nvp("nclass",nclass_),
           cereal::make_nvp("y",y_),
           cereal::make_nvp("alphas",alphas_),
+          cereal::make_nvp("oldalphas",old_alphas_),
           cereal::make_nvp("ulab",ulab_),
           cereal::make_nvp("idx",idx_),
-          cereal::make_nvp("b",b_),
           cereal::make_nvp("C",C_),
           cereal::make_nvp("oneclass",oneclass_),
+          cereal::make_nvp("eps",eps_),
+          cereal::make_nvp("tau",tau_),
+          cereal::make_nvp("max_iter",max_iter_),
+          cereal::make_nvp("iter",iter_),
           cereal::make_nvp("solver",solver_) );
   }
 
@@ -159,7 +163,6 @@ private:
   arma::Row<T> alphas_;
   arma::Row<T> old_alphas_;
   arma::uvec idx_;
-  T b_ = 0;
   bool oneclass_ = false;
   T eps_ = 1e-3;
   T tau_ = 1e-12;

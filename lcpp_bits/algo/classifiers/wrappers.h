@@ -100,7 +100,7 @@ class LogisticRegression
    * @param labels  : y*
    */
   void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& labels ) 
+                  arma::Row<size_t>& labels ) const
   {
     arma::Mat<T> dummy;
     Classify(inputs, labels, dummy);
@@ -113,7 +113,7 @@ class LogisticRegression
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& labels,
-                  arma::Mat<T>& scores ) 
+                  arma::Mat<T>& scores ) const
   {
     scores.resize(num_class_,inputs.n_cols);
     if (ulab_.n_elem != 1 && ulab_.n_elem < 3)
@@ -169,6 +169,8 @@ class LogisticRegression
   {
     ar ( cereal::make_nvp("num_class",num_class_),
          cereal::make_nvp("ulab",ulab_),
+         cereal::make_nvp("ova",ova_),
+         cereal::make_nvp("model",model_),
          cereal::make_nvp("lambda",lambda_) );
 
   }

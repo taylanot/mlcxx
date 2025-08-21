@@ -7,83 +7,241 @@
 #ifndef TEST_ALGO_H 
 #define TEST_ALGO_H
 
+using GPR = algo::regression::GaussianProcess<mlpack::GaussianKernel>;
+using KR = algo::regression::KernelRidge<mlpack::GaussianKernel>;
+using KWR = algo::regression::Kernel<mlpack::GaussianKernel>;
 
-TEST_SUITE("OUTPUT_CHECK") 
+/* using SPKR2 = algo::regression::SemiParamKernelRidge2<mlpack::GaussianKernel, */
+/*                                                   data::functional::SineGen<>>; */
+/* using SPKR = algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel, */
+/*                                                 data::functional::SineGen<>>; */
+
+using LDC = algo::classification::LDC<>;
+using QDC = algo::classification::QDC<>;
+using NNC = algo::classification::NNC<>;
+using NMC = algo::classification::NMC<>;
+using OvA = algo::classification::OnevAll<mlpack::LogisticRegression<>>;
+using LREG = algo::classification::LogisticRegression<>;
+using SVM = algo::classification::SVM<mlpack::GaussianKernel>;
+
+using ACC = mlpack::Accuracy;
+using MSE = mlpack::MSE;
+
+
+
+// Utility: check save/load consistency using fully qualified std::filesystem
+template<class MODEL, class LabelType, class METRIC>
+void CheckModelPersistence(const MODEL& model,
+                           const arma::mat& inputs,
+                           const LabelType& labels, METRIC metric)
+{
+  std::filesystem::create_directories("temp");
+  std::filesystem::path tmpFile = "temp/model.bin";
+  
+  algo::save<MODEL>(tmpFile,model);
+                                              
+  auto loaded = algo::load<MODEL>(tmpFile);
+
+  auto res = metric.Evaluate(model,inputs,labels);
+  auto res2 = metric.Evaluate(*loaded,inputs,labels);
+
+  CHECK( res == doctest::Approx(res2) );
+
+  std::filesystem::remove_all("temp");
+}
+
+template<typename MODEL, typename Metric=ACC>
+void TestLinearClassifier()
+{
+  arma::Mat<DTYPE> inputs(2, 6);
+  inputs.col(0) = {0.0, 0.0};
+  inputs.col(1) = {0.1, 0.1};
+  inputs.col(2) = {0.2, 0.0};
+  inputs.col(3) = {1.0, 1.0};
+  inputs.col(4) = {1.1, 1.0};
+  inputs.col(5) = {0.9, 1.2};
+
+  arma::Row<size_t> labels = {0, 0, 0, 1, 1, 1};
+
+  MODEL model(inputs, labels,2);
+  Metric metric;
+
+  DTYPE acc = metric.Evaluate(model, inputs, labels);
+
+  arma::Row<size_t> preds;
+  model.Classify(inputs, preds);
+  CHECK(preds.n_elem == labels.n_elem);
+  CHECK(acc == doctest::Approx(1.0));
+
+  CheckModelPersistence(model, inputs, labels,metric);
+}
+
+template<typename MODEL, typename Metric=ACC>
+void TestNonLinearClassifier()
+{
+  arma::mat inputs(2, 4);
+  inputs.col(0) = {0.0, 0.0};
+  inputs.col(1) = {0.0, 1.0};
+  inputs.col(2) = {1.0, 0.0};
+  inputs.col(3) = {1.0, 1.0};
+
+  arma::Row<size_t> labels = {0, 1, 1, 0};
+
+  MODEL model(inputs, labels,2);
+  Metric metric;
+
+  DTYPE acc = metric.Evaluate(model, inputs, labels);
+
+  arma::Row<size_t> preds;
+  model.Classify(inputs, preds);
+  CHECK(preds.n_elem == labels.n_elem);
+  CHECK(acc == doctest::Approx(1.0));
+
+  CheckModelPersistence(model, inputs, labels, metric);
+}
+
+template<typename MODEL, typename Metric=ACC>
+void TestOneClassProblem()
+{
+  arma::mat inputs(2, 5, arma::fill::randu);
+  arma::Row<size_t> labels = {0, 0, 0, 0, 0};
+
+  MODEL model(inputs, labels,1);
+
+  arma::Row<size_t> preds;
+  model.Classify(inputs, preds);
+  CHECK(preds.n_elem == labels.n_elem);
+  CHECK(arma::all(preds == 0)); 
+
+}
+
+template<typename MODEL, typename Metric=ACC>
+void TestOneSampleProblem()
+{
+  arma::mat inputs(2, 1, arma::fill::randu);
+  arma::Row<size_t> labels = {0};
+
+  MODEL model(inputs, labels,1);
+
+  arma::Row<size_t> preds;
+  model.Classify(inputs, preds);
+  CHECK(preds.n_elem == labels.n_elem);
+  CHECK(preds[0] == labels[0]); 
+
+}
+
+// Nonlinear regression test: quadratic relation
+template<typename MODEL, typename Metric=MSE>
+void TestNonLinearRegression()
+{
+  arma::rowvec x = arma::linspace<arma::rowvec>(-2.0, 2.0, 50);
+  arma::mat inputs(1, x.n_elem);
+  inputs.row(0) = x;
+
+  // True function: y = x^2
+  arma::rowvec labels = arma::square(x);
+
+  MODEL model(inputs, labels);
+  Metric metric;
+
+  arma::rowvec preds;
+  model.Predict(inputs, preds);
+
+  CHECK(preds.n_elem == labels.n_elem);
+
+  double mse = metric.Evaluate(inputs, labels, model);
+  CHECK(mse == doctest::Approx(0.0).epsilon(1e-8));
+
+  CheckModelPersistence(model, inputs, labels, metric);
+}
+
+TEST_SUITE("CLASSIFIERS") 
 {
 
-  template <class ModelType,class... Args>
-  void SizeTestRegress ( Args... args )
+  TEST_CASE("LDC")
   {
-    arma::Mat<DTYPE> input = { 1,2 };
-    arma::Row<DTYPE> labels = {0.0, 1.};
-
-
-    arma::Mat<DTYPE> testInput = { 3.0, 4.0 };
-    arma::Row<DTYPE> predictions;
-
-    ModelType model(input, labels);
-    model.Predict(testInput, predictions);
-
-    CHECK(predictions.size() == 2);
+    TestOneClassProblem<LDC>();
+    TestOneSampleProblem<LDC>();
+    TestLinearClassifier<LDC>();
   }
 
-  
-  template <class ModelType,class... Args>
-  void SizeTestClass ( Args... args )
+  TEST_CASE("NMC")
   {
-    arma::Mat<DTYPE> input = { 1,2 };
-    arma::Row<size_t> labels = { 0,1 };
-
-
-    arma::Mat<DTYPE> testInput = { 3.0, 4.0 };
-    arma::Row<size_t> predictions;
-    arma::Mat<DTYPE> prob;
-
-    ModelType model(input, labels, args...);
-    model.Predict(testInput, predictions);
-
-    CHECK(predictions.size() == 2);
+    TestOneClassProblem<NMC>();
+    TestOneSampleProblem<NMC>();
+    TestLinearClassifier<NMC>();
+  }
+  TEST_CASE("NNC")
+  {
+    TestOneClassProblem<NNC>();
+    TestOneSampleProblem<NNC>();
+    TestNonLinearClassifier<NNC>();
   }
 
-  using GPR = algo::regression::GaussianProcess<mlpack::GaussianKernel>;
-  using KR = algo::regression::KernelRidge<mlpack::GaussianKernel>;
-  using KWR = algo::regression::Kernel<mlpack::GaussianKernel>;
-  using SPKR2 = algo::regression::SemiParamKernelRidge2<mlpack::GaussianKernel,
-                                                    data::functional::SineGen<>>;
-  using SPKR = algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel,
-                                                  data::functional::SineGen<>>;
-  /* using LDC = algo::classification::LDC<>; */
-  /* using QDC = algo::classification::QDC<>; */
-  /* using NNC = algo::classification::NNC<>; */
-  /* using NMC = algo::classification::NMC<>; */
-  /* using LREG = algo::classification::MultiClass<mlpack::LogisticRegression<>>; */
-  /* using GSVM = algo::classification::SVM<mlpack::GaussianKernel>; */
-
-  TEST_CASE("REGRESSION")
+  TEST_CASE("QDC")
   {
-    SizeTestRegress<GPR>(0.);
-    SizeTestRegress<KR>(0.);
-    SizeTestRegress<KWR>();
-    SizeTestRegress<SPKR2>(0.,3);
-    SizeTestRegress<SPKR>(0.,3);
+    TestOneClassProblem<QDC>();
+    TestOneSampleProblem<QDC>();
+    TestNonLinearClassifier<QDC>();
   }
 
-  TEST_CASE("CLASSIFICATION")
+  TEST_CASE("OvA")
   {
-
+    TestOneClassProblem<OvA>();
+    TestOneSampleProblem<OvA>();
+    TestLinearClassifier<OvA>();
   }
-} // OUTPUT_CHECK
-  //
 
-/* TEST_SUITE("EDGE_CASES") */ 
+  TEST_CASE("LREG")
+  {
+    TestOneClassProblem<LREG>();
+    TestOneSampleProblem<LREG>();
+    TestLinearClassifier<LREG>();
+  }
+
+  TEST_CASE("SVM")
+  {
+    TestOneClassProblem<SVM>();
+    TestOneSampleProblem<SVM>();
+    TestNonLinearClassifier<SVM>();
+  }
+
+} 
+
+TEST_SUITE("REGRESSORS") 
+{
+  TEST_CASE("KR")
+  {
+    TestNonLinearRegression<KR>();
+  }
+
+  TEST_CASE("KWR")
+  {
+    
+  }
+
+  TEST_CASE("GPR")
+  {
+    
+  }
+
+  TEST_CASE("SPKR")
+  {
+   
+  }
+}
+
+
+/* TEST_SUITE("DIMRED") */ 
 /* { */
 
 /* } */
 
-/* TEST_SUITE("SIMPLE_PROBLEMS") */ 
+/* TEST_SUITE("NN") */ 
 /* { */
 
 /* } */
+
 
 /* TEST_SUITE("FUNCTIONALPCA") { */
 /*   TEST_CASE("UFPCA") */

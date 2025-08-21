@@ -210,7 +210,7 @@ void SVM<KERNEL,SOLVER,T>::_fanSMO ( const arma::Mat<T>& X,
 ///////////////////////////////////////////////////////////////////////////////
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
-                                      arma::Row<size_t>& preds ) 
+                                      arma::Row<size_t>& preds ) const
 {
   if (!oneclass_)
   {
@@ -234,10 +234,10 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
 template<class KERNEL,size_t SOLVER,class T>
 void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
                                       arma::Row<size_t>& preds,
-                                      arma::Mat<T>& probs ) 
+                                      arma::Mat<T>& probs ) const 
 {
   arma::Mat<T> dec_func;
-
+  T b = 0;
   if (!oneclass_)
   {
     if (nclass_==2)
@@ -250,10 +250,10 @@ void SVM<KERNEL,SOLVER,T>::Classify ( const arma::Mat<T>& inputs,
         arma::Mat<T> K = cov_.GetMatrix(svs,inputs);
         arma::Mat<T> Ksv = cov_.GetMatrix(svs);
 
-        b_ = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
+        b = arma::accu(arma::conv_to<arma::Row<T>>::from(y_.cols(idx_))
         - ((alphas_.cols(idx_) % y_.cols(idx_)) * Ksv)) /idx_.n_elem;
 
-        dec_func = (alphas_.cols(idx_) % y_.cols(idx_)) * K ;
+        dec_func = (alphas_.cols(idx_) % y_.cols(idx_)) * K + b;
 
         preds.elem( arma::find( dec_func <= 0.) ).fill(ulab_[0]);
         preds.elem( arma::find( dec_func > 0.) ).fill(ulab_[1]);

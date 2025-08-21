@@ -87,7 +87,7 @@ void OnevAll<MODEL,T>::Train ( const arma::Mat<T>& inputs,
 ///////////////////////////////////////////////////////////////////////////////
 template<class MODEL, class T>
 void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
-                                 arma::Row<size_t>& preds )
+                                 arma::Row<size_t>& preds ) const
 {
   arma::Mat<T> probs;
   Classify(inputs, preds, probs);
@@ -96,7 +96,7 @@ void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
 template<class MODEL, class T>
 void OnevAll<MODEL,T>::Classify( const arma::Mat<T>& inputs,
                                  arma::Row<size_t>& preds,
-                                 arma::Mat<T>& probs )
+                                 arma::Mat<T>& probs ) const 
 {
   probs.resize(nclass_,inputs.n_cols);
   preds.resize(inputs.n_cols);

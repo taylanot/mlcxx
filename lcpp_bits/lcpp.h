@@ -73,7 +73,7 @@
   << " | armadillo/" <<arma::arma_version::as_string()  \
   << " | " << mlpack::util::GetVersion()  \
   << " | ensmallen/" << ens::version::as_string() \
-  << " | " <<  curl_version() << '\n' << std::endl; 
+  << " | " <<  curl_version() << '\n'  << std::endl;
 
 // Define the precision for what is to come...
 #ifndef DTYPE

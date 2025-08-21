@@ -125,9 +125,11 @@ class LDC
         cereal::make_nvp("lambda",lambda_),
         cereal::make_nvp("means",means_),
         cereal::make_nvp("covs",covs_),
+        cereal::make_nvp("mean",mean_),
+        cereal::make_nvp("cov",cov_),
+        cereal::make_nvp("class",class_),
         cereal::make_nvp("unique",unique_),
         cereal::make_nvp("priors",priors_));
-
   }
 
   private:
@@ -268,6 +270,7 @@ class QDC
          cereal::make_nvp("covs",covs_),
          cereal::make_nvp("icovs",icovs_),
          cereal::make_nvp("unique",unique_),
+         cereal::make_nvp("class",class_),
          cereal::make_nvp("priors",priors_));
   }
 
@@ -391,8 +394,8 @@ class NMC
     ar (  cereal::make_nvp("parameters",parameters_),
           cereal::make_nvp("dim",dim_),
           cereal::make_nvp("num_class",num_class_),
+          cereal::make_nvp("centroid",centroid_),
           cereal::make_nvp("unique",unique_),
-          cereal::make_nvp("metric",metric_),
           cereal::make_nvp("shrink",shrink_),
           cereal::make_nvp("size",size_) );
   }
@@ -412,7 +415,30 @@ class NMC
   mlpack::EuclideanDistance metric_;
 
 };
+  //---------------------------------------------------------------------------
+  // extract_class  : Get all the data from one class
+  //---------------------------------------------------------------------------
+  template<class T=DTYPE>
+  std::tuple< arma::Mat<T>,
+              arma::uvec > extract_class ( const arma::Mat<T>& inputs,
+                                           const arma::Row<size_t>& labels,
+                                           const size_t& label_id )
+  {
+    arma::uvec index = arma::find(labels == label_id);
+    return std::make_tuple(inputs.cols(index), index);
+  }
 
+  //---------------------------------------------------------------------------
+  // get_prior  : Estimates prior from given labels
+  //---------------------------------------------------------------------------
+  template<class T=DTYPE>
+  arma::Row<T> get_prior ( const arma::Row<size_t>& labels,
+                           const size_t& num_class )
+  {
+    auto unq = arma::regspace<arma::Row<size_t>>(0,1,num_class);
+    auto prior = arma::conv_to<arma::Row<T>>::from(arma::hist(labels, unq));
+    return  prior / labels.n_cols;
+  }
 } // namespace classification
 } // namespace algo
 

@@ -442,15 +442,165 @@ TEST_SUITE("SAMPLE")
 {
   TEST_CASE("RandomSelect")
   {
-  
+    std::vector seeds = {1,2,3};
+    for (size_t seed : seeds)
+    {
+      std::vector<std::pair<arma::uvec, arma::uvec>> sets;
+      
+      // Ns = {1,2,3}
+      auto ns = arma::regspace<arma::Row<size_t>>(1, 3);
+
+      // Instantiate functor
+      data::RandomSelect<> selector;
+
+      // Fill sets
+      selector(5, ns, 1, sets, seed);
+      std::set<std::string> seenPairs;
+      // Check each split
+      for (size_t i = 0; i < ns.n_elem; i++)
+      {
+        auto train = sets[i].first;
+        auto test  = sets[i].second;
+
+        // 1. Check sizes
+        CHECK(train.n_elem == ns[i]);
+        CHECK(test.n_elem == 5 - ns[i]);
+
+        // 2. No overlap between train and test
+        CHECK(arma::intersect(train, test).is_empty());
+
+        // 3. No duplicates inside train/test
+        CHECK(arma::unique(train).eval().n_elem == train.n_elem);
+        CHECK(arma::unique(test).eval().n_elem == test.n_elem);
+
+        // 4. All train-test pairs different
+        std::ostringstream oss;
+        train.t().raw_print(oss);
+        test.t().raw_print(oss);
+        auto repr = oss.str();
+        CHECK(seenPairs.count(repr) == 0);
+        seenPairs.insert(repr);
+      }
+    }
   }
   TEST_CASE("Additive")
   {
+    std::vector<size_t> seeds = {1, 2, 3};
+    for (size_t seed : seeds)
+    {
+      std::vector<std::pair<arma::uvec, arma::uvec>> sets;
 
+      // Ns = {1,2,3}
+      auto ns = arma::regspace<arma::Row<size_t>>(1, 3);
+
+      // Instantiate functor
+      data::Additive<> selector;
+
+      // Fill sets
+      selector(5, ns, 1, sets, seed);
+
+      std::set<std::string> seenPairs;
+
+      arma::uvec prevTrain;  // to check additive property
+
+      // Check each split
+      for (size_t i = 0; i < ns.n_elem; i++)
+      {
+        auto train = sets[i].first;
+        auto test  = sets[i].second;
+
+        // Sort for comparison
+        arma::uvec sortedTrain = arma::sort(train);
+        arma::uvec sortedTest  = arma::sort(test);
+
+        // 1. Sizes
+        CHECK(sortedTrain.n_elem == ns[i]);
+        CHECK(sortedTest.n_elem == 5 - ns[i]);
+
+        // 2. No overlap
+        CHECK(arma::intersect(sortedTrain, sortedTest).is_empty());
+
+        // 3. No duplicates
+        CHECK(arma::unique(sortedTrain).eval().n_elem == sortedTrain.n_elem);
+        CHECK(arma::unique(sortedTest).eval().n_elem == sortedTest.n_elem);
+
+        // 4. Deterministic partition: train ∪ test = {0,1,2,3,4}
+        arma::uvec all = arma::join_vert(sortedTrain, sortedTest);
+        CHECK(arma::unique(all).eval().n_elem == 5);
+
+        // 5. Additive property
+        if (i > 0)
+        {
+          // New train must contain all previous train elements
+          bool subset = true;
+          for (size_t j = 0; j < prevTrain.n_elem; j++)
+          {
+            if (!arma::any(sortedTrain == prevTrain[j]))
+            {
+              subset = false;
+              break;
+            }
+          }
+          CHECK(subset);
+
+          // And exactly one new element
+          CHECK(sortedTrain.n_elem == prevTrain.n_elem + 1);
+        }
+        prevTrain = sortedTrain;
+
+        // 6. All train-test pairs different
+        std::ostringstream oss;
+        sortedTrain.t().raw_print(oss);
+        sortedTest.t().raw_print(oss);
+        auto repr = oss.str();
+        CHECK(seenPairs.count(repr) == 0);
+        seenPairs.insert(repr);
+      }
+    }
   }
   TEST_CASE("Bootstrap")
   {
+    std::vector<size_t> seeds = {1, 2, 3};
+    for (size_t seed : seeds)
+    {
+      std::vector<std::pair<arma::uvec, arma::uvec>> sets;
 
+      // Ns = {1,2,3}
+      auto ns = arma::regspace<arma::Row<size_t>>(1, 3);
+
+      // Instantiate functor
+      data::Bootstrap<> selector;
+
+      // Fill sets
+      selector(5, ns, 1, sets, seed);
+
+      std::set<std::string> seenPairs;
+
+      // Check each split
+      for (size_t i = 0; i < ns.n_elem; i++)
+      {
+        auto train = sets[i].first;
+        auto test  = sets[i].second;
+
+        // 1. Check sizes
+        CHECK(train.n_elem == ns[i]);
+        CHECK(test.n_elem >= 5 - ns[i]);
+
+        // 2. No overlap between train and test
+        CHECK(arma::intersect(train, test).is_empty());
+
+        // 3. Allow duplicates in train, but test must be unique
+        CHECK(arma::unique(test).eval().n_elem == test.n_elem);
+
+        // 4. All train-test pairs different
+        std::ostringstream oss;
+        train.t().raw_print(oss);
+        test.t().raw_print(oss);
+        auto repr = oss.str();
+        CHECK(seenPairs.count(repr) == 0);
+        seenPairs.insert(repr);
+      }
+    }
   }
 }
 #endif

@@ -68,7 +68,7 @@ public:
    * @param preds   : y*
    */
   void Classify ( const arma::Mat<T>& inputs,
-                  arma::Row<size_t>& preds );
+                  arma::Row<size_t>& preds ) const ;
   /**
    * @param inputs  : X*
    * @param preds   : y*
@@ -76,7 +76,7 @@ public:
    */
   void Classify ( const arma::Mat<T>& inputs,
                   arma::Row<size_t>& preds,
-                  arma::Mat<T>& probs );
+                  arma::Mat<T>& probs ) const ;
   /**
    * @param inputs  : X
    * @param labels  : y
@@ -92,6 +92,20 @@ public:
                       const arma::Row<size_t>& labels );
 
   std::vector<MODEL> models_;
+
+  /**
+   * Serialize the model.
+   */
+  template<typename Archive>
+  void serialize ( Archive& ar,
+                   const unsigned int /* version */ )
+  {
+    ar (  cereal::make_nvp("nclass",nclass_),
+          cereal::make_nvp("unclass",unclass_),
+          cereal::make_nvp("unq",unq_),
+          cereal::make_nvp("models",models_),
+          cereal::make_nvp("oneclass",oneclass_));
+  }
 
 private:
   size_t nclass_;  // number of classes of the problem
