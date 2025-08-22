@@ -1,6 +1,6 @@
 # lcpp [LearningCurvePlusPlus]
 
-![](figures/logo.svg)
+![](docs/figures/logo.svg)
 
 **C++ Header-Only Learning Curve Generation Tool**  
 
