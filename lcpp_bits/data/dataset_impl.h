@@ -545,7 +545,8 @@ Collect<T>::Collect( const size_t& id ) : Collect( id, DATASET_PATH )
 ///////////////////////////////////////////////////////////////////////////////
 template<class T>
 Collect<T>::Collect( const arma::Row<size_t>& ids ) : size_(ids.n_elem),
-                                                      keys_(ids)
+                                                      keys_(ids),
+                                                      path_(DATASET_PATH)
 {
   std::filesystem::create_directories(metapath_);
   std::filesystem::create_directories(filespath_);

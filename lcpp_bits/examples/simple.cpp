@@ -22,6 +22,8 @@ using SAMPLE = data::RandomSelect<>;
 
 int main ( ) 
 {
+  // Let's create the build directory if it does not exist
+  std::filesystem::create_directories("build");
   // We will be generating our own data with banana dataset aka moons by 
   // sklearn people
   DATASET data(2); // 2 represents the dimension of the dataset
@@ -29,7 +31,7 @@ int main ( )
   // You can split this dataset and used training and testing splits in 
   // LCurve. This operation will be using only the testset to test it.
                              
-  // Let's look at the portion of [10,100] of the learning curve
+  // Let's look at the portion of [10,350] of the learning curve
   auto Ns = arma::regspace<arma::Row<size_t>>(10,1,350);
   {
     lcurve::LCurve<MODEL,DATASET,
