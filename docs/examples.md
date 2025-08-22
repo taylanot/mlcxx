@@ -17,7 +17,7 @@ This example shows how to generate learning curves. The results are saved for bo
 
 ![Learning curve for a hyper-parameter tuned Decision Tree model on the Banana Dataset with training set sizes in the range $[10,350]$. Tuning is done with a simple train-validation split, and the only hyper-parameter varied is the minimum leaf size.](figures/tuned_plot.png)
 
-Since both figures are based on experiments repeated 1000 times, additional statistical measures of generalization performance are also computed with high confidence.
+Since both figures are based on experiments repeated 1000 times, additional statistical measures, such as quantiles, of generalization performance are also computed with high confidence.
 
 To illustrate the scale of the experiments even for this simple problem, see the figure below:
 

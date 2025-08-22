@@ -1,5 +1,7 @@
 # lcpp [LearningCurvePlusPlus]
 
+![](figures/logo.svg)
+
 **C++ Header-Only Learning Curve Generation Tool**  
 
 Generate learning curves for supervised machine learning algorithms with just header files — no separate compilation needed!  
