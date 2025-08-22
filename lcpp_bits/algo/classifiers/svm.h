@@ -146,6 +146,7 @@ class SVM
           cereal::make_nvp("oneclass",oneclass_),
           cereal::make_nvp("eps",eps_),
           cereal::make_nvp("tau",tau_),
+          cereal::make_nvp("cov",cov_),
           cereal::make_nvp("max_iter",max_iter_),
           cereal::make_nvp("iter",iter_),
           cereal::make_nvp("solver",solver_) );

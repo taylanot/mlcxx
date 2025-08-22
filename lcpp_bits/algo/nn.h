@@ -97,6 +97,14 @@ public:
 
   arma::Mat<O> Parameters( );
 
+  template<class Archive>
+  void serialize(Archive& ar) 
+  { 
+    ar( CEREAL_NVP(network_),
+        CEREAL_NVP(early_),
+        CEREAL_NVP(ulab_) ); 
+  }
+
 
 private:
   /**

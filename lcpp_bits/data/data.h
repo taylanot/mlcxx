@@ -225,6 +225,14 @@ struct Gram
     {
         return GetMatrix(input1, input1); 
     }
+    /**
+     * Serialize the model.
+     */
+    template<typename Archive>
+    void serialize ( Archive& ar, const unsigned int )
+    {
+      ar ( cereal::make_nvp("kernel",kernel_) );
+    }
 };
 
 //-----------------------------------------------------------------------------

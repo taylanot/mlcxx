@@ -95,9 +95,7 @@ void ANN<NET,OPT,MET,O>::Train ( const arma::Mat<O>& inputs,
   network_ = network;
   early_ = early;
   opt_ = std::make_unique<OPT>(args...);
-  PRINT("HOI")
   Train(inputs,labels);
-  PRINT("OFNIET")
 }
 ///////////////////////////////////////////////////////////////////////////////
 template<class NET,class OPT,class MET,class O>

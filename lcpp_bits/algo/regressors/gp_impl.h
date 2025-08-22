@@ -26,6 +26,14 @@ GaussianProcess<K,T>::GaussianProcess ( const arma::Mat<T>& inputs,
 }
 ///////////////////////////////////////////////////////////////////////////////
 template<class K, class T>
+GaussianProcess<K,T>::GaussianProcess ( const arma::Mat<T>& inputs,
+                                        const arma::Row<T>& labels) :
+                                        cov_(), lambda_(0.)
+{
+  Train(inputs, labels);
+}
+///////////////////////////////////////////////////////////////////////////////
+template<class K, class T>
 void GaussianProcess<K,T>::Train ( const arma::Mat<T>& inputs,
                                    const arma::Row<T>& labels )
 {

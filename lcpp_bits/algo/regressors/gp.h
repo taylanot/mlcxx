@@ -38,7 +38,13 @@ class GaussianProcess
                     const arma::Row<T>& labels,
                     const T lambda,
                     const Ts&... args );
-  
+   /**
+   * @param X     : inputs 
+   * @param y     : labels 
+   */
+  GaussianProcess ( const arma::Mat<T>& inputs,
+                    const arma::Row<T>& labels );
+ 
   /**
    * @param X     : inputs 
    * @param y     : labels 
@@ -121,13 +127,12 @@ class GaussianProcess
          cereal::make_nvp("train_inp",train_inp_),
          cereal::make_nvp("lambda",lambda_),
          cereal::make_nvp("cov",cov_),
+         cereal::make_nvp("N",N_),
          cereal::make_nvp("L",L_) );
   }
 
   private:
-  arma::Mat<T> cov_train_;   // for check 
-  arma::Mat<T> cov_predict_; // for check
-  arma::Mat<T> L_; // for check
+  arma::Mat<T> L_; 
 
   arma::Mat<T> train_inp_;   // for later usage
   size_t N_;   // for later usage

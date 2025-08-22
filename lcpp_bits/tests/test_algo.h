@@ -7,15 +7,67 @@
 #ifndef TEST_ALGO_H 
 #define TEST_ALGO_H
 
+template<typename T=DTYPE>
+class IdentityKernel
+{
+public:
+  IdentityKernel() = default;
+
+  DTYPE Evaluate (const arma::Mat<T>& X1, const arma::Mat<T>& X2) const
+  {
+    if (arma::approx_equal(X1, X2, "absdiff", 1e-12))
+      return T(1.);
+    else
+      return T(0.);
+  }
+};
+
+// Dummy FUNC: Identity features
+template<typename T=DTYPE>
+struct IdentityFeatures
+{
+  size_t M_;
+  IdentityFeatures(size_t M = 1) : M_(M) {}
+
+  arma::Mat<T> Predict(const arma::Mat<T>& X) const
+  {
+    // Just return first M_ rows of X (or X if fewer rows)
+    return X.rows(0, std::min(M_, (size_t)X.n_rows) - 1);
+  }
+
+  arma::Row<T> Mean(const arma::Mat<T>& X) const
+  {
+    // Zero mean function
+    return arma::Row<T>(X.n_cols, arma::fill::zeros);
+  }
+
+  size_t GetM() const { return M_; }
+
+  // --- cereal serialization ---
+  template<class Archive>
+  void serialize(Archive& ar) { ar(M_); }
+};
+
+// Networks
+using RNetworkType = mlpack::FFN<mlpack::MeanSquaredError>;
+using CNetworkType = mlpack::FFN<mlpack::CrossEntropyError>;
+
+// Optimizers 
+using OPT = ens::Adam;
+
+// LOSES
+using ACC = mlpack::Accuracy;
+using MSE = mlpack::MSE;
+
+// ANN models
+using RANN = algo::ANN<RNetworkType,OPT,MSE>;
+using CANN = algo::ANN<CNetworkType,OPT,ACC>;
+// Regression models
 using GPR = algo::regression::GaussianProcess<mlpack::GaussianKernel>;
 using KR = algo::regression::KernelRidge<mlpack::GaussianKernel>;
-using KWR = algo::regression::Kernel<mlpack::GaussianKernel>;
-
-/* using SPKR2 = algo::regression::SemiParamKernelRidge2<mlpack::GaussianKernel, */
-/*                                                   data::functional::SineGen<>>; */
-/* using SPKR = algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel, */
-/*                                                 data::functional::SineGen<>>; */
-
+using KWR = algo::regression::Kernel<IdentityKernel<>>;
+using SPKR = algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel,IdentityFeatures<>>;
+// Classification models
 using LDC = algo::classification::LDC<>;
 using QDC = algo::classification::QDC<>;
 using NNC = algo::classification::NNC<>;
@@ -24,16 +76,14 @@ using OvA = algo::classification::OnevAll<mlpack::LogisticRegression<>>;
 using LREG = algo::classification::LogisticRegression<>;
 using SVM = algo::classification::SVM<mlpack::GaussianKernel>;
 
-using ACC = mlpack::Accuracy;
-using MSE = mlpack::MSE;
 
 
 
 // Utility: check save/load consistency using fully qualified std::filesystem
 template<class MODEL, class LabelType, class METRIC>
-void CheckModelPersistence(const MODEL& model,
-                           const arma::mat& inputs,
-                           const LabelType& labels, METRIC metric)
+void CheckModelPersistence( MODEL& model,
+                            const arma::mat& inputs,
+                            const LabelType& labels, METRIC metric)
 {
   std::filesystem::create_directories("temp");
   std::filesystem::path tmpFile = "temp/model.bin";
@@ -79,7 +129,7 @@ void TestLinearClassifier()
 template<typename MODEL, typename Metric=ACC>
 void TestNonLinearClassifier()
 {
-  arma::mat inputs(2, 4);
+  arma::Mat<DTYPE> inputs(2, 4);
   inputs.col(0) = {0.0, 0.0};
   inputs.col(1) = {0.0, 1.0};
   inputs.col(2) = {1.0, 0.0};
@@ -130,27 +180,57 @@ void TestOneSampleProblem()
 
 }
 
-// Nonlinear regression test: quadratic relation
 template<typename MODEL, typename Metric=MSE>
-void TestNonLinearRegression()
+void TestMemorize()
 {
-  arma::rowvec x = arma::linspace<arma::rowvec>(-2.0, 2.0, 50);
-  arma::mat inputs(1, x.n_elem);
+  // Training data
+  arma::Row<DTYPE> x = {1.0, 2.0, 3.0};
+  arma::Mat<DTYPE> inputs(1, x.n_elem, arma::fill::zeros);
   inputs.row(0) = x;
-
-  // True function: y = x^2
-  arma::rowvec labels = arma::square(x);
+  arma::Row<DTYPE> labels = {10.0, 20.0, 30.0};
 
   MODEL model(inputs, labels);
   Metric metric;
 
-  arma::rowvec preds;
+  // Predict on training points
+  arma::Row<DTYPE> preds;
+  model.Predict(inputs, preds);
+
+  CHECK(preds.n_elem == labels.n_elem);
+  for (size_t i = 0; i < labels.n_elem; ++i)
+  {
+    CHECK(preds(i) == doctest::Approx(labels(i)));
+  }
+
+  // MSE should be zero
+  DTYPE mse = metric.Evaluate(model, inputs, labels);
+  CHECK(mse == doctest::Approx(0.0).epsilon(1e-6));
+
+  // Persistence check
+  CheckModelPersistence(model, inputs, labels, metric);
+}
+
+// Nonlinear regression test: quadratic relation
+template<typename MODEL, typename Metric=MSE>
+void TestNonLinearRegression()
+{
+  arma::Row<DTYPE> x = arma::linspace<arma::rowvec>(-2.0, 2.0, 50);
+  arma::Mat<DTYPE> inputs(1, x.n_elem);
+  inputs.row(0) = x;
+
+  // True function: y = x^2
+  arma::Row<DTYPE> labels = arma::square(x);
+
+  MODEL model(inputs, labels);
+  Metric metric;
+
+  arma::Row<DTYPE> preds;
   model.Predict(inputs, preds);
 
   CHECK(preds.n_elem == labels.n_elem);
 
-  double mse = metric.Evaluate(inputs, labels, model);
-  CHECK(mse == doctest::Approx(0.0).epsilon(1e-8));
+  DTYPE mse = metric.Evaluate(model,inputs, labels);
+  CHECK(mse == doctest::Approx(0.0).epsilon(1e-6));
 
   CheckModelPersistence(model, inputs, labels, metric);
 }
@@ -217,681 +297,246 @@ TEST_SUITE("REGRESSORS")
 
   TEST_CASE("KWR")
   {
-    
+    TestMemorize<KWR>();
   }
 
   TEST_CASE("GPR")
   {
-    
+    TestNonLinearRegression<GPR>();
+
+    // --- Training data: y = x^2 ---
+    arma::Row<DTYPE> x = arma::linspace<arma::rowvec>(-2.0, 2.0, 15);
+    arma::Mat<DTYPE> inputs(1, x.n_elem); 
+    inputs.row(0) = x;
+    arma::Row<DTYPE> labels = arma::square(x);
+
+    // Construct GP
+    GPR gp(inputs, labels);
+
+    SUBCASE("PredictVariance")
+    {
+      arma::Mat<DTYPE> var;
+      gp.PredictVariance(inputs, var);
+
+      CHECK(var.n_rows == inputs.n_cols);
+      CHECK(var.n_cols == inputs.n_cols);
+
+      // Must be symmetric
+      CHECK(arma::approx_equal(var, var.t(), "absdiff", 1e-12));
+
+      // Variance at training points should be ~0
+      for(size_t i=0; i<var.n_rows; i++)
+        CHECK(var(i,i) == doctest::Approx(0.0).epsilon(1e-6));
+    }
+
+    SUBCASE("ComputeError")
+    {
+      DTYPE err = gp.ComputeError(inputs, labels);
+      CHECK(err == doctest::Approx(0.0).epsilon(1e-6));
+    }
+
+    SUBCASE("LogLikelihood")
+    {
+      DTYPE ll = gp.LogLikelihood(inputs, labels);
+      CHECK(std::isfinite(ll));
+      CHECK(ll < 0.0);
+    }
+
+    SUBCASE("SamplePosterior")
+    {
+      arma::Mat<DTYPE> samples;
+      gp.SamplePosterior(500, inputs, samples);
+
+      arma::Row<DTYPE> pred_mean;
+      gp.Predict(inputs, pred_mean);
+
+      arma::Row<DTYPE> sample_mean = arma::mean(samples, 0);
+
+      for(size_t i=0; i<pred_mean.n_elem; i++)
+        CHECK(sample_mean(i) == doctest::Approx(pred_mean(i)).epsilon(0.2));
+    }
+
+    SUBCASE("SamplePrior")
+    {
+      GPR gp_prior; // default GP with no training
+
+      arma::Mat<DTYPE> samples;
+      gp_prior.SamplePrior(500, inputs, samples);
+
+      arma::Row<DTYPE> mean = arma::mean(samples, 0);
+      for(size_t i=0; i<mean.n_elem; i++)
+        CHECK(mean(i) == doctest::Approx(0.0).epsilon(0.2));
+    }
   }
 
   TEST_CASE("SPKR")
   {
-   
+    // --- Synthetic quadratic data ---
+    arma::Row<DTYPE> x = arma::linspace<arma::rowvec>(-2.0, 2.0, 25);
+    arma::Mat<DTYPE> inputs(1, x.n_elem);
+    inputs.row(0) = x;
+    arma::Row<DTYPE> labels = arma::square(x);
+
+    SUBCASE("Size and Error")
+    {
+      SPKR model( inputs, labels, 0., size_t(1), DTYPE(1.0));
+
+      arma::Row<DTYPE> preds;
+      model.Predict(inputs, preds);
+
+      CHECK(preds.n_elem == labels.n_elem);
+
+      DTYPE err = model.ComputeError(inputs, labels);
+      CHECK(err == doctest::Approx(0.0).epsilon(1e-6));
+    }
   }
 }
 
 
-/* TEST_SUITE("DIMRED") */ 
-/* { */
+TEST_SUITE("DIMRED") 
+{
+    TEST_CASE("UFPCA")
+    {
+      SUBCASE("wihout mean")
+      {
+        arma::Row<DTYPE> x = arma::linspace<arma::Row<DTYPE>>(0, 1, 5);
+        arma::Mat<DTYPE> inputs(1, 5);
+        inputs.row(0) = x;
 
-/* } */
+        // create labels: 2 functions, sine and cosine
+        arma::Mat<DTYPE> labels(2, 5);
+        labels.row(0) = arma::sin(2 * arma::datum::pi * x);
+        labels.row(1) = arma::cos(2 * arma::datum::pi * x);
 
-/* TEST_SUITE("NN") */ 
-/* { */
+        auto [eigenvalues, eigenfunctions] = algo::dimred::ufpca(inputs,labels);
 
-/* } */
+        CHECK(eigenvalues.n_elem == 5);
+        CHECK(eigenfunctions.n_rows == 5);
+        CHECK(eigenfunctions.n_cols == 5);
 
+        // eigenvalues must be nonnegative and sorted descending
+        CHECK(arma::all(eigenvalues >= 0));
+        CHECK(eigenvalues.is_sorted("descend"));
+      }
 
-/* TEST_SUITE("FUNCTIONALPCA") { */
-/*   TEST_CASE("UFPCA") */
-/*   { */
-/*     int D, Ntrn, Ntst, M, eps; */
-/*     D=1; Ntrn=100; Ntst=20; M=10; eps=0.; */
-/*     data::functional::Dataset funcset(D, Ntrn,M); */
-/*     data::functional::Dataset testfuncset(D, Ntst,M); */
+      SUBCASE("ufpca with mean add")
+      {
+        arma::Row<DTYPE> x = arma::linspace<arma::Row<double>>(0, 1, 5);
+        arma::Mat<DTYPE> inputs(1, 5);
+        inputs.row(0) = x;
 
-/*     funcset.Generate("Sine", eps); */
-/*     testfuncset.Generate("Sine", eps); */
+        arma::Mat<DTYPE> labels(2, 5, arma::fill::randu);
+
+        auto [eig1, funcs1] = algo::dimred::ufpca(inputs, labels, false);
+        auto [eig2, funcs2] = algo::dimred::ufpca(inputs, labels, true);
+
+        // mean_add should shift eigenfunctions
+        CHECK_FALSE(arma::approx_equal(funcs1, funcs2, "absdiff", 1e-12));
+      }
+
+      SUBCASE("ufpca with percentage of variance (ppc)")
+      {
+        arma::Row<DTYPE> x = arma::linspace<arma::Row<DTYPE>>(0, 1, 10);
+        arma::Mat<DTYPE> inputs(1, 10);
+        inputs.row(0) = x;
+
+        arma::Mat<double> labels(3, 10, arma::fill::randu);
+
+        auto [eigvals, eigfuncs] = algo::dimred::ufpca(inputs, labels, 0.9);
+
+        CHECK(eigvals.n_elem <= 10);
+        CHECK(eigfuncs.n_rows == eigvals.n_elem);
+        CHECK(eigfuncs.n_cols == 10);
+      }
+
+      SUBCASE("ufpca with fixed number of components (npc)")
+      {
+        arma::Row<DTYPE> x = arma::linspace<arma::Row<DTYPE>>(0, 1, 8);
+        arma::Mat<DTYPE> inputs(1, 8);
+        inputs.row(0) = x;
+
+        arma::Mat<DTYPE> labels(4, 8, arma::fill::randu);
+
+        auto [eigvals, eigfuncs] = algo::dimred::ufpca(inputs,labels,size_t(3));
+
+        CHECK(eigvals.n_elem == 3);
+        CHECK(eigfuncs.n_rows == 3);
+        CHECK(eigfuncs.n_cols == 8);
+      }
+    }
+}
+
+TEST_SUITE("NN")
+{
+  TEST_CASE("Regression")
+  {
+    // Synthetic regression dataset: y = sum(x)
+    arma::Mat<DTYPE> X = arma::randu<arma::mat>(3, 100);    // 3 features, 100 samples
+    arma::Row<DTYPE> y = arma::sum(X, 0);                // labels
+
+    // Build regression network
+    RNetworkType rnetwork;
+    rnetwork.Add<mlpack::Linear>(5);
+    rnetwork.Add<mlpack::ReLU>();
+    rnetwork.Add<mlpack::Linear>(5);
+    rnetwork.Add<mlpack::ReLU>();
+    rnetwork.Add<mlpack::Linear>(1);
+
+    RANN ann(X, y, rnetwork);
+    MSE metric;
     
-/*     arma::Mat<DTYPE> inputs = funcset.inputs_; */
-/*     arma::Mat<DTYPE> testinputs = testfuncset.inputs_; */
-/*     arma::Mat<DTYPE> labels = funcset.labels_; */
+    arma::Mat<DTYPE> preds;
+    ann.Predict(X, preds);
 
-/*     arma::Mat<DTYPE> smooth_labels; */
-/*     arma::Mat<DTYPE> pred_inputs = testinputs; */
-    
-/*     smooth_labels = algo::functional::kernelsmoothing */
-/*                       <mlpack::GaussianKernel> */
-/*                         (inputs, labels, pred_inputs, 0.1); */
+    CHECK(preds.n_elem == y.n_elem);
 
-/*     SUBCASE("KERNELSMOOTHING") */
-/*     { */
-/*       CHECK ( smooth_labels.n_rows == M ); */
-/*       CHECK ( smooth_labels.n_cols == Ntst ); */
-/*     } */
-/*     SUBCASE("PCA") */
-/*     { */
-/*       size_t npc = 2; */
-/*       auto results = algo::functional::ufpca(pred_inputs, smooth_labels,npc); */
-/*       CHECK (std::get<0>(results).n_rows == npc ); */
-/*       CHECK (std::get<1>(results).n_rows == npc ); */
-/*       CHECK (std::get<1>(results).n_cols == Ntst ); */
-/*     } */
-/*   } */
-/* } */
+    DTYPE mse = metric.Evaluate(ann, X, y);
 
-/* TEST_SUITE("SEMIPARAMETRICKERNELRIDGE") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N; double tol = 1e-6; */
-/*     double a, p, eps; */
-/*     std::string type; */
+    CHECK( mse == doctest::Approx(0).epsilon(1e-3) );
 
-/*     SUBCASE("1D-Sine") */
-/*     { */
-/*       D = 1; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
+    // Test persistence
+    CheckModelPersistence(ann, X, y, metric);
+  }
 
-/*       dataset.Generate(a, p, type, eps); */
+  TEST_CASE("Classification")
+  {
+    arma::Mat<DTYPE> X(2, 4);
+    X.col(0) = {0.0, 0.0};
+    X.col(1) = {0.0, 1.0};
+    X.col(2) = {1.0, 0.0};
+    X.col(3) = {1.0, 1.0};
 
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */      
+    arma::Row<size_t> y = {0, 1, 1, 0};
 
-/*       algo::regression::SemiParamKernelRidge<mlpack::GaussianKernel, */
-/*                                              data::functional::SineGen<>> */ 
-/*                           model(inputs,labels, 0.5, size_t(5), 1.); */
-/*       DTYPE error = model.ComputeError(inputs, labels); */
-/*       CHECK ( error <= tol ); */
-/*     } */  
-/*   } */
-/* } */
+    // Build classification network
+    CNetworkType cnetwork;
+    cnetwork.Add<mlpack::Linear>(5);
+    cnetwork.Add<mlpack::ReLU>();
+    cnetwork.Add<mlpack::Linear>(5);
+    cnetwork.Add<mlpack::ReLU>();
+    cnetwork.Add<mlpack::Linear>(2);
+    cnetwork.Add<mlpack::Softmax>();
 
-/* TEST_SUITE("ANN") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N; DTYPE tol = 1e-3; */
-/*     double a, p, eps; */
-/*     std::string type; */
-/*     typedef mlpack::FFN<mlpack::MeanSquaredError> NetworkType; */
-/*     NetworkType network; */
-/*     network.Add<mlpack::Linear>(1); */
+    CANN ann(X, y, cnetwork);
 
-/*     /1* algo::ANN<NetworkType> model(&network); *1/ */
+    arma::Row<size_t> preds;
+    ann.Classify(X, preds);
 
-/*     SUBCASE("1D-Linear") */
-/*     { */
-/*       D = 1; N = 10; type = "Linear"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-/*       dataset.Generate(a, p, type, eps); */
+    CHECK(preds.n_elem == y.n_elem);
 
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = dataset.labels_; */
+    ACC acc;
+    DTYPE res = acc.Evaluate(ann,X,y);
 
-/*       algo::ANN<NetworkType> model(dataset.inputs_, */
-/*                                      dataset.labels_,&network); */
+    CHECK( res == doctest::Approx(1.).epsilon(1e-2) );  // Should learn simple boundary
 
-/*       arma::mat preds; */
-/*       model.Predict(inputs, preds); */
+    // Test persistence
+    ACC metric;
+    CheckModelPersistence(ann, X, y, metric);
+  }
+}
 
-/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
-/*     } */
 
-/*     SUBCASE("2D-Linear") */
-/*     { */
-/*       D = 2; N = 40; type = "Linear"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-/*       dataset.Generate(a, p, type, eps); */
 
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = dataset.labels_; */
 
-/*       algo::ANN<NetworkType> model(dataset.inputs_, */
-/*                                      dataset.labels_,&network); */
 
-
-/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
-/*     } */
-/*     SUBCASE("Optimizer") */
-/*     { */
-/*       D = 1; N = 10; type = "Linear"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = dataset.labels_; */
-
-/*       algo::ANN<NetworkType,ens::Adam> model(dataset.inputs_, */
-/*                                              dataset.labels_,&network, false, */
-/*                                              0.001,32); */
-
-/*       CHECK ( model.ComputeError(inputs,labels) <= tol ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("KERNELRIDGE") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N; double tol = 1e-6; */
-/*     double a, p, eps; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Sine") */
-/*     { */
-/*       D = 1; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::KernelRidge<mlpack::GaussianKernel> */
-/*                                                  model(inputs,labels, 0.,0.1); */
-/*       DTYPE error = model.ComputeError(inputs, labels); */
-/*       CHECK ( error <= tol ); */
-/*     } */
-/*     SUBCASE("2D-Sine") */
-/*     { */
-/*       D = 2; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::KernelRidge<mlpack::GaussianKernel> */
-/*                                                 model(inputs,labels, 0.,0.1); */
-/*       DTYPE error = model.ComputeError(inputs, labels); */
-/*       CHECK ( error <= tol ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("GAUSSIANPROCESSREGRESSION") { */
-
-/*   int D, N; double tol = 1e-6; */
-/*   double a, p, eps; */
-/*   std::string type; */
-/*   size_t Ngrid = 10; */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*         SUBCASE("1D-Sine") */
-/*     { */
-/*       D = 1; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::GaussianProcess<mlpack::GaussianKernel> model(inputs,labels, 0.,0.1); */
-/*       DTYPE error = model.ComputeError(inputs, labels); */
-/*       double ll = model.LogLikelihood(inputs, labels); */
-/*       CHECK ( error <= tol ); */
-/*       CHECK ( ll <= 0. ); */
-/*     } */
-/*     SUBCASE("2D-Sine") */
-/*     { */
-/*       D = 2; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::GaussianProcess<mlpack::GaussianKernel> */
-/*                                                  model(inputs,labels, 0.,0.1); */
-/*       DTYPE error = model.ComputeError(inputs, labels); */
-/*       double ll = model.LogLikelihood(inputs, labels); */
-/*       CHECK ( error <= tol ); */
-/*       CHECK ( ll <= 0. ); */
-/*     } */
-/*   } */
-/*   TEST_CASE("SAMPLING") */
-/*   { */
-/*     SUBCASE("1D") */
-/*     { */
-/*       D = 1; N = 4; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       size_t k=2; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::GaussianProcess<mlpack::GaussianKernel> */ 
-/*                                                   model(inputs,labels, 0.,0.1); */
-/*       arma::Mat<DTYPE> labprior,labposterior; */
-/*       arma::Mat<DTYPE> inp = arma::randu<arma::Mat<DTYPE>>(D,Ngrid); */
-/*       model.SamplePrior(k,inp,labprior); */
-/*       model.SamplePosterior(k,inp,labposterior); */
-/*       CHECK ( labprior.n_cols == Ngrid ); */
-/*       CHECK ( labprior.n_rows== k ); */
-/*       CHECK ( labposterior.n_cols == Ngrid ); */
-/*       CHECK ( labposterior.n_rows== k ); */
-/*     } */
-/*     SUBCASE("2D") */
-/*     { */
-/*       D = 2; N = 10; type = "Sine"; */
-/*       a = 1.0; p = 0.; eps = 0.0; */
-/*       size_t k=2; */
-/*       data::regression::Dataset dataset(D, N); */
-
-/*       dataset.Generate(a, p, type, eps); */
-
-/*       auto inputs = dataset.inputs_; */
-/*       auto labels = arma::conv_to<arma::Row<DTYPE>>::from(dataset.labels_); */
-
-/*       algo::regression::GaussianProcess<mlpack::GaussianKernel> */ 
-/*                                                   model(inputs,labels, 0.,0.1); */
-/*       arma::Mat<DTYPE> labprior,labposterior; */
-/*       arma::Mat<DTYPE> inp = arma::randu<arma::Mat<DTYPE>>(D,Ngrid); */
-/*       model.SamplePrior(k,inp,labprior); */
-/*       model.SamplePosterior(k,inp,labposterior); */
-/*       CHECK ( labprior.n_cols == Ngrid ); */
-/*       CHECK ( labprior.n_rows== k ); */
-/*       CHECK ( labposterior.n_cols == Ngrid ); */
-/*       CHECK ( labposterior.n_rows== k ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("NEARESTMEANCLASSIFIER") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_,data.labels_,Nc); */
-/*       double acc = model.ComputeAccuracy(data.inputs_, data.labels_); */
-/*       CHECK ( acc == 100.  ); */
-/*     } */
-/*     SUBCASE("1D-Simple-Shrink") */
-/*     { */
-/*       D = 1; N = 5; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_, data.labels_,Nc,1000); */
-/*       algo::classification::NMC model_(data.inputs_, data.labels_,Nc); */
-/*       arma::Mat<DTYPE> param1 = model.Parameters(); */ 
-/*       arma::Mat<DTYPE> param2 = model_.Parameters(); */
-/*       CHECK ( param1(0,0) != param2(0,0)); */
-/*       CHECK ( param1(0,1) != param2(0,1)); */
-/*     } */
-/*     SUBCASE("2D-Simple-Shrink") */
-/*     { */
-/*       D = 2; N = 5; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_, data.labels_,Nc,1000); */
-/*       algo::classification::NMC model_(data.inputs_, data.labels_,Nc); */
-/*       arma::Mat<DTYPE> param1 = model.Parameters(); */ 
-/*       arma::Mat<DTYPE> param2 = model_.Parameters(); */
-/*       CHECK ( param1(0,0) != param2(0,0)); */
-/*       CHECK ( param1(0,1) != param2(0,1)); */
-/*     } */
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_, data.labels_,Nc); */
-/*       double acc = model.ComputeAccuracy(data.inputs_, data.labels_); */
-/*       CHECK ( acc == 100. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_, data.labels_,Nc); */
-/*       double acc = model.ComputeAccuracy(data.inputs_, data.labels_); */
-/*       CHECK ( acc >= 0.9 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NMC model(data.inputs_, data.labels_,Nc); */
-/*       double acc = model.ComputeAccuracy(data.inputs_, data.labels_); */
-/*       CHECK ( acc >= 0.9 ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("MULTICLASS") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     SUBCASE("SVM") */
-/*     { */
-      
-/*     } */
-
-/*     SUBCASE("LREG") */
-/*     { */
-      
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("LDC") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LDC model(data.inputs_, data.labels_,Nc); */
-/*       DTYPE error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.1 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.1 ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("QDC") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::QDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::QDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::QDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.1 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::QDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.1 ); */
-/*     } */
-/*     SUBCASE("BANANA") */
-/*     { */
-/*       D = 2; N = 10000; Nc = 2; type = "Banana"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::QDC model(data.inputs_, data.labels_,Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.2 ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("NNC") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("BANANA") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Banana"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::NNC model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("SVM") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::SVM model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::SVM model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::SVM model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::SVM model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("BANANA") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Banana"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::SVM<mlpack::GaussianKernel> */
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*   } */
-/* } */
-
-/* TEST_SUITE("LOGISTICREG") { */
-/*   TEST_CASE("PROBLEMS") */
-/*   { */
-/*     int D, N, Nc; //double tol = 1e-2; */
-/*     std::string type; */
-
-/*     SUBCASE("1D-Simple") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LogisticRegression */ 
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-
-/*     SUBCASE("2D-Simple") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Simple"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LogisticRegression */ 
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0. ); */
-/*     } */
-/*     SUBCASE("1D-Hard") */
-/*     { */
-/*       D = 1; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LogisticRegression */ 
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("2D-Hard") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Hard"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LogisticRegression */ 
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*     SUBCASE("BANANA") */
-/*     { */
-/*       D = 2; N = 100; Nc = 2; type = "Banana"; */
-
-/*       data::classification::Dataset data(D, N, Nc); */
-/*       data.Generate(type); */
-/*       algo::classification::LogisticRegression */ 
-/*         model(data.inputs_, data.labels_, Nc); */
-/*       double error = model.ComputeError(data.inputs_, data.labels_); */
-/*       CHECK ( error <= 0.5 ); */
-/*     } */
-/*   } */
-/* } */
 #endif

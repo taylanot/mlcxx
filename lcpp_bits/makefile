@@ -11,7 +11,6 @@ CXXFLAGS := -std=c++23 -Wall -fopenmp -lstdc++fs
 INCLFLAGS := -I .
 CXXFLAGS  += $(INCLFLAGS)
 
-
 # libraries needed for mlcxx library
 LIBS_NAME +=  armadillo curl 
 LIBS := $(addprefix -l,$(LIBS_NAME))
@@ -27,12 +26,11 @@ CLEAN_LIST := $(TARGETS)
 
 all: $(TARGETS)
 
+# default rule for building targets
 $(TARGETS): % : %.cpp 
 	@mkdir -p $(dir $(BUILD_DIR)/$@)
-	$(CXX) $(CXXFLAGS) $< -o $(addprefix $(BUILD_DIR)/,$@) $(LDFLAGS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(if $(filter test.cpp,$<),-DMLPACK_ENABLE_ANN_SERIALIZATION,) $< -o $(addprefix $(BUILD_DIR)/,$@) $(LDFLAGS) $(LIBS)
 
 # Rule for cleaning
 clean:
 	@rm -rfv $(BUILD_DIR)
-
-

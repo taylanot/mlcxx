@@ -10,8 +10,7 @@
 #ifndef FUNCTIONALPCA_H
 #define FUNCTIONALPCA_H
 
-namespace algo {
-namespace functional {
+namespace algo::dimred {
 
 //-----------------------------------------------------------------------------
 // ufpca 
@@ -134,8 +133,7 @@ std::tuple<arma::Col<T>, arma::Mat<T>> ufpca ( const arma::Mat<T>& inputs,
   return std::make_tuple(eigvals, eigfuncs);
 }
 
-} // namespace functional
-} // namespace utils
+} // namespace algo::dimred
 
 
 #endif
