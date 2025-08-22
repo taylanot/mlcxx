@@ -13,15 +13,15 @@ This example demonstrates how to use the tool for generating reports on datasets
 
 This example shows how to generate learning curves. The results are saved for both a tuned and an untuned version of the model. Using your preferred plotting tool, you can obtain figures such as:
 
-![Learning curve for a fixed Decision Tree model on the Banana Dataset with training set sizes in the range $[10,350]$.][figures/nottuned_plot.png]
+![Learning curve for a fixed Decision Tree model on the Banana Dataset with training set sizes in the range $[10,350]$.][./figures/nottuned_plot.png]
 
-![Learning curve for a hyper-parameter tuned Decision Tree model on the Banana Dataset with training set sizes in the range $[10,350]$. Tuning is done with a simple train-validation split, and the only hyper-parameter varied is the minimum leaf size.][figures/tuned_plot.png]
+![Learning curve for a hyper-parameter tuned Decision Tree model on the Banana Dataset with training set sizes in the range $[10,350]$. Tuning is done with a simple train-validation split, and the only hyper-parameter varied is the minimum leaf size.][./figures/tuned_plot.png]
 
 Since both figures are based on experiments repeated 1000 times, additional statistical measures of generalization performance are also computed with high confidence.
 
 To illustrate the scale of the experiments even for this simple problem, see the figure below:
 
-![Each scatter point represents a classification where 50 Decision Tree classifiers with different minimum leaf sizes are trained on a subset of the training data. The best model is selected using a validation set, then retrained on the combined training and validation data, and finally tested on a separate test set.][nottuned.png]
+![Each scatter point represents a classification where 50 Decision Tree classifiers with different minimum leaf sizes are trained on a subset of the training data. The best model is selected using a validation set, then retrained on the combined training and validation data, and finally tested on a separate test set.][./figures/nottuned.png]
 
 ---
 

@@ -7,19 +7,24 @@ Generate learning curves for supervised machine learning algorithms with just he
 ---
 
 ## Detailed Documentations
-[algo](docs/algo.md)
+[examples](docs/examples.md)
 [src](docs/src.md)
-[utils](docs/utils.md)
+[algo](docs/algo.md)
 [data](docs/data.md)
+[utils](docs/utils.md)
 
 ---
 
 ## About  
+
 `lcpp` is designed to help you easily generate learning curves for supervised ML algorithms.  
 It provides a clean C++ header-only implementation, making it easy to integrate into your own projects without heavy build setup.  
 
 ---
 
+## Examples 
+Some examples are provided in the examples directory. They are self-explanatory: When you crate the 
+ 
 ## Quick Start  
 
 Too lazy to set everything up?  
