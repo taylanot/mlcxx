@@ -10,7 +10,6 @@
 
 #include <lcpp.h>
 
-#include "tests/doctest.h"
 #include "tests/tests.h"
 
 

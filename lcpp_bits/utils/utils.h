@@ -6,10 +6,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "utils/progress.h"
-#include "utils/curl.h"
-#include "utils/cereal.h"
-#include "utils/clistore.h"
+#include "progress.h"
+#include "curl.h"
+#include "cereal.h"
+#include "clistore.h"
 
 #endif
 

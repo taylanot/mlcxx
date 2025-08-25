@@ -38,12 +38,8 @@
 
 # Directories
 datasets/
-# mlcxx_bits/projects/
-# mlcxx_bits/build/
-lcxx_bits/projects/
-lcxx_bits/build/
-lcpp_bits/projects/
-lcpp_bits/build/
+projects/
+build/
 
 
 

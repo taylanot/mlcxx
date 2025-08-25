@@ -11,7 +11,7 @@ CXXFLAGS := -std=c++23 -Wall -fopenmp -lstdc++fs
 INCLFLAGS := -I .
 CXXFLAGS  += $(INCLFLAGS)
 
-# libraries needed for mlcxx library
+# libraries needed for lcpp library
 LIBS_NAME +=  armadillo curl 
 LIBS := $(addprefix -l,$(LIBS_NAME))
 

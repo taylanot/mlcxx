@@ -118,13 +118,13 @@
 
 // Define some of the constants paths
 const std::filesystem::path PROGRAM_PATH = std::filesystem::current_path();
-const std::filesystem::path DATASET_PATH = /tmp/"lcpp/datasets";
+const std::filesystem::path DATASET_PATH = "/tmp/lcpp/datasets";
 const unsigned int SEED = 8 ; // KOBEEEE
             
 // local
-#include "lcpp/utils/utils.h"
-#include "lcpp/data/data.h"
-#include "lcpp/algo/algo.h"
-#include "lcpp/src/src.h"
+#include "lcpp_bits/utils/utils.h"
+#include "lcpp_bits/data/data.h"
+#include "lcpp_bits/algo/algo.h"
+#include "lcpp_bits/src/src.h"
 
 
