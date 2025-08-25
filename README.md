@@ -29,14 +29,30 @@ Some examples are provided in the examples directory. They are self-explanatory:
  
 ## Quick Start  
 
-Too lazy to set everything up?  
+Get started quickly with **lcpp**.
 
-Simply pull my pre-built image:  
-
+1. **Run the installer** (optional) to set up everything locally:
 ```bash
-docker pull taylanot/cxx-dev:latest
+./install.sh
+```
+2. Pull the pre-built Singularity image if you prefer not to install manually:
+```bash
+singularity pull lcpp.sif docker://taylanot/lcpp
+```
+3. Include **lcpp** in your program by adding this at the top of your source file:
+```cpp
+#include <lcpp.h>
 ```
 
+4. Build your project using the provided sample Makefile. This will create a build directory and place your executable there:
+```bash
+singularity lcpp.sif make your_project
+```
+
+4. Now you are ready to run you program...
+```bash
+build/your_project
+```
 ---
 
 ## Contributions
