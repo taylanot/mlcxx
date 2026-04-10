@@ -55,7 +55,7 @@ It is also designed with future-proofing in mind. Adoption of the `mlpack` [@mlp
 
 # Research Impact Statement
 
-`LCPP` is used in [@turan2025] and [@turan2026] to generate large-scale learning curve databases by considering many degrees of freedom involved in this process. By enabling tracking of the generalization performance across machine learning models, `LCPP` facilitates a systematic learning curve creation with a fast development and deployment cycle. We hope that it serves as a foundation for future learning curve research.
+`LCPP` is used by @turan2025 and @turan2026 to generate large-scale learning curve databases by considering many degrees of freedom involved in this process. By enabling tracking of the generalization performance across machine learning models, `LCPP` facilitates a systematic learning curve creation with a fast development and deployment cycle. We hope that it serves as a foundation for future learning curve research.
 
 # AI Usage Disclosure
 
