@@ -59,7 +59,7 @@ It is also designed with future-proofing in mind. Adoption of the `mlpack` [@mlp
 
 # AI Usage Disclosure
 
-We did not use AI for the development of this software and the writing.
+We did not use AI for the development of this software or the writing of this paper.
 
 # Acknowledgements 
 
