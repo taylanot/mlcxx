@@ -8,7 +8,7 @@ tags:
   - Armadillo
   - learning curve
   - generalization performance
-  - openml
+  - OpenMP
   - pattern recognition
   - machine learning
 
