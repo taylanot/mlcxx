@@ -22,6 +22,7 @@ authors:
 affiliations:
  - name: Delft University of Technology, The Netherlands
    index: 1
+   ror: 02e2c7k09
 date: 09 January 2026
 bibliography: ref.bib
 --- 
