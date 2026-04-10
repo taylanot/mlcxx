@@ -51,7 +51,7 @@ In the C++ domain, we are not aware of any tool explicitly designed for learning
 
 `LCPP` is designed for easy deployment on high-performance computing (HPC) environments. With little effort it can efficiently run large-scale experiments in parallel, ensuring reproducibility and scalability. Moreover, it supports easy and light-weight check-pointing, allowing high-fidelity (both in terms of the training set size resolution and also the times the training set is resampled) learning curves to be created in multiple sessions. This structure also enables the missing experiments to be investigated easily. 
 
-It is also designed with future-proofing in mind. Adoption of the `mlpack` [@mlpack2023] conventions means `LCPP` has access to a wide range of learning algorithms. And as `mlpack` [@mlpack2023] continues to expand the number of supported models, so will `LCPP`. In addition, `LCPP` is not restricted by this, any model that is using the same conventions as `mlpack` [@mlpack2023] and relies on `armadillo` [@arma2016] and `ensmallen` [@ensmallen2021] can also be used without an effort. 
+It is also designed with future-proofing in mind. Adoption of the `mlpack` [@mlpack2023] conventions means `LCPP` has access to a wide range of learning algorithms. And as `mlpack` [@mlpack2023] continues to expand the number of supported models, so will `LCPP`. In addition, `LCPP` is not restricted by this: any model that is using the same conventions as `mlpack` [@mlpack2023] and relies on `armadillo` [@arma2016] and `ensmallen` [@ensmallen2021] can also be used without extra effort. 
 
 # Research Impact Statement
 
