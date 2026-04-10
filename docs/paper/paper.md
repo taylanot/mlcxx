@@ -40,7 +40,7 @@ Generally, creating learning curves is computationally expensive because it requ
 
 To empower the machine learning community to generate richer, more detailed learning curves, we propose `LCPP`: a C++ library for scalable learning curve generation. `LCPP` offers several features; first, it offers several approaches for splitting a given dataset into training and test sets of varying sizes (where training sets can be drawn randomly or incrementally, where test sets can be fixed or vary in size). Next, unlike most existing tools that fix hyper-parameters during learning curve creation, `LCPP` integrates hyper-parameter optimization routines from `mlpack` [@mlpack2023], enabling optimized learner evaluations.
 
-`LCPP` also includes a simple dataset container for access to `OpenML` datasets [@openml], with built-in support for complete dataset transformations and train/test splits, allowing users to directly measure the generalization performance of models available in `mlpack` and some other learning algorithms included in itself, such as kernel ridge regression, discriminant classifiers, multi-class classification extensions of binary classifiers. 
+`LCPP` also includes a simple dataset container for access to `OpenML` datasets [@openml], with built-in support for complete dataset transformations and train/test splits, allowing users to directly measure the generalization performance of models available in `mlpack` and some other learning algorithms included in `LCPP`, such as kernel ridge regression, discriminant classifiers, multi-class classification extensions of binary classifiers. 
 
 # State of the Field 
 
