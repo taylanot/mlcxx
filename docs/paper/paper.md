@@ -31,7 +31,7 @@ A learning algorithm is said to learn if its performance on a given task improve
 
 Learning curve databases are valuable for **model selection** and for **estimating the amount of data needed** to achieve a target performance. These applications typically assume learning curves are monotonic and convex. However, findings of [@yan2025], [@mohr2023] and [@viering2022] suggest that learning curves often exhibit more complex and irregular behavior. Sparse sampling of training sizes limits the ability to fully characterize these behaviors, highlighting the need for **high-fidelity learning curves** to investigate them.
 
-**LCPP (Learning Curve Plus Plus)** is a C++ library that allows for learning curve creation of machine learning models. `LCPP` enables its users to obtain learning curves for variety of learners on any supervised learning dataset with/out hyper-parameter tuning, enabling  model selection and training data requirement determination.
+**LCPP (Learning Curve Plus Plus)** is a C++ library that allows for learning curve creation of machine learning models. `LCPP` enables its users to obtain learning curves for a variety of learners on any supervised learning dataset with/out hyper-parameter tuning, enabling  model selection and training data requirement determination.
 
 # Statement of Need
 
