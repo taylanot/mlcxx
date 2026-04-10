@@ -36,7 +36,7 @@ Learning curve databases are valuable for **model selection** and for **estimati
 
 # Statement of Need
 
-Generally, creating learning curves is computationally expensive because it requires repeatedly training algorithms on many subsets of varying training sizes. Consequently, learning curves are often computed for a limited number of training set sizes. For example, while creating learning curve databases, @mohr2023 and @yan2025 used a limited number of training set sizes. Moreover, these generations are computed only for fixed learners without hyper-parameter tuning.
+Generally, creating learning curves is computationally expensive because it requires repeatedly training algorithms on many subsets of varying training sizes. Consequently, learning curves are often computed for a limited number of training set sizes. For example, while creating learning curve databases, @mohr2023 and @yan2025 used a limited number of training set sizes. Moreover, these curves are computed only for fixed learners without hyper-parameter tuning.
 
 To empower the machine learning community to generate richer, more detailed learning curves, we propose `LCPP`: a C++ library for scalable learning curve generation. `LCPP` offers several features; first, it offers several approaches for splitting a given dataset into training and test sets of varying sizes (where training sets can be drawn randomly or incrementally, where test sets can be fixed or vary in size). Next, unlike most existing tools that fix hyper-parameters during learning curve creation, `LCPP` integrates hyper-parameter optimization routines from `mlpack` [@mlpack2023], enabling optimized learner evaluations.
 
